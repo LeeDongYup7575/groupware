@@ -74,7 +74,7 @@ public void addInterceptors(InterceptorRegistry registry) {
 
 ## 설정 가이드
 
-### 1. 스프링 부트 설정 (application.properties/yml)
+### 1. 스프링 부트 설정 (application.properties/따로 전달예정)
 ```properties
 # JWT 설정
 jwt.secret=yourSecretKey
