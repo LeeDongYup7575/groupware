@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//app과의 token 검증/qr scan
 @RestController
 @RequestMapping("/api/attendance")
 public class QRApiController {
@@ -45,7 +46,7 @@ public class QRApiController {
         }
 
         try {
-            // Validate QR token
+            //qr token 체크.../검증~
             if (!qrTokenUtil.validateQRToken(token)) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", false);
@@ -53,11 +54,9 @@ public class QRApiController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
-            // Extract employee number and attendance type from token
             String empNum = qrTokenUtil.extractEmpNum(token);
             String attendanceType = qrTokenUtil.getAttendanceTypeFromToken(token);
 
-            // Get employee by employee number
             EmployeesDTO employee = employeeService.findByEmpNum(empNum);
             if (employee == null) {
                 Map<String, Object> response = new HashMap<>();
@@ -66,10 +65,8 @@ public class QRApiController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            // Process attendance
             Attendance attendance = attendanceService.processQRAttendance(empNum, attendanceType);
 
-            // Create response data
             Map<String, Object> attendanceData = new HashMap<>();
             attendanceData.put("empNum", empNum);
             attendanceData.put("name", employee.getName());
@@ -84,7 +81,6 @@ public class QRApiController {
 
             attendanceData.put("workDate", attendance.getWorkDate().toString());
 
-            // Create success response
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Attendance recorded successfully");
@@ -101,13 +97,9 @@ public class QRApiController {
         }
     }
 
-    /**
-     * Get current employee's attendance status
-     */
     @GetMapping("/status/{empNum}")
     public ResponseEntity<?> getAttendanceStatus(@PathVariable String empNum) {
         try {
-            // Get employee by employee number
             EmployeesDTO employee = employeeService.findByEmpNum(empNum);
             if (employee == null) {
                 Map<String, Object> response = new HashMap<>();
@@ -116,10 +108,8 @@ public class QRApiController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            // Get today's attendance record
             Attendance attendance = attendanceService.getAttendanceByEmployeeAndDate(employee.getId(), java.time.LocalDate.now());
 
-            // Create response data
             Map<String, Object> attendanceData = new HashMap<>();
             attendanceData.put("empNum", empNum);
             attendanceData.put("name", employee.getName());
@@ -133,7 +123,6 @@ public class QRApiController {
                 attendanceData.put("workHours", attendance.getWorkHours());
             }
 
-            // Create success response
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", attendanceData);
@@ -157,7 +146,6 @@ public class QRApiController {
             @PathVariable String empNum,
             @RequestParam(required = false) String month) {
         try {
-            // Get employee by employee number
             EmployeesDTO employee = employeeService.findByEmpNum(empNum);
             if (employee == null) {
                 Map<String, Object> response = new HashMap<>();
@@ -166,7 +154,6 @@ public class QRApiController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
 
-            // Parse month parameter (format: yyyy-MM)
             java.time.LocalDate startDate;
             java.time.LocalDate endDate;
 
@@ -175,7 +162,6 @@ public class QRApiController {
                 startDate = yearMonth.atDay(1);
                 endDate = yearMonth.atEndOfMonth();
             } else {
-                // Default to current month if not specified
                 java.time.YearMonth currentMonth = java.time.YearMonth.now();
                 startDate = currentMonth.atDay(1);
                 endDate = currentMonth.atEndOfMonth();
@@ -203,7 +189,6 @@ public class QRApiController {
                 currentDate = currentDate.plusDays(1);
             }
 
-            // Create success response
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("data", attendanceData);

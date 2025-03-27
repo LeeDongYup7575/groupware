@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class Position {
 
     private Integer id;
-    private String title;  // 직급명
+    private String title;
 }

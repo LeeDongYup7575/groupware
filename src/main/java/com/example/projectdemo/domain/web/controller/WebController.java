@@ -8,6 +8,8 @@ public class WebController {
 
     /**
      * 홈 페이지 (인트로)
+     * '/' 요청은 notification 패키지 내부로 이동했습니다..!
+     * notification > conroller > NoticeController.java 내부에 존재
      */
 //    @GetMapping("/")
 //    public String home() {

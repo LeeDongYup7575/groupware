@@ -40,9 +40,7 @@ public class QRController {
 
     private static final int QR_CODE_SIZE = 250;
 
-    /**
-     * Display QR code page
-     */
+
     @GetMapping("/qrcheck")
     public String showQRCodePage(
             Model model,
@@ -74,23 +72,18 @@ public class QRController {
         }
     }
 
-    /**
-     * Generate QR code image
-     */
+
     @GetMapping(value = "/generate-qr", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public ResponseEntity<byte[]> generateQRCode(
             @RequestParam(required = false, defaultValue = "NORMAL") String type,
             HttpServletRequest request) {
         try {
-            // Log headers for debugging
             logger.debug("Authorization header: {}", request.getHeader("Authorization"));
 
-            // Get employee number from request attribute (set by JWT filter)
             String empNum = (String) request.getAttribute("empNum");
             logger.debug("Extracted empNum: {}", empNum);
 
-            // If no token in authorization header, try to extract from request parameter
             if (empNum == null && request.getParameter("token") != null) {
                 String token = request.getParameter("token");
                 try {
@@ -117,19 +110,15 @@ public class QRController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
 
-            // Clean up the type parameter if it contains unsupported characters
             if (type.contains(":")) {
                 type = type.split(":")[0];
             }
 
-            // Generate QR token with employee number and attendance type
             String qrToken = jwtUtil.generateQRToken(employee.getEmpNum(), type);
 
-            // Create QR code
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(qrToken, BarcodeFormat.QR_CODE, QR_CODE_SIZE, QR_CODE_SIZE);
 
-            // Convert to image
             ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
             byte[] pngData = pngOutputStream.toByteArray();

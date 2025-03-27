@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class Department {
 
     private Integer id;
-    private String name;  // 부서명
+    private String name;
 }

@@ -28,11 +28,7 @@ public class CacheConfig {
         return new ConcurrentMapCacheManager("notices");
     }
 
-    /**
-     * 1시간마다 캐시 데이터를 주기적으로 갱신
-     * 이렇게 하면 사용자 요청과 무관하게 백그라운드에서 캐시가 갱신됨
-     */
-    @Scheduled(fixedRate = 3600000) // 1시간마다 실행
+    @Scheduled(fixedRate = 3600000)
     public void refreshNoticesCache() {
         System.out.println("스케줄링된 작업: 공지사항 캐시 갱신 중...");
         noticeCrawler.getNotices(); // 캐시 갱신을 위해 크롤링 실행

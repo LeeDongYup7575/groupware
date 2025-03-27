@@ -43,10 +43,6 @@ public class NoticeController {
         return "intro"; // Thymeleaf 템플릿 이름
     }
 
-    /**
-     * 캐시에서 공지사항 데이터를 가져오거나, 캐시가 없거나 만료되었으면 크롤링 실행
-     * @return 공지사항 목록
-     */
     private List<Notice> getCachedNotices() {
         String cacheKey = "notices";
 

@@ -30,23 +30,19 @@ public class QRTokenUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Extract employee number from token
     public String extractEmpNum(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Extract expiration date from token
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // Extract a specific claim from token
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    // Extract all claims from token
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -55,12 +51,10 @@ public class QRTokenUtil {
                 .getBody();
     }
 
-    // Check if token is expired
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // Generate QR token for attendance
     public String generateQRToken(String empNum, String attendanceType) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", attendanceType);
@@ -68,7 +62,6 @@ public class QRTokenUtil {
         return createQRToken(claims, empNum);
     }
 
-    // Create QR token with claims and subject
     private String createQRToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -79,7 +72,6 @@ public class QRTokenUtil {
                 .compact();
     }
 
-    // Validate QR token
     public Boolean validateQRToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -96,7 +88,6 @@ public class QRTokenUtil {
         }
     }
 
-    // Get attendance type from token
     public String getAttendanceTypeFromToken(String token) {
         Claims claims = extractAllClaims(token);
         return claims.get("type", String.class);

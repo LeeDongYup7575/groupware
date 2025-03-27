@@ -22,11 +22,6 @@ public class NoticeCrawler {
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
     private static final long CACHE_EXPIRY_TIME_MS = 3600000; // 1시간(밀리초)
 
-    /**
-     * 공지사항 크롤링 메소드 - 캐싱 기능 추가
-     *
-     * @return 공지사항 목록
-     */
     public List<Notice> getNotices() {
         String cacheKey = "notices";
 
