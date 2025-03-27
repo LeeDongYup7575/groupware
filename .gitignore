@@ -1,0 +1,73 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE 관련 설정 파일
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.class
+
+# OS 관련 파일
+.DS_Store
+Thumbs.db
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# 로그 파일
+logs/
+*.log
+
+# 테스트 보고서
+test-output/
+surefire-reports/
+
+### VS Code ###
+.vscode/
+
+# 환경설정 파일
+*.env
+*.properties
+*.yml
+*.yaml
+!src/main/resources/application.yml
+!src/main/resources/application.properties
+
+# MyBatis XML 컴파일 결과물
+*.xml~
+
+# 업로드된 파일
+uploads/
+
+# Maven 관련 빌드 파일
+target/
+*.jar
+*.war
+*.ear
