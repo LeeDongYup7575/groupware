@@ -57,8 +57,8 @@ surefire-reports/
 *.properties
 *.yml
 *.yaml
-!src/main/resources/application.yml
-!src/main/resources/application.properties
+src/main/resources/application.yml
+src/main/resources/application.properties
 
 # MyBatis XML 컴파일 결과물
 *.xml~
@@ -71,3 +71,7 @@ target/
 *.jar
 *.war
 *.ear
+
+mvnw
+mvnw.cmd
+.gitattributes
