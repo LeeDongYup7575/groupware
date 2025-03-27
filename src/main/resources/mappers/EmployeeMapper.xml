@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.projectdemo.domain.employees.mapper.EmployeeMapper">
+    <resultMap id="EmployeeResultMap" type="com.example.projectdemo.domain.employees.entity.Employees">
+        <id property="id" column="id" />
+        <result property="empNum" column="emp_num" />
+        <result property="password" column="password" />
+        <result property="name" column="name" />
+        <result property="gender" column="gender" />
+        <result property="phone" column="phone" />
+        <result property="email" column="email" />
+        <result property="profileImgUrl" column="profile_img_url" />
+        <result property="ssn" column="ssn" />
+        <result property="depId" column="dep_id" />
+        <result property="posId" column="pos_id" />
+        <result property="hireDate" column="hire_date" />
+        <result property="retirementId" column="retirement_id" />
+        <result property="attendStatus" column="attend_status" />
+        <result property="salary" column="salary" />
+        <result property="enabled" column="enabled" />
+        <result property="role" column="role" />
+        <result property="lastLogin" column="last_login" />
+        <result property="registered" column="registered" />
+        <result property="temp_password" column="temp_password" />
+        <result property="totalLeave" column="total_leave" />
+        <result property="usedLeave" column="used_leave" />
+    </resultMap>
+
+    <!-- 재사용 가능한 컬럼 정의 -->
+    <sql id="employeeColumns">
+        id, emp_num as empNum, password, name, gender, phone, email,
+        profile_img_url as profileImgUrl, ssn, dep_id as depId,
+        pos_id as posId, hire_date as hireDate,
+        retirement_id as retirementId, attend_status as attendStatus,
+        salary, enabled, role, last_login as lastLogin, registered,
+        temp_password as temp_password, total_leave as totalLeave,
+        used_leave as usedLeave
+    </sql>
+
+    <!-- 사원번호로 직원 조회 (DTO 반환) -->
+    <select id="findByEmpNum" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT
+        <include refid="employeeColumns" />
+        FROM
+        employees
+        WHERE
+        emp_num = #{empNum}
+    </select>
+
+    <!-- 사원 ID로 직원 조회 (DTO 반환) -->
+    <select id="findById" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT
+        <include refid="employeeColumns" />
+        FROM
+        employees
+        WHERE
+        id = #{empId}
+    </select>
+
+    <!-- 이메일로 직원 조회 -->
+    <select id="findByEmail" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT
+        <include refid="employeeColumns" />
+        FROM
+        employees
+        WHERE
+        email = #{email}
+    </select>
+
+    <!-- 사원번호, 이름, 이메일, 주민번호로 직원 조회 -->
+    <select id="findByEmpNumAndNameAndEmailAndSsn" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT
+        <include refid="employeeColumns" />
+        FROM
+        employees
+        WHERE
+        emp_num = #{empNum}
+        AND name = #{name}
+        AND email = #{email}
+        AND ssn = #{ssn}
+    </select>
+
+    <!-- 회원가입 정보 업데이트 -->
+    <update id="updateRegistrationStatus">
+        UPDATE
+            employees
+        SET
+            registered = #{registered},
+            password = #{password},
+            profile_img_url = #{profileImgUrl},
+            phone = #{phone},
+            gender = #{gender},
+            temp_password = #{tempPassword}
+        WHERE
+            emp_num = #{empNum}
+    </update>
+
+    <!-- 비밀번호 업데이트 -->
+    <update id="updatePassword">
+        UPDATE
+            employees
+        SET
+            password = #{password},
+            temp_password = #{tempPassword}
+        WHERE
+            emp_num = #{empNum}
+    </update>
+
+    <!-- 마지막 로그인 시간 업데이트 -->
+    <update id="updateLastLogin">
+        UPDATE
+            employees
+        SET
+            last_login = #{lastLogin}
+        WHERE
+            emp_num = #{empNum}
+    </update>
+
+    <!-- 출결 상태 업데이트 -->
+    <update id="updateAttendStatus">
+        UPDATE
+            employees
+        SET
+            attend_status = #{attendStatus}
+        WHERE
+            id = #{empId}
+    </update>
+
+</mapper>

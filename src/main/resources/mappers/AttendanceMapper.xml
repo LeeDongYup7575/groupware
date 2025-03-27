@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.attendance.mapper.AttendanceMapper">
+
+    <!-- 출석 결과 매핑 -->
+    <resultMap id="AttendanceResultMap" type="com.example.projectdemo.domain.attendance.entity.Attendance">
+        <id property="id" column="id" />
+        <result property="empId" column="emp_id" />
+        <result property="workDate" column="work_date" />
+        <result property="checkIn" column="check_in" />
+        <result property="checkOut" column="check_out" />
+        <result property="workHours" column="work_hours" />
+        <result property="status" column="status" />
+    </resultMap>
+
+    <!-- 출석 기록 삽입 -->
+    <insert id="insertAttendance" parameterType="com.example.projectdemo.domain.attendance.entity.Attendance" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO attendance (
+            emp_id,
+            work_date,
+            check_in,
+            check_out,
+            work_hours,
+            status
+        ) VALUES (
+                     #{empId},
+                     #{workDate},
+                     #{checkIn},
+                     #{checkOut},
+                     #{workHours},
+                     #{status}
+                 )
+    </insert>
+
+    <!-- 출석 기록 업데이트 -->
+    <update id="updateAttendance" parameterType="com.example.projectdemo.domain.attendance.entity.Attendance">
+        UPDATE attendance
+        SET
+            emp_id = #{empId},
+            work_date = #{workDate},
+            check_in = #{checkIn},
+            check_out = #{checkOut},
+            work_hours = #{workHours},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- ID로 출석 기록 조회 -->
+    <select id="getAttendanceById" resultMap="AttendanceResultMap">
+        SELECT * FROM attendance
+        WHERE id = #{id}
+    </select>
+
+    <!-- 직원 ID와 날짜로 출석 기록 조회 -->
+    <select id="getAttendanceByEmployeeAndDate" resultMap="AttendanceResultMap">
+        SELECT * FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date = #{workDate}
+    </select>
+
+    <!-- 직원 ID별 출석 기록 내역 조회 -->
+    <select id="getAttendanceHistoryByEmployeeId" resultMap="AttendanceResultMap">
+        SELECT * FROM attendance
+        WHERE emp_id = #{empId}
+        ORDER BY work_date DESC
+    </select>
+
+    <!-- 직원 ID와 날짜 범위로 출석 기록 내역 조회 -->
+    <select id="getAttendanceHistoryByEmployeeIdAndDateRange" resultMap="AttendanceResultMap">
+        SELECT * FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY work_date ASC
+    </select>
+</mapper>

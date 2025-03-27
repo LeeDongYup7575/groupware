@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>그룹웨어 회원가입</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #dbeafe;
+      --secondary-color: #f3f4f6;
+      --text-color: #1f2937;
+      --text-light: #6b7280;
+      --accent-color: #f97316;
+      --error-color: #ef4444;
+      --success-color: #10b981;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
+      padding: 3rem 0;
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    .form-signup {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      padding: 2.5rem;
+    }
+
+    .signup-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .logo span {
+      color: var(--accent-color);
+    }
+
+    .form-title {
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+      color: var(--text-light);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-steps {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      padding: 0 2rem;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .step-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    .step.active .step-number {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .step.active .step-label {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .step.completed .step-number {
+      background-color: var(--success-color);
+      color: white;
+    }
+
+    .step-line {
+      flex-grow: 1;
+      height: 3px;
+      background-color: var(--secondary-color);
+      position: relative;
+      z-index: 0;
+    }
+
+    .step.completed + .step-line {
+      background-color: var(--success-color);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .profile-upload {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .profile-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      border: 3px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-preview i {
+      font-size: 3rem;
+      color: var(--text-light);
+    }
+
+    .upload-btn {
+      background-color: var(--primary-light);
+      color: var(--primary-color);
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .upload-btn:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .upload-btn i {
+      margin-right: 0.5rem;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .alert-danger {
+      background-color: #fee2e2;
+      color: var(--error-color);
+      border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+      background-color: #d1fae5;
+      color: var(--success-color);
+      border: 1px solid #a7f3d0;
+    }
+
+    .alert-info {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-outline {
+      background-color: white;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+    }
+
+    .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .links-container {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .links-container a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .links-container a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<main class="form-signup">
+  <div class="signup-header">
+    <div class="logo">GROUP<span>WARE</span></div>
+    <h1 class="form-title">회원가입</h1>
+    <p class="form-subtitle" id="step-subtitle">회사 인사 정보와 일치하는지 확인해주세요.</p>
+  </div>
+
+  <div class="form-steps">
+    <div class="step active" id="step1-indicator">
+      <div class="step-number">1</div>
+      <div class="step-label">직원 정보 확인</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step2-indicator">
+      <div class="step-number">2</div>
+      <div class="step-label">회원 정보 입력</div>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" id="error-message" style="display: none;"></div>
+  <div class="alert alert-success" id="success-message" style="display: none;"></div>
+
+  <!-- 직원 확인 단계 -->
+  <form id="verify-form" style="display: block;">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="verify-empNum" class="form-label">사원번호 <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="verify-empNum" name="empNum" required>
+          <div class="invalid-feedback">사원번호를 입력해주세요.</div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="verify-name" class="form-label">이름 <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="verify-name" name="name" required>
+          <div class="invalid-feedback">이름을 입력해주세요.</div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="verify-email" class="form-label">이메일 <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" id="verify-email" name="email" required>
+          <div class="invalid-feedback">올바른 이메일 형식이 아닙니다.</div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="verify-ssn" class="form-label">주민등록번호 <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="verify-ssn" name="ssn" placeholder="000000-0000000" required>
+          <div class="invalid-feedback">올바른 주민등록번호 형식이 아닙니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      입력하신 정보는 회사 인사 정보와 대조하여 확인합니다. 정확하게 입력해주세요.
+    </div>
+
+    <button class="w-100 btn btn-primary mt-4" type="submit">
+      <i class="fas fa-check-circle me-2"></i>확인
+    </button>
+
+    <div class="links-container">
+      <span>이미 계정이 있으신가요?</span>
+      <a href="/auth/login" class="ms-2">로그인</a>
+    </div>
+  </form>
+
+  <!-- 회원가입 단계 -->
+  <form id="signup-form" style="display: none;">
+    <input type="hidden" id="signup-empNum" name="empNum">
+    <input type="hidden" id="signup-name" name="name">
+    <input type="hidden" id="signup-email" name="email">
+    <input type="hidden" id="signup-ssn" name="ssn">
+    <input type="hidden" id="signup-depId" name="depId" value="1">
+
+    <div class="profile-upload">
+      <div class="profile-preview" id="profile-preview">
+        <i class="fas fa-user"></i>
+      </div>
+      <input type="file" id="profile-input" style="display: none;" accept="image/*">
+      <button type="button" class="upload-btn" id="upload-btn">
+        <i class="fas fa-cloud-upload-alt"></i>프로필 사진 업로드
+      </button>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="phone" class="form-label">전화번호</label>
+          <input type="tel" class="form-control" id="phone" name="phone" placeholder="010-1234-5678">
+          <div class="invalid-feedback">올바른 전화번호 형식이 아닙니다.</div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="gender" class="form-label">성별 <span class="text-danger">*</span></label>
+          <select class="form-select" id="gender" name="gender" required>
+            <option value="">선택하세요</option>
+            <option value="M">남성</option>
+            <option value="F">여성</option>
+            <option value="Other">기타</option>
+          </select>
+          <div class="invalid-feedback">성별을 선택해주세요.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group mt-4">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="agree-terms" name="agreeTerms" required>
+        <label class="form-check-label" for="agree-terms">
+          개인정보 수집 및 이용에 동의합니다. <span class="text-danger">*</span>
+        </label>
+        <div class="invalid-feedback">약관에 동의해야 회원가입이 가능합니다.</div>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-4">
+      <button type="button" class="w-100 btn btn-outline" id="back-button">
+        <i class="fas fa-arrow-left me-2"></i>이전
+      </button>
+      <button class="w-100 btn btn-primary" type="submit">
+        <i class="fas fa-user-plus me-2"></i>회원가입
+      </button>
+    </div>
+  </form>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // 직원 확인 폼 제출
+  document.getElementById('verify-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // 폼 유효성 검사
+    const form = event.target;
+    if (!form.checkValidity()) {
+      event.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+
+    // 에러/성공 메시지 초기화
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('success-message').style.display = 'none';
+
+    const verifyData = {
+      empNum: document.getElementById('verify-empNum').value,
+      name: document.getElementById('verify-name').value,
+      email: document.getElementById('verify-email').value,
+      ssn: document.getElementById('verify-ssn').value
+    };
+
+    try {
+      // API 호출
+      const response = await fetch('/api/auth/verify-employee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(verifyData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || '직원 정보 확인 중 오류가 발생했습니다.');
+      }
+
+      // 성공 메시지 표시
+      const successMessageElement = document.getElementById('success-message');
+      successMessageElement.textContent = data.message || '직원 정보가 확인되었습니다.';
+      successMessageElement.style.display = 'block';
+
+      // 폼 전환 (다음 단계로)
+      setTimeout(() => {
+        // 히든 필드에 값 설정
+        document.getElementById('signup-empNum').value = verifyData.empNum;
+        document.getElementById('signup-name').value = verifyData.name;
+        document.getElementById('signup-email').value = verifyData.email;
+        document.getElementById('signup-ssn').value = verifyData.ssn;
+
+        // 단계 전환
+        document.getElementById('verify-form').style.display = 'none';
+        document.getElementById('signup-form').style.display = 'block';
+        document.getElementById('step-subtitle').textContent = '추가 정보를 입력하여 회원가입을 완료해주세요.';
+
+        // 단계 인디케이터 업데이트
+        document.getElementById('step1-indicator').classList.remove('active');
+        document.getElementById('step1-indicator').classList.add('completed');
+        document.getElementById('step2-indicator').classList.add('active');
+
+        // 성공 메시지 숨기기
+        successMessageElement.style.display = 'none';
+      }, 1500);
+    } catch (error) {
+      // 에러 메시지 표시
+      const errorMessageElement = document.getElementById('error-message');
+      errorMessageElement.textContent = error.message || '직원 정보 확인 중 오류가 발생했습니다.';
+      errorMessageElement.style.display = 'block';
+    }
+  });
+
+  // 이전 버튼 클릭
+  document.getElementById('back-button').addEventListener('click', function() {
+    document.getElementById('signup-form').style.display = 'none';
+    document.getElementById('verify-form').style.display = 'block';
+    document.getElementById('step-subtitle').textContent = '회사 인사 정보와 일치하는지 확인해주세요.';
+
+    // 단계 인디케이터 업데이트
+    document.getElementById('step1-indicator').classList.add('active');
+    document.getElementById('step1-indicator').classList.remove('completed');
+    document.getElementById('step2-indicator').classList.remove('active');
+
+    // 에러/성공 메시지 초기화
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('success-message').style.display = 'none';
+  });
+
+  // 프로필 사진 업로드 처리
+  document.getElementById('upload-btn').addEventListener('click', function() {
+    document.getElementById('profile-input').click();
+  });
+
+  document.getElementById('profile-input').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewDiv = document.getElementById('profile-preview');
+        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // 회원가입 폼 제출
+  document.getElementById('signup-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // 폼 유효성 검사
+    const form = event.target;
+    if (!form.checkValidity()) {
+      event.stopPropagation();
+      form.classList.add('was-validated');
+      return;
+    }
+
+    // 에러/성공 메시지 초기화
+    document.getElementById('error-message').style.display = 'none';
+    document.getElementById('success-message').style.display = 'none';
+
+    // FormData 객체 생성
+    const formData = new FormData();
+
+    // 회원 정보를 JSON으로 변환하여 추가
+    const userData = {
+      empNum: document.getElementById('signup-empNum').value,
+      name: document.getElementById('signup-name').value,
+      email: document.getElementById('signup-email').value,
+      ssn: document.getElementById('signup-ssn').value,
+      gender: document.getElementById('gender').value,
+      phone: document.getElementById('phone').value,
+      agreeTerms: document.getElementById('agree-terms').checked
+    };
+
+    formData.append('userData', new Blob([JSON.stringify(userData)], {
+      type: 'application/json'
+    }));
+
+    // 프로필 이미지가 있으면 추가
+    const profileInput = document.getElementById('profile-input');
+    if (profileInput.files.length > 0) {
+      const profileFile = profileInput.files[0];
+
+      // 디버깅: 파일 정보 로깅
+      console.log('Profile Image Details:', {
+        name: profileFile.name,
+        type: profileFile.type,
+        size: profileFile.size
+      });
+
+      // 파일 크기 제한 체크 (예: 5MB)
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+      if (profileFile.size > MAX_FILE_SIZE) {
+        console.error('File size exceeds limit:', profileFile.size);
+        const errorMessageElement = document.getElementById('error-message');
+        errorMessageElement.textContent = '프로필 이미지 크기가 5MB를 초과했습니다.';
+        errorMessageElement.style.display = 'block';
+        return;
+      }
+
+      // 허용된 파일 타입 체크
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (!ALLOWED_TYPES.includes(profileFile.type)) {
+        console.error('Invalid file type:', profileFile.type);
+        const errorMessageElement = document.getElementById('error-message');
+        errorMessageElement.textContent = '지원되지 않는 이미지 형식입니다. JPEG, PNG, GIF, WebP 형식의 이미지만 업로드 가능합니다.';
+        errorMessageElement.style.display = 'block';
+        return;
+      }
+
+      formData.append('profileImage', profileFile);
+    }
+
+    try {
+      // 디버깅: FormData 내용 로깅
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`FormData Entry - Key: ${key}, File: ${value.name}, Type: ${value.type}, Size: ${value.size}`);
+        } else {
+          console.log(`FormData Entry - Key: ${key}, Value: ${value}`);
+        }
+      }
+
+      // 회원가입 API 호출 (파일 업로드 포함)
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        body: formData
+        // headers 설정 안 함 (multipart/form-data는 브라우저가 자동으로 설정)
+      });
+
+      // 디버깅: 전체 응답 로깅
+      console.log('Response Status:', response.status);
+      console.log('Response Headers:', Object.fromEntries(response.headers.entries()));
+
+      const data = await response.json();
+
+      // 디버깅: 응답 데이터 로깅
+      console.log('Response Data:', data);
+
+      if (!response.ok) {
+        // 더 자세한 에러 로깅
+        console.error('Server Error Response:', {
+          status: response.status,
+          message: data.message,
+          details: data.details || 'No additional details'
+        });
+        throw new Error(data.message || '회원가입 중 오류가 발생했습니다.');
+      }
+
+      // 성공 메시지 표시
+      const successMessageElement = document.getElementById('success-message');
+      successMessageElement.textContent = data.message || '회원가입이 완료되었습니다. 임시 비밀번호가 이메일로 발송되었습니다.';
+      successMessageElement.style.display = 'block';
+
+      // 폼 리셋
+      form.reset();
+      document.getElementById('verify-form').reset();
+      document.getElementById('profile-preview').innerHTML = '<i class="fas fa-user"></i>';
+
+      // 5초 후 로그인 페이지로 이동
+      setTimeout(() => {
+        window.location.href = '/auth/login';
+      }, 2500);
+    } catch (error) {
+      // 더 자세한 클라이언트 사이드 에러 로깅
+      console.error('Client-side Error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+
+      // 에러 메시지 표시
+      const errorMessageElement = document.getElementById('error-message');
+      errorMessageElement.textContent = error.message || '회원가입 중 오류가 발생했습니다.';
+      errorMessageElement.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>

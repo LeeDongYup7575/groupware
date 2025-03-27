@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출퇴근 QR 코드</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .qr-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .qr-image {
+            margin: 20px auto;
+            width: 250px;
+            height: 250px;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            background-color: white;
+        }
+        .timer {
+            font-size: 1.2rem;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        .title {
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+        .instruction {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+        .btn-group {
+            margin-bottom: 20px;
+        }
+        .employee-info {
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .current-status {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .status-normal {
+            color: #198754; /* Green */
+        }
+        .status-late {
+            color: #dc3545; /* Red */
+        }
+        .status-checkout {
+            color: #0d6efd; /* Blue */
+        }
+        .status-early-leave {
+            color: #fd7e14; /* Orange */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="qr-container">
+        <h2 class="title">출퇴근 QR 코드</h2>
+
+        <div class="employee-info">
+            <p><strong>이름:</strong> <span th:text="${employee.name}">홍길동</span></p>
+            <p><strong>사번:</strong> <span th:text="${employee.empNum}">E001</span></p>
+            <p>
+                <strong>현재 상태:</strong>
+                <span th:class="${employee.attendStatus == '정상출근' ? 'current-status status-normal' :
+                                    (employee.attendStatus == '지각' ? 'current-status status-late' :
+                                    (employee.attendStatus == '퇴근' ? 'current-status status-checkout' :
+                                    (employee.attendStatus == '조퇴' ? 'current-status status-early-leave' : 'current-status')))}"
+                      th:text="${employee.attendStatus != null ? employee.attendStatus : '미출근'}">미출근</span>
+            </p>
+            <p><strong>현재 시간:</strong> <span id="current-time" th:text="${#temporals.format(currentTime, 'yyyy-MM-dd HH:mm:ss')}">2023-01-01 09:00:00</span></p>
+        </div>
+
+<!--        <div class="btn-group" role="group" aria-label="Attendance options">-->
+<!--            <a th:href="@{/qr/select-attendance-type(type='NORMAL')}" class="btn btn-primary">출근</a>-->
+<!--            <a th:href="@{/qr/select-attendance-type(type='LATE')}" class="btn btn-warning">지각</a>-->
+<!--            <a th:href="@{/qr/select-attendance-type(type='EARLY_LEAVE')}" class="btn btn-info">조퇴</a>-->
+<!--            <a th:href="@{/qr/select-attendance-type(type='CHECKOUT')}" class="btn btn-success">퇴근</a>-->
+<!--        </div>-->
+        <div class="btn-group" role="group" aria-label="Attendance options">
+            <button onclick="selectAttendanceType('NORMAL')" class="btn btn-primary attendance-type-btn" data-type="NORMAL">출근</button>
+            <button onclick="selectAttendanceType('LATE')" class="btn btn-warning attendance-type-btn" data-type="LATE">지각</button>
+            <button onclick="selectAttendanceType('EARLY_LEAVE')" class="btn btn-info attendance-type-btn" data-type="EARLY_LEAVE">조퇴</button>
+            <button onclick="selectAttendanceType('CHECKOUT')" class="btn btn-success attendance-type-btn" data-type="CHECKOUT">퇴근</button>
+        </div>
+        <!-- 선택된 타입을 저장할 히든 필드 -->
+        <input type="hidden" name="selectedType" value="NORMAL">
+
+        <p class="instruction">모바일 앱으로 아래 QR 코드를 스캔하여 출퇴근을 기록하세요.</p>
+        <p class="instruction" th:if="${selectedType != null}">
+            현재 선택된 모드:
+            <strong th:text="${selectedType == 'NORMAL' ? '정상출근' :
+                               (selectedType == 'LATE' ? '지각' :
+                               (selectedType == 'EARLY_LEAVE' ? '조퇴' : '퇴근'))}">정상출근</strong>
+        </p>
+
+<!--        <div class="qr-image">-->
+<!--            <img th:src="@{/qr/generate-qr(type=${selectedType != null ? selectedType : 'NORMAL'})}"-->
+<!--                 alt="QR Code" id="qrImage" class="img-fluid">-->
+<!--        </div>-->
+        <div class="qr-image">
+            <img id="qrImage" class="img-fluid" alt="QR Code">
+        </div>
+
+        <div class="timer">
+            <span id="countdown">120</span>초 후 QR 코드가 재생성됩니다.
+        </div>
+
+        <div class="mt-4">
+            <button id="refreshButton" class="btn btn-secondary">
+                <i class="fas fa-sync-alt"></i> QR 코드 새로고침
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 먼저 모든 함수를 정의
+    function updateCurrentTime() {
+        const now = new Date();
+        const formattedTime = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0') + ' ' +
+            String(now.getHours()).padStart(2, '0') + ':' +
+            String(now.getMinutes()).padStart(2, '0') + ':' +
+            String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('current-time').textContent = formattedTime;
+    }
+
+    // QR 코드 로드 함수
+    function loadQrCode(attendanceType) {
+        const token = localStorage.getItem('accessToken');
+
+        // 토큰 검사 및 디버깅
+        console.log('토큰 존재 여부:', !!token);
+        console.log('토큰값:', token); // 개발 중에만 사용, 실제 환경에서는 보안상 제거
+
+        if (!token) {
+            console.error('토큰이 없습니다. 로그인이 필요합니다.');
+            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+            window.location.href = '/auth/login';
+            return;
+        }
+
+        // 브라우저에서 현재 로그인 상태 확인을 위한 정보 출력
+        console.log('로컬 스토리지 상태:');
+        Object.keys(localStorage).forEach(key => {
+            if (key !== 'accessToken') { // 토큰 자체는 보안상 출력하지 않음
+                console.log(`${key}: ${localStorage.getItem(key)}`);
+            } else {
+                console.log('accessToken: 존재함');
+            }
+        });
+
+        // 직접 로그인 페이지로 이동하는 임시 링크 제공
+        console.log('로그인 문제 해결을 위해 다음 링크를 클릭하세요: /auth/login');
+
+        // API 요청
+        fetch(`/qr/generate-qr?type=${attendanceType}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'image/png' // 명시적으로 이미지 타입 요청
+            },
+            credentials: 'include' // 쿠키 포함
+        })
+            .then(response => {
+                console.log('응답 상태:', response.status);
+                console.log('응답 헤더:',
+                    Array.from(response.headers.entries())
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join('\n')
+                );
+
+                if (response.status === 401) {
+                    return response.text().then(text => {
+                        try {
+                            // JSON 응답일 경우 파싱
+                            const errorData = JSON.parse(text);
+                            console.error('인증 오류 세부정보:', errorData);
+                            throw new Error(`인증 오류: ${errorData.message || '알 수 없는 오류'}`);
+                        } catch (e) {
+                            // 일반 텍스트인 경우
+                            console.error('인증 오류 응답(텍스트):', text);
+                            throw new Error('인증에 실패했습니다. 다시 로그인해주세요.');
+                        }
+                    });
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP 오류! 상태: ${response.status}`);
+                }
+
+                return response.blob();
+            })
+            .then(blob => {
+                console.log('응답 blob 타입:', blob.type);
+                console.log('응답 blob 크기:', blob.size, 'bytes');
+                const imageUrl = URL.createObjectURL(blob);
+                document.getElementById('qrImage').src = imageUrl;
+            })
+            .catch(error => {
+                console.error('QR 코드 로드 오류:', error);
+
+                // 사용자에게 오류 알림 및 선택적 재로그인
+                const reloginConfirm = confirm(`${error.message}\n\n다시 로그인하시겠습니까?`);
+                if (reloginConfirm) {
+                    localStorage.removeItem('accessToken'); // 토큰 제거
+                    window.location.href = '/auth/login';
+                }
+            });
+    }
+
+    // 카운트다운 기능
+    let countdownInterval;
+
+    function startCountdown() {
+        let seconds = 120;
+        const countdownElement = document.getElementById('countdown');
+
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+
+        countdownInterval = setInterval(function() {
+            seconds--;
+            countdownElement.textContent = seconds;
+
+            if (seconds <= 0) {
+                const selectedType = document.querySelector('[name="selectedType"]')?.value || 'NORMAL';
+                loadQrCode(selectedType);
+                resetCountdown();
+            }
+        }, 1000);
+    }
+
+    function resetCountdown() {
+        clearInterval(countdownInterval);
+        document.getElementById('countdown').textContent = '120';
+        startCountdown();
+    }
+
+    function selectAttendanceType(attendanceType) {
+        console.log('선택한 타입:', attendanceType); // 디버깅용
+
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            window.location.href = '/auth/login';
+            return;
+        }
+
+        // 타입 정보 저장
+        const hiddenInput = document.querySelector('[name="selectedType"]');
+        if (hiddenInput) {
+            hiddenInput.value = attendanceType;
+        } else {
+            // 히든 필드가 없으면 생성
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'selectedType';
+            input.value = attendanceType;
+            document.body.appendChild(input);
+        }
+
+        // 선택된 타입으로 QR 코드 로드
+        loadQrCode(attendanceType);
+
+        // 선택된 버튼 시각적으로 표시
+        document.querySelectorAll('.attendance-type-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        const activeBtn = document.querySelector(`.attendance-type-btn[data-type="${attendanceType}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        // 카운트다운 재설정
+        resetCountdown();
+    }
+
+    // 그 다음 이벤트 리스너와 초기화 코드
+    document.addEventListener('DOMContentLoaded', function() {
+        // 현재 시간 업데이트 시작
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime();
+
+        // 새로고침 버튼 이벤트 처리
+        const refreshButton = document.getElementById('refreshButton');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                const selectedType = document.querySelector('[name="selectedType"]')?.value || 'NORMAL';
+                loadQrCode(selectedType);
+                resetCountdown();
+            });
+        }
+
+        // 초기 QR 코드 로드
+        loadQrCode('NORMAL');
+
+        // 초기 카운트다운 시작
+        startCountdown();
+    });
+</script>
+</body>
+</html>
