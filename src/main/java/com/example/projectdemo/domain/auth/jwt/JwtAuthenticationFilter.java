@@ -44,6 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/images/**"
     );
 
+    //개발용
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return true;
+    }
+
     @Autowired
     public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, EmployeeMapper employeeMapper, ObjectMapper objectMapper) {
         this.jwtTokenUtil = jwtTokenUtil;
