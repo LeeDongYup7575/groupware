@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/intro.css">
     <style>
         :root {
@@ -126,6 +127,11 @@
             width: 1rem;
         }
 
+        /*대시보드*/
+        .dashboard-section{
+            padding: 80px 0;
+        }
+
 
         /*푸터*/
         footer {
@@ -190,7 +196,8 @@
             <!-- 로고 이미지 대신 텍스트로 변경 -->
             <span>GROUP<span style="color: var(--accent-color);">WARE</span></span>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -208,16 +215,21 @@
                 </li>
                 <!-- 로그인된 상태일 때 보이는 사용자 메뉴 -->
                 <li class="nav-item dropdown user-dropdown" id="user-dropdown" style="display: none;">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-user-circle me-1"></i>
                         <span id="user-name">사용자</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="/mypage"><i class="fas fa-user"></i> 마이페이지</a></li>
                         <li><a class="dropdown-item" href="/attendances"><i class="fas fa-clock"></i> 근태관리</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="navigateToQRCheck(event)"><i class="fas fa-file-signature"></i>QR</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i> 로그아웃</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="navigateToQRCheck(event)"><i
+                                class="fas fa-file-signature"></i>QR</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i>
+                            로그아웃</a></li>
                     </ul>
                 </li>
             </ul>
@@ -268,19 +280,20 @@
                     <a href="/auth/login" class="btn btn-outline" id="hero-login-button">로그인</a>
                 </div>
                 <!-- 로그인된 사용자를 위한 대체 버튼 (기본 숨김) -->
-                <div class="d-flex flex-wrap gap-3 justify-content-center" id="logged-in-buttons" style="display: none;">
+                <div class="d-flex flex-wrap gap-3 justify-content-center" id="logged-in-buttons"
+                     style="display: none;">
                     <a href="/groupware-main" class="btn btn-primary">그룹웨어</a>
                     <a href="/mypage" class="btn btn-outline">마이페이지</a>
                 </div>
             </div>
-<!--            <div class="col-lg-6 mt-5 mt-lg-0">-->
-<!--                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=2070" alt="Dashboard Preview" class="img-fluid hero-image">-->
-<!--            </div>-->
+            <!--            <div class="col-lg-6 mt-5 mt-lg-0">-->
+            <!--                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=2070" alt="Dashboard Preview" class="img-fluid hero-image">-->
+            <!--            </div>-->
         </div>
     </div>
 
     <!-- 추가: feature boxes -->
-    <div class="container feature-boxes">
+    <div class="container feature-boxes" id="heroFeatures">
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="feature-box">
@@ -306,114 +319,6 @@
                     <a href="#" class="feature-box-link">자세히 보기 →</a>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- 기능 섹션 -->
-<section class="features-section" id="features">
-    <div class="container">
-        <h2 class="section-title">대표 공지사항</h2>
-        <p class="section-subtitle">
-            회사 공식 홈페이지의 주요 공지사항 입니다.
-        </p>
-        <div class="row g-4">
-            <!-- 공지사항이 있는 경우 -->
-            <div th:if="${!notices.isEmpty()}">
-                <div class="list-group">
-                    <a th:each="notice : ${notices}"
-                       th:href="${notice.url}"
-                       th:text="${notice.title}"
-                       class="list-group-item list-group-item-action"
-                       target="_blank">
-                        공지사항 제목
-                    </a>
-                </div>
-            </div>
-
-            <!-- 공지사항이 없는 경우 -->
-            <div th:if="${notices.isEmpty()}" class="alert alert-info">
-                표시할 공지사항이 없습니다.
-            </div>
-
-            <!-- 기능 카드 1 -->
-<!--            <div class="col-md-6 col-lg-4">-->
-<!--                <div class="feature-card">-->
-<!--                    <div class="feature-icon">-->
-<!--                        <i class="fas fa-calendar-check"></i>-->
-<!--                    </div>-->
-<!--                    <h3 class="feature-title">일정 관리</h3>-->
-<!--                    <p class="feature-text">-->
-<!--                        개인 및 부서별 일정을 관리하고 공유할 수 있습니다.-->
-<!--                        중요 회의와 이벤트를 놓치지 않도록 알림 서비스를 제공합니다.-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; 기능 카드 2 &ndash;&gt;-->
-<!--            <div class="col-md-6 col-lg-4">-->
-<!--                <div class="feature-card">-->
-<!--                    <div class="feature-icon">-->
-<!--                        <i class="fas fa-comments"></i>-->
-<!--                    </div>-->
-<!--                    <h3 class="feature-title">실시간 채팅</h3>-->
-<!--                    <p class="feature-text">-->
-<!--                        동료들과 실시간으로 소통할 수 있는 메신저 기능을 제공합니다.-->
-<!--                        개인 채팅과 그룹 채팅을 모두 지원합니다.-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; 기능 카드 3 &ndash;&gt;-->
-<!--            <div class="col-md-6 col-lg-4">-->
-<!--                <div class="feature-card">-->
-<!--                    <div class="feature-icon">-->
-<!--                        <i class="fas fa-clock"></i>-->
-<!--                    </div>-->
-<!--                    <h3 class="feature-title">근태 관리</h3>-->
-<!--                    <p class="feature-text">-->
-<!--                        출퇴근 시간을 기록하고 휴가 신청을 관리합니다.-->
-<!--                        월별 근무 시간 통계와 리포트를 제공합니다.-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; 기능 카드 4 &ndash;&gt;-->
-<!--            <div class="col-md-6 col-lg-4">-->
-<!--                <div class="feature-card">-->
-<!--                    <div class="feature-icon">-->
-<!--                        <i class="fas fa-file-signature"></i>-->
-<!--                    </div>-->
-<!--                    <h3 class="feature-title">전자결재</h3>-->
-<!--                    <p class="feature-text">-->
-<!--                        다양한 양식의 문서를 온라인으로 생성하고 결재할 수 있습니다.-->
-<!--                        결재 상태 추적과 이력 관리가 가능합니다.-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; 기능 카드 5 &ndash;&gt;-->
-<!--            <div class="col-md-6 col-lg-4">-->
-<!--                <div class="feature-card">-->
-<!--                    <div class="feature-icon">-->
-<!--                        <i class="fas fa-sitemap"></i>-->
-<!--                    </div>-->
-<!--                    <h3 class="feature-title">조직도</h3>-->
-<!--                    <p class="feature-text">-->
-<!--                        직관적인 조직도를 통해 회사 구조와 각 직원의 역할을 확인할 수 있습니다.-->
-<!--                        직원 검색 기능으로 빠르게 연락처를 찾을 수 있습니다.-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash; 기능 카드 6 &ndash;&gt;-->
-<!--            <div class="col-md-6 col-lg-4">-->
-<!--                <div class="feature-card">-->
-<!--                    <div class="feature-icon">-->
-<!--                        <i class="fas fa-clipboard-list"></i>-->
-<!--                    </div>-->
-<!--                    <h3 class="feature-title">게시판</h3>-->
-<!--                    <p class="feature-text">-->
-<!--                        공지사항, 부서별 게시판, 자유 게시판 등 다양한 게시판을 제공합니다.-->
-<!--                        중요한 정보를 모든 직원들과 효과적으로 공유할 수 있습니다.-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </div>-->
         </div>
     </div>
 </section>
@@ -538,6 +443,293 @@
     </div>
 </section>
 
+<!-- 로그인 후 대시보드 화면 -->
+<main class="dashboard-section" id="dashboard-section" style="display: none;">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 왼쪽 내비게이션 메뉴 -->
+            <div class="col-md-2 dashboard-sidebar">
+                <div class="sidebar-menu">
+                    <ul class="list-unstyled">
+                        <li class="active"><a href="#"><i class="fas fa-home"></i> 이메일</a></li>
+                        <li><a href="#"><i class="fas fa-user"></i> 게시판</a></li>
+                        <li><a href="#"><i class="fas fa-envelope"></i> 메시지</a></li>
+                        <li><a href="#"><i class="fas fa-calendar-check"></i> 일정</a></li>
+                        <li><a href="#"><i class="fas fa-building"></i> 공용 메일</a></li>
+                        <li><a href="#"><i class="fas fa-clipboard-list"></i> 주소록</a></li>
+                        <li><a href="#"><i class="fas fa-chart-bar"></i> 예약</a></li>
+                        <li><a href="#"><i class="fas fa-file-alt"></i> 문서 관리</a></li>
+                        <li><a href="#"><i class="fas fa-money-bill-wave"></i> 근무/경비처리</a></li>
+                        <li><a href="#"><i class="fas fa-sitemap"></i> 전자결재</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> 조직도</a></li>
+                        <li><a href="#"><i class="fas fa-cog"></i> 관리자 페이지</a></li>
+                        <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 메인 콘텐츠 영역 -->
+            <div class="col-md-10 dashboard-content">
+                <div class="row">
+                    <!-- 프로필 및 게시판 섹션 -->
+                    <div class="col-md-5">
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-image">
+                                    <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="프로필 이미지" class="rounded-circle">
+                                </div>
+                                <div class="profile-name">
+                                    <h3>이미르 대리</h3>
+                                    <p>개발팀</p>
+                                </div>
+                            </div>
+
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">결재할 문서</div>
+                                    <div class="stat-value">6</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">내 예약/대여 현황</div>
+                                    <div class="stat-value">1</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 공지사항 섹션 :: 하드코딩 -->
+                    <div class="col-md-7">
+                        <div class="dashboard-card">
+                            <h4 class="card-title">게시판</h4>
+                            <ul class="nav nav-tabs" id="boardTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="notice-tab" data-bs-toggle="tab"
+                                            data-bs-target="#notice" type="button" role="tab" aria-controls="notice"
+                                            aria-selected="true">사내공지
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="dept-tab" data-bs-toggle="tab" data-bs-target="#dept"
+                                            type="button" role="tab" aria-controls="dept" aria-selected="false">자유게시판
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content p-3" id="boardTabsContent">
+                                <div class="tab-pane fade show active" id="notice" role="tabpanel"
+                                     aria-labelledby="notice-tab">
+                                    <!-- 공지사항이 있는 경우 -->
+                                    <div th:if="${!notices.isEmpty()}">
+                                        <div class="list-group">
+                                            <a th:each="notice, index : ${notices}"
+                                               th:href="${notice.url}"
+                                               th:text="${notice.title}"
+                                               class="list-group-item list-group-item-action"
+                                               target="_blank">
+                                                공지사항 제목
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- 공지사항이 없는 경우 -->
+                                    <div th:if="${notices.isEmpty()}" class="alert alert-info">
+                                        표시할 공지사항이 없습니다.
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="dept" role="tabpanel" aria-labelledby="dept-tab">
+                                    <p>자유게시판 내용이 여기에 표시됩니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 근태 및 회의실 예약 섹션 -->
+                <div class="row mt-4">
+                    <div class="col-md-5">
+                        <div class="dashboard-card">
+                            <h4 class="card-title">근태관리</h4>
+                            <p class="date-info">2024년 10월 24일 (화) 10:56:43</p>
+
+                            <div class="attendance-info">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p class="attendance-label">출근시간</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="attendance-value">미등록</p>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <p class="attendance-label">퇴근시간</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="attendance-value">미등록</p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="schedule-info mt-3">
+                                <p>2025-03-27 일정 없음</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 회의실 예약 현황 -->
+                    <div class="col-md-7">
+                        <div class="dashboard-card">
+                            <h4 class="card-title">회의실 예약 현황</h4>
+
+                            <div class="timetable-container">
+                                <table class="timetable">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>09:00</th>
+                                        <th>10:00</th>
+                                        <th>11:00</th>
+                                        <th>12:00</th>
+                                        <th>13:00</th>
+                                        <th>14:00</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>1번 회의실</td>
+                                        <td colspan="6">
+                                            <div class="reservation-bar"
+                                                 style="width: 25%; left: 50%; background-color: #90caf9;">
+                                                오후 10:30 - 12:30
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2번 회의실</td>
+                                        <td colspan="6">
+                                            <div class="reservation-bar"
+                                                 style="width: 25%; left: 0; background-color: #a5d6a7;">
+                                                오전 09:30 - 11:30
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3번 회의실</td>
+                                        <td colspan="6">
+                                            <div class="reservation-bar"
+                                                 style="width: 33%; left: 17%; background-color: #90caf9;">
+                                                오전 10:00 - 12:00
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>4번 회의실</td>
+                                        <td colspan="6">
+                                            <div class="reservation-bar"
+                                                 style="width: 33%; left: 0; background-color: #fff59d;">
+                                                오전 09:00 - 11:00
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 달력 -->
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="calendar-container dashboard-card">
+                            <div class="calendar-header">
+                                <button class="btn btn-sm btn-link"><i class="fas fa-chevron-left"></i></button>
+                                <h5>2025년 3월</h5>
+                                <button class="btn btn-sm btn-link"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                            <table class="calendar-table">
+                                <thead>
+                                <tr>
+                                    <th>일</th>
+                                    <th>월</th>
+                                    <th>화</th>
+                                    <th>수</th>
+                                    <th>목</th>
+                                    <th>금</th>
+                                    <th>토</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- 달력 날짜들 -->
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>7</td>
+                                    <td>8</td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>10</td>
+                                    <td>11</td>
+                                    <td>12</td>
+                                    <td>13</td>
+                                    <td>14</td>
+                                    <td>15</td>
+                                </tr>
+                                <tr>
+                                    <td>16</td>
+                                    <td>17</td>
+                                    <td>18</td>
+                                    <td>19</td>
+                                    <td>20</td>
+                                    <td>21</td>
+                                    <td>22</td>
+                                </tr>
+                                <tr>
+                                    <td>23</td>
+                                    <td>24</td>
+                                    <td>25</td>
+                                    <td class="current-day">26</td>
+                                    <td>27</td>
+                                    <td>28</td>
+                                    <td>29</td>
+                                </tr>
+                                <tr>
+                                    <td>30</td>
+                                    <td>31</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
 <!-- 푸터 -->
 <footer>
     <div class="container">
@@ -574,7 +766,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // 스크롤 시 네비게이션바 스타일 변경
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', function () {
         const navbar = document.querySelector('.navbar');
         if (window.scrollY > 50) {
             navbar.classList.add('navbar-scrolled');
@@ -584,7 +776,7 @@
     });
 
     // 페이지 로드 시 JWT 토큰 확인하여 로그인 상태 확인
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         // 로컬 스토리지에서 JWT 토큰 확인
         const token = localStorage.getItem('accessToken');
         const userName = localStorage.getItem('name');
@@ -595,11 +787,20 @@
         const userDropdown = document.getElementById('user-dropdown');
         const loggedInButtons = document.getElementById('logged-in-buttons');
         const userNameElement = document.getElementById('user-name');
+        const home = document.getElementById('home');
+
+        const productSection = document.querySelector('.product-section');
+        const featuresUpdateSection = document.querySelector('.features-update-section');
+        const dashboardSection = document.getElementById('dashboard-section');
 
         // 디버깅: 요소들이 제대로 선택되었는지 확인
         console.log('heroButtons:', heroButtons);
         console.log('loginButton:', loginButton);
         console.log('loggedInButtons:', loggedInButtons);
+        console.log('home:', home);
+        console.log('productSection:', productSection);
+        console.log('featuresUpdateSection:', featuresUpdateSection);
+        console.log('dashboardSection:', dashboardSection);
 
         if (token) {
             // 토큰이 있으면 로그인된 상태로 처리
@@ -615,6 +816,21 @@
                 console.log('login-button 숨김 처리됨');
             }
 
+            if (home) {
+                home.style.cssText = 'display: none !important;';
+                console.log('home 숨김 처리됨');
+            }
+
+            if (productSection) {
+                productSection.style.cssText = 'display: none !important;';
+                console.log('product-section 숨김 처리됨');
+            }
+
+            if (featuresUpdateSection) {
+                featuresUpdateSection.style.cssText = 'display: none !important;';
+                console.log('features-update-section 숨김 처리됨');
+            }
+
             // 로그인 상태 요소들 표시하기
             if (userDropdown) {
                 userDropdown.style.cssText = 'display: block !important;';
@@ -627,12 +843,26 @@
                 console.log('logged-in-buttons 표시됨');
             }
 
+            if (dashboardSection) {
+                dashboardSection.style.cssText = 'display: block !important;';
+                console.log('dashboard-section 표시됨');
+            }
+
             // 사용자 이름 표시
             document.getElementById('user-name').textContent = userName || '사용자';
+        } else {
+            // 비로그인 상태
+            // 인트로 섹션들 보이기
+            if (heroSection) heroSection.style.display = 'block';
+            if (featuresSection) featuresSection.style.display = 'block';
+            if (featuresUpdateSection) featuresUpdateSection.style.display = 'block';
+
+            // 대시보드 숨기기
+            if (dashboardSection) dashboardSection.style.display = 'none';
         }
 
         // 로그아웃 처리
-        document.getElementById('logout-button').addEventListener('click', function(e) {
+        document.getElementById('logout-button').addEventListener('click', function (e) {
             e.preventDefault();
 
             // 로컬 스토리지에서 토큰 제거
