@@ -104,6 +104,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 sendErrorResponse(response, 401, "비활성화된 계정입니다.");
                 return;
             }
+            int id = jwtTokenUtil.getIdFromToken(token);
 
             // 임시 비밀번호 상태 확인 (비밀번호 변경 페이지로의 접근은 허용)
             if (tempPassword && !requestURI.contains("/api/auth/change-password")) {
@@ -118,6 +119,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             request.setAttribute("empNum", empNum);
             request.setAttribute("role", role);
             request.setAttribute("tempPassword", tempPassword);
+            request.setAttribute("id",id);
 
             // 요청 진행
             filterChain.doFilter(request, response);
