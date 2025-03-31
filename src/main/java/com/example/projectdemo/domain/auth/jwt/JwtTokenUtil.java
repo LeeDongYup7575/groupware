@@ -65,6 +65,10 @@ public class JwtTokenUtil {
         Claims claims = getAllClaimsFromToken(token);
         return claims.get("tempPassword", Boolean.class);
     }
+    public int getIdFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("id", Integer.class);
+    }
 
     /**
      * 토큰에서 클레임 추출

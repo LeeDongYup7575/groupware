@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chatRoom">
+    <select id="getChatRoom" resultType="com.example.projectdemo.domain.chat.dto.ChatRoomDTO">
+        select *
+        from chatrooms where id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <insert id="createChatRoom">
+        insert into chatrooms values (default,#{name},default)
+    </insert>
+
+
+</mapper>

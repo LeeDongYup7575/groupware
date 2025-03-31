@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
     // 개발 모드에서는 모든 요청을 정상적으로 통과시킵니다
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleException(Exception e) {
+        e.printStackTrace();
         // 개발 중이므로 요청을 성공으로 처리
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.OK.value());
