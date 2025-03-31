@@ -101,6 +101,7 @@ public class JwtTokenUtil {
         System.out.println("geneate token: "+employee);
         Map<String, Object> claims = new HashMap<>();
         // 기본 인증 정보
+        claims.put("id", employee.getId());
         claims.put("role", employee.getRole());
         claims.put("name", employee.getName());
         claims.put("empNum", employee.getEmpNum());
@@ -131,6 +132,7 @@ public class JwtTokenUtil {
         Map<String, Object> claims = new HashMap<>();
 
         // 기본 인증 정보
+        claims.put("id", employee.getId());
         claims.put("role", employee.getRole());
         claims.put("name", employee.getName());
         claims.put("empNum", employee.getEmpNum());

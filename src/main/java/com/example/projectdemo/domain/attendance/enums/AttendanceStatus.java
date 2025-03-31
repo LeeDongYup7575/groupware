@@ -1,7 +1,7 @@
 package com.example.projectdemo.domain.attendance.enums;
 
 public enum AttendanceStatus {
-    NORMAL("정상출근"),
+    NORMAL("출근"),
     CHECKOUT("퇴근"),
     LATE("지각"),
     EARLY_LEAVE("조퇴"),

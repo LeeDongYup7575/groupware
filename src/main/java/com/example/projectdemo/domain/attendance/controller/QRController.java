@@ -2,7 +2,7 @@ package com.example.projectdemo.domain.attendance.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.service.EmployeeService;
+import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -20,10 +20,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDateTime;
 
 
@@ -36,7 +34,7 @@ public class QRController {
     private JwtTokenUtil jwtUtil;
 
     @Autowired
-    private EmployeeService employeeService;
+    private EmployeesService employeeService;
 
     private static final int QR_CODE_SIZE = 250;
 

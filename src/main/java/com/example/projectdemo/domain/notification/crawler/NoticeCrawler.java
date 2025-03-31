@@ -45,10 +45,11 @@ public class NoticeCrawler {
     }
 
     /**
-     * 실제 크롤링을 수행하는 메소드
+     * 실제 크롤링을 수행하는 메소드 - try-finally 패턴 적용
      */
     public static List<Notice> crawlNotices() {
         List<Notice> noticeList = new ArrayList<>();
+        WebDriver driver = null;
 
         System.out.println("===== 공지사항 크롤링 시작 =====");
 
@@ -66,53 +67,55 @@ public class NoticeCrawler {
 
             // ChromeDriver 객체 생성
             System.out.println("ChromeDriver 객체 생성 시도...");
-            WebDriver driver = new ChromeDriver(options);
+            driver = new ChromeDriver(options);
             System.out.println("ChromeDriver 객체 생성 성공!");
 
-            try {
-                // 공지사항 페이지로 이동
-                System.out.println("공지사항 페이지로 이동 중...");
-                driver.get("https://www.keduit.com/renew_community/notice/list.php");
-                System.out.println("페이지 로드 완료");
+            // 공지사항 페이지로 이동
+            System.out.println("공지사항 페이지로 이동 중...");
+            driver.get("https://www.keduit.com/renew_community/notice/list.php");
+            System.out.println("페이지 로드 완료");
 
-                // 게시글 목록 찾기
-                System.out.println("게시글 목록 찾는 중...");
-                List<WebElement> posts = driver.findElements(By.cssSelector("a[href^='javascript:view']"));
-                System.out.println("찾은 게시글 수: " + posts.size());
+            // 게시글 목록 찾기
+            System.out.println("게시글 목록 찾는 중...");
+            List<WebElement> posts = driver.findElements(By.cssSelector("a[href^='javascript:view']"));
+            System.out.println("찾은 게시글 수: " + posts.size());
 
-                // 각 게시글 클릭하여 정보 추출
-                for (WebElement post : posts) {
-                    String postTitle = post.getText();
-                    String postHref = post.getAttribute("href");
-                    System.out.println("게시글 제목: " + postTitle);
-                    System.out.println("게시글 href: " + postHref);
+            // 각 게시글 클릭하여 정보 추출
+            for (WebElement post : posts) {
+                String postTitle = post.getText();
+                String postHref = post.getAttribute("href");
+                System.out.println("게시글 제목: " + postTitle);
+                System.out.println("게시글 href: " + postHref);
 
-                    // 게시글 ID 추출
-                    String postId = postHref.replaceAll("javascript:view\\('(\\d+)'\\)", "$1");
-                    System.out.println("추출된 ID: " + postId);
+                // 게시글 ID 추출
+                String postId = postHref.replaceAll("javascript:view\\('(\\d+)'\\)", "$1");
+                System.out.println("추출된 ID: " + postId);
 
-                    // 게시글 URL 생성
-                    String postUrl = "https://www.keduit.com/renew_community/notice/view.php?id=" + postId;
-                    System.out.println("생성된 URL: " + postUrl);
+                // 게시글 URL 생성
+                String postUrl = "https://www.keduit.com/renew_community/notice/view.php?id=" + postId;
+                System.out.println("생성된 URL: " + postUrl);
 
-                    // Notice 객체 생성하여 리스트에 추가
-                    if (!postTitle.isEmpty() && !postUrl.isEmpty()) {
-                        noticeList.add(new Notice(postId, postTitle, postUrl));
-                        System.out.println("공지사항 객체 추가 완료");
-                    }
+                // Notice 객체 생성하여 리스트에 추가
+                if (!postTitle.isEmpty() && !postUrl.isEmpty()) {
+                    noticeList.add(new Notice(postId, postTitle, postUrl));
+                    System.out.println("공지사항 객체 추가 완료");
                 }
-            } catch (Exception e) {
-                System.out.println("크롤링 중 오류 발생: " + e.getMessage());
-                e.printStackTrace();
-            } finally {
-                // 웹 드라이버 종료
-                System.out.println("웹 드라이버 종료 중...");
-                driver.quit();
-                System.out.println("웹 드라이버 종료 완료");
             }
         } catch (Exception e) {
-            System.out.println("ChromeDriver 설정 중 오류 발생: " + e.getMessage());
+            System.out.println("크롤링 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            // 웹 드라이버 안전하게 종료
+            if (driver != null) {
+                try {
+                    System.out.println("웹 드라이버 종료 중...");
+                    driver.quit();
+                    System.out.println("웹 드라이버 종료 완료");
+                } catch (Exception e) {
+                    System.out.println("웹 드라이버 종료 중 오류 발생: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
         }
 
         System.out.println("총 수집된 공지사항 수: " + noticeList.size());
@@ -150,5 +153,4 @@ public class NoticeCrawler {
             return createdTime;
         }
     }
-
 }

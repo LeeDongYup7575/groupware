@@ -3,8 +3,7 @@ package com.example.projectdemo.domain.employees.service;
 import com.example.projectdemo.config.PasswordEncoder;
 import com.example.projectdemo.domain.auth.service.EmailService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.entity.Employees;
-import com.example.projectdemo.domain.employees.mapper.EmployeeMapper;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +13,10 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
 @Service
-public class EmployeeService {
+public class EmployeesService {
 
     @Autowired
-    private EmployeeMapper employeeMapper;
+    private EmployeesMapper employeeMapper;
 
     @Autowired
     private EmailService emailService;
@@ -55,6 +54,7 @@ public class EmployeeService {
     public EmployeesDTO findByEmpNum(String empNum) {
         return employeeMapper.findByEmpNum(empNum);
     }
+
 
     /**
      * 회원가입 및 임시 비밀번호 생성

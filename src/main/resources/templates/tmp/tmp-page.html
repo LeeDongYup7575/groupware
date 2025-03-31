@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>임시페이지</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .employee-info {
+      padding: 15px;
+    }
+    .info-item {
+      display: flex;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .info-label {
+      font-weight: 600;
+      width: 100px;
+      color: #495057;
+    }
+    .info-value {
+      flex: 1;
+    }
+    .current-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .status-normal {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .status-late {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    .status-checkout {
+      background-color: #d6d8db;
+      color: #383d41;
+    }
+    .status-early-leave {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .profile-section {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 20px;
+    }
+    .profile-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 20px;
+    }
+    .profile-details {
+      flex: 1;
+    }
+    .employee-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 5px 0;
+    }
+    .employee-position {
+      color: #6c757d;
+      margin: 0 0 10px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+    <div>
+      tmp-jwt 사용
+      <
+    </div>
+  <div class="profile-section">
+    <img class="profile-image" th:src="${token.profileImgUrl != null ? token.profileImgUrl : '/assets/images/default-profile.png'}"
+         src="/images/default-profile.png" alt="프로필 이미지">
+    <div class="profile-details">
+      <h2 class="employee-name" th:text="${token.name}">홍길동</h2>
+      <p class="employee-position" th:text="${token.position != null ? token.position.name : '직책 정보 없음'}">대리</p>
+      <p>
+                <span class="current-status" th:class="${token.attendStatus == '출근' ? 'current-status status-normal' :
+                                          (token.attendStatus == '지각' ? 'current-status status-late' :
+                                          (token.attendStatus == '퇴근' ? 'current-status status-checkout' :
+                                          (token.attendStatus == '조퇴' ? 'current-status status-early-leave' : 'current-status')))}"
+                      th:text="${token.attendStatus != null ? token.attendStatus : '미출근'}">미출근</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="employee-info">
+    <div class="info-item">
+      <span class="info-label">사번:</span>
+      <span class="info-value" th:text="${token.empNum}">E001</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">부서:</span>
+      <span class="info-value" th:text="${token.department != null ? token.department.name : '부서 정보 없음'}">개발팀</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">이메일:</span>
+      <span class="info-value" th:text="${token.email}">employee@company.com</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">내선번호:</span>
+      <span class="info-value" th:text="${token.internalEmail}">internal@company.com</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

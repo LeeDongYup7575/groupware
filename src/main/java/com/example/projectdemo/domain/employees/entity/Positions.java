@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Department {
+public class Positions {
 
     private Integer id;
-    private String name;
+    private String title;
 }

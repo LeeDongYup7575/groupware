@@ -38,6 +38,6 @@ public class Employees {
     private Integer usedLeave;
 
     // Transient 대신 제외할 필드는 직접 선언하지 않음
-    private transient Department department;
-    private transient Position position;
+    private transient Departments department;
+    private transient Positions position;
 }

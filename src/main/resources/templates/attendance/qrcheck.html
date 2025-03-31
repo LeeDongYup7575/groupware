@@ -79,7 +79,7 @@
             <p><strong>사번:</strong> <span th:text="${employee.empNum}">E001</span></p>
             <p>
                 <strong>현재 상태:</strong>
-                <span th:class="${employee.attendStatus == '정상출근' ? 'current-status status-normal' :
+                <span th:class="${employee.attendStatus == '출근' ? 'current-status status-normal' :
                                     (employee.attendStatus == '지각' ? 'current-status status-late' :
                                     (employee.attendStatus == '퇴근' ? 'current-status status-checkout' :
                                     (employee.attendStatus == '조퇴' ? 'current-status status-early-leave' : 'current-status')))}"
@@ -88,12 +88,12 @@
             <p><strong>현재 시간:</strong> <span id="current-time" th:text="${#temporals.format(currentTime, 'yyyy-MM-dd HH:mm:ss')}">2023-01-01 09:00:00</span></p>
         </div>
 
-<!--        <div class="btn-group" role="group" aria-label="Attendance options">-->
-<!--            <a th:href="@{/qr/select-attendance-type(type='NORMAL')}" class="btn btn-primary">출근</a>-->
-<!--            <a th:href="@{/qr/select-attendance-type(type='LATE')}" class="btn btn-warning">지각</a>-->
-<!--            <a th:href="@{/qr/select-attendance-type(type='EARLY_LEAVE')}" class="btn btn-info">조퇴</a>-->
-<!--            <a th:href="@{/qr/select-attendance-type(type='CHECKOUT')}" class="btn btn-success">퇴근</a>-->
-<!--        </div>-->
+        <!--        <div class="btn-group" role="group" aria-label="Attendance options">-->
+        <!--            <a th:href="@{/qr/select-attendance-type(type='NORMAL')}" class="btn btn-primary">출근</a>-->
+        <!--            <a th:href="@{/qr/select-attendance-type(type='LATE')}" class="btn btn-warning">지각</a>-->
+        <!--            <a th:href="@{/qr/select-attendance-type(type='EARLY_LEAVE')}" class="btn btn-info">조퇴</a>-->
+        <!--            <a th:href="@{/qr/select-attendance-type(type='CHECKOUT')}" class="btn btn-success">퇴근</a>-->
+        <!--        </div>-->
         <div class="btn-group" role="group" aria-label="Attendance options">
             <button onclick="selectAttendanceType('NORMAL')" class="btn btn-primary attendance-type-btn" data-type="NORMAL">출근</button>
             <button onclick="selectAttendanceType('LATE')" class="btn btn-warning attendance-type-btn" data-type="LATE">지각</button>
@@ -111,10 +111,10 @@
                                (selectedType == 'EARLY_LEAVE' ? '조퇴' : '퇴근'))}">정상출근</strong>
         </p>
 
-<!--        <div class="qr-image">-->
-<!--            <img th:src="@{/qr/generate-qr(type=${selectedType != null ? selectedType : 'NORMAL'})}"-->
-<!--                 alt="QR Code" id="qrImage" class="img-fluid">-->
-<!--        </div>-->
+        <!--        <div class="qr-image">-->
+        <!--            <img th:src="@{/qr/generate-qr(type=${selectedType != null ? selectedType : 'NORMAL'})}"-->
+        <!--                 alt="QR Code" id="qrImage" class="img-fluid">-->
+        <!--        </div>-->
         <div class="qr-image">
             <img id="qrImage" class="img-fluid" alt="QR Code">
         </div>

@@ -3,9 +3,8 @@ package com.example.projectdemo.domain.attendance.controller;
 import com.example.projectdemo.domain.attendance.entity.Attendance;
 import com.example.projectdemo.domain.attendance.service.AttendanceService;
 import com.example.projectdemo.domain.attendance.util.QRTokenUtil;
-import com.example.projectdemo.domain.employees.entity.Employees;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.service.EmployeeService;
+import com.example.projectdemo.domain.employees.service.EmployeesService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ public class QRApiController {
     private QRTokenUtil qrTokenUtil;
 
     @Autowired
-    private EmployeeService employeeService;
+    private EmployeesService employeeService;
 
     @Autowired
     private AttendanceService attendanceService;

@@ -2,13 +2,20 @@ package com.example.projectdemo.domain.notification.controller;
 
 import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
 import com.example.projectdemo.domain.notification.model.Notice;
+import com.example.projectdemo.tmp.TmpJwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -27,7 +34,7 @@ public class NoticeController {
     }
 
     @GetMapping("/")
-    public String home(Model model) {
+    public String home(Model model, HttpServletResponse response) {
         System.out.println("===== / 엔드포인트 요청 시작 =====");
 
         // 캐시에서 공지사항 데이터 가져오기 시도
@@ -40,7 +47,7 @@ public class NoticeController {
         System.out.println("'intro' 템플릿 반환 준비 완료");
         System.out.println("===== / 엔드포인트 요청 종료 =====");
 
-        return "intro"; // Thymeleaf 템플릿 이름
+        return "intro";
     }
 
     private List<Notice> getCachedNotices() {
@@ -108,5 +115,8 @@ public class NoticeController {
             return createdTime;
         }
     }
+
+
+
 
 }

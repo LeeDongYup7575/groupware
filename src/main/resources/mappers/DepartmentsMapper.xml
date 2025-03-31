@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.projectdemo.domain.employees.repository.DepartmentRepository">
 
-    <resultMap id="departmentMap" type="com.example.projectdemo.domain.employees.entity.Department">
+    <resultMap id="departmentMap" type="com.example.projectdemo.domain.employees.entity.Departments">
         <id property="id" column="id" />
         <result property="name" column="name" />
     </resultMap>
@@ -19,11 +19,11 @@
         SELECT * FROM departments WHERE name = #{name}
     </select>
 
-    <insert id="save" parameterType="com.example.projectdemo.domain.employees.entity.Department" useGeneratedKeys="true" keyProperty="id">
+    <insert id="save" parameterType="com.example.projectdemo.domain.employees.entity.Departments" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO departments (name) VALUES (#{name})
     </insert>
 
-    <update id="update" parameterType="com.example.projectdemo.domain.employees.entity.Department">
+    <update id="update" parameterType="com.example.projectdemo.domain.employees.entity.Departments">
         UPDATE departments SET name = #{name} WHERE id = #{id}
     </update>
 

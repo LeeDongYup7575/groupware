@@ -18,6 +18,7 @@ public class JwtResponseDTO {
     private String refreshToken;
 
     // 핵심 직원 정보
+    private int id;
     private String empNum;
     private String name;
     private String email;

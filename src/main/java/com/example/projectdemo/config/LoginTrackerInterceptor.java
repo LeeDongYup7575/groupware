@@ -1,13 +1,11 @@
 package com.example.projectdemo.config;
 
-import com.example.projectdemo.domain.employees.mapper.EmployeeMapper;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.time.LocalDateTime;
 
 /**
  * 로그인 추적 인터셉터
@@ -16,10 +14,10 @@ import java.time.LocalDateTime;
 @Component
 public class LoginTrackerInterceptor implements HandlerInterceptor {
 
-    private final EmployeeMapper employeeMapper;
+    private final EmployeesMapper employeeMapper;
 
     @Autowired
-    public LoginTrackerInterceptor(EmployeeMapper employeeMapper) {
+    public LoginTrackerInterceptor(EmployeesMapper employeeMapper) {
         this.employeeMapper = employeeMapper;
     }
 

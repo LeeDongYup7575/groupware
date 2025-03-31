@@ -6,8 +6,12 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 
+
 @Mapper
-public interface EmployeeMapper {
+public interface EmployeesMapper {
+
+    // 사원 전체 조회
+    EmployeesDTO selectEmpAll();
 
     // 사원번호로 직원 조회
     EmployeesDTO findByEmpNum(@Param("empNum") String empNum);

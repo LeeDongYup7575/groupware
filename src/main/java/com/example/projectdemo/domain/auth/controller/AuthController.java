@@ -5,8 +5,8 @@ import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.EmailService;
 import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.mapper.EmployeeMapper;
-import com.example.projectdemo.domain.employees.service.EmployeeService;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
+import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -30,17 +29,17 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final JwtTokenUtil jwtTokenUtil;
-    private final EmployeeMapper employeeMapper;
+    private final EmployeesMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
-    private final EmployeeService employeeService;
+    private final EmployeesService employeeService;
     private final EmailService emailService;
     private final ProfileUploadService profileUploadService;
 
     @Autowired
     public AuthController(JwtTokenUtil jwtTokenUtil,
-                          EmployeeMapper employeeMapper,
+                          EmployeesMapper employeeMapper,
                           PasswordEncoder passwordEncoder,
-                          EmployeeService employeeService,
+                          EmployeesService employeeService,
                           EmailService emailService,
                           ProfileUploadService profileUploadService) {
         this.jwtTokenUtil = jwtTokenUtil;
@@ -90,6 +89,7 @@ public class AuthController {
             JwtResponseDTO jwtResponse = JwtResponseDTO.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
+                    .id(employee.getId())
                     .empNum(employee.getEmpNum())
                     .name(employee.getName())
                     .email(employee.getEmail())

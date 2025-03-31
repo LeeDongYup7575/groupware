@@ -4,7 +4,7 @@ import com.example.projectdemo.domain.attendance.entity.Attendance;
 import com.example.projectdemo.domain.attendance.enums.AttendanceStatus;
 import com.example.projectdemo.domain.attendance.mapper.AttendanceMapper;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.mapper.EmployeeMapper;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.List;
 public class AttendanceService {
 
     private final AttendanceMapper attendanceMapper;
-    private final EmployeeMapper employeeMapper;
+    private final EmployeesMapper employeeMapper;
 
     private static final LocalTime STANDARD_START_TIME = LocalTime.of(9, 0); // 9:00 AM
     private static final LocalTime LATE_TIME = LocalTime.of(9, 30); // 9:30 AM
@@ -135,11 +135,11 @@ public class AttendanceService {
     @Transactional
     public Attendance processAttendanceById(Integer empId, String attendanceType) {
         switch (attendanceType) {
-            case "NORMAL":
-            case "LATE":
+            case "출근":
+            case "지각":
                 return recordCheckIn(empId);
-            case "CHECKOUT":
-            case "EARLY_LEAVE":
+            case "퇴근":
+            case "조퇴":
                 return recordCheckOut(empId);
             default:
                 throw new IllegalArgumentException("Invalid attendance type: " + attendanceType);
@@ -149,13 +149,11 @@ public class AttendanceService {
 
     @Transactional
     public Attendance processAttendanceByEmpNum(String empNum, String attendanceType) {
-        // Find employee by employee number (DTO 반환)
         EmployeesDTO employeeDTO = employeeMapper.findByEmpNum(empNum);
         if (employeeDTO == null) {
             throw new RuntimeException("Employee not found with employee number: " + empNum);
         }
 
-        // DTO의 ID를 사용하여 처리
         return processAttendanceById(employeeDTO.getId(), attendanceType);
     }
 

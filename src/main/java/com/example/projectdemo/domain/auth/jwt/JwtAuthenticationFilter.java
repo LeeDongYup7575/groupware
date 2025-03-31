@@ -1,7 +1,7 @@
 package com.example.projectdemo.domain.auth.jwt;
 
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.mapper.EmployeeMapper;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
-    private final EmployeeMapper employeeMapper;
+    private final EmployeesMapper employeeMapper;
     private final ObjectMapper objectMapper;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Autowired
-    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, EmployeeMapper employeeMapper, ObjectMapper objectMapper) {
+    public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, EmployeesMapper employeeMapper, ObjectMapper objectMapper) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeeMapper = employeeMapper;
         this.objectMapper = objectMapper;
