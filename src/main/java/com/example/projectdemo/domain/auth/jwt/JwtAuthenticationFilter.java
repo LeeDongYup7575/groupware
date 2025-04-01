@@ -60,6 +60,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            // CORS 프리플라이트 요청에 필요한 헤더 설정
+            response.setHeader("Access-Control-Allow-Origin", "*"); // 필요에 따라 도메인 제한 가능
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+            response.setHeader("Access-Control-Max-Age", "3600"); // 프리플라이트 캐싱 시간(초)
+
+            // OPTIONS 요청은 여기서 종료 (200 OK 응답)
+            response.setStatus(HttpServletResponse.SC_OK);
+            return; // 더 이상 필터 체인을 진행하지 않음
+        }
 
         String requestURI = request.getRequestURI();
 
