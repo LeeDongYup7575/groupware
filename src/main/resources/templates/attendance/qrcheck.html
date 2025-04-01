@@ -88,12 +88,6 @@
             <p><strong>현재 시간:</strong> <span id="current-time" th:text="${#temporals.format(currentTime, 'yyyy-MM-dd HH:mm:ss')}">2023-01-01 09:00:00</span></p>
         </div>
 
-        <!--        <div class="btn-group" role="group" aria-label="Attendance options">-->
-        <!--            <a th:href="@{/qr/select-attendance-type(type='NORMAL')}" class="btn btn-primary">출근</a>-->
-        <!--            <a th:href="@{/qr/select-attendance-type(type='LATE')}" class="btn btn-warning">지각</a>-->
-        <!--            <a th:href="@{/qr/select-attendance-type(type='EARLY_LEAVE')}" class="btn btn-info">조퇴</a>-->
-        <!--            <a th:href="@{/qr/select-attendance-type(type='CHECKOUT')}" class="btn btn-success">퇴근</a>-->
-        <!--        </div>-->
         <div class="btn-group" role="group" aria-label="Attendance options">
             <button onclick="selectAttendanceType('BEFORE_WORK')" class="btn attendance-type-btn" style="background-color: #a5d6a7" data-type="BEFORE_WORK">출근 전</button>
             <button onclick="selectAttendanceType('NORMAL')" class="btn btn-primary attendance-type-btn" data-type="NORMAL">출근</button>
@@ -245,7 +239,7 @@
             countdownElement.textContent = seconds;
 
             if (seconds <= 0) {
-                const selectedType = document.querySelector('[name="selectedType"]')?.value || 'NORMAL';
+                const selectedType = document.querySelector('[name="selectedType"]')?.value || 'BEFORE_WORK';
                 loadQrCode(selectedType);
                 resetCountdown();
             }
