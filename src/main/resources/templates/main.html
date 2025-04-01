@@ -189,6 +189,23 @@
   </style>
 </head>
 <body>
+<script>
+  function openChat() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      alert("로그인이 필요합니다");
+      return;
+    }
+
+    // 새 창 열기
+    const url = `http://localhost:3000?token=${encodeURIComponent(token)}`;
+    const newWindow = window.open(url, "_blank");
+
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
+    }
+  }
+</script>
 
 
 
