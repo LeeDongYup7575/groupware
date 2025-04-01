@@ -7,6 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,9 @@ public class NoticeCrawler {
     // 메모리 캐시 (실제 프로덕션에서는 Redis 등의 외부 캐시 서버 권장)
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
     private static final long CACHE_EXPIRY_TIME_MS = 3600000; // 1시간(밀리초)
+
+    @Value("${webdriver.chrome.driver}")
+    private String webDriverPath;
 
     public List<Notice> getNotices() {
         String cacheKey = "notices";
@@ -47,7 +51,7 @@ public class NoticeCrawler {
     /**
      * 실제 크롤링을 수행하는 메소드 - try-finally 패턴 적용
      */
-    public static List<Notice> crawlNotices() {
+    public List<Notice> crawlNotices() {
         List<Notice> noticeList = new ArrayList<>();
         WebDriver driver = null;
 
@@ -55,9 +59,8 @@ public class NoticeCrawler {
 
         try {
             // WebDriver 경로 설정
-            System.setProperty("webdriver.chrome.driver", "/opt/homebrew/bin/chromedriver");
-//            String url = "C:/WebDrive/bin/chromedriver-win64/chromedriver.exe";
-//            System.setProperty("webdriver.chrome.driver", url);
+            System.setProperty("webdriver.chrome.driver", webDriverPath);
+
             // Chrome 옵션 설정
             System.out.println("Chrome 옵션 설정 중...");
             ChromeOptions options = new ChromeOptions();
@@ -82,7 +85,10 @@ public class NoticeCrawler {
             System.out.println("찾은 게시글 수: " + posts.size());
 
             // 각 게시글 클릭하여 정보 추출
+            int count = 0;
             for (WebElement post : posts) {
+                if(count==4) break;
+                count++;
                 String postTitle = post.getText();
                 String postHref = post.getAttribute("href");
                 System.out.println("게시글 제목: " + postTitle);

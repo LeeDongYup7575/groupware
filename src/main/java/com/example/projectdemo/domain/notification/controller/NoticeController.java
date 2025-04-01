@@ -25,12 +25,8 @@ public class NoticeController {
     // 캐시 유효 시간 (1시간 = 3600000ms)
     private static final long CACHE_EXPIRY_TIME_MS = 3600000;
 
-    private final NoticeCrawler noticeCrawler;
-
     @Autowired
-    public NoticeController(NoticeCrawler noticeCrawler) {
-        this.noticeCrawler = noticeCrawler;
-    }
+    private NoticeCrawler noticeCrawler;
 
     @GetMapping("/")
     public String home(Model model, HttpServletResponse response) {
@@ -68,7 +64,7 @@ public class NoticeController {
         try {
             // NoticeCrawler를 사용하여 공지사항 데이터 크롤링
             System.out.println("NoticeCrawler.crawlNotices() 호출 시작");
-            freshNotices = NoticeCrawler.crawlNotices();
+            freshNotices = noticeCrawler.crawlNotices();
             System.out.println("NoticeCrawler.crawlNotices() 호출 완료");
             System.out.println("크롤링된 공지사항 수: " + freshNotices.size());
 
