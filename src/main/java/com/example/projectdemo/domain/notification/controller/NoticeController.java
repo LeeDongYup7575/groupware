@@ -2,7 +2,6 @@ package com.example.projectdemo.domain.notification.controller;
 
 import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
 import com.example.projectdemo.domain.notification.model.Notice;
-import com.example.projectdemo.tmp.TmpJwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

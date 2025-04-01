@@ -95,20 +95,22 @@
         <!--            <a th:href="@{/qr/select-attendance-type(type='CHECKOUT')}" class="btn btn-success">퇴근</a>-->
         <!--        </div>-->
         <div class="btn-group" role="group" aria-label="Attendance options">
+            <button onclick="selectAttendanceType('BEFORE_WORK')" class="btn attendance-type-btn" style="background-color: #a5d6a7" data-type="BEFORE_WORK">출근 전</button>
             <button onclick="selectAttendanceType('NORMAL')" class="btn btn-primary attendance-type-btn" data-type="NORMAL">출근</button>
             <button onclick="selectAttendanceType('LATE')" class="btn btn-warning attendance-type-btn" data-type="LATE">지각</button>
             <button onclick="selectAttendanceType('EARLY_LEAVE')" class="btn btn-info attendance-type-btn" data-type="EARLY_LEAVE">조퇴</button>
             <button onclick="selectAttendanceType('CHECKOUT')" class="btn btn-success attendance-type-btn" data-type="CHECKOUT">퇴근</button>
         </div>
         <!-- 선택된 타입을 저장할 히든 필드 -->
-        <input type="hidden" name="selectedType" value="NORMAL">
+        <input type="hidden" name="selectedType" value="BEFORE_WORK">
 
         <p class="instruction">모바일 앱으로 아래 QR 코드를 스캔하여 출퇴근을 기록하세요.</p>
         <p class="instruction" th:if="${selectedType != null}">
             현재 선택된 모드:
-            <strong th:text="${selectedType == 'NORMAL' ? '정상출근' :
+            <strong th:text="${selectedType == 'BEFORE_WORK' ? '출근 전' :
+                               (selectedType == 'NORMAL' ? '출근' :
                                (selectedType == 'LATE' ? '지각' :
-                               (selectedType == 'EARLY_LEAVE' ? '조퇴' : '퇴근'))}">정상출근</strong>
+                               (selectedType == 'EARLY_LEAVE' ? '조퇴' : '퇴근')))}">정상출근</strong>
         </p>
 
         <!--        <div class="qr-image">-->
@@ -170,9 +172,6 @@
                 console.log('accessToken: 존재함');
             }
         });
-
-        // 직접 로그인 페이지로 이동하는 임시 링크 제공
-        console.log('로그인 문제 해결을 위해 다음 링크를 클릭하세요: /auth/login');
 
         // API 요청
         fetch(`/qr/generate-qr?type=${attendanceType}`, {

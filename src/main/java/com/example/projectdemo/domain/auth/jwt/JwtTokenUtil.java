@@ -65,6 +65,7 @@ public class JwtTokenUtil {
         Claims claims = getAllClaimsFromToken(token);
         return claims.get("tempPassword", Boolean.class);
     }
+
     public int getIdFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);
         return claims.get("id", Integer.class);
@@ -88,7 +89,6 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
 
     /**
      * 토큰 만료 확인
@@ -117,8 +117,8 @@ public class JwtTokenUtil {
         claims.put("profileImgUrl", employee.getProfileImgUrl());
 
         // 근무 관련 정보
-        claims.put("departmentId", employee.getDepId());
-        claims.put("positionId", employee.getPosId());
+        claims.put("depId", employee.getDepId());
+        claims.put("posId", employee.getPosId());
         claims.put("hireDate", employee.getHireDate().toString());
         claims.put("attendStatus", employee.getAttendStatus());
 
@@ -149,8 +149,8 @@ public class JwtTokenUtil {
         claims.put("profileImgUrl", employee.getProfileImgUrl());
 
         // 근무 관련 정보
-        claims.put("departmentId", employee.getDepId());
-        claims.put("positionId", employee.getPosId());
+        claims.put("depId", employee.getDepId());
+        claims.put("posId", employee.getPosId());
         claims.put("hireDate", employee.getHireDate().toString());
         claims.put("attendStatus", employee.getAttendStatus());
 

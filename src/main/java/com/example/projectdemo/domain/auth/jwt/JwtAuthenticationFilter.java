@@ -45,10 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     );
 
     //개발용
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return true;
-    }
+//    @Override
+//    protected boolean shouldNotFilter(HttpServletRequest request) {
+//        return true;
+//    }
 
     @Autowired
     public JwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil, EmployeesMapper employeeMapper, ObjectMapper objectMapper) {
@@ -116,10 +116,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             employeeMapper.updateLastLogin(empNum, LocalDateTime.now());
 
             // 요청 속성에 사용자 정보 설정
+            request.setAttribute("id",id);
             request.setAttribute("empNum", empNum);
             request.setAttribute("role", role);
             request.setAttribute("tempPassword", tempPassword);
-            request.setAttribute("id",id);
 
             // 요청 진행
             filterChain.doFilter(request, response);

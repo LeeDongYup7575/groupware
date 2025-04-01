@@ -46,7 +46,7 @@ public class QRController {
     ) {
         try {
             // JWT 필터에서 설정한 사원번호 추출
-            String empNum = (String) request.getAttribute("empNum");
+            String empNum = (String)request.getAttribute("empNum");
 
             if (empNum == null) {
                 logger.warn("No employee number found in request attributes");
@@ -74,7 +74,7 @@ public class QRController {
     @GetMapping(value = "/generate-qr", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public ResponseEntity<byte[]> generateQRCode(
-            @RequestParam(required = false, defaultValue = "NORMAL") String type,
+            @RequestParam(required = false, defaultValue = "출근") String type,
             HttpServletRequest request) {
         try {
             logger.debug("Authorization header: {}", request.getHeader("Authorization"));

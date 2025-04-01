@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import com.example.projectdemo.config.PasswordEncoder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,7 +52,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginRequest, Model model) {
         try {
             EmployeesDTO employee = employeeMapper.findByEmpNum(loginRequest.getEmpNum());
 
