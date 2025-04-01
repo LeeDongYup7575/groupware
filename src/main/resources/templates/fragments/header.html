@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>헤더 프래그먼트</title>
+</head>
+<body>
+<!-- 네비게이션 바 -->
+<nav th:fragment="header" class="gw-navbar">
+    <div class="gw-container">
+        <a class="gw-navbar-brand" href="/">
+            <span>GROUP<span class="gw-accent-color">WARE</span></span>
+        </a>
+        <input type="checkbox" id="gw-navbar-toggle" class="gw-navbar-toggle">
+        <label for="gw-navbar-toggle" class="gw-navbar-toggle-label">
+            <span class="gw-hamburger"></span>
+        </label>
+        <div class="gw-navbar-collapse">
+            <ul class="gw-navbar-nav">
+                <li class="gw-nav-item">
+                    <a class="gw-nav-link" href="/">홈</a>
+                </li>
+                <li class="gw-nav-item">
+                    <a class="gw-nav-link" href="#contact">문의</a>
+                </li>
+                <!-- 로그인 안된 상태일 때 보이는 버튼 -->
+                <li class="gw-nav-item" id="login-button">
+                    <a class="gw-btn gw-btn-login" href="/auth/login">로그인</a>
+                </li>
+                <!-- 로그인된 상태일 때 보이는 사용자 메뉴 -->
+                <li class="gw-nav-item gw-user-dropdown" id="user-dropdown" style="display: none;">
+                    <input type="checkbox" id="gw-dropdown-toggle" class="gw-dropdown-toggle">
+                    <label for="gw-dropdown-toggle" class="gw-dropdown-toggle-label">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="user-name">사용자</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </label>
+                    <ul class="gw-dropdown-menu">
+                        <li><a class="gw-dropdown-item" href="/mypage"><i class="fas fa-user"></i> 마이페이지</a></li>
+                        <li><a class="gw-dropdown-item" href="/attendances"><i class="fas fa-clock"></i> 근태관리</a></li>
+                        <li><a class="gw-dropdown-item" href="#" onclick="navigateToQRCheck(event)"><i class="fas fa-file-signature"></i>QR</a></li>
+                        <li><hr class="gw-dropdown-divider"></li>
+                        <li><a class="gw-dropdown-item" href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i> 로그아웃</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- CSS 부분 -->
+<th:block th:fragment="headerAssets">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style th:fragment="headerCss">
+        :root {
+            --gw-primary-color: #0183D4;
+            --gw-primary-light: #DDF6FF;
+            --gw-primary-dark: #0066a8;
+            --gw-secondary-color: #f3f4f6;
+            --gw-text-color: #1f2937;
+            --gw-text-light: #6b7280;
+            --gw-accent-color: #f97316;
+            --gw-white: #ffffff;
+            --gw-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .gw-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 네비게이션 바 */
+        .gw-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--gw-white);
+            box-shadow: var(--gw-box-shadow);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .gw-navbar-scrolled {
+            height: 60px;
+        }
+
+        .gw-navbar .gw-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .gw-navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gw-primary-color);
+            text-decoration: none;
+        }
+
+        .gw-accent-color {
+            color: var(--gw-accent-color);
+        }
+
+        /* 햄버거 메뉴 */
+        .gw-navbar-toggle {
+            display: none;
+        }
+
+        .gw-navbar-toggle-label {
+            display: none;
+            cursor: pointer;
+            position: relative;
+            height: 24px;
+            width: 30px;
+        }
+
+        .gw-hamburger,
+        .gw-hamburger::before,
+        .gw-hamburger::after {
+            position: absolute;
+            width: 30px;
+            height: 3px;
+            background-color: var(--gw-primary-color);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .gw-hamburger {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .gw-hamburger::before,
+        .gw-hamburger::after {
+            content: '';
+            left: 0;
+        }
+
+        .gw-hamburger::before {
+            top: -8px;
+        }
+
+        .gw-hamburger::after {
+            bottom: -8px;
+        }
+
+        /* 네비게이션 메뉴 */
+        .gw-navbar-nav {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gw-nav-item {
+            margin-left: 1.5rem;
+        }
+
+        .gw-nav-link {
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--gw-text-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .gw-nav-link:hover {
+            color: var(--gw-primary-color);
+        }
+
+        /* 버튼 스타일 */
+        .gw-btn {
+            display: inline-block;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .gw-btn-login {
+            background-color: var(--gw-white);
+            color: var(--gw-primary-color);
+            border: 2px solid var(--gw-primary-color);
+        }
+
+        .gw-btn-login:hover {
+            background-color: var(--gw-primary-color);
+            color: var(--gw-white);
+        }
+
+        /* 드롭다운 메뉴 */
+        .gw-user-dropdown {
+            position: relative;
+        }
+
+        .gw-dropdown-toggle {
+            display: none;
+        }
+
+        .gw-dropdown-toggle-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gw-text-color);
+        }
+
+        .gw-dropdown-toggle-label i {
+            margin-right: 0.5rem;
+        }
+
+        .gw-dropdown-toggle-label .fa-chevron-down {
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .gw-dropdown-toggle:checked + .gw-dropdown-toggle-label .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .gw-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background-color: var(--gw-white);
+            border-radius: 0.5rem;
+            box-shadow: var(--gw-box-shadow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            list-style: none;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+            z-index: 1001;
+        }
+
+        .gw-dropdown-toggle:checked ~ .gw-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .gw-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            color: var(--gw-text-color);
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .gw-dropdown-item:hover {
+            background-color: var(--gw-primary-light);
+        }
+
+        .gw-dropdown-item i {
+            margin-right: 0.5rem;
+            width: 1rem;
+        }
+
+        .gw-dropdown-divider {
+            height: 1px;
+            background-color: var(--gw-secondary-color);
+            border: none;
+            margin: 0.5rem 0;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .gw-navbar-toggle-label {
+                display: block;
+                z-index: 1001;
+            }
+
+            .gw-navbar-toggle:checked ~ .gw-navbar-toggle-label .gw-hamburger {
+                background-color: transparent;
+            }
+
+            .gw-navbar-toggle:checked ~ .gw-navbar-toggle-label .gw-hamburger::before {
+                transform: rotate(45deg);
+                top: 0;
+            }
+
+            .gw-navbar-toggle:checked ~ .gw-navbar-toggle-label .gw-hamburger::after {
+                transform: rotate(-45deg);
+                bottom: 0;
+            }
+
+            .gw-navbar-collapse {
+                position: fixed;
+                top: 0;
+                right: -280px;
+                width: 280px;
+                height: 100vh;
+                background-color: var(--gw-white);
+                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+                transition: right 0.3s ease;
+                z-index: 1000;
+                padding: 80px 20px 20px;
+                overflow-y: auto;
+            }
+
+            .gw-navbar-toggle:checked ~ .gw-navbar-collapse {
+                right: 0;
+            }
+
+            .gw-navbar-nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .gw-nav-item {
+                margin-left: 0;
+                margin-bottom: 1rem;
+                width: 100%;
+            }
+
+            .gw-dropdown-menu {
+                position: static;
+                box-shadow: none;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                width: 100%;
+                display: none;
+                margin-top: 0.5rem;
+            }
+
+            .gw-dropdown-toggle:checked ~ .gw-dropdown-menu {
+                display: block;
+            }
+        }
+    </style>
+</th:block>
+
+<!-- JavaScript 부분 -->
+<th:block th:fragment="headerScripts">
+    <script>
+        // 스크롤 시 네비게이션바 스타일 변경
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.gw-navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('gw-navbar-scrolled');
+            } else {
+                navbar.classList.remove('gw-navbar-scrolled');
+            }
+        });
+
+        // 페이지 로드 시 JWT 토큰 확인하여 로그인 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            // 로컬 스토리지에서 JWT 토큰 확인
+            const token = localStorage.getItem('accessToken');
+            const userName = localStorage.getItem('name');
+
+            // 요소들을 변수에 저장하고 존재 여부 확인
+            const loginButton = document.getElementById('login-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            const userNameElement = document.getElementById('user-name');
+
+            // 모바일 메뉴 닫기 함수
+            function closeMenu() {
+                document.getElementById('gw-navbar-toggle').checked = false;
+            }
+
+            // 모든 메뉴 링크에 이벤트 리스너 추가
+            const navLinks = document.querySelectorAll('.gw-nav-link, .gw-dropdown-item');
+            navLinks.forEach(link => {
+                link.addEventListener('click', closeMenu);
+            });
+
+            if (token) {
+                // 토큰이 있으면 로그인된 상태로 처리
+                if (loginButton) {
+                    loginButton.style.cssText = 'display: none !important;';
+                }
+
+                if (userDropdown) {
+                    userDropdown.style.cssText = 'display: block !important;';
+                }
+
+                // 사용자 이름 표시
+                if (userNameElement) {
+                    userNameElement.textContent = userName || '사용자';
+                }
+            }
+
+            // 로그아웃 버튼 클릭 이벤트
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // 로컬 스토리지에서 토큰 제거
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('empNum');
+                    localStorage.removeItem('name');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('role');
+
+                    // intro.html 페이지로 이동 
+                    window.location.href = '/';
+                });
+            }
+        });
+
+        // QR체크 페이지로 이동하는 함수
+        function navigateToQRCheck(event) {
+            event.preventDefault();
+
+            // 로컬 스토리지에서 토큰 가져오기
+            const token = localStorage.getItem('accessToken');
+
+            if (token) {
+                // fetch API를 사용하여 헤더에 토큰을 포함시켜 요청
+                fetch('/qr/qrcheck', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(response => {
+                        if (response.redirected) {
+                            // 리다이렉션이 있으면 해당 URL로 이동
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            // 응답이 HTML이면 전체 페이지를 그 내용으로 대체
+                            return response.text().then(html => {
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            });
+                        } else {
+                            console.error('QR 체크 페이지 로드 오류:', response.status);
+                            alert('QR 체크 페이지를 로드할 수 없습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('QR 체크 페이지 요청 오류:', error);
+                        alert('QR 체크 페이지 요청 중 오류가 발생했습니다.');
+                    });
+            } else {
+                // 토큰이 없으면 로그인 페이지로 리다이렉트
+                window.location.href = '/auth/login';
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>
