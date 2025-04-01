@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH X - 근태 관리</title>
+    <link rel="stylesheet" href="/css/attendLeavesHistory.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h1>TECH X</h1>
+        <span class="title">근태 관리</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
+        <ul class="menu">
+            <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
+            <li class="dropdown active">
+                <div class="dropdown-header">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
+                </div>
+                <ul class="submenu">
+                    <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i>휴가/근무</a></li>
+                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="tab-menu">
+            <a href="/attend/workSchedule"><button class="tab-button">근무현황</button></a>
+            <a href="/attend/leavesHistory"><button class="tab-button active">휴가내역</button></a>
+            <a href="/attend/annualStatistics"><button class="tab-button">연간통계</button></a>
+            <a href="/attend/workDetails"><button class="tab-button">근무신청내역</button></a>
+        </div>
+
+        <div class="date-selector">
+            <div class="date-navigator">
+                <button class="nav-button">&lt;</button>
+                <span class="date-range">2025-01-01 ~ 2025-12-31</span>
+                <button class="nav-button">&gt;</button>
+            </div>
+            <button class="apply-button">휴가 신청</button>
+        </div>
+
+        <div class="section-title">
+            휴가 생성 내역 2025-01-01 ~ 2025-12-31
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th rowspan="2">생성일</th>
+                <th colspan="2">생성 내역</th>
+                <th rowspan="2">내용</th>
+                <th rowspan="2">비고</th>
+            </tr>
+            <tr>
+                <th>발생</th>
+                <th>최종</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>2025-03-26</td>
+                <td>20일</td>
+                <td>20일</td>
+                <td>정기휴가</td>
+                <td>연차 (20일 x 8시간=160시간)</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="summary">
+            휴가 현황 총 휴가: 20일 | 사용: 0일 | 잔여: 20일 (연차: 20일)
+        </div>
+
+        <div class="section-title">
+            휴가 신청 내역
+        </div>
+
+        <table class="data-table application-table">
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th>신청자</th>
+                <th>휴가 종류</th>
+                <th>일수</th>
+                <th>기간</th>
+                <th>상태</th>
+                <th>상세</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td colspan="7" class="no-data">데이터가 없습니다.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // 드롭다운 메뉴 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownHeader = document.querySelector('.dropdown-header');
+        dropdownHeader.addEventListener('click', function() {
+            this.parentElement.classList.toggle('open');
+        });
+    });
+</script>
+</body>
+</html>

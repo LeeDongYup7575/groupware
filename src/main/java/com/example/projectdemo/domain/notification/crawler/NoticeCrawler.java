@@ -55,9 +55,8 @@ public class NoticeCrawler {
 
         try {
             // WebDriver 경로 설정
-//            System.setProperty("webdriver.chrome.driver", "/opt/homebrew/bin/chromedriver");
-            String url = "C:/WebDrive/bin/chromedriver-win64/chromedriver.exe";
-            System.setProperty("webdriver.chrome.driver", url);
+            System.setProperty("webdriver.chrome.driver", "/opt/homebrew/bin/chromedriver");
+
             // Chrome 옵션 설정
             System.out.println("Chrome 옵션 설정 중...");
             ChromeOptions options = new ChromeOptions();
