@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH X - 근태 관리</title>
+    <link rel="stylesheet" href="/css/attendAnnualStatistics.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h1>TECH X</h1>
+        <span class="title">근태 관리</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
+        <ul class="menu">
+            <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
+            <li class="dropdown active open">
+                <div class="dropdown-header">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
+                </div>
+                <ul class="submenu">
+                    <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i>휴가/근무</a></li>
+                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="tab-menu">
+            <a href="/attend/workSchedule"><button class="tab-button">근무현황</button></a>
+            <a href="/attend/leavesHistory"><button class="tab-button">휴가내역</button></a>
+            <a href="/attend/annualStatistics"><button class="tab-button active">연간통계</button></a>
+            <a href="/attend/workDetails"><button class="tab-button">근무신청내역</button></a>
+
+        </div>
+
+        <div class="year-navigation">
+            <a href="#" class="prev-year"><i class="fas fa-chevron-left"></i></a>
+            <h2>2025년</h2>
+        </div>
+
+        <div class="statistics-table-container">
+            <table class="statistics-table">
+                <thead>
+                <tr>
+                    <th colspan="2"></th>
+                    <th>1월</th>
+                    <th>2월</th>
+                    <th>3월</th>
+                    <th>4월</th>
+                    <th>5월</th>
+                    <th>6월</th>
+                    <th>7월</th>
+                    <th>8월</th>
+                    <th>9월</th>
+                    <th>10월</th>
+                    <th>11월</th>
+                    <th>12월</th>
+                    <th>합계</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="group-header">
+                    <td rowspan="3" class="group-label">근태</td>
+                    <td>지각</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>퇴근미체크</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>결근</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr class="group-header">
+                    <td rowspan="2" class="group-label">휴가</td>
+                    <td>생성된 휴가 사용</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>기타 휴가 사용</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr class="group-header">
+                    <td rowspan="5" class="group-label">근무시간</td>
+                    <td>기준 근무</td>
+                    <td>144:00</td>
+                    <td>160:00</td>
+                    <td>160:00</td>
+                    <td>176:00</td>
+                    <td>152:00</td>
+                    <td>160:00</td>
+                    <td>184:00</td>
+                    <td>160:00</td>
+                    <td>176:00</td>
+                    <td>144:00</td>
+                    <td>160:00</td>
+                    <td>176:00</td>
+                    <td>1,952:00</td>
+                </tr>
+                <tr>
+                    <td>근무 계획</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>32:00</td>
+                    <td>176:00</td>
+                    <td>152:00</td>
+                    <td>160:00</td>
+                    <td>184:00</td>
+                    <td>160:00</td>
+                    <td>176:00</td>
+                    <td>144:00</td>
+                    <td>160:00</td>
+                    <td>176:00</td>
+                    <td>1,520:00</td>
+                </tr>
+                <tr>
+                    <td>실근무</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                </tr>
+                <tr>
+                    <td>출근일수</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>일평균근무</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                </tr>
+                <tr>
+                    <td colspan="2">보정평균근무</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                    <td>00:00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 드롭다운 메뉴 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownHeader = document.querySelector('.dropdown-header');
+        dropdownHeader.addEventListener('click', function() {
+            this.parentElement.classList.toggle('open');
+        });
+    });
+</script>
+</body>
+</html>

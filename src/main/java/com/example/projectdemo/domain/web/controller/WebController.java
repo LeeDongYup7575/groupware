@@ -45,10 +45,11 @@ public class WebController {
         return "auth/forgot-password";
     }
     /**
-     * 비밀번호 변경 페이지
+     * 비밀번호 변경 페이지y
      */
     @GetMapping("/auth/change-password")
     public String changePassword() {
         return "auth/change-password";
     }
+
 }

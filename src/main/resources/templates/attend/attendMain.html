@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH X - 근태 관리</title>
+    <link rel="stylesheet" href="/css/attendMain.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h1>TECH X</h1>
+        <span class="title">근태 관리</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
+        <ul class="menu">
+            <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
+            <li class="dropdown active">
+                <div class="dropdown-header">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
+                </div>
+                <ul class="submenu">
+                    <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i>휴가/근무</a></li>
+                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <h2>올해 근무 정보</h2>
+
+            <div class="info-cards">
+                <div class="card" th:each="statistics : ${statisticsByYear}">
+                    <h3><i class="fas fa-list"></i> 근태 현황</h3>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="label">지각</span>
+                            <span class="value" th:text="${statistics['tardyCount']}">0회</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">조퇴</span>
+                            <span class="value" th:text="${statistics['earlyLeaveCount']}">0회</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">결근</span>
+                            <span class="value" th:text="${statistics['absenteeismCount']}">0회</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" th:each="statistics : ${statisticsByYear}">
+                    <h3><i class="fas fa-calendar-plus"></i> 휴가 현황 </h3>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="label">잔여휴가</span>
+                            <span class="value" th:text="${CanUseLeaves}">0일</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label"><a href="/attend/leavesHistory">휴가 현황</a></span>
+                            <span class="value vacation-link">휴가 신청</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-clock"></i> 근무 시간</h3>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="label">근무일수</span>
+                            <span class="value" th:text="${workDays}">0일</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">총근무시간</span>
+                            <span class="value" th:text="${totalWorkHours}">0시간</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">보정평균</span>
+                            <span class="value" th:text="${correctionAverage}">0시간</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="section">
+            <h2>오늘 근무 현황</h2>
+
+            <div class="work-status">
+                <div class="calendar-card">
+                    <h3><i class="fas fa-calendar-day"></i> 근무 계획</h3>
+                    <div class="calendar-container">
+                        <div class="calendar">
+                            <div class="month" id="month">3월</div>
+                            <div class="day" id="day">25</div>
+                            <div class="weekday" id="weekday">화요일</div>
+                        </div>
+                        <div class="work-hours">
+                            <div class="schedule">9시 출근</div>
+                            <div class="time-range">09:00 ~ 18:00 (소정 8시간)</div>
+                            <button class="schedule-btn"><a href="/attend/workSchedule">내 근무 계획</a></button>
+                        </div>
+                        <div class="buttons">
+                            <button class="request-btn">연장근무신청</button>
+                            <button class="request-btn">휴일근무신청</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timer-card">
+                    <h3><i class="fas fa-stopwatch"></i> 근무 체크</h3>
+                    <div class="timer">
+                        <div id="time" th:text="${#dates.format(currentDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
+                        <div class="status" th:if="${not #lists.isEmpty(list) and list[0].checkIn != null}">업무중</div>
+                        <div class="status" th:if="${#lists.isEmpty(list) or list[0].checkIn == null}">출근전</div>
+                        <div class="status" th:if="${not #lists.isEmpty(list) and list[0].checkOut != null}">퇴근</div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <h3><i class="fas fa-desktop"></i> 근무 현황</h3>
+                    <div class="status-list">
+                        <ul>
+                            <li th:each="attendance : ${list}">
+                                <span th:text="${attendance.checkIn}">08:50</span> 출근
+                            </li>
+                            <li th:each="attendance : ${list}">
+                                <span th:text="${attendance.checkOut}">18:00</span> 퇴근
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 드롭다운 메뉴 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownHeader = document.querySelector('.dropdown-header');
+        dropdownHeader.addEventListener('click', function() {
+            this.parentElement.classList.toggle('open');
+        });
+    });
+
+
+    function updateTime(){
+        var now = new Date();
+        // 브라우저의 지역 설정에 따라 시간 형식을 자동으로 변환
+        document.getElementById("time").innerHTML = now.toLocaleTimeString();
+    }
+
+    // 1초마다 업데이트
+    setInterval(updateTime, 1000);
+
+    // 페이지 로드 시 바로 한 번 실행
+    updateTime();
+
+    // 현재 날짜의 월, 일, 요일을 표시하는 함수
+    function updateCalendarDate() {
+        var now = new Date();
+
+        // 월, 일, 요일
+        var month = now.getMonth() + 1;  // 0~11 범위라서 1을 더해줍니다.
+        var day = now.getDate();
+        var weekday = now.toLocaleString('ko-KR', { weekday: 'long' });  // 요일을 한글로 표시
+
+        // 해당 요소에 값 삽입
+        document.getElementById("month").textContent = month + '월';
+        document.getElementById("day").textContent = day;
+        document.getElementById("weekday").textContent = weekday;
+    }
+
+    // 페이지 로드 시 날짜 업데이트
+    updateCalendarDate();
+
+
+</script>
+</body>
+</html>

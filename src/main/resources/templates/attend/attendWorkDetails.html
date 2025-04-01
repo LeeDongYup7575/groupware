@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH X - 근태 관리</title>
+    <link rel="stylesheet" href="/css/attendWorkDetails.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<header>
+    <div class="logo">
+        <h1>TECH X</h1>
+        <span class="title">근태 관리</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
+        <ul class="menu">
+            <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
+            <li class="dropdown active">
+                <div class="dropdown-header">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
+                </div>
+                <ul class="submenu">
+                    <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i>휴가/근무</a></li>
+                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div class="tab-menu">
+            <a href="/attend/workSchedule"><button class="tab-button">근무현황</button></a>
+            <a href="/attend/leavesHistory"><button class="tab-button">휴가내역</button></a>
+            <a href="/attend/annualStatistics"><button class="tab-button">연간통계</button></a>
+            <a href="/attend/workDetails"><button class="tab-button active">근무신청내역</button></a>
+
+        </div>
+        <div class="year-navigation">
+            <a href="#" class="prev-year"><i class="fas fa-chevron-left"></i></a>
+            <h2>2025년</h2>
+        </div>
+
+        <div class="document-option">
+            <select>
+                <option>모든문서</option>
+                <option>연장근무 신청</option>
+                <option>휴(무)일 근무 신청</option>
+            </select>
+        </div>
+
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th rowspan="2">기안일</th>
+                <th colspan="2">제목</th>
+                <th rowspan="2">기안자</th>
+                <th rowspan="2">결재 상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>2025-03-26 09:47:57</td>
+                <td colspan="2">근무체크 수정(팀장) - 2025년 3월 26일</td>
+                <td>팀장</td>
+                <td>결재 완료</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="summary">
+            문서수:1
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // 드롭다운 메뉴 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownHeader = document.querySelector('.dropdown-header');
+        dropdownHeader.addEventListener('click', function() {
+            this.parentElement.classList.toggle('open');
+        });
+    });
+</script>
+</body>
+</html>
