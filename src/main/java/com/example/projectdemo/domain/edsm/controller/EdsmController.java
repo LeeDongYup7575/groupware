@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.edsm.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 
 @Controller
@@ -24,23 +27,16 @@ public class EdsmController {
     @Autowired
     private EmployeesService employeeService;
 
+    @Autowired
+    private EmployeesMapper employeesMapper;
+
     @RequestMapping("/main")
     public String main(Model model, HttpServletRequest request) {
 
 
     model.addAttribute("main","전체");
-        System.out.println("확인");
-        // 사원번호로 직원 정보 조회
-        // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String)request.getAttribute("empNum");
-// 사원번호로 직원 정보 조회
-        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
 
 
-
-        model.addAttribute("employee", employee);
-
-        model.addAttribute("employee", employee);
         return "edsm/edsmMain";
     }
 
@@ -83,14 +79,40 @@ public class EdsmController {
         String cdv = "cdv";
         model.addAttribute("cdv",cdv);
 
+        List<EmployeesDTO> list = employeesMapper.selectEmpAll();
+        model.addAttribute("list",list);
         return "edsm/edsmInputCdv";
     }
 
     @RequestMapping("/bc")
-    public String inputBc(Model model) {
+    public String inputBc(Model model, HttpServletRequest request) {
+
+
+
 
     String bc = "bc";
     model.addAttribute("bc",bc);
+
+        List<EmployeesDTO> list = employeesMapper.selectEmpAll();
+        model.addAttribute("list",list);
+
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String)request.getAttribute("empNum");
+
+        if (empNum == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
+
+
         return "edsm/edsmInputBc";
     }
 
@@ -100,6 +122,8 @@ public class EdsmController {
         String loa = "loa";
         model.addAttribute("loa",loa);
 
+        List<EmployeesDTO> list = employeesMapper.selectEmpAll();
+        model.addAttribute("list",list);
         return "edsm/edsmInputLoa";
     }
 

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href= "/assets/css/edsm/edsmInputCdv.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>전자결재</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 아이콘 사용 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+<!-- 헤더 -->
+<div class="header">
+    <div class="logo">TECH X</div>
+    <div class="title">전자결재</div>
+</div>
+
+<div class="container">
+    <!-- 좌측 사이드바 -->
+    <div class="sidebar">
+        <button class="create-button" id="create-button">
+            <i class="fas fa-plus"></i>
+            작성하기
+        </button>
+
+        <div class="menu-section">
+            <div class="menu-header">
+                <i class="fas fa-chevron-down"></i>
+                결재 상태
+            </div>
+            <div class="menu-items">
+                <div class="menu-item" id="main">
+                    <i class="fas fa-folder"></i>
+                    전체
+                </div>
+
+                <div class="menu-item" id="progress">
+                    <i class="fas fa-spinner"></i>
+                    진행
+                </div>
+                <div class="menu-item" id="complete">
+                    <i class="fas fa-check-circle"></i>
+                    완료
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-header">
+                <i class="fas fa-chevron-down"></i>
+                문서함
+            </div>
+            <div class="menu-items">
+                <div class="menu-item">
+                    <i class="fas fa-folder"></i>
+                    전체
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-pen"></i>
+                    기안
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-file-signature"></i>
+                    결재
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-undo"></i>
+                    반려
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="main-content">
+        <div class="add-btn" style="margin-bottom: 20px">
+            <button class="button">기안하기</button>
+        </div>
+
+        <div class="form-section">
+            <h3 class="form-header">기본설정</h3>
+
+            <div class="form-row">
+                <div class="form-label">문서 종류</div>
+                <div class="form-input">
+                    <select>
+                        <option>공통</option>
+                    </select>
+                    <select id="formSelect">
+                        <option value="">양식선택</option>
+                        <option value="bc">업무연락</option>
+                        <option value="cdv">지출결의서</option>
+                        <option value="loa">품의서</option>
+
+                    </select>
+                </div>
+                <div class="form-label" style="margin-left: 20px;">작성자</div>
+                <div class="form-input" th:text="${name}"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">보존 연한</div>
+                <div class="form-input">
+                    <select>
+                        <option>선택</option>
+                        <option>5년</option>
+                        <option>10년</option>
+                        <option>무기한</option>
+                    </select>
+                </div>
+                <div class="form-label" style="margin-left: 20px;">보안 등급</div>
+                <div class="form-input">
+                    <select>
+                        <option>S 등급</option>
+                        <option>A 등급</option>
+                        <option>B 등급</option>
+                        <option>C 등급</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 모달 창 (사원 선택) -->
+        <div id="employeeModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>사원 선택</h3>
+                <ul class="employee-list">
+                    <!-- 예시 사원 데이터. 실제로는 AJAX 등으로 데이터를 받아올 수 있음 -->
+                    <li data-empid="1">김철수 (대리)</li>
+                    <li data-empid="2">이영희 (과장)</li>
+                    <li data-empid="3">박민수 (부장)</li>
+                    <li data-empid="4">최수진 (사원)</li>
+                    <li data-empid="5">홍길동 (대표이사)</li>
+                </ul>
+                <button id="saveApprovalLine" class="button">선택 완료</button>
+            </div>
+        </div>
+
+
+
+        <div class="form-section">
+            <div class="form-row">
+                <div class="form-label">결재선</div>
+                <button class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
+            </div>
+
+            <div class="approval-container">
+                <!-- 신청라인 -->
+                <div class="approval-line">
+                    <div class="approval-header">
+                        신청
+                    </div>
+
+                    <div class="approval-body">
+                        <div class="approval-body-cell">
+                            <div class="approval-stamp">신청</div>
+                            <div class="approval-name">신청자</div>
+                            <div class="approval-date">2025.04.01</div>
+                        </div>
+                        <div class="approval-body-cell">
+                            <div class="approval-stamp">신청</div>
+                            <div class="approval-name">신청자</div>
+                            <div class="approval-date">2025.04.01</div>
+                        </div>
+
+                        <div class="approval-body-cell">
+
+                            <div class="approval-stamp">신청</div>
+                            <div class="approval-name">신청자</div>
+                            <div class="approval-date">2025.04.01</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 결재 라인 -->
+                <div class="approval-line">
+                    <div class="approval-header">
+                        <!--결재 라인 동적 추가해야함. -->
+                        <div class="approval-header-cell">결재라인</div>
+                    </div>
+
+
+                    <div class="approval-body">
+                        <div class="approval-body-cell">
+                            <div class="approval-stamp">승인</div>
+                            <div class="approval-name">대리 김대리</div>
+                            <div class="approval-date">2025.04.01</div>
+                        </div>
+                        <div class="approval-body-cell">
+                            <div class="approval-stamp">승인</div>
+                            <div class="approval-name">차장 이차장</div>
+                            <div class="approval-date">2025.04.01</div>
+                        </div>
+
+
+                        <div class="approval-body-cell">
+
+                            <div class="approval-stamp">승인</div>
+                            <div class="approval-name">대표이사 박이사</div>
+                            <div class="approval-date">2025.04.01</div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 20px;">
+                <div class="form-label">참조</div>
+                <div class="form-input">
+                    <input type="text" class="text-input" placeholder="결재 후 열람하세요">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">수신</div>
+                <div class="form-input">
+                    <input type="text" class="text-input" placeholder="결재 후 열람하세요">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label>제목</label>
+            <input type="text" placeholder="제목입력" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
+        </div>
+
+        <div class="form-group">
+            <label>본문</label>
+
+            <div style="border: 1px solid #ddd;">
+                <div style="margin-bottom: 20px;">
+                    <span style=" margin-right: 20px;">구분</span>
+                    <label class="checkbox-label">
+                        <input type="radio" name="type" checked> 개인
+                        <input type="radio" name="type"> 법인
+                    </label>
+
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span style="margin-right: 10px;">회계 기준월</span>
+                    <select id="year"></select>
+                    <span>년</span>
+                    <select id="month"></select>
+                    <span>월</span>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <span style="margin-right: 10px;">지출자</span>
+                    <span class="file-input"> 클릭 후 입력 </span>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+
+                    <span>계좌은행</span>
+                    <input type="text" class="bank-input" placeholder="은행입력">
+                    <span>계좌번호</span>
+                    <input type="text" class="bank-input" placeholder="계좌번호입력">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>별첨 <span style="color: blue;">파일 첨부</span></label>
+            <div class="upload-box">
+                여기로 파일을 끌어서 놓으세요
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</div>
+
+
+<script th:inline="javascript">
+
+    $(document).ready(function() {
+        var storedValue = [[${cdv}]];
+        if (storedValue) {
+            $("#formSelect").val(storedValue);
+        }
+
+
+        setDateSelectBox();
+        $("#year").select2({
+            dropdownAutoWidth: true,
+            width: '10%'
+            // Select2에서는 기본 드롭다운에 스크롤이 적용되어 옵션이 많을 경우 스크롤됩니다.
+        });
+
+        $("#month").select2({
+            dropdownAutoWidth: true,
+            width: '10%'
+            // Select2에서는 기본 드롭다운에 스크롤이 적용되어 옵션이 많을 경우 스크롤됩니다.
+        });
+
+    });
+
+
+    function setDateSelectBox(){
+        var now = new Date();
+        var now_year = now.getFullYear();
+
+        $("#year").append("<option value=''>선택</option>");
+
+        // 2005년 부터 올해까지
+        for(var i = now_year; i >= 2010; i--){
+            $("#year").append("<option value='"+ i +"'>"+ i + " 년" +"</option>");
+        }
+
+
+        $("#month").append("<option value=''>선택</option>");
+
+        // 2005년 부터 올해까지
+        for(var i = 1; i <= 12; i++){
+            $("#month").append("<option value='"+ i +"'>"+ i + " 월" +"</option>");
+        }
+
+
+    }
+
+
+
+
+    $("#wait").on("click", function () {
+        location.href = "/edsm/wait";
+    });
+
+    $("#main").on("click", function () {
+        location.href = "/edsm/main";
+    });
+
+    $("#progress").on("click", function () {
+        location.href = "/edsm/progress";
+    });
+
+    $("#complete").on("click", function () {
+        location.href = "/edsm/complete";
+    });
+
+    $("#create-button").on("click", function () {
+        location.href = "/edsm/create";
+    });
+
+    //form 양식 값 가져오기
+    $("#formSelect").on("change", function() {
+        var selectedValue = $(this).val();
+        console.log("선택된 값:", selectedValue);
+        if(selectedValue == "bc"){
+            location.href = "/edsm/bc";
+        }else if(selectedValue == "cdv"){
+            location.href = "/edsm/cdv";
+        }else if(selectedValue == "loa"){
+            location.href = "/edsm/loa";
+        }else{
+            alert("양식을 확인해주세요");
+        }
+
+
+    });
+
+    // 결재선 설정 버튼 클릭 시 모달 열기
+    $("#approvalSettingButton").on("click", function () {
+        $("#employeeModal").fadeIn();
+    });
+
+    // 모달 닫기 버튼 클릭
+    $(".close").on("click", function () {
+        $("#employeeModal").fadeOut();
+    });
+
+    // 사원 목록 클릭 시 선택 토글 (여러명 선택 가능)
+    $(".employee-list li").on("click", function () {
+        $(this).toggleClass("selected");
+    });
+
+    // 선택 완료 버튼 클릭 시 선택된 사원들을 결재라인에 추가
+    $("#saveApprovalLine").on("click", function () {
+        var selectedEmployees = [];
+        $(".employee-list li.selected").each(function() {
+            var empName = $(this).text();
+            var empId = $(this).data("empid");
+            selectedEmployees.push({ id: empId, name: empName });
+        });
+        // 결재라인 영역 업데이트 (예시: 승인 스탬프와 함께 추가)
+        var approvalBody = $("#approvalLine .approval-body");
+        approvalBody.empty(); // 기존 결재라인 클리어
+        selectedEmployees.forEach(function(emp) {
+            var cell = '<div class="approval-body-cell">' +
+                '<div class="approval-stamp">승인</div>' +
+                '<div class="approval-name">' + emp.name + '</div>' +
+                '<div class="approval-date">2025.04.01</div>' +
+                '</div>';
+            approvalBody.append(cell);
+        });
+        $("#employeeModal").fadeOut();
+    });
+
+</script>
+</body>
+</html>

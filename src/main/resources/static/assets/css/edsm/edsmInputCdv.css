@@ -8,6 +8,8 @@
 
 body {
     background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.5;
 }
 
 /* 헤더 */
@@ -32,16 +34,12 @@ body {
     color: #333;
 }
 
-.total{
-    width: 100%;
-
-}
-
 /* 전체 레이아웃 */
 .container {
     display: flex;
-
     min-height: calc(100vh - 60px);
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 /* 좌측 사이드바 */
@@ -76,6 +74,8 @@ body {
     background-color: #3a80d2;
 }
 
+
+
 /* 메뉴 스타일 */
 .menu-section {
     margin-bottom: 20px;
@@ -88,7 +88,7 @@ body {
     color: #333;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
 }
 
 .menu-header i {
@@ -114,6 +114,7 @@ body {
 
 .menu-item:hover {
     background-color: #e6f0fb;
+
 }
 
 .menu-item.active {
@@ -129,12 +130,16 @@ body {
     color: #666;
 }
 
+.menu-item:hover i {
+    color: #4a90e2;
+}
+
 
 
 /* 메인 콘텐츠 영역 */
 .main-content {
     flex: 1;
-    padding: 20px;
+    padding: 24px;
     background-color: #fff;
 }
 
@@ -149,23 +154,36 @@ body {
 }
 
 .button:hover {
-    background-color: #f5f5f5;
+    background-color: #3a80d2;
+}
+
+.button.secondary {
+    background-color: #fff;
+    color: #4a90e2;
+    border: 1px solid #4a90e2;
+}
+
+.button.secondary:hover {
+    background-color: #f0f7ff;
 }
 
 /* 양식 스타일 */
 .form-section {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .form-header {
     font-size: 16px;
     font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    color: #333;
 }
 
 .form-row {
     display: flex;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     align-items: center;
 }
 
@@ -173,23 +191,32 @@ body {
     width: 100px;
     color: #555;
     font-size: 14px;
+    font-weight: 500;
 }
 
 .form-input {
     flex: 1;
-    padding: 5px 10px;
+    padding: 5px 0;
 }
 
 /* 셀렉트 박스 스타일 */
 select {
-    padding: 5px 25px 5px 10px;
+    padding: 7px 30px 7px 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: white;
+    font-size: 14px;
+    color: #333;
     appearance: none;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23333' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 8px center;
+    transition: border-color 0.2s;
+}
+
+select:hover, select:focus {
+    border-color: #4a90e2;
+    outline: none;
 }
 
 /* 결재선 영역 */
@@ -223,8 +250,7 @@ select {
 
 .approval-body {
     display: flex;
-    margin: 20px;
-    justify-content: space-evenly;
+    justify-content: space-between;
 }
 
 .approval-body-cell {
@@ -266,7 +292,7 @@ select {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #5858ff;
+    color: #5858FFFF;
     font-weight: bold;
     transform: rotate(-15deg);
 }
@@ -274,10 +300,29 @@ select {
 /* 입력 필드 스타일 */
 .text-input {
     width: 100%;
-    padding: 8px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    margin-bottom: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.text-input:focus {
+    border-color: #4a90e2;
+    outline: none;
+}
+
+.bank-input {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 10px;
+    width: 200px;
+}
+
+.bank-input:focus {
+    border-color: #4a90e2;
+    outline: none;
 }
 
 ::placeholder {
@@ -285,95 +330,75 @@ select {
     font-size: 13px;
 }
 
-/* 푸터 버튼 영역 */
-.form-actions {
-    text-align: right;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+/* 라디오 버튼 및 체크박스 */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    cursor: pointer;
 }
 
-/* 메인 콘텐츠 영역 */
-
-.main2-contents {
-    flex: 1;
-    padding: 20px;
-    background-color: #fff;
+.checkbox-label input {
+    margin-right: 5px;
 }
 
-/* 폼 스타일 */
-.form-contents {
-    margin-bottom: 25px;
-}
-
-.contents-label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
-}
-
-.label-input {
-    width: 100%;
-    padding: 10px;
+/* 파일 입력 영역 */
+.file-input {
+    display: inline-block;
+    background-color: #f5f5f5;
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
     border: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.file-input:hover {
+    background-color: #e9e9e9;
+}
+
+.text-area {
+    width: 100%;
+    height: 80px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    resize: none;
     border-radius: 4px;
     font-size: 14px;
 }
 
-.label-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-height: 200px;
-    resize: vertical;
-    font-size: 14px;
+.text-area:focus {
+    border-color: #4a90e2;
+    outline: none;
 }
 
-/* 첨부파일 영역 */
-.attachment-section {
+/* 파일첨부영역 */
+.upload-box {
+    border: 2px dashed #ddd;
+    padding: 30px;
+    text-align: center;
+    color: #888;
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.upload-box:hover {
+    border-color: #4a90e2;
+    background-color: #f5faff;
+}
+
+.form-group {
     margin-bottom: 20px;
 }
 
-.attachment-label {
+.form-group label {
     display: block;
-    font-size: 14px;
     margin-bottom: 8px;
-    color: #333;
+    font-weight: 500;
+    color: #444;
 }
-
-.attachment-links {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.attachment-link {
-    color: #4a90e2;
-    font-size: 14px;
-    text-decoration: none;
-    display: inline-block;
-    border-right: 1px solid #ddd;
-    padding-right: 10px;
-}
-
-.attachment-link:last-child {
-    border-right: none;
-}
-
-.attachment-drop-area {
-    border: 1px dashed #ddd;
-    border-radius: 4px;
-    padding: 25px;
-    text-align: center;
-    color: #888;
-    font-size: 14px;
-    background-color: #fafafa;
-    margin-top: 10px;
-}
-
 
 /* 모달 배경 */
 .modal {
@@ -425,4 +450,33 @@ select {
 }
 .selected {
     background-color: #e0f7fa;
+}
+
+
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .form-label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .form-input {
+        width: 100%;
+    }
 }
