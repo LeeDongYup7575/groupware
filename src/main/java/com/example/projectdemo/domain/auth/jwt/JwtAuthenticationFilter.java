@@ -4,6 +4,7 @@ import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,25 +81,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 요청 헤더에서 JWT 토큰 추출
-        String authHeader = request.getHeader("Authorization");
+        // 토큰 추출 시도
+        String token = null;
 
+        // 1. 헤더에서 토큰 확인
+        String authHeader = request.getHeader("Authorization");
         System.out.println("Authorization 헤더: " + (authHeader != null ? "존재함" : "없음"));
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            System.out.println("헤더에서 토큰 추출: " + (token != null ? token.substring(0, Math.min(10, token.length())) + "..." : "없음"));
+        }
+
+        // 2. 토큰이 없으면 쿠키에서 확인
+        if (token == null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("accessToken".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        System.out.println("쿠키에서 토큰 추출: " + (token != null ? token.substring(0, Math.min(10, token.length())) + "..." : "없음"));
+                        break;
+                    }
+                }
+            } else {
+                System.out.println("쿠키가 없음");
+            }
+        }
+
+        if (token == null) {
             sendErrorResponse(response, 401, "인증 토큰이 필요합니다.");
             return;
         }
-
-
-        String token = authHeader.substring(7);
 
         try {
             // 토큰 유효성 검증
             System.out.println("토큰 유효성 검증 시작");
             boolean isValid = jwtTokenUtil.validateToken(token);
             System.out.println("토큰 유효성 검증 결과: " + isValid);
-            if (!jwtTokenUtil.validateToken(token)) {
+
+            if (!isValid) {
                 sendErrorResponse(response, 401, "유효하지 않은 토큰입니다.");
                 return;
             }
@@ -127,7 +149,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             employeeMapper.updateLastLogin(empNum, LocalDateTime.now());
 
             // 요청 속성에 사용자 정보 설정
-            request.setAttribute("id",id);
+            request.setAttribute("id", id);
             request.setAttribute("empNum", empNum);
             request.setAttribute("role", role);
             request.setAttribute("tempPassword", tempPassword);
@@ -136,6 +158,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
+            System.out.println("인증 처리 중 예외 발생: " + e.getMessage());
+            e.printStackTrace();
             sendErrorResponse(response, 401, "인증 처리 중 오류가 발생했습니다.");
         }
     }

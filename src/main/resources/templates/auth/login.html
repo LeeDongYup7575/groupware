@@ -228,13 +228,26 @@
               return response.json();
             })
             .then(data => {
-              // JWT 토큰 저장
+              // 쿠키에 토큰 저장 (1일 유효기간)
+              const expires = new Date();
+              expires.setDate(expires.getDate() + 1);
+
+              document.cookie = `accessToken=${data.accessToken}; path=/; expires=${expires.toUTCString()}`;
+              document.cookie = `empNum=${data.empNum}; path=/; expires=${expires.toUTCString()}`;
+              document.cookie = `name=${encodeURIComponent(data.name)}; path=/; expires=${expires.toUTCString()}`;
+              document.cookie = `email=${encodeURIComponent(data.email)}; path=/; expires=${expires.toUTCString()}`;
+              document.cookie = `role=${data.role}; path=/; expires=${expires.toUTCString()}`;
+
+              // localStorage에도 저장 (AJAX 요청용)
               localStorage.setItem('accessToken', data.accessToken);
               localStorage.setItem('refreshToken', data.refreshToken);
               localStorage.setItem('empNum', data.empNum);
               localStorage.setItem('name', data.name);
               localStorage.setItem('email', data.email);
               localStorage.setItem('role', data.role);
+
+              console.log("로그인 성공! 쿠키와 localStorage에 저장됨");
+              console.log("토큰:", localStorage.getItem('accessToken').substring(0, 20) + "...");
 
               // 임시 비밀번호 사용 여부 확인
               if (data.tempPassword) {
@@ -250,6 +263,31 @@
               errorMessageElement.textContent = error.message || '로그인에 실패했습니다. 사원번호와 비밀번호를 확인해주세요.';
               errorMessageElement.style.display = 'block';
             });
+  });
+
+  // 모든 AJAX 요청에 자동으로 인증 헤더 추가
+  document.addEventListener('DOMContentLoaded', function() {
+    (function() {
+      // 원래 fetch 함수 백업
+      const originalFetch = window.fetch;
+
+      // fetch 오버라이드
+      window.fetch = function(url, options = {}) {
+        // 옵션이 없으면 빈 객체 생성
+        options = options || {};
+        // 헤더가 없으면 빈 객체 생성
+        options.headers = options.headers || {};
+
+        // localStorage에 토큰이 있으면 헤더에 추가
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          options.headers['Authorization'] = 'Bearer ' + token;
+        }
+
+        // 원래 fetch 호출
+        return originalFetch(url, options);
+      };
+    })();
   });
 </script>
 </body>
