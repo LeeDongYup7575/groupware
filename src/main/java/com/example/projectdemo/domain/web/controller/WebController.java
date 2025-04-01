@@ -16,6 +16,14 @@ public class WebController {
 //        return "intro";
 //    }
     /**
+     * 로그인 후 페이지
+     */
+    @GetMapping("/main")
+    public String mainPage() {
+
+        return "/main"; // main.html 템플릿을 찾아 렌더링
+    }
+    /**
      * 로그인 페이지
      */
     @GetMapping("/login")
