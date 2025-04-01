@@ -134,7 +134,8 @@
         <h3>사원 선택</h3>
         <ul class="employee-list" >
 
-          <li data-empid="1" th:each="list:${list}"  th:text="${list.empNum} + ' ' + ${list.name}"></li>
+
+          <li data-empid="1" th:each="emp : ${list_emp}" th:text="${emp.positionTitle} + ' ' + ${emp.name}"></li>
 
         </ul>
         <button id="saveApprovalLine" class="button">선택 완료</button>
