@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>그룹웨어 시스템 - test </title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/intro.css">
+  <style>
+    :root {
+      --primary-color: #0183D4;
+      --primary-light: #DDF6FF;
+      --secondary-color: #f3f4f6;
+      --text-color: #1f2937;
+      --text-light: #6b7280;
+      --accent-color: #0183D4;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--text-color);
+      line-height: 1.6;
+      background-color: white;
+    }
+
+    .navbar {
+      padding: 1rem 0;
+      background-color: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .navbar-scrolled {
+      padding: 0.5rem 0;
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .nav-link {
+      font-weight: 500;
+      margin: 0 0.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--primary-color);
+    }
+
+    .btn-login {
+      background-color: white;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn-mypage {
+      background-color: white;
+      color: var(--accent-color);
+      border: 2px solid var(--accent-color);
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-mypage:hover {
+      background-color: var(--accent-color);
+      color: white;
+    }
+
+    .btn-logout {
+      background-color: white;
+      color: var(--text-light);
+      border: 2px solid var(--text-light);
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      margin-left: 0.5rem;
+    }
+
+    .btn-logout:hover {
+      background-color: var(--text-light);
+      color: white;
+    }
+
+    .user-dropdown {
+      margin-left: 0.5rem;
+    }
+
+    .user-dropdown .dropdown-toggle {
+      color: var(--text-color);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .user-dropdown .dropdown-menu {
+      min-width: 10rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border: none;
+      border-radius: 0.5rem;
+    }
+
+    .user-dropdown .dropdown-item {
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+    }
+
+    .user-dropdown .dropdown-item i {
+      margin-right: 0.5rem;
+      width: 1rem;
+    }
+
+    /*대시보드*/
+    .dashboard-section{
+      padding: 80px 0;
+    }
+
+
+    /*푸터*/
+    footer {
+      background-color: var(--text-color);
+      color: white;
+      padding: 4rem 0 2rem;
+    }
+
+    .footer-logo {
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .footer-text {
+      color: #d1d5db;
+      margin-bottom: 2rem;
+      max-width: 300px;
+    }
+
+    .footer-heading {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-link {
+      color: #d1d5db;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.75rem;
+      transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+      color: white;
+    }
+
+    .footer-info {
+      color: #d1d5db;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .copyright {
+      color: #9ca3af;
+      font-size: 0.9rem;
+      text-align: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+    }
+
+  </style>
+</head>
+<body>
+
+
+
+<!-- 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <!-- 로고 이미지 대신 텍스트로 변경 -->
+      <span>GROUP<span style="color: var(--accent-color);">WARE</span></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/">홈</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#contact">문의</a>
+        </li>
+        <!-- 로그인 안된 상태일 때 보이는 버튼 -->
+        <li class="nav-item ms-lg-3" id="login-button">
+          <a class="btn btn-login" href="/auth/login">로그인</a>
+        </li>
+        <!-- 로그인된 상태일 때 보이는 사용자 메뉴 -->
+        <li class="nav-item dropdown user-dropdown" id="user-dropdown" style="display: none;">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+            <span id="user-name">사용자</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="/mypage"><i class="fas fa-user"></i> 마이페이지</a></li>
+            <li><a class="dropdown-item" href="/attendances"><i class="fas fa-clock"></i> 근태관리</a></li>
+            <li><a class="dropdown-item" href="#" onclick="navigateToQRCheck(event)"><i
+                    class="fas fa-file-signature"></i>QR</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i>
+              로그아웃</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 로그인 후 대시보드 화면 -->
+<main class="dashboard-section" id="dashboard-section">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- 왼쪽 내비게이션 메뉴 -->
+      <div class="col-md-2 dashboard-sidebar">
+        <div class="sidebar-menu">
+          <ul class="list-unstyled">
+            <li class="active"><a href="#"><i class="fas fa-home"></i> 이메일</a></li>
+            <li><a href="#"><i class="fas fa-user"></i> 게시판</a></li>
+            <li><a href="#" onclick="event.preventDefault(); openChat();"><i class="fas fa-envelope"></i>메시지</a>
+            </li>                        <li><a href="#"><i class="fas fa-calendar-check"></i> 일정</a></li>
+            <li><a href="#"><i class="fas fa-building"></i> 공용 메일</a></li>
+            <li><a href="#"><i class="fas fa-clipboard-list"></i> 주소록</a></li>
+            <li><a href="#"><i class="fas fa-chart-bar"></i> 예약</a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> 문서 관리</a></li>
+            <li><a href="#"><i class="fas fa-money-bill-wave"></i> 근무/경비처리</a></li>
+            <li><a href="#"><i class="fas fa-sitemap"></i> 전자결재</a></li>
+            <li><a href="#"><i class="fas fa-map-marker-alt"></i> 조직도</a></li>
+            <li><a href="#"><i class="fas fa-cog"></i> 관리자 페이지</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 메인 콘텐츠 영역 -->
+      <div class="col-md-10 dashboard-content">
+        <div class="row">
+          <!-- 프로필 및 게시판 섹션 -->
+          <div class="col-md-5">
+            <div class="profile-card">
+              <div class="profile-header">
+                <div class="profile-image">
+                  <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="프로필 이미지" class="rounded-circle">
+                </div>
+                <div class="profile-name">
+                  <h3>이미르 대리</h3>
+                  <p>개발팀</p>
+                </div>
+              </div>
+
+              <div class="profile-stats">
+                <div class="stat-item">
+                  <div class="stat-label">결재할 문서</div>
+                  <div class="stat-value">6</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-label">내 예약/대여 현황</div>
+                  <div class="stat-value">1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 공지사항 섹션 :: 하드코딩 -->
+          <div class="col-md-7">
+            <div class="dashboard-card">
+              <h4 class="card-title">게시판</h4>
+              <ul class="nav nav-tabs" id="boardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="notice-tab" data-bs-toggle="tab"
+                          data-bs-target="#notice" type="button" role="tab" aria-controls="notice"
+                          aria-selected="true">사내공지
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="dept-tab" data-bs-toggle="tab" data-bs-target="#dept"
+                          type="button" role="tab" aria-controls="dept" aria-selected="false">자유게시판
+                  </button>
+                </li>
+              </ul>
+              <div class="tab-content p-3" id="boardTabsContent">
+                <div class="tab-pane fade show active" id="notice" role="tabpanel"
+                     aria-labelledby="notice-tab">
+                  <!-- 공지사항이 있는 경우 -->
+                  <div th:if="${!notices.isEmpty()}">
+                    <div class="list-group">
+                      <a th:each="notice, index : ${notices}"
+                         th:href="${notice.url}"
+                         th:text="${notice.title}"
+                         class="list-group-item list-group-item-action"
+                         target="_blank">
+                        공지사항 제목
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- 공지사항이 없는 경우 -->
+                  <div th:if="${notices.isEmpty()}" class="alert alert-info">
+                    표시할 공지사항이 없습니다.
+                  </div>
+
+                </div>
+                <div class="tab-pane fade" id="dept" role="tabpanel" aria-labelledby="dept-tab">
+                  <p>자유게시판 내용이 여기에 표시됩니다.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 근태 및 회의실 예약 섹션 -->
+        <div class="row mt-4">
+          <div class="col-md-5">
+            <div class="dashboard-card">
+              <h4 class="card-title">근태관리</h4>
+              <p class="date-info">2024년 10월 24일 (화) 10:56:43</p>
+
+              <div class="attendance-info">
+                <div class="row">
+                  <div class="col-6">
+                    <p class="attendance-label">출근시간</p>
+                  </div>
+                  <div class="col-6">
+                    <p class="attendance-value">미등록</p>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-6">
+                    <p class="attendance-label">퇴근시간</p>
+                  </div>
+                  <div class="col-6">
+                    <p class="attendance-value">미등록</p>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="schedule-info mt-3">
+                <p>2025-03-27 일정 없음</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 회의실 예약 현황 -->
+          <div class="col-md-7">
+            <div class="dashboard-card">
+              <h4 class="card-title">회의실 예약 현황</h4>
+
+              <div class="timetable-container">
+                <table class="timetable">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>09:00</th>
+                    <th>10:00</th>
+                    <th>11:00</th>
+                    <th>12:00</th>
+                    <th>13:00</th>
+                    <th>14:00</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>1번 회의실</td>
+                    <td colspan="6">
+                      <div class="reservation-bar"
+                           style="width: 25%; left: 50%; background-color: #90caf9;">
+                        오후 10:30 - 12:30
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>2번 회의실</td>
+                    <td colspan="6">
+                      <div class="reservation-bar"
+                           style="width: 25%; left: 0; background-color: #a5d6a7;">
+                        오전 09:30 - 11:30
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>3번 회의실</td>
+                    <td colspan="6">
+                      <div class="reservation-bar"
+                           style="width: 33%; left: 17%; background-color: #90caf9;">
+                        오전 10:00 - 12:00
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>4번 회의실</td>
+                    <td colspan="6">
+                      <div class="reservation-bar"
+                           style="width: 33%; left: 0; background-color: #fff59d;">
+                        오전 09:00 - 11:00
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- 달력 -->
+        <div class="row">
+          <div class="col-md-5">
+            <div class="calendar-container dashboard-card">
+              <div class="calendar-header">
+                <button class="btn btn-sm btn-link"><i class="fas fa-chevron-left"></i></button>
+                <h5>2025년 3월</h5>
+                <button class="btn btn-sm btn-link"><i class="fas fa-chevron-right"></i></button>
+              </div>
+              <table class="calendar-table">
+                <thead>
+                <tr>
+                  <th>일</th>
+                  <th>월</th>
+                  <th>화</th>
+                  <th>수</th>
+                  <th>목</th>
+                  <th>금</th>
+                  <th>토</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 달력 날짜들 -->
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>1</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>3</td>
+                  <td>4</td>
+                  <td>5</td>
+                  <td>6</td>
+                  <td>7</td>
+                  <td>8</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>10</td>
+                  <td>11</td>
+                  <td>12</td>
+                  <td>13</td>
+                  <td>14</td>
+                  <td>15</td>
+                </tr>
+                <tr>
+                  <td>16</td>
+                  <td>17</td>
+                  <td>18</td>
+                  <td>19</td>
+                  <td>20</td>
+                  <td>21</td>
+                  <td>22</td>
+                </tr>
+                <tr>
+                  <td>23</td>
+                  <td>24</td>
+                  <td>25</td>
+                  <td class="current-day">26</td>
+                  <td>27</td>
+                  <td>28</td>
+                  <td>29</td>
+                </tr>
+                <tr>
+                  <td>30</td>
+                  <td>31</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- 푸터 -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4 mb-5 mb-lg-0">
+        <div class="footer-logo">GROUP<span style="color: var(--accent-color);">WARE</span></div>
+        <p class="footer-text">효율적인 업무 환경을 위한 최고의 선택.<br>당신의 회사에 가장 적합한 그룹웨어 솔루션입니다.</p>
+      </div>
+      <div class="col-md-4 col-lg-2 mb-4 mb-md-0">
+        <h4 class="footer-heading">바로가기</h4>
+        <a href="/" class="footer-link">홈</a>
+        <a href="#features" class="footer-link">기능</a>
+        <a href="#contact" class="footer-link">문의</a>
+      </div>
+      <div class="col-md-4 col-lg-3 mb-4 mb-md-0">
+        <h4 class="footer-heading">지원</h4>
+        <a href="#" class="footer-link">FAQ</a>
+        <a href="#" class="footer-link">고객 지원</a>
+        <a href="#" class="footer-link">개인정보 처리방침</a>
+      </div>
+      <div class="col-md-4 col-lg-3">
+        <h4 class="footer-heading">연락처</h4>
+        <p class="footer-info">서울시 관악구 봉천로 227 보라매샤르망</p>
+        <p class="footer-info">이메일: techX@texhX.kor.kr</p>
+        <p class="footer-info">전화: 02-XXX-XXXX</p>
+      </div>
+    </div>
+    <div class="copyright">
+      &copy; 2025 그룹웨어 시스템. 모든 권리 보유.
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // 스크롤 시 네비게이션바 스타일 변경
+  window.addEventListener('scroll', function () {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 50) {
+      navbar.classList.add('navbar-scrolled');
+    } else {
+      navbar.classList.remove('navbar-scrolled');
+    }
+  });
+
+  // 페이지 로드 시 JWT 토큰 확인하여 로그인 상태 확인
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // 로컬 스토리지에서 JWT 토큰 확인
+    const token = localStorage.getItem('accessToken');
+    const userName = localStorage.getItem('name');
+
+    // 요소들을 변수에 저장하고 존재 여부 확인
+    const loginButton = document.getElementById('login-button');
+    const userDropdown = document.getElementById('user-dropdown');
+    const loggedInButtons = document.getElementById('logged-in-buttons');
+    const userNameElement = document.getElementById('user-name');
+
+
+    // 디버깅: 요소들이 제대로 선택되었는지 확인
+    console.log('loginButton:', loginButton);
+    console.log('loggedInButtons:', loggedInButtons);
+
+
+    if (token) {
+      // 토큰이 있으면 로그인된 상태로 처리
+
+      // 비로그인 상태 요소들 숨기기 (null 체크 추가)
+      if (loginButton) {
+        loginButton.style.cssText = 'display: none !important;';
+        console.log('login-button 숨김 처리됨');
+      }
+
+
+      // 로그인 상태 요소들 표시하기
+      if (userDropdown) {
+        userDropdown.style.cssText = 'display: block !important;';
+        console.log('user-dropdown 표시됨');
+      }
+
+      if (loggedInButtons) {
+        // !important를 포함한 인라인 스타일 직접 적용
+        loggedInButtons.style.cssText = 'display: flex !important;';
+        console.log('logged-in-buttons 표시됨');
+      }
+
+
+      // 사용자 이름 표시
+      document.getElementById('user-name').textContent = userName || '사용자';
+    }
+
+    // 로그아웃 처리
+    document.getElementById('logout-button').addEventListener('click', function (e) {
+      e.preventDefault();
+
+      // 로컬 스토리지에서 토큰 제거
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('empNum');
+      localStorage.removeItem('name');
+      localStorage.removeItem('email');
+      localStorage.removeItem('role');
+
+      // 페이지 새로고침
+      window.location.reload();
+    });
+  });
+
+  // QR체크 페이지로 이동하는 함수 (토큰 처리 포함)
+  function navigateToQRCheck(event) {
+    event.preventDefault();
+
+    // 로컬 스토리지에서 토큰 가져오기
+    const token = localStorage.getItem('accessToken');
+
+    if (token) {
+      // fetch API를 사용하여 헤더에 토큰을 포함시켜 요청
+      fetch('/qr/qrcheck', {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      })
+              .then(response => {
+                if (response.redirected) {
+                  // 리다이렉션이 있으면 해당 URL로 이동
+                  window.location.href = response.url;
+                } else if (response.ok) {
+                  // 응답이 HTML이면 전체 페이지를 그 내용으로 대체
+                  return response.text().then(html => {
+                    document.open();
+                    document.write(html);
+                    document.close();
+                  });
+                } else {
+                  // 오류 처리
+                  console.error('QR 체크 페이지 로드 오류:', response.status);
+                  alert('QR 체크 페이지를 로드할 수 없습니다.');
+                }
+              })
+              .catch(error => {
+                console.error('QR 체크 페이지 요청 오류:', error);
+                alert('QR 체크 페이지 요청 중 오류가 발생했습니다.');
+              });
+    } else {
+      // 토큰이 없으면 로그인 페이지로 리다이렉트
+      window.location.href = '/auth/login';
+    }
+  }
+</script>
+
+</body>
+</html>
