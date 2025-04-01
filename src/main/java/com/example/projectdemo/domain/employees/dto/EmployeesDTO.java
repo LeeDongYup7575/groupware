@@ -21,6 +21,7 @@ public class EmployeesDTO {
     private String gender;
     private String phone;
     private String email;
+    private String internalEmail;
     private String profileImgUrl;
     private String ssn;
     private Integer depId;
