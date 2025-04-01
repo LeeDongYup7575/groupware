@@ -9,6 +9,7 @@
         <result property="gender" column="gender" />
         <result property="phone" column="phone" />
         <result property="email" column="email" />
+        <result property="internalEmail" column="internal_email" />
         <result property="profileImgUrl" column="profile_img_url" />
         <result property="ssn" column="ssn" />
         <result property="depId" column="dep_id" />
@@ -28,7 +29,7 @@
 
     <!-- 재사용 가능한 컬럼 정의 -->
     <sql id="employeeColumns">
-        id, emp_num as empNum, password, name, gender, phone, email,
+        id, emp_num as empNum, password, name, gender, phone, email, internal_email as InternalEmail,
         profile_img_url as profileImgUrl, ssn, dep_id as depId,
         pos_id as posId, hire_date as hireDate,
         retirement_id as retirementId, attend_status as attendStatus,

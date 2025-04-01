@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이페이지</title>
+  <link rel="stylesheet" href="/assets/css/mypage/mypage.css">
+
+</head>
+<body>
+<div class="header">
+  <div class="logo">TECH X</div>
+</div>
+
+<main>
+  <div class="sidebar">
+    <div class="sidebar-item active">
+      <span class="sidebar-icon">👤</span>
+      <span class="sidebar-link">내 정보</span>
+    </div>
+    <div class="sidebar-item">
+      <span class="sidebar-icon">📋</span>
+      <span class="sidebar-link">나의 활동</span>
+    </div>
+    <div class="sidebar-item">
+      <span class="sidebar-icon">🔒</span>
+      <span class="sidebar-link">보안 설정</span>
+    </div>
+  </div>
+
+  <section class="main-section">
+
+    <div class="title-container">
+      <h1>내 정보</h1>
+    </div>
+
+    <div class="content-container">
+
+      <div class="profile-container">
+        <div class="profile-image"></div>
+
+        <div class="profile-info">
+          <div class="info-row upper-info-row">
+            <div class="info-label upper-info-label">이름</div>
+            <div class="info-content upper-info-content" th:text="${employee.name}"></div>
+          </div>
+          <div class="info-row upper-info-row">
+            <div class="info-label upper-info-label">사번</div>
+            <div class="info-content upper-info-content" th:text="${employee.empNum}"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-container">
+        <div class="info-row">
+          <div class="info-label">입사일</div>
+
+          <div class="info-content" th:text="${employee.hireDate}"></div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">소속</div>
+          <div class="info-content" th:text="${employee.departmentName}"></div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">직급</div>
+          <div class="info-content" th:text="${employee.positionTitle}">팀장</div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">전화번호</div>
+          <div class="info-content">
+            <input type="text" th:value="${employee.phone}">
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">이메일</div>
+          <div class="info-content" th:text="${employee.internalEmail}"></div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">개인 이메일</div>
+          <div class="info-content">
+            <input type="email" th:value="${employee.email}">
+          </div>
+        </div>
+
+        <button class="submit-button">저장</button>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -3,7 +3,9 @@ package com.example.projectdemo.domain.employees.service;
 import com.example.projectdemo.config.PasswordEncoder;
 import com.example.projectdemo.domain.auth.service.EmailService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
+import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ public class EmployeesService {
 
     @Autowired
     private EmployeesMapper employeeMapper;
+    @Autowired
+    private DepartmentsMapper departmentsMapper;
 
     @Autowired
     private EmailService emailService;
@@ -31,6 +35,8 @@ public class EmployeesService {
     private static final String ALL_CHARS = CHAR_LOWER + CHAR_UPPER + NUMBER + SPECIAL_CHARS;
 //private static final String ALL_CHARS = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static final SecureRandom random = new SecureRandom();
+    @Autowired
+    private PositionsMapper positionsMapper;
 
     /**
      * 이미 회원가입한 직원인지 확인
@@ -52,7 +58,17 @@ public class EmployeesService {
      * 사번으로 직원 찾기
      */
     public EmployeesDTO findByEmpNum(String empNum) {
-        return employeeMapper.findByEmpNum(empNum);
+        EmployeesDTO employee = employeeMapper.findByEmpNum(empNum);
+
+        // 직원 dto 부서 이름 설정
+        String depName = departmentsMapper.findById(employee.getDepId()).getName();
+        employee.setDepartmentName(depName);
+
+        // 직원 dto 직급 이름 설정
+        String posTitle = positionsMapper.findById(employee.getPosId()).getTitle();
+        employee.setPositionTitle(posTitle);
+
+        return employee;
     }
 
 

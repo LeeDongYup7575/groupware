@@ -1,33 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.projectdemo.domain.employees.repository.PositionRepository">
+<mapper namespace="com.example.projectdemo.domain.employees.mapper.PositionsMapper">
 
     <resultMap id="positionMap" type="com.example.projectdemo.domain.employees.entity.Positions">
         <id property="id" column="id" />
         <result property="title" column="title" />
     </resultMap>
 
-    <select id="findAll" resultMap="positionMap">
+    <select id="findAll" resultType="com.example.projectdemo.domain.employees.dto.PositionsDTO">
         SELECT * FROM positions ORDER BY id
     </select>
 
-    <select id="findById" resultMap="positionMap">
-        SELECT * FROM positions WHERE id = #{id}
+    <select id="findById" resultType="com.example.projectdemo.domain.employees.dto.PositionsDTO">
+        SELECT * FROM positions WHERE id = #{posId}
     </select>
 
-    <select id="findByTitle" resultMap="positionMap">
-        SELECT * FROM positions WHERE title = #{title}
-    </select>
-
-    <insert id="save" parameterType="com.example.projectdemo.domain.employees.entity.Positions" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO positions (title) VALUES (#{title})
-    </insert>
-
-    <update id="update" parameterType="com.example.projectdemo.domain.employees.entity.Positions">
-        UPDATE positions SET title = #{title} WHERE id = #{id}
-    </update>
-
-    <delete id="deleteById">
-        DELETE FROM positions WHERE id = #{id}
-    </delete>
 </mapper>
