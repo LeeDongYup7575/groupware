@@ -118,7 +118,7 @@
                     <h3><i class="fas fa-stopwatch"></i> 근무 체크</h3>
                     <div class="timer">
                         <div id="time" th:text="${#dates.format(currentDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
-                        <div class="status" th:if="${not #lists.isEmpty(attendanceListByDate) and attendanceListByDate[0].checkIn != null}">업무중</div>
+                        <div class="status" th:if="${not #lists.isEmpty(attendanceListByDate) and attendanceListByDate[0].checkIn != null and attendanceListByDate[0].checkOut == null}">업무중</div>
                         <div class="status" th:if="${#lists.isEmpty(attendanceListByDate) or attendanceListByDate[0].checkIn == null}">출근전</div>
                         <div class="status" th:if="${not #lists.isEmpty(attendanceListByDate) and attendanceListByDate[0].checkOut != null}">퇴근</div>
                     </div>
@@ -128,13 +128,15 @@
                     <h3><i class="fas fa-desktop"></i> 근무 현황</h3>
                     <div class="status-list">
                         <ul>
-                            <li th:each="attendance : ${attendanceListByDate}">
-                                <span th:text="${attendance.checkIn}">08:50</span> 출근
+                            <li th:each="attendance : ${attendanceListByDate}" th:if="${attendance.checkIn != null}">
+                                <span th:text="${attendance.checkIn} + '  출근'"></span>
                             </li>
-                            <li th:each="attendance : ${attendanceListByDate}">
-                                <span th:text="${attendance.checkOut}">18:00</span> 퇴근
+                            <li th:each="attendance : ${attendanceListByDate}" th:if="${attendance.checkOut != null}">
+                                <span th:text="${attendance.checkOut} + '  퇴근'"></span>
                             </li>
                         </ul>
+
+
                     </div>
                 </div>
             </div>

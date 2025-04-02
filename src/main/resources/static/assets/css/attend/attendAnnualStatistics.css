@@ -39,12 +39,12 @@ header {
     min-height: calc(100vh - 60px);
 }
 
-/* Sidebar */
+/* Sidebar - Updated colors */
 .sidebar {
     width: 250px;
-    background-color: white;
+    background-color: #f3f7fb; /* Updated to light blue background */
     padding: 20px 0;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid #e5e5e5;
 }
 
 .add-button {
@@ -98,9 +98,9 @@ header {
 }
 
 .dropdown.active .dropdown-header {
-    background-color: #e6f7ee;
-    color: #009688;
-    border-left: 3px solid #009688;
+    background-color: #e1ebf5; /* Updated to match the blue in the screenshot */
+    color: #555; /* Updated to white text for better contrast */
+    border-left: 3px solid #0078d4; /* Darker blue for the border */
 }
 
 .dropdown-icon {
@@ -117,7 +117,7 @@ header {
     overflow: hidden;
     transition: max-height 0.3s ease;
     list-style: none;
-    background-color: #f5f5f5;
+    background-color: #e6eef8; /* Lighter blue for submenu */
 }
 
 .dropdown.open .submenu {
@@ -132,7 +132,7 @@ header {
 }
 
 .submenu li:hover {
-    background-color: #e8e8e8;
+    background-color: #d1e1f7; /* Slightly darker blue on hover */
 }
 
 .submenu li i {
@@ -147,6 +147,12 @@ header {
     color: inherit;
 }
 
+/* Active submenu item */
+.submenu li.active {
+    background-color: #c0d6f0; /* Highlight for active submenu item */
+    color: #0056b3;
+}
+
 /* Content */
 .content {
     flex: 1;
@@ -157,6 +163,7 @@ header {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
     margin-bottom: 20px;
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
 }
 
 .tab-button {
@@ -167,6 +174,7 @@ header {
     font-size: 14px;
     color: #666;
     position: relative;
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
 .tab-button.active {
@@ -239,15 +247,70 @@ header {
     background-color: #f0f8ff;
 }
 
-/* Different background colors for each group */
+/* 근태(1-3행) - 연한 회색 */
 .statistics-table tr:nth-child(-n+3) {
     background-color: #f5f5f5;
 }
 
-.statistics-table tr:nth-child(n+4):nth-child(-n+5) {
+/* 휴가(4행) - 노란색 */
+.statistics-table tr:nth-child(4) {
     background-color: #fff8e1;
 }
 
-.statistics-table tr:nth-child(n+6) {
+/* 근무시간(5-9행) 및 보정평균근무(10행) - 연한 녹색 */
+.statistics-table tr:nth-child(n+5) {
     background-color: #f0f8e6;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 992px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .content {
+        padding: 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .tab-menu {
+        padding-bottom: 5px;
+    }
+
+    .tab-button {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .statistics-table th,
+    .statistics-table td {
+        padding: 8px 5px;
+        font-size: 12px;
+    }
+
+    .year-navigation h2 {
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .logo h1 {
+        font-size: 1.5rem;
+    }
+
+    .title {
+        font-size: 1rem;
+    }
+
+    .add-button {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
 }
