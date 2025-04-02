@@ -26,4 +26,14 @@ public class MembershipDAO {
         return mybatis.insert("memberShip.insertMember", param);
     }
 
+
+    public int deleteChatRoom(int roomid) {
+        return mybatis.delete("memberShip.deleteChatroom", roomid);
+    }
+    public int deleteById(Map<String, Object> params) {
+        return mybatis.delete("memberShip.deleteById", params);
+    }
+    public boolean isAdmin(Map<String, Object> params) {
+        return mybatis.selectOne("memberShip.isAdmin", params);
+    }
 }

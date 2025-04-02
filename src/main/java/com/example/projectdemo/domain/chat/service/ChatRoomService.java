@@ -30,12 +30,19 @@ public class ChatRoomService {
         return dao.getChatRoom(idList);
     }
 
-    public List<EmployeesDTO> getAddList() {
-        return employeesMapper.selectEmpAll();
+    public List<EmployeesDTO> getAddList(int id) {
+        List<EmployeesDTO> list = employeesMapper.selectEmpAll();
+        for(int i=0; i<list.size(); i++) {
+            if(list.get(i).getId() == id) {
+                list.remove(i);
+            }
+        }
+        return list;
     }
 
     public ChatRoomDTO addRoom(ChatRoomRequestDTO request, int id) {
         List<Integer> memberList = request.getMembers();
+        memberList.add(id);
         String roomName = request.getName();
         ChatRoomDTO room = new ChatRoomDTO();
         room.setName(roomName);
