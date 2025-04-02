@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>헤더 프래그먼트</title>
+</head>
+<body>
+<!-- 네비게이션 바 -->
+<nav th:fragment="header" class="gw-navbar">
+    <div class="gw-container">
+        <div class="gw-navbar-left">
+            <a class="gw-navbar-brand" href="/">
+                <span>GROUP<span class="gw-accent-color">WARE</span></span>
+            </a>
+
+            <!-- 현재 페이지 및 전체 메뉴 -->
+            <div class="gw-current-page" id="currentPageToggle" style="display: none;">
+                <span class="gw-page-title" th:text="${pageTitle ?: '홈'}">홈</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <div class="gw-navbar-right">
+            <input type="checkbox" id="gw-navbar-toggle" class="gw-navbar-toggle">
+            <label for="gw-navbar-toggle" class="gw-navbar-toggle-label">
+                <i class="fas fa-ellipsis-v"></i>
+            </label>
+            <div class="gw-navbar-collapse">
+                <ul class="gw-navbar-nav">
+                    <li class="gw-nav-item">
+                        <a class="gw-nav-link" href="/">홈</a>
+                    </li>
+                    <li class="gw-nav-item">
+                        <a class="gw-nav-link" href="#contact">문의</a>
+                    </li>
+                    <!-- 로그인 안된 상태일 때 보이는 버튼 -->
+                    <li class="gw-nav-item" id="login-button">
+                        <a class="gw-btn gw-btn-login" href="/auth/login">로그인</a>
+                    </li>
+                    <!-- 로그인된 상태일 때 보이는 사용자 메뉴 -->
+                    <li class="gw-nav-item gw-user-dropdown" id="user-dropdown" style="display: none;">
+                        <input type="checkbox" id="gw-dropdown-toggle" class="gw-dropdown-toggle">
+                        <label for="gw-dropdown-toggle" class="gw-dropdown-toggle-label">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="user-name">사용자</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </label>
+                        <ul class="gw-dropdown-menu">
+                            <li><a class="gw-dropdown-item" href="/mypage"><i class="fas fa-user"></i> 마이페이지</a></li>
+                            <li><a class="gw-dropdown-item" href="/attendances"><i class="fas fa-clock"></i> 근태관리</a></li>
+                            <li><a class="gw-dropdown-item" href="#" onclick="navigateToQRCheck(event)"><i class="fas fa-file-signature"></i>QR</a></li>
+                            <li><hr class="gw-dropdown-divider"></li>
+                            <li><a class="gw-dropdown-item" href="#" id="logout-button"><i class="fas fa-sign-out-alt"></i> 로그아웃</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="gw-modal-backdrop"></div>
+    </div>
+</nav>
+
+<!-- CSS 부분 -->
+<th:block th:fragment="headerAssets">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style th:fragment="headerCss">
+        :root {
+            --gw-primary-color: #0183D4;
+            --gw-primary-light: #DDF6FF;
+            --gw-primary-dark: #0066a8;
+            --gw-secondary-color: #f3f4f6;
+            --gw-text-color: #1f2937;
+            --gw-text-light: #6b7280;
+            --gw-accent-color: #f97316;
+            --gw-white: #ffffff;
+            --gw-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .gw-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 네비게이션 바 */
+        .gw-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: var(--gw-white);
+            box-shadow: var(--gw-box-shadow);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .gw-navbar-scrolled {
+            height: 60px;
+        }
+
+        .gw-navbar .gw-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .gw-navbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .gw-navbar-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .gw-navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gw-primary-color);
+            text-decoration: none;
+            margin-right: 1rem;
+        }
+
+        .gw-accent-color {
+            color: var(--gw-accent-color);
+        }
+
+        /* 현재 페이지 표시 */
+        .gw-current-page {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.4rem 0.8rem;
+            background-color: var(--gw-secondary-color);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .gw-current-page:hover {
+            background-color: var(--gw-primary-light);
+        }
+
+        .gw-page-title {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+
+        .gw-current-page i {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .gw-current-page.active i {
+            transform: rotate(180deg);
+        }
+
+        /* 임포트된 사이드바 */
+        #importedSidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: var(--gw-white);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1010;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            padding-top: 60px; /* 헤더 높이만큼 여백 */
+        }
+
+        #importedSidebar.open {
+            left: 0;
+        }
+
+        .gw-sidebar-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--gw-text-light);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 0.5rem;
+            z-index: 1011;
+        }
+
+        .gw-sidebar-close:hover {
+            color: var(--gw-text-color);
+        }
+
+        /* 토글 버튼 (점 세개 아이콘) */
+        .gw-navbar-toggle {
+            display: none;
+        }
+
+        .gw-navbar-toggle-label {
+            display: none;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--gw-primary-color);
+            z-index: 1002;
+        }
+
+        /* 네비게이션 메뉴 */
+        .gw-navbar-nav {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gw-nav-item {
+            margin-left: 1.5rem;
+        }
+
+        .gw-nav-link {
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--gw-text-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .gw-nav-link:hover {
+            color: var(--gw-primary-color);
+        }
+
+        /* 버튼 스타일 */
+        .gw-btn {
+            display: inline-block;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .gw-btn-login {
+            background-color: var(--gw-white);
+            color: var(--gw-primary-color);
+            border: 2px solid var(--gw-primary-color);
+        }
+
+        .gw-btn-login:hover {
+            background-color: var(--gw-primary-color);
+            color: var(--gw-white);
+        }
+
+        /* 드롭다운 메뉴 */
+        .gw-user-dropdown {
+            position: relative;
+        }
+
+        .gw-dropdown-toggle {
+            display: none;
+        }
+
+        .gw-dropdown-toggle-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gw-text-color);
+        }
+
+        .gw-dropdown-toggle-label i {
+            margin-right: 0.5rem;
+        }
+
+        .gw-dropdown-toggle-label .fa-chevron-down {
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .gw-dropdown-toggle:checked + .gw-dropdown-toggle-label .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .gw-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 200px;
+            background-color: var(--gw-white);
+            border-radius: 0.5rem;
+            box-shadow: var(--gw-box-shadow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            list-style: none;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+            z-index: 1001;
+        }
+
+        .gw-dropdown-toggle:checked ~ .gw-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .gw-dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            color: var(--gw-text-color);
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .gw-dropdown-item:hover {
+            background-color: var(--gw-primary-light);
+        }
+
+        .gw-dropdown-item i {
+            margin-right: 0.5rem;
+            width: 1rem;
+        }
+
+        .gw-dropdown-divider {
+            height: 1px;
+            background-color: var(--gw-secondary-color);
+            border: none;
+            margin: 0.5rem 0;
+        }
+
+        /* 모달 배경 */
+        .gw-modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1005;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gw-modal-backdrop.open {
+            display: block;
+            opacity: 1;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .gw-navbar-toggle-label {
+                display: flex;
+                z-index: 1001;
+            }
+
+            .gw-navbar-toggle:checked ~ .gw-container .gw-modal-backdrop {
+                display: block;
+                opacity: 1;
+            }
+
+            .gw-navbar-collapse {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.9);
+                width: 80%;
+                max-width: 320px;
+                max-height: 80vh;
+                background-color: var(--gw-white);
+                border-radius: 1rem;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s ease;
+                z-index: 1000;
+                padding: 1.5rem;
+                overflow-y: auto;
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            .gw-navbar-toggle:checked ~ .gw-navbar-collapse {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .gw-navbar-nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .gw-nav-item {
+                margin-left: 0;
+                margin-bottom: 1rem;
+                width: 100%;
+            }
+
+            .gw-dropdown-menu {
+                position: static;
+                box-shadow: none;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                width: 100%;
+                display: none;
+                margin-top: 0.5rem;
+            }
+
+            .gw-dropdown-toggle:checked ~ .gw-dropdown-menu {
+                display: block;
+            }
+        }
+    </style>
+</th:block>
+
+<!-- JavaScript 부분 -->
+<th:block th:fragment="headerScripts">
+    <script>
+        // 스크롤 시 네비게이션바 스타일 변경
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.gw-navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('gw-navbar-scrolled');
+            } else {
+                navbar.classList.remove('gw-navbar-scrolled');
+            }
+        });
+
+        // 페이지 로드 시 JWT 토큰 확인하여 로그인 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            // 로컬 스토리지에서 JWT 토큰 확인
+            const token = localStorage.getItem('accessToken');
+            const userName = localStorage.getItem('name');
+
+            // 요소들을 변수에 저장하고 존재 여부 확인
+            const loginButton = document.getElementById('login-button');
+            const userDropdown = document.getElementById('user-dropdown');
+            const userNameElement = document.getElementById('user-name');
+            const modalBackdrop = document.querySelector('.gw-modal-backdrop');
+            const currentPageToggle = document.getElementById('currentPageToggle');
+
+            // 사이드바 관련 변수 및 함수들
+            let importedSidebar = document.getElementById('importedSidebar');
+            const importSidebar = async function() {
+                try {
+                    // 사이드바가 이미 존재하는지 확인
+                    if (!importedSidebar) {
+                        const response = await fetch('/fragments/sidebar/main-sidebar');
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const html = await response.text();
+
+                        // 임시 div에 HTML 삽입
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+
+                        // sidebar 프래그먼트 추출 및 ID 부여
+                        const sidebarElement = tempDiv.querySelector('[th\\:fragment="sidebar"]') ||
+                            tempDiv.querySelector('[data-th-fragment="sidebar"]') ||
+                            tempDiv.querySelector('#sidebar') ||
+                            tempDiv.querySelector('.sidebar');
+
+
+                        if (sidebarElement) {
+                            sidebarElement.id = 'importedSidebar';
+
+                            // 닫기 버튼 추가
+                            const closeButton = document.createElement('button');
+                            closeButton.className = 'gw-sidebar-close';
+                            closeButton.innerHTML = '<i class="fas fa-times"></i>';
+                            closeButton.addEventListener('click', closeSidebar);
+                            sidebarElement.appendChild(closeButton);
+
+                            // body에 추가
+                            document.body.appendChild(sidebarElement);
+                            importedSidebar = sidebarElement;
+                        } else {
+                            console.error('Could not find sidebar fragment in the response');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error importing sidebar:', error);
+                }
+            };
+
+            // 사이드바 토글 함수
+            const toggleSidebar = async function() {
+                // 사이드바가 아직 로드되지 않았다면 로드
+                if (!importedSidebar) {
+                    await importSidebar();
+                }
+
+                if (importedSidebar) {
+                    importedSidebar.classList.add('open');
+                    modalBackdrop.classList.add('open');
+                    document.body.style.overflow = 'hidden'; // 배경 스크롤 막기
+                }
+            };
+
+            // 사이드바 닫기 함수
+            const closeSidebar = function() {
+                if (importedSidebar) {
+                    importedSidebar.classList.remove('open');
+                }
+                modalBackdrop.classList.remove('open');
+                document.body.style.overflow = ''; // 배경 스크롤 복원
+            };
+
+            // 현재 페이지 버튼 클릭 이벤트
+            if (currentPageToggle) {
+                currentPageToggle.addEventListener('click', toggleSidebar);
+            }
+
+            // 모달 배경 클릭 이벤트
+            if (modalBackdrop) {
+                modalBackdrop.addEventListener('click', function() {
+                    closeSidebar();
+                    closeMenu();
+                });
+            }
+
+            // 모바일 메뉴 닫기 함수
+            function closeMenu() {
+                document.getElementById('gw-navbar-toggle').checked = false;
+            }
+
+            // 모든 메뉴 링크에 이벤트 리스너 추가
+            const navLinks = document.querySelectorAll('.gw-nav-link, .gw-dropdown-item');
+            navLinks.forEach(link => {
+                link.addEventListener('click', closeMenu);
+            });
+
+            if (token) {
+                // 토큰이 있으면 로그인된 상태로 처리
+                if (loginButton) {
+                    loginButton.style.cssText = 'display: none !important;';
+                }
+
+                if (userDropdown) {
+                    userDropdown.style.cssText = 'display: block !important;';
+                }
+
+                // 사용자 이름 표시
+                if (userNameElement) {
+                    userNameElement.textContent = userName || '사용자';
+                }
+
+                if(currentPageToggle){
+                    currentPageToggle.style.cssText = 'display: block !important;';
+                }
+            }
+
+            // 로그아웃 버튼 클릭 이벤트
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // 로컬 스토리지에서 토큰 제거
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('refreshToken');
+                    localStorage.removeItem('empNum');
+                    localStorage.removeItem('name');
+                    localStorage.removeItem('email');
+                    localStorage.removeItem('role');
+
+                    // intro.html 페이지로 이동
+                    window.location.href = '/';
+                });
+            }
+
+            // ESC 키로 모달과 사이드바 닫기
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeMenu();
+                    closeSidebar();
+                }
+            });
+
+            // 현재 페이지 제목 설정
+            function setPageTitle() {
+                // URL에서 페이지 정보 추출
+                const path = window.location.pathname;
+                let pageTitle = '홈';
+
+                // URL 경로에 따라 페이지 제목 설정
+                if (path.includes('/mail')) {
+                    pageTitle = '이메일';
+                } else if (path.includes('/board')) {
+                    pageTitle = '게시판';
+                } else if (path.includes('/chat')) {
+                    pageTitle = '메시지';
+                } else if (path.includes('/calendar')) {
+                    pageTitle = '일정';
+                } else if (path.includes('/shared-mail')) {
+                    pageTitle = '공용 메일';
+                } else if (path.includes('/address')) {
+                    pageTitle = '주소록';
+                } else if (path.includes('/booking')) {
+                    pageTitle = '예약';
+                } else if (path.includes('/documents')) {
+                    pageTitle = '문서 관리';
+                } else if (path.includes('/attend')) {
+                    pageTitle = '근무/경비처리';
+                } else if (path.includes('/edsm')) {
+                    pageTitle = '전자결재';
+                } else if (path.includes('/organization')) {
+                    pageTitle = '조직도';
+                } else if (path.includes('/admin')) {
+                    pageTitle = '관리자 페이지';
+                } else if (path.includes('/faq')) {
+                    pageTitle = 'FAQ';
+                } else if (path.includes('/mypage')) {
+                    pageTitle = '마이페이지';
+                }
+
+                // 페이지 제목 요소 업데이트
+                const pageTitleElement = document.querySelector('.gw-page-title');
+                if (pageTitleElement) {
+                    pageTitleElement.textContent = pageTitle;
+                }
+            }
+
+            // 현재 페이지 제목 설정 호출
+            setPageTitle();
+        });
+
+        // QR체크 페이지로 이동하는 함수
+        function navigateToQRCheck(event) {
+            event.preventDefault();
+
+            // 로컬 스토리지에서 토큰 가져오기
+            const token = localStorage.getItem('accessToken');
+
+            if (token) {
+                // fetch API를 사용하여 헤더에 토큰을 포함시켜 요청
+                fetch('/qr/qrcheck', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(response => {
+                        if (response.redirected) {
+                            // 리다이렉션이 있으면 해당 URL로 이동
+                            window.location.href = response.url;
+                        } else if (response.ok) {
+                            // 응답이 HTML이면 전체 페이지를 그 내용으로 대체
+                            return response.text().then(html => {
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            });
+                        } else {
+                            console.error('QR 체크 페이지 로드 오류:', response.status);
+                            alert('QR 체크 페이지를 로드할 수 없습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('QR 체크 페이지 요청 오류:', error);
+                        alert('QR 체크 페이지 요청 중 오류가 발생했습니다.');
+                    });
+            } else {
+                // 토큰이 없으면 인트로 페이지로 리다이렉트
+                window.location.href = '/';
+            }
+        }
+
+        // 채팅 창 열기 함수
+        function openChat() {
+            const token = localStorage.getItem('accessToken');
+            if (!token) {
+                alert("로그인이 필요합니다");
+                return;
+            }
+
+            // 새 창 열기
+            const url = `http://localhost:3000?token=${encodeURIComponent(token)}`;
+            const newWindow = window.open(url, "_blank");
+
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

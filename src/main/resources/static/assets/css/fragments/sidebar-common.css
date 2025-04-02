@@ -1,0 +1,102 @@
+
+/* 사이드바 */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding-top: var(--header-height);
+    transition: transform 0.3s ease;
+    z-index: 990;
+    border-right: 1px solid #e5e5e5;
+}
+
+.sidebar-menu {
+    padding: 20px 0;
+}
+
+.sidebar-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.sidebar-menu a:hover {
+    background-color: var(--sidebar-hover);
+}
+
+.sidebar-menu li.active a {
+    background-color: var(--sidebar-active);
+    border-left: 4px solid var(--sidebar-active-border);
+    padding-left: 16px;
+    color: var(--sidebar-active-border);
+    font-weight: 500;
+}
+
+.sidebar-menu li:not(.active) a {
+    border-left: 4px solid transparent;
+    padding-left: 16px;
+}
+
+.sidebar-icon {
+    margin-right: 10px;
+    font-size: 18px;
+    display: inline-block;
+    width: 24px;
+    text-align: center;
+}
+
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 1200px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-toggle {
+        display: flex;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}

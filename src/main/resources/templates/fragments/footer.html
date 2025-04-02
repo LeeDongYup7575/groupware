@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>푸터 프래그먼트</title>
+</head>
+<body>
+<!-- 푸터 -->
+<footer th:fragment="footer" class="gw-footer">
+    <div class="gw-footer-container">
+        <div class="gw-footer-grid">
+            <div class="gw-footer-brand">
+                <div class="gw-footer-logo">GROUP<span class="gw-accent-color">WARE</span></div>
+                <p class="gw-footer-text">효율적인 업무 환경을 위한 최고의 선택.<br>당신의 회사에 가장 적합한 그룹웨어 솔루션입니다.</p>
+            </div>
+            <div class="gw-footer-links">
+                <h4 class="gw-footer-heading">바로가기</h4>
+                <a href="/" class="gw-footer-link">홈</a>
+                <a href="#features" class="gw-footer-link">기능</a>
+                <a href="#contact" class="gw-footer-link">문의</a>
+            </div>
+            <div class="gw-footer-links">
+                <h4 class="gw-footer-heading">지원</h4>
+                <a href="#" class="gw-footer-link">FAQ</a>
+                <a href="#" class="gw-footer-link">고객 지원</a>
+                <a href="#" class="gw-footer-link">개인정보 처리방침</a>
+            </div>
+            <div class="gw-footer-contact">
+                <h4 class="gw-footer-heading">연락처</h4>
+                <p class="gw-footer-info">서울시 관악구 봉천로 227 보라매샤르망</p>
+                <p class="gw-footer-info">이메일: techX@texhX.kor.kr</p>
+                <p class="gw-footer-info">전화: 02-XXX-XXXX</p>
+            </div>
+        </div>
+        <div class="gw-copyright">
+            &copy; 2025 TechX 그룹웨어. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- CSS 부분 -->
+<th:block th:fragment="footerAssets">
+    <style th:fragment="footerCss">
+        :root {
+            --gw-primary-color: #0183D4;
+            --gw-primary-light: #DDF6FF;
+            --gw-primary-dark: #0066a8;
+            --gw-secondary-color: #f3f4f6;
+            --gw-text-color: #1f2937;
+            --gw-text-light: #6b7280;
+            --gw-accent-color: #0183D4;
+            --gw-white: #ffffff;
+            --gw-dark: #1f2937;
+            --gw-gray-light: #d1d5db;
+            --gw-gray-dark: #9ca3af;
+        }
+
+        /* 푸터 스타일 */
+        .gw-footer {
+            background-color: var(--gw-dark);
+            color: var(--gw-white);
+            padding: 4rem 0 2rem;
+        }
+
+        .gw-footer-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .gw-footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .gw-footer-brand {
+            margin-right: 2rem;
+        }
+
+        .gw-footer-logo {
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--gw-white);
+        }
+
+        .gw-accent-color {
+            color: var(--gw-accent-color);
+        }
+
+        .gw-footer-text {
+            color: var(--gw-gray-light);
+            margin-bottom: 2rem;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+
+        .gw-footer-heading {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--gw-white);
+        }
+
+        .gw-footer-links {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gw-footer-link {
+            color: var(--gw-gray-light);
+            text-decoration: none;
+            margin-bottom: 0.75rem;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .gw-footer-link:hover {
+            color: var(--gw-white);
+        }
+
+        .gw-footer-info {
+            color: var(--gw-gray-light);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .gw-copyright {
+            color: var(--gw-gray-dark);
+            font-size: 0.9rem;
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+        }
+
+        /* 반응형 스타일 */
+        @media (max-width: 992px) {
+            .gw-footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+
+            .gw-footer-brand {
+                grid-column: span 2;
+                margin-right: 0;
+            }
+
+            .gw-footer-text {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .gw-footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .gw-footer-brand {
+                grid-column: span 1;
+            }
+
+            .gw-footer {
+                padding: 3rem 0 1.5rem;
+            }
+        }
+    </style>
+</th:block>
+</body>
+</html>

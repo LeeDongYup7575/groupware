@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>메인 사이드바</title>
+</head>
+<body>
+<!-- 공통 사이드바 스타일 포함 -->
+<th:block th:fragment="sidebarAssets">
+  <link rel="stylesheet" th:href="@{/css/fragments/sidebar-common.css}">
+</th:block>
+
+<!-- 메인 사이드바 -->
+<div th:fragment="sidebar" id="sidebar" class="sidebar">
+  <div class="sidebar-menu">
+    <ul>
+      <li class="active"><a href="#"><span class="sidebar-icon">📧</span> 이메일</a></li>
+      <li><a th:href="@{/board}"><span class="sidebar-icon">📋</span> 게시판</a></li>
+      <li><a href="#" onclick="event.preventDefault(); openChat();"><span class="sidebar-icon">💬</span> 메시지</a></li>
+      <li><a href="#"><span class="sidebar-icon">📅</span> 일정</a></li>
+      <li><a href="#"><span class="sidebar-icon">📨</span> 공용 메일</a></li>
+      <li><a href="#"><span class="sidebar-icon">📚</span> 주소록</a></li>
+      <li><a th:href="@{/booking/main}"><span class="sidebar-icon">🔖</span> 예약</a></li>
+      <li><a href="#"><span class="sidebar-icon">📂</span> 문서 관리</a></li>
+      <li><a th:href="@{/attend/main}"><span class="sidebar-icon">⏰</span> 근무/경비처리</a></li>
+      <li><a th:href="@{/edsm/main}"><span class="sidebar-icon">📝</span> 전자결재</a></li>
+      <li><a href="#"><span class="sidebar-icon">👥</span> 조직도</a></li>
+      <li><a href="#"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a></li>
+      <li><a href="#"><span class="sidebar-icon">❓</span> FAQ</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- 공통 사이드바 스크립트 포함 -->
+<th:block th:fragment="sidebarScripts">
+  <script th:src="@{/js/fragments/sidebar-common.js}"></script>
+</th:block>
+</body>
+</html>

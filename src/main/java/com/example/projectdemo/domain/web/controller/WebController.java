@@ -249,4 +249,24 @@ public class WebController {
      */
     @GetMapping("/contact")
     public String contact() {return "contact/contact";}
+
+    /**
+     * 사이드바 프래그먼트 경로
+     */
+    @GetMapping("/fragments/sidebar/main-sidebar")
+    public String getMainSidebar() {
+        return "fragments/sidebar/main-sidebar :: sidebar";
+    }
+
+    /**
+     * 게시판
+     */
+    @GetMapping("/board")
+    public String board(Model model) {
+        model.addAttribute("pageTitle", "게시판");
+        return "board/list";
+    }
+
+
+
 }
