@@ -44,4 +44,14 @@ public class BookingController {
         return "booking/booking-main";
     }
 
+    @GetMapping("/meeting-room")
+    public String meetingRoom(Model model) {
+        return "booking/booking-meeting-room";
+    }
+
+    @GetMapping("/supplies")
+    public String supplies(Model model) {
+        return "booking/booking-supplies";
+    }
+
 }
