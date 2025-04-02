@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TECH X - 근태 관리</title>
-    <link rel="stylesheet" href="/css/attendMain.css">
+    <link rel="stylesheet" href="/assets/css/attend/attendMain.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -60,7 +60,7 @@
                     <div class="stats">
                         <div class="stat">
                             <span class="label">잔여휴가</span>
-                            <span class="value" th:text="${CanUseLeaves}">0일</span>
+                            <span class="value" th:text="${canUseLeaves}">0일</span>
                         </div>
                         <div class="stat">
                             <span class="label"><a href="/attend/leavesHistory">휴가 현황</a></span>
@@ -118,9 +118,9 @@
                     <h3><i class="fas fa-stopwatch"></i> 근무 체크</h3>
                     <div class="timer">
                         <div id="time" th:text="${#dates.format(currentDate, 'yyyy-MM-dd HH:mm:ss')}"></div>
-                        <div class="status" th:if="${not #lists.isEmpty(list) and list[0].checkIn != null}">업무중</div>
-                        <div class="status" th:if="${#lists.isEmpty(list) or list[0].checkIn == null}">출근전</div>
-                        <div class="status" th:if="${not #lists.isEmpty(list) and list[0].checkOut != null}">퇴근</div>
+                        <div class="status" th:if="${not #lists.isEmpty(attendanceListByDate) and attendanceListByDate[0].checkIn != null}">업무중</div>
+                        <div class="status" th:if="${#lists.isEmpty(attendanceListByDate) or attendanceListByDate[0].checkIn == null}">출근전</div>
+                        <div class="status" th:if="${not #lists.isEmpty(attendanceListByDate) and attendanceListByDate[0].checkOut != null}">퇴근</div>
                     </div>
                 </div>
 
@@ -128,10 +128,10 @@
                     <h3><i class="fas fa-desktop"></i> 근무 현황</h3>
                     <div class="status-list">
                         <ul>
-                            <li th:each="attendance : ${list}">
+                            <li th:each="attendance : ${attendanceListByDate}">
                                 <span th:text="${attendance.checkIn}">08:50</span> 출근
                             </li>
-                            <li th:each="attendance : ${list}">
+                            <li th:each="attendance : ${attendanceListByDate}">
                                 <span th:text="${attendance.checkOut}">18:00</span> 퇴근
                             </li>
                         </ul>

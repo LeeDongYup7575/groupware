@@ -132,8 +132,30 @@ public class AttendanceService {
     }
 
 
+//    @Transactional
+//    public Attendance processAttendanceById(Integer empId, String attendanceType) {
+//        switch (attendanceType) {
+//            case "출근":
+//            case "지각":
+//                return recordCheckIn(empId);
+//            case "퇴근":
+//            case "조퇴":
+//                return recordCheckOut(empId);
+//            default:
+//                throw new IllegalArgumentException("Invalid attendance type: " + attendanceType);
+//        }
+//    }
     @Transactional
     public Attendance processAttendanceById(Integer empId, String attendanceType) {
+        // enum 이름인지 먼저 확인
+        try {
+            AttendanceStatus status = AttendanceStatus.valueOf(attendanceType);
+            attendanceType = status.getStatus(); // enum 이름이면 한글 상태값으로 변환
+        } catch (IllegalArgumentException e) {
+            // 이미 한글 상태값이라면 패스
+        }
+
+        // 이제 한글 상태값으로 처리
         switch (attendanceType) {
             case "출근":
             case "지각":
@@ -141,6 +163,29 @@ public class AttendanceService {
             case "퇴근":
             case "조퇴":
                 return recordCheckOut(empId);
+            case "미출근":
+                // 미출근 상태 처리 로직...
+                EmployeesDTO employee = employeeMapper.findById(empId);
+                if (employee != null) {
+                    employee.setAttendStatus("미출근");
+                    employeeMapper.updateAttendStatus(employee.getId(), "미출근");
+                }
+
+                LocalDate today = LocalDate.now();
+                Attendance attendance = attendanceMapper.getAttendanceByEmployeeAndDate(empId, today);
+
+                if (attendance == null) {
+                    attendance = Attendance.builder()
+                            .empId(empId)
+                            .workDate(today)
+                            .status("미출근")
+                            .workHours(BigDecimal.ZERO)
+                            .build();
+
+                    attendanceMapper.insertAttendance(attendance);
+                }
+
+                return attendance;
             default:
                 throw new IllegalArgumentException("Invalid attendance type: " + attendanceType);
         }

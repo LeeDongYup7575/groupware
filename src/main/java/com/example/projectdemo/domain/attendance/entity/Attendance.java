@@ -18,5 +18,5 @@ public class Attendance {
     private LocalTime checkIn;
     private LocalTime checkOut;
     private BigDecimal workHours;
-    private String status; // enum('출근','퇴근','지각','조퇴','결근','연차','병가','출근전') - 출근 전은 코드로만 처리해볼게요
+    private String status; // enum('출근','퇴근','지각','조퇴','결근','연차','병가','미출근')
 }

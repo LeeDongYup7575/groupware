@@ -8,8 +8,11 @@
             #{id}
         </foreach>
     </select>
-    <insert id="createChatRoom">
-        insert into chatrooms values (default,#{name},default)
+    <insert id="createChatRoom"
+            parameterType="com.example.projectdemo.domain.chat.dto.ChatRoomDTO"
+            useGeneratedKeys="true"
+            keyProperty="id">        insert into chatrooms
+                                     values (default, #{name}, default)
     </insert>
 
 
