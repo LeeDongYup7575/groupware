@@ -66,6 +66,14 @@ public class QRApiController {
 
             Attendance attendance = attendanceService.processQRAttendance(empNum, attendanceType);
 
+            if (attendance == null) {
+                // 적절한 오류 응답 반환
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Unable to process attendance");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            }
+
             Map<String, Object> attendanceData = new HashMap<>();
             attendanceData.put("empNum", empNum);
             attendanceData.put("name", employee.getName());
@@ -75,7 +83,10 @@ public class QRApiController {
             if (attendanceType.equals("CHECKOUT") || attendanceType.equals("EARLY_LEAVE")) {
                 attendanceData.put("checkoutTime", attendance.getCheckOut().toString());
             } else {
-                attendanceData.put("checkinTime", attendance.getCheckIn().toString());
+                String checkInTime = (attendance.getCheckIn() != null) ?
+                        attendance.getCheckIn().toString() :
+                        "미체크인";
+                attendanceData.put("checkinTime", checkInTime);
             }
 
             attendanceData.put("workDate", attendance.getWorkDate().toString());
