@@ -50,7 +50,7 @@ public class AttendController {
 
         model.addAttribute("employee", employee);
 
-        List<AttendDTO>list = attendService.selectByEmpIdAndDate(empId);
+        List<AttendDTO>attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
 
         List<Map<String, Object>> statisticsByYear = attendService.getAttendanceStatisticsThisYear(empId);
 
@@ -60,7 +60,7 @@ public class AttendController {
         int workDays = attendService.getWorkDaysThisYear(empId);
         BigDecimal correctionAverage = workDays > 0 ? totalWorkHours.divide(new BigDecimal(workDays), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
 
-        model.addAttribute("list", list);
+        model.addAttribute("attendanceListByDate", attendanceListByDate);
         model.addAttribute("statisticsByYear", statisticsByYear);
         model.addAttribute("canUseLeaves", canUseLeaves);
         model.addAttribute("currentDate", new Date());
