@@ -356,11 +356,11 @@
     $("#formSelect").on("change", function() {
         var selectedValue = $(this).val();
         console.log("선택된 값:", selectedValue);
-        if(selectedValue == "bc"){
+        if(selectedValue === "bc"){
             location.href = "/edsm/bc";
-        }else if(selectedValue == "cdv"){
+        }else if(selectedValue === "cdv"){
             location.href = "/edsm/cdv";
-        }else if(selectedValue == "loa"){
+        }else if(selectedValue === "loa"){
             location.href = "/edsm/loa";
         }else{
             alert("양식을 확인해주세요");

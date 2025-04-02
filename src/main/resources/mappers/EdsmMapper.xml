@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.projectdemo.domain.attendance.mapper.AttendanceMapper">
+<mapper namespace="Edsm">
 
-
+    <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO groupware.edsm_document
+            (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date ,status)
+        VALUES
+            (#{edsmFormId}, #{title}, #{content},#{retentionPeriod},#{securityGrade}, #{drafterId}, current_date,null,'진행')
+    </insert>
 
 
 
 </mapper>
+
