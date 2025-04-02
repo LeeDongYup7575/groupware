@@ -27,21 +27,19 @@ public class ChatRoomController {
     @GetMapping
     public ResponseEntity<List<ChatRoomDTO>> getChatRoom(HttpServletRequest request) {
         int id = (int) request.getAttribute("id");
-        System.out.println(id+"아이디입니다");
-
         return ResponseEntity.ok(chatRoomService.getChatRoom(id));
     }
 
 
     @GetMapping("/getaddlist")
     public ResponseEntity<List<EmployeesDTO>> getAddList(HttpServletRequest request) {
-
-        return ResponseEntity.ok(chatRoomService.getAddList());
+        int id=(int) request.getAttribute("id");
+        return ResponseEntity.ok(chatRoomService.getAddList(id));
     }
-
     @PostMapping("/addroom")
-    public ResponseEntity<ChatRoomDTO> addRoom(@RequestBody ChatRoomRequestDTO request) {
-        return ResponseEntity.ok(chatRoomService.addRoom(request, 3));
+    public ResponseEntity<ChatRoomDTO> addRoom(@RequestBody ChatRoomRequestDTO request, HttpServletRequest resq) {
+        int id=(int) resq.getAttribute("id");
+        return ResponseEntity.ok(chatRoomService.addRoom(request, id));
     }
 
 }
