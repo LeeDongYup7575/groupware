@@ -22,39 +22,29 @@
         <result property="purpose" column="purpose"/>
         <result property="bookingStatus" column="booking_status"/>
         <result property="createdAt" column="created_at"/>
-        <result property="empName" column="name"/>
+        <result property="empName" column="emp_name"/>
         <result property="deptName" column="dept_name"/>
         <association property="meetingRoom" resultMap="meetingRoomResultMap"/>
     </resultMap>
 
-    <select id="findAllMeetingRooms" resultMap="meetingRoomResultMap">
-        SELECT * FROM meeting_room
-        ORDER BY id
-    </select>
-
-    <select id="findMeetingRoomById" resultMap="meetingRoomResultMap">
-        SELECT * FROM meeting_room
-        WHERE id = #{id}
-    </select>
-
     <select id="findAllMeetingRoomBookings" resultMap="meetingRoomBookingResultMap">
         SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
-               e.name, d.dept_name
+               e.name as emp_name, d.name as dept_name
         FROM meeting_room_booking b
                  JOIN meeting_room r ON b.room_id = r.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
-                 LEFT JOIN departments d ON e.dept_code = d.dept_code
+                 LEFT JOIN departments d ON e.dep_id = d.id
         WHERE b.booking_status != 'CANCELLED'
         ORDER BY b.start DESC
     </select>
 
     <select id="findMeetingRoomBookingsByEmpNum" resultMap="meetingRoomBookingResultMap">
         SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
-               e.name, d.dept_name
+               e.name as emp_name, d.name as dept_name
         FROM meeting_room_booking b
                  JOIN meeting_room r ON b.room_id = r.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
-                 LEFT JOIN departments d ON e.dept_code = d.dept_code
+                 LEFT JOIN departments d ON e.dep_id = d.id
         WHERE b.emp_num = #{empNum}
           AND b.booking_status != 'CANCELLED'
         ORDER BY b.start DESC
@@ -62,11 +52,11 @@
 
     <select id="findMeetingRoomBookingsByRoomId" resultMap="meetingRoomBookingResultMap">
         SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
-               e.name, d.dept_name
+               e.name as emp_name, d.name as dept_name
         FROM meeting_room_booking b
                  JOIN meeting_room r ON b.room_id = r.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
-                 LEFT JOIN departments d ON e.dept_code = d.dept_code
+                 LEFT JOIN departments d ON e.dep_id = d.id
         WHERE b.room_id = #{roomId}
           AND b.booking_status != 'CANCELLED'
         ORDER BY b.start DESC
@@ -74,11 +64,11 @@
 
     <select id="findMeetingRoomBookingsByDateRange" resultMap="meetingRoomBookingResultMap">
         SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
-               e.name, d.dept_name
+               e.name as emp_name, d.name as dept_name
         FROM meeting_room_booking b
                  JOIN meeting_room r ON b.room_id = r.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
-                 LEFT JOIN departments d ON e.dept_code = d.dept_code
+                 LEFT JOIN departments d ON e.dep_id = d.id
         WHERE b.booking_status != 'CANCELLED'
         AND ((b.start BETWEEN #{startDate} AND #{endDate})
            OR (b.end BETWEEN #{startDate} AND #{endDate})
