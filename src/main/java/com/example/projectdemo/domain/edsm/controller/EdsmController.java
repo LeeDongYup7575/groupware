@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -94,7 +95,14 @@ public class EdsmController {
     model.addAttribute("bc",bc);
 
         List<EmployeesDTO> list = employeesMapper.selectEmpAll();
-        model.addAttribute("list",list);
+        List<EmployeesDTO> empList = new ArrayList<>();
+        for(int i = 0; list.size()>i; i++) {
+            String empNum1 = list.get(i).getEmpNum();
+            EmployeesDTO list_emp = employeeService.findByEmpNum(empNum1);
+            empList.add(list_emp);
+        }
+        model.addAttribute("list_emp", empList);
+
 
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String)request.getAttribute("empNum");
