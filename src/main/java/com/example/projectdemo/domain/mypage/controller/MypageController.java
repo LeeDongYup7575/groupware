@@ -33,4 +33,6 @@ public class MypageController {
 
         return ResponseEntity.ok(employee);
     }
+
+//    @GetMapping("/activities/{menu}")
 }
