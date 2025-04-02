@@ -48,8 +48,6 @@ public class AttendController {
             return "redirect:/auth/login";
         }
 
-        model.addAttribute("employee", employee);
-
         List<AttendDTO>attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
 
         List<Map<String, Object>> statisticsByYear = attendService.getAttendanceStatisticsThisYear(empId);
@@ -60,6 +58,8 @@ public class AttendController {
         int workDays = attendService.getWorkDaysThisYear(empId);
         BigDecimal correctionAverage = workDays > 0 ? totalWorkHours.divide(new BigDecimal(workDays), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
 
+
+        model.addAttribute("employee", employee);
         model.addAttribute("attendanceListByDate", attendanceListByDate);
         model.addAttribute("statisticsByYear", statisticsByYear);
         model.addAttribute("canUseLeaves", canUseLeaves);
@@ -84,55 +84,76 @@ public class AttendController {
     @RequestMapping("/annualStatistics")
     public String annualStatistics(Model model, HttpServletRequest request,
                                    @RequestParam(required = false) Integer year) {
-        int empId = (int)request.getAttribute("id");
+        int empId = (int) request.getAttribute("id");
 
-        // 연도가 지정되지 않은 경우 현재 연도를 기본값으로 사용
         if (year == null) {
             year = Year.now().getValue();
         }
 
-        if (empId == 0) { //예외처리
+        if (empId == 0) {
             return "redirect:/auth/login";
         }
 
         EmployeesDTO employee = employeeMapper.findById(empId);
-        if (employee == null) { //예외처리
+        if (employee == null) {
             return "redirect:/auth/login";
         }
 
-        // 지정된 연도의 통계 가져오기
         List<Map<String, Object>> monthlyStats = attendService.getMonthlyAttendanceStatistics(empId, year);
 
-        // 월별 데이터가 비어있는 경우 0으로 채우기
         List<Map<String, Object>> completeMonthlyStats = new ArrayList<>();
+        BigDecimal totalTardy = BigDecimal.ZERO;
+        BigDecimal totalEarlyLeave = BigDecimal.ZERO;
+        BigDecimal totalAbsenteeism = BigDecimal.ZERO;
+        BigDecimal totalVacationCount = BigDecimal.ZERO;
+        BigDecimal totalWorkHours = BigDecimal.ZERO;
+        long totalWorkDays = 0;
+
         for (int month = 1; month <= 12; month++) {
             boolean found = false;
             for (Map<String, Object> stats : monthlyStats) {
                 if (stats.get("month").equals(Long.valueOf(month))) {
                     completeMonthlyStats.add(stats);
+
+                    // 합계 계산
+                    totalTardy = totalTardy.add((BigDecimal) stats.get("tardyCount"));
+                    totalEarlyLeave = totalEarlyLeave.add((BigDecimal) stats.get("earlyLeaveCount"));
+                    totalAbsenteeism = totalAbsenteeism.add((BigDecimal) stats.get("absenteeismCount"));
+                    totalVacationCount = totalVacationCount.add((BigDecimal) stats.get("vacationCount"));
+                    totalWorkHours = totalWorkHours.add((BigDecimal) stats.get("workHours"));
+                    totalWorkDays += (long) stats.get("workDays"); // long 타입 직접 연산
+
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                // 해당 월에 값이 없으면 0으로 채움
                 Map<String, Object> emptyStats = new HashMap<>();
                 emptyStats.put("month", month);
-                emptyStats.put("tardyCount", 0);
-                emptyStats.put("earlyLeaveCount", 0);
-                emptyStats.put("absenteeismCount", 0);
-                emptyStats.put("vacationCount", 0);
-                emptyStats.put("totalWorkHours", 0);
-                emptyStats.put("workDays", 0);
+                emptyStats.put("tardyCount", BigDecimal.ZERO);
+                emptyStats.put("earlyLeaveCount", BigDecimal.ZERO);
+                emptyStats.put("absenteeismCount", BigDecimal.ZERO);
+                emptyStats.put("vacationCount", BigDecimal.ZERO);
+                emptyStats.put("workHours", BigDecimal.ZERO);
+                emptyStats.put("workDays", 0L); // long 값으로 초기화
                 completeMonthlyStats.add(emptyStats);
             }
         }
+
         model.addAttribute("year", year);
         model.addAttribute("monthlyStats", completeMonthlyStats);
         model.addAttribute("employee", employee);
+        model.addAttribute("totalTardy", totalTardy);
+        model.addAttribute("totalEarlyLeave", totalEarlyLeave);
+        model.addAttribute("totalAbsenteeism", totalAbsenteeism);
+        model.addAttribute("totalVacationCount", totalVacationCount);
+        model.addAttribute("totalWorkHours", totalWorkHours);
+        model.addAttribute("totalWorkDays", totalWorkDays);
 
         return "/attend/attendAnnualStatistics";
     }
+
+
 
     @RequestMapping("/workDetails")
     public String workDetails(Model model) {

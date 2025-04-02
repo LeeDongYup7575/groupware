@@ -43,8 +43,8 @@
             SUM(CASE WHEN status = '조퇴' THEN 1 ELSE 0 END) AS earlyLeaveCount,
             SUM(CASE WHEN status = '결근' THEN 1 ELSE 0 END) AS absenteeismCount,
             SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS vacationCount,
-            SUM(work_hours) AS totalWorkHours,
-            COUNT(DISTINCT work_date) AS workDays
+            SUM(work_hours) AS workHours,
+            COUNT(DISTINCT CASE WHEN status != '결근' THEN work_date END) AS workDays
         FROM attendance
         WHERE emp_id = #{empId}
           AND YEAR(work_date) = #{year}
