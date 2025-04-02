@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.attend.dto;
 
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -10,8 +11,8 @@ public class AttendDTO {
     private int id;
     private int empId;
     private Date workDate;
-    private Timestamp checkIn;
-    private Timestamp checkOut;
+    private Time checkIn;
+    private Time checkOut;
     private BigDecimal workHours;
     private String status;
 
@@ -47,19 +48,19 @@ public class AttendDTO {
         this.workDate = workDate;
     }
 
-    public Timestamp getCheckIn() {
+    public Time getCheckIn() {
         return checkIn;
     }
 
-    public void setCheckIn(Timestamp checkIn) {
+    public void setCheckIn(Time checkIn) {
         this.checkIn = checkIn;
     }
 
-    public Timestamp getCheckOut() {
+    public Time getCheckOut() {
         return checkOut;
     }
 
-    public void setCheckOut(Timestamp checkOut) {
+    public void setCheckOut(Time checkOut) {
         this.checkOut = checkOut;
     }
 

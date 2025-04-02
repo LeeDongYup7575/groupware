@@ -71,66 +71,42 @@
                 <tr class="group-header">
                     <td rowspan="3" class="group-label">근태</td>
                     <td>지각</td>
-                    <td th:each="stats : ${monthlyStats}" th:text="${stats.tardyCount != null ? stats.tardyCount : 0}">0</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.tardyCount}"></td>
+                    <td th:text="${totalTardy}"></td>
                 </tr>
                 <tr>
                     <td>조퇴</td>
-                    <td th:each="stats : ${monthlyStats}" th:text="${stats.earlyLeaveCount != null ? stats.earlyLeaveCount : 0}">0</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.earlyLeaveCount}"></td>
+                    <td th:text="${totalEarlyLeave}"></td>
                 </tr>
                 <tr>
                     <td>결근</td>
-                    <td th:each="stats : ${monthlyStats}" th:text="${stats.absenteeismCount != null ? stats.absenteeismCount : 0}">0</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.absenteeismCount}"></td>
+                    <td th:text="${totalAbsenteeism}"></td>
                 </tr>
 
                 <tr class="group-header">
-                    <td rowspan="2" class="group-label">휴가</td>
-                    <td>생성된 휴가 사용</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <td>기타 휴가 사용</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td rowspan="1" class="group-label">휴가</td>
+                    <td>휴가 사용</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.vacationCount}"></td>
+                    <td th:text="${totalVacationCount}"></td>
                 </tr>
                 <tr class="group-header">
                     <td rowspan="5" class="group-label">근무시간</td>
                     <td>기준 근무</td>
-                    <td>144:00</td>
-                    <td>160:00</td>
+                    <td>168:00</td>
+                    <td>152:00</td>
                     <td>160:00</td>
                     <td>176:00</td>
-                    <td>152:00</td>
+                    <td>160:00</td>
                     <td>160:00</td>
                     <td>184:00</td>
                     <td>160:00</td>
-                    <td>176:00</td>
-                    <td>144:00</td>
                     <td>160:00</td>
-                    <td>176:00</td>
-                    <td>1,952:00</td>
+                    <td>168:00</td>
+                    <td>168:00</td>
+                    <td>168:00</td>
+                    <td>1,992:00</td>
                 </tr>
                 <tr>
                     <td>근무 계획</td>
@@ -150,51 +126,20 @@
                 </tr>
                 <tr>
                     <td>실근무</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.workHours}"></td>
+                    <td th:text="${totalWorkHours}"></td>
                 </tr>
                 <tr>
                     <td>출근일수</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.workDays}"></td>
+                    <td th:text="${totalWorkDays}"></td>
                 </tr>
                 <tr>
                     <td>일평균근무</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
+                    <td th:each="stats : ${monthlyStats}"
+                        th:text="${stats.workDays > 0 ? stats.workHours / stats.workDays : '00:00'}">
+                    </td>
+                    <td th:text="${totalWorkDays > 0 ? totalWorkHours / totalWorkDays : '00:00'}"></td>
                 </tr>
                 <tr>
                     <td colspan="2">보정평균근무</td>
