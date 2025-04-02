@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/css/**",
             "/js/**",
             "/assets/**",
-            "/images/**"
+            "/images/**","/ws/**","/ws"
     );
 
     //개발용
@@ -63,7 +63,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             // CORS 프리플라이트 요청에 필요한 헤더 설정
-            response.setHeader("Access-Control-Allow-Origin", "*"); // 필요에 따라 도메인 제한 가능
+            response.setHeader("Access-Control-Allow-Origin", "http://10.10.55.57:3000"); // 필요에 따라 도메인 제한 가능
+            response.setHeader("Access-Control-Allow-Credentials", "true");
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
             response.setHeader("Access-Control-Max-Age", "3600"); // 프리플라이트 캐싱 시간(초)
