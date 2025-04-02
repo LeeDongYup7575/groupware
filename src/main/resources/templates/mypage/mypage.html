@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>마이페이지</title>
   <link rel="stylesheet" href="/assets/css/mypage/mypage.css">
+  <script src="/assets/js/mypage/mypage.js"></script>
 
 </head>
 <body>
@@ -42,11 +43,11 @@
         <div class="profile-info">
           <div class="info-row upper-info-row">
             <div class="info-label upper-info-label">이름</div>
-            <div class="info-content upper-info-content" th:text="${employee.name}"></div>
+            <div class="info-content upper-info-content" id="name"></div>
           </div>
           <div class="info-row upper-info-row">
             <div class="info-label upper-info-label">사번</div>
-            <div class="info-content upper-info-content" th:text="${employee.empNum}"></div>
+            <div class="info-content upper-info-content" id="empNum"></div>
           </div>
         </div>
       </div>
@@ -54,36 +55,35 @@
       <div class="info-container">
         <div class="info-row">
           <div class="info-label">입사일</div>
-
-          <div class="info-content" th:text="${employee.hireDate}"></div>
+          <div class="info-content" id="hireDate"></div>
         </div>
 
         <div class="info-row">
           <div class="info-label">소속</div>
-          <div class="info-content" th:text="${employee.departmentName}"></div>
+          <div class="info-content" id="departmentName"></div>
         </div>
 
         <div class="info-row">
           <div class="info-label">직급</div>
-          <div class="info-content" th:text="${employee.positionTitle}">팀장</div>
+          <div class="info-content" id="positionTitle"></div>
         </div>
 
         <div class="info-row">
           <div class="info-label">전화번호</div>
           <div class="info-content">
-            <input type="text" th:value="${employee.phone}">
+            <input type="text" id="phone">
           </div>
         </div>
 
         <div class="info-row">
           <div class="info-label">이메일</div>
-          <div class="info-content" th:text="${employee.internalEmail}"></div>
+          <div class="info-content" id="internalEmail"></div>
         </div>
 
         <div class="info-row">
           <div class="info-label">개인 이메일</div>
           <div class="info-content">
-            <input type="email" th:value="${employee.email}">
+            <input type="email" id="email">
           </div>
         </div>
 
