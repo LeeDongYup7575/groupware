@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,14 @@ public class AttendDAO {
     // 근무 일정 조회
     public List<Map<String, Object>> getWorkSchedules(int empId) {
         return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getWorkSchedules", empId);
+    }
+
+    public List<Map<String, Object>> getMonthlyAttendanceStatistics(int empId, int year) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("empId", empId);
+        params.put("year", year);
+
+        return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getMonthlyAttendanceStatistics", params);
     }
 
 }

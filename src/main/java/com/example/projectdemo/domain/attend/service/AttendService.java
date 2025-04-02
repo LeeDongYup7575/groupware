@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.attend.service;
 
 import com.example.projectdemo.domain.attend.dao.AttendDAO;
 import com.example.projectdemo.domain.attend.dto.AttendDTO;
+import com.example.projectdemo.domain.attendance.entity.Attendance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,10 @@ public class AttendService {
         return thisYearStatistics;
     }
 
+    public List<Map<String, Object>> getMonthlyAttendanceStatistics(int empId,int year) {
+        return dao.getMonthlyAttendanceStatistics(empId, year);
+    }
+
     // 총 근무시간 조회
     public BigDecimal getTotalWorkHoursThisYear(int empId) {
         return dao.getTotalWorkHoursThisYear(empId);
@@ -53,4 +58,5 @@ public class AttendService {
     public List<Map<String, Object>> getWorkSchedules(int empId) {
         return dao.getWorkSchedules(empId);
     }
+
 }

@@ -78,6 +78,7 @@
             <p><strong>이름:</strong> <span th:text="${employee.name}">홍길동</span></p>
             <p><strong>사번:</strong> <span th:text="${employee.empNum}">E001</span></p>
             <p>
+            <!--        DB에서 default 값을 미출근으로 바꿔야 함.        -->
                 <strong>현재 상태:</strong>
                 <span th:class="${employee.attendStatus == '출근' ? 'current-status status-normal' :
                                     (employee.attendStatus == '지각' ? 'current-status status-late' :
@@ -89,7 +90,7 @@
         </div>
 
         <div class="btn-group" role="group" aria-label="Attendance options">
-            <button onclick="selectAttendanceType('BEFORE_WORK')" class="btn attendance-type-btn" style="background-color: #a5d6a7" data-type="BEFORE_WORK">출근 전</button>
+            <button onclick="selectAttendanceType('BEFORE_WORK')" class="btn attendance-type-btn" style="background-color: #a5d6a7" data-type="BEFORE_WORK">미출근</button>
             <button onclick="selectAttendanceType('NORMAL')" class="btn btn-primary attendance-type-btn" data-type="NORMAL">출근</button>
             <button onclick="selectAttendanceType('LATE')" class="btn btn-warning attendance-type-btn" data-type="LATE">지각</button>
             <button onclick="selectAttendanceType('EARLY_LEAVE')" class="btn btn-info attendance-type-btn" data-type="EARLY_LEAVE">조퇴</button>
@@ -101,7 +102,7 @@
         <p class="instruction">모바일 앱으로 아래 QR 코드를 스캔하여 출퇴근을 기록하세요.</p>
         <p class="instruction" th:if="${selectedType != null}">
             현재 선택된 모드:
-            <strong th:text="${selectedType == 'BEFORE_WORK' ? '출근 전' :
+            <strong th:text="${selectedType == 'BEFORE_WORK' ? '미출근' :
                                (selectedType == 'NORMAL' ? '출근' :
                                (selectedType == 'LATE' ? '지각' :
                                (selectedType == 'EARLY_LEAVE' ? '조퇴' : '퇴근')))}">정상출근</strong>
@@ -301,14 +302,14 @@
         const refreshButton = document.getElementById('refreshButton');
         if (refreshButton) {
             refreshButton.addEventListener('click', function() {
-                const selectedType = document.querySelector('[name="selectedType"]')?.value || 'NORMAL';
+                const selectedType = document.querySelector('[name="selectedType"]')?.value || 'BEFORE_WORK';
                 loadQrCode(selectedType);
                 resetCountdown();
             });
         }
 
         // 초기 QR 코드 로드
-        loadQrCode('출근 전');
+        loadQrCode('BEFORE_WORK');
 
         // 초기 카운트다운 시작
         startCountdown();

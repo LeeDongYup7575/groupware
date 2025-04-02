@@ -12,6 +12,12 @@ public class ChatRoomDAO {
     @Autowired
     private SqlSession mybatis;
 
-    public List<ChatRoomDTO> getChatRoom(List<Integer> getChatRoomIds) {return mybatis.selectList("chatRoom.getChatRoom", getChatRoomIds);}
-    public int createChatRoom(ChatRoomDTO chatRoomDTO) {return mybatis.insert("chatRoom.createChatRoom", chatRoomDTO);}
+    public List<ChatRoomDTO> getChatRoom(List<Integer> getChatRoomIds) {
+        return mybatis.selectList("chatRoom.getChatRoom", getChatRoomIds);
+    }
+
+    public int createChatRoom(ChatRoomDTO room) {
+        mybatis.insert("chatRoom.createChatRoom", room);
+        return room.getId();
+    }
 }

@@ -5,6 +5,8 @@
         select chatroom_id
         from membership where emp_id = ${id}
     </select>
-
-
+    <insert id="insertMember" parameterType="map">
+        INSERT INTO membership (chatroom_id, emp_id, role)
+        values (#{roomId}, #{empId}, #{role})
+    </insert>
 </mapper>

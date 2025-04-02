@@ -8,7 +8,7 @@ public enum AttendanceStatus {
     ABSENT("결근"),
     ANNUAL_LEAVE("연차"),
     SICK_LEAVE("병가"),
-    BEFORE_WORK("출근전");
+    BEFORE_WORK("미출근");
 
     private final String status;
 
@@ -21,11 +21,17 @@ public enum AttendanceStatus {
     }
 
     public static AttendanceStatus fromString(String text) {
-        for (AttendanceStatus status : AttendanceStatus.values()) {
-            if (status.status.equalsIgnoreCase(text)) {
-                return status;
+        // Enum 이름 자체로도 매핑 가능하도록
+        try {
+            return AttendanceStatus.valueOf(text);
+        } catch (IllegalArgumentException e) {
+            // 기존 로직: 한글 상태값으로 매핑
+            for (AttendanceStatus status : AttendanceStatus.values()) {
+                if (status.status.equalsIgnoreCase(text)) {
+                    return status;
+                }
             }
+            throw new IllegalArgumentException("No constant with text " + text + " found");
         }
-        throw new IllegalArgumentException("No constant with text " + text + " found");
     }
 }

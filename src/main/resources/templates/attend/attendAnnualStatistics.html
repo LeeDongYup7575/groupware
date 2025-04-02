@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TECH X - 근태 관리</title>
-    <link rel="stylesheet" href="/css/attendAnnualStatistics.css">
+    <link rel="stylesheet" href="/assets/css/attend/attendAnnualStatistics.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -43,7 +43,8 @@
 
         <div class="year-navigation">
             <a href="#" class="prev-year"><i class="fas fa-chevron-left"></i></a>
-            <h2>2025년</h2>
+            <h2 th:text="${year} + '년'">2025년</h2>
+            <a href="#" class="next-year"><i class="fas fa-chevron-right"></i></a>
         </div>
 
         <div class="statistics-table-container">
@@ -63,59 +64,24 @@
                     <th>10월</th>
                     <th>11월</th>
                     <th>12월</th>
-                    <th>합계</th>
+                    <th>합 계</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr class="group-header">
                     <td rowspan="3" class="group-label">근태</td>
                     <td>지각</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.tardyCount != null ? stats.tardyCount : 0}">0</td>
                 </tr>
                 <tr>
-                    <td>퇴근미체크</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td>조퇴</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.earlyLeaveCount != null ? stats.earlyLeaveCount : 0}">0</td>
                 </tr>
                 <tr>
                     <td>결근</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td th:each="stats : ${monthlyStats}" th:text="${stats.absenteeismCount != null ? stats.absenteeismCount : 0}">0</td>
                 </tr>
+
                 <tr class="group-header">
                     <td rowspan="2" class="group-label">휴가</td>
                     <td>생성된 휴가 사용</td>
@@ -259,6 +225,36 @@
         dropdownHeader.addEventListener('click', function() {
             this.parentElement.classList.toggle('open');
         });
+        // 연도 이동 기능
+        const prevYearBtn = document.querySelector('.prev-year');
+        const nextYearBtn = document.querySelector('.next-year');
+        const yearHeader = document.querySelector('.year-navigation h2');
+
+        let currentYear = parseInt(yearHeader.textContent.match(/\d+/)[0]);
+
+        // 다음 연도 버튼이 없는 경우 추가
+        if (!nextYearBtn) {
+            const nextYearLink = document.createElement('a');
+            nextYearLink.href = '#';
+            nextYearLink.className = 'next-year';
+            nextYearLink.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            document.querySelector('.year-navigation').appendChild(nextYearLink);
+        }
+
+        // 이전 연도 클릭 처리
+        document.querySelector('.prev-year').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/attend/annualStatistics?year=' + (currentYear - 1);
+        });
+
+        // 다음 연도 클릭 처리 (추가된 경우에만)
+        const nextYear = document.querySelector('.next-year');
+        if (nextYear) {
+            nextYear.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = '/attend/annualStatistics?year=' + (currentYear + 1);
+            });
+        }
     });
 </script>
 </body>
