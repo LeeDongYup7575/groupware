@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.attend.dao.AttendDAO">
+
+
+    <resultMap id="attendanceStatsResultMap" type="map">
+        <result property="month" column="month"/>
+        <result property="tardyCount" column="tardyCount"/>
+        <result property="earlyLeaveCount" column="earlyLeaveCount"/>
+        <result property="absenteeismCount" column="absenteeismCount"/>
+        <result property="vacationCount" column="vacationCount"/>
+        <result property="totalWorkHours" column="totalWorkHours"/>
+        <result property="workDays" column="workDays"/>
+    </resultMap>
+
+    <select id="selectByEmpIdAndDate" resultType="com.example.projectdemo.domain.attend.dto.AttendDTO">
+        SELECT * FROM attendance
+        WHERE emp_id = #{empId}
+          AND DATE(work_date) = CURRENT_DATE
+    </select>
+
+    <!-- 올해의 근태 통계 조회 쿼리 -->
+    <select id="getAttendanceStatisticsThisYear" parameterType="int" resultMap="attendanceStatsResultMap">
+        SELECT
+        EXTRACT(YEAR FROM work_date) AS year,
+        SUM(CASE WHEN status = '지각' THEN 1 ELSE 0 END) AS tardyCount,
+        SUM(CASE WHEN status = '조퇴' THEN 1 ELSE 0 END) AS earlyLeaveCount,
+        SUM(CASE WHEN status = '결근' THEN 1 ELSE 0 END) AS absenteeismCount,
+        SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS vacationCount
+        FROM attendance
+        WHERE emp_id = #{empId}
+        AND EXTRACT(YEAR FROM work_date) = YEAR(CURDATE())
+        GROUP BY EXTRACT(YEAR FROM work_date)
+        ORDER BY year DESC
+    </select>
+
+    <!-- 특정 직원의 월별 근태 통계 조회 -->
+    <select id="getMonthlyAttendanceStatistics" parameterType="map" resultMap="attendanceStatsResultMap">
+        SELECT
+            EXTRACT(MONTH FROM work_date) AS month,
+            SUM(CASE WHEN status = '지각' THEN 1 ELSE 0 END) AS tardyCount,
+            SUM(CASE WHEN status = '조퇴' THEN 1 ELSE 0 END) AS earlyLeaveCount,
+            SUM(CASE WHEN status = '결근' THEN 1 ELSE 0 END) AS absenteeismCount,
+            SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS vacationCount,
+            SUM(work_hours) AS totalWorkHours,
+            COUNT(DISTINCT work_date) AS workDays
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND YEAR(work_date) = #{year}
+        GROUP BY EXTRACT(MONTH FROM work_date)
+        ORDER BY month
+    </select>
+
+    <select id="selectTotalWorkHoursThisYear" resultType="BigDecimal">
+        SELECT SUM(work_hours)
+        FROM attendance
+        WHERE emp_id = #{empId}
+                  AND YEAR(work_date) = YEAR(CURDATE())
+    </select>
+
+    <select id="selectWorkDaysThisYear" resultType="int">
+        SELECT COUNT(DISTINCT work_date)
+        FROM attendance
+        WHERE emp_id = #{empId}
+                  AND YEAR(work_date) = YEAR(CURDATE())
+    </select>
+
+    <select id="getWorkSchedules" resultType="map">
+        SELECT work_date, start_time, end_time, work_type
+        FROM work_schedules
+        WHERE emp_id = #{empId}
+    </select>
+
+
+</mapper>
