@@ -22,7 +22,7 @@
         <result property="purpose" column="purpose"/>
         <result property="bookingStatus" column="booking_status"/>
         <result property="createdAt" column="created_at"/>
-        <result property="empName" column="emp_name"/>
+        <result property="empName" column="name"/>
         <result property="deptName" column="dept_name"/>
         <association property="supplies" resultMap="suppliesResultMap"/>
     </resultMap>
@@ -37,7 +37,7 @@
 
     <select id="findAllSuppliesBookings" resultMap="suppliesBookingResultMap">
         SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
-               e.emp_name, d.dept_name
+               e.name, d.dept_name
         FROM supplies_booking b
                  JOIN supplies s ON b.supply_id = s.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
@@ -48,7 +48,7 @@
 
     <select id="findSuppliesBookingsByEmpNum" resultMap="suppliesBookingResultMap">
         SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
-               e.emp_name, d.dept_name
+               e.name, d.dept_name
         FROM supplies_booking b
                  JOIN supplies s ON b.supply_id = s.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
@@ -59,7 +59,7 @@
 
     <select id="findSuppliesBookingsBySupplyId" resultMap="suppliesBookingResultMap">
         SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
-               e.emp_name, d.dept_name
+               e.name, d.dept_name
         FROM supplies_booking b
                  JOIN supplies s ON b.supply_id = s.id
                  LEFT JOIN employees e ON b.emp_num = e.emp_num
@@ -70,15 +70,15 @@
 
     <select id="findSuppliesBookingsByDateRange" resultMap="suppliesBookingResultMap">
         SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
-        e.emp_name, d.dept_name
+               e.name, d.dept_name
         FROM supplies_booking b
-        JOIN supplies s ON b.supply_id = s.id
-        LEFT JOIN employees e ON b.emp_num = e.emp_num
-        LEFT JOIN departments d ON e.dept_code = d.dept_code
+                 JOIN supplies s ON b.supply_id = s.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dept_code = d.dept_code
         WHERE b.booking_status != 'CANCELLED'
         AND ((b.start BETWEEN #{startDate} AND #{endDate})
-        OR (b.end BETWEEN #{startDate} AND #{endDate})
-        OR (b.start <![CDATA[ <= ]]> #{startDate} AND b.end <![CDATA[ >= ]]> #{endDate}))
+           OR (b.end BETWEEN #{startDate} AND #{endDate})
+           OR (b.start <![CDATA[ <= ]]> #{startDate} AND b.end <![CDATA[ >= ]]> #{endDate}))
         ORDER BY b.start
     </select>
 
