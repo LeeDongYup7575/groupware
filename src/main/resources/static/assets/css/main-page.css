@@ -1,0 +1,407 @@
+/* 그룹웨어 메인 페이지 CSS */
+:root {
+    --primary-color: #0183D4;
+    --primary-light: #DDF6FF;
+    --primary-dark: #0066a8;
+    --secondary-color: #f3f4f6;
+    --sidebar-bg: #f3f7fb;
+    --sidebar-hover: #e8f0f8;
+    --sidebar-active: #e1ebf5;
+    --sidebar-active-border: #0078d4;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --sidebar-width: 250px;
+    --header-height: 60px;
+}
+
+/* 리셋 및 기본 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+    background-color: #f8f9fa;
+}
+
+/* 기본 레이아웃 */
+.main-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* 메인 콘텐츠 영역 */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    padding-top: calc(var(--header-height) + 4rem);
+    min-height: 100vh;
+    background-color: #fff;
+}
+
+/* 대시보드 레이아웃 */
+.dashboard-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.dashboard-section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.section-left {
+    flex: 1;
+    min-width: 300px;
+    max-width: 40%;
+}
+
+.section-right {
+    flex: 1.5;
+    min-width: 400px;
+}
+
+.section-full {
+    width: 100%;
+}
+
+/*공지사항*/
+.list-group {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.list-group a{
+    padding: 3px 0;
+    border-bottom: 1px solid #e5e5e5;
+    text-decoration: none;
+    color: #333;
+}
+
+@media (max-width: 1100px) {
+    .section-left, .section-right {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+/* 카드 타이틀 스타일 */
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.75rem;
+}
+
+/* 프로필 카드 */
+.profile-card {
+    height: 100%;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    flex-flow: column nowrap;
+    margin-bottom: 1.5rem;
+}
+
+
+.profile-image img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-name{
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+.profile-name h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.profile-name p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.profile-stats {
+    border-top: 1px solid #eee;
+    padding-top: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* 게시판 탭 스타일 */
+.tabs-container {
+    position: relative;
+}
+
+.tabs-navigation {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-right: 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-light);
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.tab-button:hover {
+    color: #0078d4;
+}
+
+.tab-button.active {
+    color: #0078d4;
+    border-bottom: 2px solid #0078d4;
+    font-weight: 500;
+}
+
+.tab-content {
+    display: none;
+    padding: 1rem 0;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.post-list {
+    list-style: none;
+    padding: 0;
+}
+
+.post-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.post-item:hover {
+    background-color: #f9f9f9;
+}
+
+.post-title {
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.post-title:hover {
+    color: var(--primary-color);
+}
+
+.post-date {
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+/* 근태 관리 */
+.attendance-info {
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.date-info {
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.attendance-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.attendance-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.attendance-value {
+    color: var(--text-light);
+}
+
+
+/* 회의실 예약 현황 */
+.timetable-container {
+    overflow-x: auto;
+}
+
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.timetable th, .timetable td {
+    border: 1px solid #eee;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.timetable th {
+    background-color: var(--secondary-color);
+    font-weight: 500;
+}
+
+.timetable td:first-child {
+    font-weight: 500;
+    width: 100px;
+}
+
+.reservation-bar {
+    position: relative;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 캘린더 */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.calendar-header h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.calendar-header button {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s;
+}
+
+.calendar-header button:hover {
+    color: var(--primary-color);
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar-table th, .calendar-table td {
+    text-align: center;
+    padding: 0.5rem;
+    border: 1px solid #eee;
+}
+
+.calendar-table th {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.calendar-table .current-day {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.calendar-info {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.calendar-info > div{
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 알림 메시지 */
+.alert {
+    background-color: #f8f9fa;
+    color: var(--text-light);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 1200px) {
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+        padding-top: calc(var(--header-height) + 1rem);
+    }
+
+    .dashboard-row {
+        flex-direction: column;
+    }
+}

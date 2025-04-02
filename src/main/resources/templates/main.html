@@ -3,416 +3,287 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>그룹웨어 시스템 - test </title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>그룹웨어 시스템 - 대시보드</title>
+
+  <!-- 폰트 및 아이콘 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/intro.css">
-  <style>
-    :root {
-      --primary-color: #0183D4;
-      --primary-light: #DDF6FF;
-      --secondary-color: #f3f4f6;
-      --text-color: #1f2937;
-      --text-light: #6b7280;
-      --accent-color: #0183D4;
-    }
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      color: var(--text-color);
-      line-height: 1.6;
-      background-color: white;
-    }
+  <!-- 메인 페이지 CSS -->
+  <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
 
-    /*대시보드*/
-    .dashboard-section{
-      padding: 80px 0;
-    }
-
-
-    /*푸터*/
-    footer {
-      background-color: var(--text-color);
-      color: white;
-      padding: 4rem 0 2rem;
-    }
-
-    .footer-logo {
-      margin-bottom: 1.5rem;
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: white;
-    }
-
-    .footer-text {
-      color: #d1d5db;
-      margin-bottom: 2rem;
-      max-width: 300px;
-    }
-
-    .footer-heading {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-    }
-
-    .footer-link {
-      color: #d1d5db;
-      text-decoration: none;
-      display: block;
-      margin-bottom: 0.75rem;
-      transition: color 0.3s ease;
-    }
-
-    .footer-link:hover {
-      color: white;
-    }
-
-    .footer-info {
-      color: #d1d5db;
-      margin-bottom: 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .copyright {
-      color: #9ca3af;
-      font-size: 0.9rem;
-      text-align: center;
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 2rem;
-    }
-
-  </style>
-
-  <!-- 헤더 에셋(CSS, 폰트 등) 포함 -->
+  <!-- 헤더 에셋 포함 -->
   <th:block th:replace="fragments/header :: headerAssets"></th:block>
-  <!-- 푸터 에셋(CSS, 폰트 등) 포함 -->
-  <th:block th:replace="fragments/footer :: footerAssets"></th:block>
+
+  <!-- 사이드바 스타일 포함 -->
+  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+
 </head>
 <body>
-<script>
-  function openChat() {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert("로그인이 필요합니다");
-      return;
-    }
-
-    // 새 창 열기
-    const url = `http://localhost:3000?token=${encodeURIComponent(token)}`;
-    const newWindow = window.open(url, "_blank");
-
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
-    }
-  }
-</script>
-
-
-
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
 
-<!-- 로그인 후 대시보드 화면 -->
-<main class="dashboard-section" id="dashboard-section">
-  <div class="container-fluid">
-    <div class="row">
-      <!-- 왼쪽 내비게이션 메뉴 -->
-      <div class="col-md-2 dashboard-sidebar">
-        <div class="sidebar-menu">
-          <ul class="list-unstyled">
-            <li class="active"><a href="#"><i class="fas fa-home"></i> 이메일</a></li>
-            <li><a href="#"><i class="fas fa-user"></i> 게시판</a></li>
-            <li><a href="#" onclick="event.preventDefault(); openChat();"><i class="fas fa-envelope"></i>메시지</a>
-            </li>                        <li><a href="#"><i class="fas fa-calendar-check"></i> 일정</a></li>
-            <li><a href="#"><i class="fas fa-building"></i> 공용 메일</a></li>
-            <li><a href="#"><i class="fas fa-clipboard-list"></i> 주소록</a></li>
-            <li><a th:href="@{/booking/main}"><i class="fas fa-chart-bar"></i> 예약</a></li>
-            <li><a href="#"><i class="fas fa-file-alt"></i> 문서 관리</a></li>
-            <li><a th:href="@{/attend/main}"><i class="fas fa-money-bill-wave"></i> 근무/경비처리</a></li>
-            <li><a th:href="@{/edsm/main}"><i class="fas fa-sitemap"></i> 전자결재</a></li>
-            <li><a href="#"><i class="fas fa-map-marker-alt"></i> 조직도</a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> 관리자 페이지</a></li>
-            <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
-          </ul>
+<div class="main-container">
+  <!-- 사이드바 -->
+  <div th:replace="fragments/main-sidebar :: sidebar"></div>
+
+  <!-- 메인 콘텐츠 -->
+  <div class="main-content">
+    <!-- 프로필 및 게시판 섹션 -->
+    <div class="dashboard-row">
+      <div class="dashboard-section section-left">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-image">
+              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="프로필 이미지">
+            </div>
+            <div class="profile-name">
+              <h3>이미르 대리</h3>
+              <p>개발팀</p>
+            </div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-label">결재할 문서</div>
+              <div class="stat-value">6</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">내 예약/대여 현황</div>
+              <div class="stat-value">1</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 메인 콘텐츠 영역 -->
-      <div class="col-md-10 dashboard-content">
-        <div class="row">
-          <!-- 프로필 및 게시판 섹션 -->
-          <div class="col-md-5">
-            <div class="profile-card">
-              <div class="profile-header">
-                <div class="profile-image">
-                  <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="프로필 이미지" class="rounded-circle">
-                </div>
-                <div class="profile-name">
-                  <h3>이미르 대리</h3>
-                  <p>개발팀</p>
-                </div>
-              </div>
+      <div class="dashboard-section section-right">
+        <h4 class="card-title">게시판</h4>
 
-              <div class="profile-stats">
-                <div class="stat-item">
-                  <div class="stat-label">결재할 문서</div>
-                  <div class="stat-value">6</div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-label">내 예약/대여 현황</div>
-                  <div class="stat-value">1</div>
-                </div>
+        <div class="tabs-container">
+          <div class="tabs-navigation">
+            <button class="tab-button active" data-tab="notice">사내공지</button>
+            <button class="tab-button" data-tab="free">자유게시판</button>
+          </div>
+
+          <div id="notice" class="tab-content active">
+            <!-- 공지사항이 있는 경우 -->
+            <div th:if="${!notices.isEmpty()}">
+              <div class="list-group">
+                <a th:each="notice, index : ${notices}"
+                   th:href="${notice.url}"
+                   th:text="${notice.title}"
+                   class="list-group-item list-group-item-action"
+                   target="_blank">
+                  공지사항 제목
+                </a>
               </div>
+            </div>
+
+            <!-- 공지사항이 없는 경우 -->
+            <div th:if="${notices.isEmpty()}" class="alert">
+              표시할 공지사항이 없습니다.
             </div>
           </div>
 
-          <!-- 공지사항 섹션 :: 하드코딩 -->
-          <div class="col-md-7">
-            <div class="dashboard-card">
-              <h4 class="card-title">게시판</h4>
-              <ul class="nav nav-tabs" id="boardTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="notice-tab" data-bs-toggle="tab"
-                          data-bs-target="#notice" type="button" role="tab" aria-controls="notice"
-                          aria-selected="true">사내공지
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="dept-tab" data-bs-toggle="tab" data-bs-target="#dept"
-                          type="button" role="tab" aria-controls="dept" aria-selected="false">자유게시판
-                  </button>
-                </li>
-              </ul>
-              <div class="tab-content p-3" id="boardTabsContent">
-                <div class="tab-pane fade show active" id="notice" role="tabpanel"
-                     aria-labelledby="notice-tab">
-                  <!-- 공지사항이 있는 경우 -->
-                  <div th:if="${!notices.isEmpty()}">
-                    <div class="list-group">
-                      <a th:each="notice, index : ${notices}"
-                         th:href="${notice.url}"
-                         th:text="${notice.title}"
-                         class="list-group-item list-group-item-action"
-                         target="_blank">
-                        공지사항 제목
-                      </a>
-                    </div>
-                  </div>
-
-                  <!-- 공지사항이 없는 경우 -->
-                  <div th:if="${notices.isEmpty()}" class="alert alert-info">
-                    표시할 공지사항이 없습니다.
-                  </div>
-
-                </div>
-                <div class="tab-pane fade" id="dept" role="tabpanel" aria-labelledby="dept-tab">
-                  <p>자유게시판 내용이 여기에 표시됩니다.</p>
-                </div>
-              </div>
-            </div>
+          <div id="free" class="tab-content">
+            <p>자유게시판 내용이 여기에 표시됩니다.</p>
           </div>
-        </div>
-
-
-        <!-- 근태 및 회의실 예약 섹션 -->
-        <div class="row mt-4">
-          <div class="col-md-5">
-            <div class="dashboard-card">
-              <h4 class="card-title">근태관리</h4>
-              <p class="date-info">2024년 10월 24일 (화) 10:56:43</p>
-
-              <div class="attendance-info">
-                <div class="row">
-                  <div class="col-6">
-                    <p class="attendance-label">출근시간</p>
-                  </div>
-                  <div class="col-6">
-                    <p class="attendance-value">미등록</p>
-                  </div>
-                </div>
-                <div class="row mt-2">
-                  <div class="col-6">
-                    <p class="attendance-label">퇴근시간</p>
-                  </div>
-                  <div class="col-6">
-                    <p class="attendance-value">미등록</p>
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="schedule-info mt-3">
-                <p>2025-03-27 일정 없음</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 회의실 예약 현황 -->
-          <div class="col-md-7">
-            <div class="dashboard-card">
-              <h4 class="card-title">회의실 예약 현황</h4>
-
-              <div class="timetable-container">
-                <table class="timetable">
-                  <thead>
-                  <tr>
-                    <th></th>
-                    <th>09:00</th>
-                    <th>10:00</th>
-                    <th>11:00</th>
-                    <th>12:00</th>
-                    <th>13:00</th>
-                    <th>14:00</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td>1번 회의실</td>
-                    <td colspan="6">
-                      <div class="reservation-bar"
-                           style="width: 25%; left: 50%; background-color: #90caf9;">
-                        오후 10:30 - 12:30
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>2번 회의실</td>
-                    <td colspan="6">
-                      <div class="reservation-bar"
-                           style="width: 25%; left: 0; background-color: #a5d6a7;">
-                        오전 09:30 - 11:30
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>3번 회의실</td>
-                    <td colspan="6">
-                      <div class="reservation-bar"
-                           style="width: 33%; left: 17%; background-color: #90caf9;">
-                        오전 10:00 - 12:00
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>4번 회의실</td>
-                    <td colspan="6">
-                      <div class="reservation-bar"
-                           style="width: 33%; left: 0; background-color: #fff59d;">
-                        오전 09:00 - 11:00
-                      </div>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-        <!-- 달력 -->
-        <div class="row">
-          <div class="col-md-5">
-            <div class="calendar-container dashboard-card">
-              <div class="calendar-header">
-                <button class="btn btn-sm btn-link"><i class="fas fa-chevron-left"></i></button>
-                <h5>2025년 3월</h5>
-                <button class="btn btn-sm btn-link"><i class="fas fa-chevron-right"></i></button>
-              </div>
-              <table class="calendar-table">
-                <thead>
-                <tr>
-                  <th>일</th>
-                  <th>월</th>
-                  <th>화</th>
-                  <th>수</th>
-                  <th>목</th>
-                  <th>금</th>
-                  <th>토</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- 달력 날짜들 -->
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td>1</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>3</td>
-                  <td>4</td>
-                  <td>5</td>
-                  <td>6</td>
-                  <td>7</td>
-                  <td>8</td>
-                </tr>
-                <tr>
-                  <td>9</td>
-                  <td>10</td>
-                  <td>11</td>
-                  <td>12</td>
-                  <td>13</td>
-                  <td>14</td>
-                  <td>15</td>
-                </tr>
-                <tr>
-                  <td>16</td>
-                  <td>17</td>
-                  <td>18</td>
-                  <td>19</td>
-                  <td>20</td>
-                  <td>21</td>
-                  <td>22</td>
-                </tr>
-                <tr>
-                  <td>23</td>
-                  <td>24</td>
-                  <td>25</td>
-                  <td class="current-day">26</td>
-                  <td>27</td>
-                  <td>28</td>
-                  <td>29</td>
-                </tr>
-                <tr>
-                  <td>30</td>
-                  <td>31</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
         </div>
       </div>
+    </div>
 
+    <!-- 근태 및 회의실 예약 섹션 -->
+    <div class="dashboard-row">
+      <div class="dashboard-section section-left">
+        <h4 class="card-title">근태관리</h4>
+        <p class="date-info">2025년 03월 26일 (화) 10:56:43</p>
+
+        <div class="attendance-info">
+          <div class="attendance-row">
+            <div class="attendance-label">출근시간</div>
+            <div class="attendance-value">미등록</div>
+          </div>
+          <div class="attendance-row">
+            <div class="attendance-label">퇴근시간</div>
+            <div class="attendance-value">미등록</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="dashboard-section section-right">
+        <h4 class="card-title">회의실 예약 현황</h4>
+
+        <div class="timetable-container">
+          <table class="timetable">
+            <thead>
+            <tr>
+              <th></th>
+              <th>09:00</th>
+              <th>10:00</th>
+              <th>11:00</th>
+              <th>12:00</th>
+              <th>13:00</th>
+              <th>14:00</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1번 회의실</td>
+              <td colspan="6" style="position: relative;">
+                <div class="reservation-bar" style="width: 25%; left: 50%; background-color: #90caf9;">
+                  오후 10:30 - 12:30
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>2번 회의실</td>
+              <td colspan="6" style="position: relative;">
+                <div class="reservation-bar" style="width: 25%; left: 0; background-color: #a5d6a7;">
+                  오전 09:30 - 11:30
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>3번 회의실</td>
+              <td colspan="6" style="position: relative;">
+                <div class="reservation-bar" style="width: 33%; left: 17%; background-color: #90caf9;">
+                  오전 10:00 - 12:00
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>4번 회의실</td>
+              <td colspan="6" style="position: relative;">
+                <div class="reservation-bar" style="width: 33%; left: 0; background-color: #fff59d;">
+                  오전 09:00 - 11:00
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 캘린더 -->
+    <div class="dashboard-row">
+      <div class="dashboard-section section-left">
+        <div class="calendar-header">
+          <button><i class="fas fa-chevron-left"></i></button>
+          <h5>2025년 3월</h5>
+          <button><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <table class="calendar-table">
+          <thead>
+          <tr>
+            <th>일</th>
+            <th>월</th>
+            <th>화</th>
+            <th>수</th>
+            <th>목</th>
+            <th>금</th>
+            <th>토</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- 달력 날짜들 -->
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>7</td>
+            <td>8</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+            <td>14</td>
+            <td>15</td>
+          </tr>
+          <tr>
+            <td>16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+            <td>21</td>
+            <td>22</td>
+          </tr>
+          <tr>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td class="current-day">26</td>
+            <td>27</td>
+            <td>28</td>
+            <td>29</td>
+          </tr>
+          <tr>
+            <td>30</td>
+            <td>31</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="calendar-info">
+          <div>
+            <p>2025-03-27</p>
+            <p>일정 없음</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</main>
+</div>
 
-<!-- 푸터 포함 -->
-<div th:replace="fragments/footer :: footer"></div>
+<!-- 페이지 스크립트 -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 탭 전환 기능
+    const tabButtons = document.querySelectorAll('.tab-button');
 
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // 모든 탭 비활성화
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        // 클릭된 탭 활성화
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+  });
+</script>
 
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
+
+<!-- 공통 사이드바 스크립트 포함 -->
+<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
 
 </body>
 </html>
