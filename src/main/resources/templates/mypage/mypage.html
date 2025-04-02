@@ -15,81 +15,22 @@
 
 <main>
   <div class="sidebar">
-    <div class="sidebar-item active">
+    <div class="sidebar-item" id="info" onclick="loadTabContent('info')">
       <span class="sidebar-icon">👤</span>
       <span class="sidebar-link">내 정보</span>
     </div>
-    <div class="sidebar-item">
+    <div class="sidebar-item" id="activities" onclick="loadTabContent('activities')">
       <span class="sidebar-icon">📋</span>
       <span class="sidebar-link">나의 활동</span>
     </div>
-    <div class="sidebar-item">
+    <div class="sidebar-item" id="security" onclick="loadTabContent('security')">
       <span class="sidebar-icon">🔒</span>
-      <span class="sidebar-link">보안 설정</span>
+      <span class="sidebar-link">보안</span>
     </div>
   </div>
 
-  <section class="main-section">
+  <section class="main-section" id="mainSection">
 
-    <div class="title-container">
-      <h1>내 정보</h1>
-    </div>
-
-    <div class="content-container">
-
-      <div class="profile-container">
-        <div class="profile-image"></div>
-
-        <div class="profile-info">
-          <div class="info-row upper-info-row">
-            <div class="info-label upper-info-label">이름</div>
-            <div class="info-content upper-info-content" id="name"></div>
-          </div>
-          <div class="info-row upper-info-row">
-            <div class="info-label upper-info-label">사번</div>
-            <div class="info-content upper-info-content" id="empNum"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="info-container">
-        <div class="info-row">
-          <div class="info-label">입사일</div>
-          <div class="info-content" id="hireDate"></div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-label">소속</div>
-          <div class="info-content" id="departmentName"></div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-label">직급</div>
-          <div class="info-content" id="positionTitle"></div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-label">전화번호</div>
-          <div class="info-content">
-            <input type="text" id="phone">
-          </div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-label">이메일</div>
-          <div class="info-content" id="internalEmail"></div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-label">개인 이메일</div>
-          <div class="info-content">
-            <input type="email" id="email">
-          </div>
-        </div>
-
-        <button class="submit-button">저장</button>
-      </div>
-    </div>
   </section>
 </main>
 </body>
