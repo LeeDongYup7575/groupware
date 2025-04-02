@@ -4,18 +4,21 @@ import java.util.List;
 
 public class ChatRoomRequestDTO {
     private String name;
-    private List<String> members;
+    private List<Integer> ids;
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
-    public List<String> getMembers() {
-        return members;
-    }
-    public void setMembers(List<String> members) {
-        this.members = members;
+
+    public List<Integer> getMembers() {
+        return ids;
     }
 
+    public void setMembers(List<Integer> ids) {
+        this.ids = ids;
+    }
 }
