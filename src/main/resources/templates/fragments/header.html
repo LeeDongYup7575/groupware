@@ -694,8 +694,9 @@
                 return;
             }
 
+
             // 새 창 열기
-            const url = `http://localhost:3000?token=${encodeURIComponent(token)}`;
+            const url = `http://10.10.55.57:3000?token=${encodeURIComponent(token)}`;
             const newWindow = window.open(url, "_blank");
 
             if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
