@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.projectdemo.domain.booking.mapper.MeetingRoomMapper">
+
+    <resultMap id="meetingRoomResultMap" type="com.example.projectdemo.domain.booking.entity.MeetingRoom">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="capacity" column="capacity"/>
+        <result property="location" column="location"/>
+        <result property="description" column="description"/>
+        <result property="isAvailable" column="is_available"/>
+    </resultMap>
+
+    <resultMap id="meetingRoomBookingResultMap" type="com.example.projectdemo.domain.booking.entity.MeetingRoomBooking">
+        <id property="id" column="id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="empNum" column="emp_num"/>
+        <result property="title" column="title"/>
+        <result property="start" column="start"/>
+        <result property="end" column="end"/>
+        <result property="attendees" column="attendees"/>
+        <result property="purpose" column="purpose"/>
+        <result property="bookingStatus" column="booking_status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="empName" column="emp_name"/>
+        <result property="deptName" column="dept_name"/>
+        <association property="meetingRoom" resultMap="meetingRoomResultMap"/>
+    </resultMap>
+
+    <select id="findAllMeetingRoomBookings" resultMap="meetingRoomBookingResultMap">
+        SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM meeting_room_booking b
+                 JOIN meeting_room r ON b.room_id = r.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.booking_status != 'CANCELLED'
+        ORDER BY b.start DESC
+    </select>
+
+    <select id="findMeetingRoomBookingsByEmpNum" resultMap="meetingRoomBookingResultMap">
+        SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM meeting_room_booking b
+                 JOIN meeting_room r ON b.room_id = r.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.emp_num = #{empNum}
+          AND b.booking_status != 'CANCELLED'
+        ORDER BY b.start DESC
+    </select>
+
+    <select id="findMeetingRoomBookingsByRoomId" resultMap="meetingRoomBookingResultMap">
+        SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM meeting_room_booking b
+                 JOIN meeting_room r ON b.room_id = r.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.room_id = #{roomId}
+          AND b.booking_status != 'CANCELLED'
+        ORDER BY b.start DESC
+    </select>
+
+    <select id="findMeetingRoomBookingsByDateRange" resultMap="meetingRoomBookingResultMap">
+        SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM meeting_room_booking b
+                 JOIN meeting_room r ON b.room_id = r.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.booking_status != 'CANCELLED'
+        AND ((b.start BETWEEN #{startDate} AND #{endDate})
+           OR (b.end BETWEEN #{startDate} AND #{endDate})
+           OR (b.start <![CDATA[ <= ]]> #{startDate} AND b.end >= #{endDate}))
+        ORDER BY b.start
+    </select>
+
+    <insert id="insertMeetingRoomBooking" parameterType="com.example.projectdemo.domain.booking.entity.MeetingRoomBooking"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO meeting_room_booking (
+            room_id, emp_num, title, start, end,
+            attendees, purpose, booking_status
+        ) VALUES (
+                     #{roomId}, #{empNum}, #{title}, #{start}, #{end},
+                     #{attendees}, #{purpose}, #{bookingStatus}
+                 )
+    </insert>
+
+    <update id="updateMeetingRoomBooking" parameterType="com.example.projectdemo.domain.booking.entity.MeetingRoomBooking">
+        UPDATE meeting_room_booking
+        SET room_id = #{roomId},
+            title = #{title},
+            start = #{start},
+            end = #{end},
+            attendees = #{attendees},
+            purpose = #{purpose},
+            booking_status = #{bookingStatus}
+        WHERE id = #{id}
+    </update>
+
+    <update id="cancelMeetingRoomBooking">
+        UPDATE meeting_room_booking
+        SET booking_status = 'CANCELLED'
+        WHERE id = #{id}
+    </update>
+
+    <select id="isRoomAvailable" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) = 0 THEN true ELSE false END
+        FROM meeting_room_booking
+        WHERE room_id = #{roomId}
+        AND booking_status != 'CANCELLED'
+        AND (
+        (start &lt; #{endTime} AND end &gt; #{startTime})
+        )
+        <if test="excludeBookingId != null">
+            AND id != #{excludeBookingId}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.projectdemo.domain.booking.mapper.SuppliesMapper">
+
+    <resultMap id="suppliesResultMap" type="com.example.projectdemo.domain.booking.entity.Supplies">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="category" column="category"/>
+        <result property="totalQuantity" column="total_quantity"/>
+        <result property="availableQuantity" column="available_quantity"/>
+        <result property="description" column="description"/>
+        <result property="isAvailable" column="is_available"/>
+    </resultMap>
+
+    <resultMap id="suppliesBookingResultMap" type="com.example.projectdemo.domain.booking.entity.SuppliesBooking">
+        <id property="id" column="id"/>
+        <result property="supplyId" column="supply_id"/>
+        <result property="empNum" column="emp_num"/>
+        <result property="quantity" column="quantity"/>
+        <result property="start" column="start"/>
+        <result property="end" column="end"/>
+        <result property="purpose" column="purpose"/>
+        <result property="bookingStatus" column="booking_status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="empName" column="emp_name"/>
+        <result property="deptName" column="dept_name"/>
+        <association property="supplies" resultMap="suppliesResultMap"/>
+    </resultMap>
+
+    <select id="findAllSupplies" resultMap="suppliesResultMap">
+        SELECT * FROM supplies ORDER BY id
+    </select>
+
+    <select id="findSuppliesById" resultMap="suppliesResultMap">
+        SELECT * FROM supplies WHERE id = #{id}
+    </select>
+
+    <select id="findAllSuppliesBookings" resultMap="suppliesBookingResultMap">
+        SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM supplies_booking b
+                 JOIN supplies s ON b.supply_id = s.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.booking_status != 'CANCELLED'
+        ORDER BY b.start DESC
+    </select>
+
+    <select id="findSuppliesBookingsByEmpNum" resultMap="suppliesBookingResultMap">
+        SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM supplies_booking b
+                 JOIN supplies s ON b.supply_id = s.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.emp_num = #{empNum} AND b.booking_status != 'CANCELLED'
+        ORDER BY b.start DESC
+    </select>
+
+    <select id="findSuppliesBookingsBySupplyId" resultMap="suppliesBookingResultMap">
+        SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM supplies_booking b
+                 JOIN supplies s ON b.supply_id = s.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.supply_id = #{supplyId} AND b.booking_status != 'CANCELLED'
+        ORDER BY b.start DESC
+    </select>
+
+    <select id="findSuppliesBookingsByDateRange" resultMap="suppliesBookingResultMap">
+        SELECT b.*, s.name, s.category, s.total_quantity, s.available_quantity, s.description, s.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM supplies_booking b
+                 JOIN supplies s ON b.supply_id = s.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.booking_status != 'CANCELLED'
+        AND ((b.start BETWEEN #{startDate} AND #{endDate})
+           OR (b.end BETWEEN #{startDate} AND #{endDate})
+           OR (b.start <![CDATA[ <= ]]> #{startDate} AND b.end <![CDATA[ >= ]]> #{endDate}))
+        ORDER BY b.start
+    </select>
+
+    <insert id="insertSuppliesBooking" parameterType="com.example.projectdemo.domain.booking.entity.SuppliesBooking" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO supplies_booking (supply_id, emp_num, quantity, start, end, purpose, booking_status)
+        VALUES (#{supplyId}, #{empNum}, #{quantity}, #{start}, #{end}, #{purpose}, #{bookingStatus})
+    </insert>
+
+    <update id="updateSuppliesBooking" parameterType="com.example.projectdemo.domain.booking.entity.SuppliesBooking">
+        UPDATE supplies_booking
+        SET supply_id = #{supplyId}, quantity = #{quantity}, start = #{start}, end = #{end},
+            purpose = #{purpose}, booking_status = #{bookingStatus}
+        WHERE id = #{id}
+    </update>
+
+    <update id="cancelSuppliesBooking">
+        UPDATE supplies_booking
+        SET booking_status = 'CANCELLED'
+        WHERE id = #{id}
+    </update>
+
+    <select id="isSupplyAvailable" resultType="boolean">
+        SELECT CASE WHEN (
+        SELECT s.available_quantity - COALESCE(SUM(b.quantity), 0)
+        FROM supplies s
+        JOIN supplies_booking b ON s.id = b.supply_id
+        WHERE s.id = #{supplyId}
+        AND b.booking_status != 'CANCELLED'
+        AND (b.start <![CDATA[ < ]]> #{endTime} AND b.end <![CDATA[ > ]]> #{startTime})
+        <if test="excludeBookingId != null">
+            AND b.id != #{excludeBookingId}
+        </if>
+        ) >= #{quantity} THEN true ELSE false END
+    </select>
+
+    <update id="updateSupplyAvailableQuantity">
+        UPDATE supplies
+        SET available_quantity = available_quantity + #{changeAmount}
+        WHERE id = #{supplyId}
+    </update>
+
+</mapper>
