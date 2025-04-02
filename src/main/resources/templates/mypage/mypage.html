@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>마이페이지</title>
   <link rel="stylesheet" href="/assets/css/mypage/mypage.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="/assets/js/mypage/mypage.js"></script>
+
+  <!-- 헤더 에셋 포함 -->
+  <th:block th:replace="fragments/header :: headerAssets"></th:block>
 
 </head>
 <body>
-<div class="header">
-  <div class="logo">TECH X</div>
-</div>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
 
 <main>
   <div class="sidebar">
