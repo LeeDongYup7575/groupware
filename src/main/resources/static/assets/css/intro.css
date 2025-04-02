@@ -541,9 +541,14 @@
     padding: 20px 0;
 }
 
+.sidebar-menu ul{
+    padding-left: 0;
+}
+
 .sidebar-menu ul li {
     padding: 10px 20px;
     border-left: 3px solid transparent;
+    list-style: none;
 }
 
 .sidebar-menu ul li.active {
