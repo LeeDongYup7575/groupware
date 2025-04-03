@@ -184,6 +184,95 @@ header {
     background-color: #0078d7;
 }
 #calendar {
-    max-width: 900px;
-    margin: 40px auto;
+    width: 100%;
+    height: calc(100vh - 200px);
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 20px 0;
+}
+
+/* 헤더 버튼 스타일 */
+.fc-prev-button, .fc-next-button {
+    background-color: transparent !important;
+    border: none !important;
+    color: #333 !important;
+    box-shadow: none !important;
+}
+
+/* 헤더 타이틀 스타일 */
+.fc-toolbar-title {
+    font-size: 22px !important;
+    font-weight: bold;
+}
+
+/* 요일 헤더 스타일 */
+.fc-col-header-cell {
+    background-color: #f8f9fa;
+    padding: 10px 0;
+}
+
+/* 날짜 셀 스타일 */
+.fc-daygrid-day {
+    height: 120px;
+}
+
+/* 다른 달 날짜 스타일 */
+.fc-day-other .fc-daygrid-day-number {
+    opacity: 0.3;
+}
+
+/* 일요일 색상 */
+.fc-day-sun .fc-daygrid-day-number {
+    color: #ff4d4d;
+}
+
+/* 토요일 색상 */
+.fc-day-sat .fc-daygrid-day-number {
+    color: #4d79ff;
+}
+
+/* 이벤트 스타일 */
+.fc-event {
+    border-radius: 0;
+    font-size: 12px;
+}
+
+/* 날짜 번호 스타일 */
+.fc-daygrid-day-number {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px;
+}
+
+/* 오늘 날짜 스타일 */
+.fc-day-today {
+    background-color: #f0f8ff !important;
+}
+
+/* 이벤트 스타일 */
+.fc-event {
+    border: none;
+    padding: 2px 4px;
+}
+
+.fc-daygrid-event-harness {
+    margin-top: 2px;
+}
+
+/* 주간 합계 스타일 */
+.weekly-summary {
+    font-size: 12px;
+    color: #333;
+}
+
+.weekly-summary div {
+    margin-bottom: 5px;
+}
+
+/* 지각, 휴가 등 텍스트 색상 */
+.late-text {
+    color: #ff6b6b;
+}
+
+.leave-text {
+    color: #4a9fff;
 }
