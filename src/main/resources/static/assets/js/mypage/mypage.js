@@ -240,7 +240,7 @@ function generateContent(contentName, data) {
         </div>
         <div class="info-row">
           <div class="info-label">비밀번호 변경</div>
-          <div class="info-content"><a href="/auth/change-password">변경하기</a></div>
+          <div class="info-content"><a href="/auth/change-password" target="_blank">변경하기</a></div>
         </div>
     </div>  
     
