@@ -130,4 +130,37 @@ public class BookingController {
 
         return "booking/booking-supplies";
     }
+
+    @GetMapping("/meeting-details")
+    public String bookingDetails(Model model, HttpServletRequest request) {
+        String empNum = (String)request.getAttribute("empNum");
+        if (empNum == null) {
+            return "redirect:/auth/login";
+        }
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+        if (employee == null) {
+            return "redirect:/auth/login";
+        }
+        model.addAttribute("employee", employee);
+        model.addAttribute("meetingRooms", meetingRoomService.getAllMeetingRooms());
+        model.addAttribute("myBookings", meetingRoomService.getBookingsByEmpNum(empNum));
+        return "booking/booking-meeting-details";
+    }
+
+    @GetMapping("/supplies-details")
+    public String suppliesDetails(Model model, HttpServletRequest request) {
+        String empNum = (String)request.getAttribute("empNum");
+        if (empNum == null) {
+            return "redirect:/auth/login";
+        }
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+        if (employee == null) {
+            return "redirect:/auth/login";
+        }
+        model.addAttribute("employee", employee);
+        model.addAttribute("meetingRooms", meetingRoomService.getAllMeetingRooms());
+        model.addAttribute("mySupplies", suppliesService.getAllSupplies());
+        return "booking/booking-supplies-details";
+    }
+
 }
