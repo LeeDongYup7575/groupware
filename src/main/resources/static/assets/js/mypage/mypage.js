@@ -122,6 +122,30 @@ function loadTabContent(tabName) {
     window.history.pushState({}, '', `?tab=${tabName}`);
 }
 
+function loadMenuContent(menuName) {
+    // 모든 sidebar-item에서 active 클래스 제거
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // 클릭한 요소에 active 클래스 추가
+    document.getElementById(menuName).classList.add('active');
+
+    // 탭 내용 가져오기
+    fetch(`/api/mypage/activities/${menuName}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('tableContainer').innerHTML = generateContent(menuName, data);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+
+    // URL 업데이트 (activities 탭 안에서 menu 변경)
+    window.history.pushState({}, '', `?tab=activities&menu=${menuName}`);
+}
+
+
 function generateContent(contentName, data) {
     let content = '';
     if (contentName === 'info') {
@@ -204,7 +228,23 @@ function generateContent(contentName, data) {
 `;
 
     } else if (contentName === 'security') {
-        content = `<h2>보안설정</h2>`;
+        content = `
+    <div class="title-container">
+      <h1>보안</h1>
+    </div>
+    
+    <div class="info-container">
+        <div class="info-row">
+          <div class="info-label">마지막 로그인</div>
+          <div class="info-content" id="lastLogin">${data.lastLogin}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">비밀번호 변경</div>
+          <div class="info-content"><a href="/auth/change-password">변경하기</a></div>
+        </div>
+    </div>  
+    
+`;
     } else if (contentName === 'mypost') {
         content = `
     <table>
@@ -270,27 +310,4 @@ function generateContent(contentName, data) {
         content = `<h2>중요게시글</h2>`;
     }
     return content;
-}
-
-function loadMenuContent(menuName) {
-    // 모든 sidebar-item에서 active 클래스 제거
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.classList.remove('active');
-    });
-
-    // 클릭한 요소에 active 클래스 추가
-    document.getElementById(menuName).classList.add('active');
-
-    // 탭 내용 가져오기
-    fetch(`/api/mypage/activities/${menuName}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('tableContainer').innerHTML = generateContent(menuName, data);
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-
-    // URL 업데이트 (activities 탭 안에서 menu 변경)
-    window.history.pushState({}, '', `?tab=activities&menu=${menuName}`);
 }
