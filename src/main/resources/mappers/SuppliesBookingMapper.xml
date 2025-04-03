@@ -102,16 +102,19 @@
 
     <select id="isSupplyAvailable" resultType="boolean">
         SELECT CASE WHEN (
-        SELECT s.available_quantity - COALESCE(SUM(b.quantity), 0)
-        FROM supplies s
-        JOIN supplies_booking b ON s.id = b.supply_id
-        WHERE s.id = #{supplyId}
+        (SELECT available_quantity FROM supplies WHERE id = #{supplyId}) >=
+        (#{quantity} + COALESCE(
+        (SELECT SUM(b.quantity)
+        FROM supplies_booking b
+        WHERE b.supply_id = #{supplyId}
         AND b.booking_status != 'CANCELLED'
         AND (b.start <![CDATA[ < ]]> #{endTime} AND b.end <![CDATA[ > ]]> #{startTime})
         <if test="excludeBookingId != null">
             AND b.id != #{excludeBookingId}
         </if>
-        ) >= #{quantity} THEN true ELSE false END
+        ), 0)
+        )
+        ) THEN true ELSE false END
     </select>
 
     <update id="updateSupplyAvailableQuantity">

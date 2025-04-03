@@ -175,7 +175,17 @@ public class BookingApiController {
         LocalDateTime startDateTime = parseDateTime(startDate, startTime);
         LocalDateTime endDateTime = parseDateTime(endDate, endTime);
 
+        // 디버깅을 위한 로그 출력
+        SuppliesDTO supply = suppliesService.getSuppliesById(supplyId);
+        System.out.println("Checking availability for supply ID: " + supplyId);
+        System.out.println("Supply name: " + supply.getName());
+        System.out.println("Available quantity: " + supply.getAvailableQuantity());
+        System.out.println("Requested quantity: " + quantity);
+        System.out.println("Start time: " + startDateTime);
+        System.out.println("End time: " + endDateTime);
+
         boolean isAvailable = suppliesService.isSupplyAvailable(supplyId, quantity, startDateTime, endDateTime);
+        System.out.println("Is available: " + isAvailable);
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("available", isAvailable);
