@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -111,38 +112,36 @@ public class EdsmController {
     @RequestMapping("/bc")
     public String inputBc(Model model, HttpServletRequest request) {
 
-
-
-
-    int bc = 1;
-    model.addAttribute("bc",bc);
+        int bc = 1;
+        model.addAttribute("bc", bc);
 
         List<EmployeesDTO> list = employeesMapper.selectEmpAll();
         List<EmployeesDTO> empList = new ArrayList<>();
-        for(int i = 0; list.size()>i; i++) {
+        for (int i = 0; i < list.size(); i++) {
             String empNum1 = list.get(i).getEmpNum();
             EmployeesDTO list_emp = employeeService.findByEmpNum(empNum1);
             empList.add(list_emp);
         }
+
+        // 사번(empNum)을 기준으로 오름차순 정렬 (Java 8 이상 사용)
+        empList.sort(Comparator.comparing(EmployeesDTO::getEmpNum).reversed());
         model.addAttribute("list_emp", empList);
 
-
         // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String)request.getAttribute("empNum");
+        String empNum = (String) request.getAttribute("empNum");
 
-        if (empNum == null) { //예외처리
+        if (empNum == null) { // 예외 처리
             return "redirect:/edsm/edsmMain";
         }
 
         // 사원번호로 직원 정보 조회
         EmployeesDTO employee = employeeService.findByEmpNum(empNum);
 
-        if (employee == null) { //예외처리
+        if (employee == null) { // 예외 처리
             return "redirect:/edsm/edsmMain";
         }
 
         model.addAttribute("employee", employee);
-
 
         return "edsm/edsmInputBc";
     }

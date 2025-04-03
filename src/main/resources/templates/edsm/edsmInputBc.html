@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href= "/assets/css/edsm/edsmInput.css" />
+  <link rel="stylesheet" href="/assets/css/edsm/edsmInput.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <title>전자결재</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -24,7 +24,6 @@
       <i class="fas fa-plus"></i>
       작성하기
     </button>
-
     <div class="menu-section">
       <div class="menu-header">
         <i class="fas fa-chevron-down"></i>
@@ -35,7 +34,6 @@
           <i class="fas fa-folder"></i>
           전체
         </div>
-
         <div class="menu-item" id="progress">
           <i class="fas fa-spinner"></i>
           진행
@@ -46,7 +44,6 @@
         </div>
       </div>
     </div>
-
     <div class="menu-section">
       <div class="menu-header">
         <i class="fas fa-chevron-down"></i>
@@ -73,10 +70,6 @@
     </div>
   </div>
 
-
-
-
-
   <div class="main-container">
     <div class="total">
       <!-- 실제 폼 시작 -->
@@ -97,11 +90,10 @@
             <!-- 작성자 (서버에서 세팅된 변수 사용) -->
             <div class="form-label" style="margin-left: 20px;">작성자</div>
             <div class="form-input">
-              <!-- 작성자 정보는 화면에 표시하고, hidden 필드로 폼에 포함 -->
-              <span id="writerInfo"
-                    th:attr="data-writernum=${employee.empNum}, data-writerposition=${employee.positionTitle}, data-writername=${employee.name}"
-                    th:text="${employee.positionTitle} + ' ' + ${employee.name}">
-              </span>
+                <span id="writerInfo"
+                      th:attr="data-writernum=${employee.empNum}, data-writerposition=${employee.positionTitle}, data-writername=${employee.name}"
+                      th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                </span>
               <input type="hidden" name="writerEmpNum" th:value="${employee.empNum}" />
               <input type="hidden" name="writerPosition" th:value="${employee.positionTitle}" />
               <input type="hidden" name="writerName" th:value="${employee.name}" />
@@ -135,7 +127,7 @@
         <div class="form-section">
           <div class="form-row">
             <div class="form-label">결재선</div>
-            <!-- 결재라인은 모달로 설정한 후, hidden 필드에 JSON이나 구분자로 저장 -->
+            <!-- 결재라인은 모달로 설정한 후, hidden 필드에 JSON 또는 구분자로 저장 -->
             <button type="button" class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
           </div>
           <div class="approval-container">
@@ -156,7 +148,6 @@
                 <div class="approval-header-cell approval-header-cell-2">결재라인</div>
               </div>
               <div class="approval-body approval-body-2">
-                <!-- 사용자가 선택한 결재라인이 여기 표시됨 -->
                 <div class="approval-body-cell approval-body-cell-2">결재라인을 설정해주세요</div>
               </div>
             </div>
@@ -164,8 +155,6 @@
           <!-- 결재라인 정보를 hidden 필드로 폼에 포함 -->
           <input type="hidden" name="approvalLine" id="approvalLine" value="" />
         </div>
-
-
 
         <!-- 본문 입력 영역 -->
         <div class="main2-contents">
@@ -181,7 +170,6 @@
           <div class="attachment-section">
             <label class="attachment-label" for="fileAttachment">첨부</label>
             <div class="attachment-links">
-              <!-- 파일 첨부 및 관련문서 첨부를 위한 링크 -->
               <a href="#" class="attachment-link">파일 첨부</a>
               <a href="#" class="attachment-link">관련문서 첨부</a>
             </div>
@@ -200,7 +188,7 @@
     </div>
   </div>
 
-  <!-- 결재선 설정 모달 (기존 모달 코드 사용) -->
+  <!-- 결재선 설정 모달 -->
   <div id="employeeModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -217,7 +205,6 @@
 </div>
 
 <script th:inline="javascript">
-
   $(document).ready(function() {
     // 초기화 및 이벤트 바인딩
     var storedValue = [[${bc}]];
@@ -258,31 +245,43 @@
       $("#employeeModal").fadeOut();
     });
 
-    // 사원 목록 클릭 시 선택 토글 (여러명 선택 가능)
+    // 사원 목록 클릭 시 선택 및 순서 재할당
     $(".employee-list").on("click", "li", function () {
       $(this).toggleClass("selected");
+      // 선택된 li들의 순서를 재할당 (1부터 시작)
+      $(".employee-list li.selected").each(function(index) {
+        $(this).attr("data-order", index + 1);
+        console.log("순서:", index + 1, "사원번호:", $(this).data("num"));
+      });
     });
 
     // 선택 완료 버튼 클릭 시 선택된 사원들을 결재라인에 추가
     $("#saveApprovalLine").on("click", function () {
       var selectedEmployees = [];
-      $(".employee-list li.selected").each(function() {
+      $(".employee-list li.selected").each(function(index) {
+        let order = $(this).attr("data-order");  // 이미 할당된 순서를 사용
         var empNum = $(this).data("num");
         var empPosition = $(this).data("position");
         var empName = $(this).data("name");
-        selectedEmployees.push({ id: empNum, position: empPosition, name: empName });
+        selectedEmployees.push({ id: empNum, order: order, position: empPosition, name: empName });
+        console.log("순서:", order, "사원번호:", empNum);
       });
+
+      // 선택된 사원 정보를 hidden 필드에 JSON 문자열로 저장 (서버에 전달)
       $("#approvalLine").val(JSON.stringify(selectedEmployees));
+
+      // 결재라인 영역 업데이트 (선택된 순서대로 왼쪽부터 표시)
       var approvalBody = $(".approval-line-2 .approval-body-2");
       approvalBody.empty();
-      selectedEmployees.reverse().forEach(function(emp) {
-        var cell = '<div class="approval-body-cell-2">' +
-                '<div class="approval-stamp">대기</div>' +
+      selectedEmployees.forEach(function(emp) {
+        var cell = '<div class="approval-body-cell-2" data-order="'+ emp.order +'">' +
+                '<div class="approval-stamp">' + emp.order + '</div>' +
                 '<div class="approval-name">' + emp.position + ' ' + emp.name + '</div>' +
                 '<div class="approval-date">2025.04.01</div>' +
                 '</div>';
         approvalBody.append(cell);
       });
+
       $("#employeeModal").fadeOut();
     });
   });
