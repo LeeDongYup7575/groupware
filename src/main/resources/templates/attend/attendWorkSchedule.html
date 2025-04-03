@@ -51,6 +51,11 @@
 </div>
 
 <script>
+
+    document.querySelector(".add-button").onclick = function() {
+        location.href = "/leaves/leavesForm";
+    };
+
     // 드롭다운 메뉴 기능
     document.addEventListener('DOMContentLoaded', function() {
         const dropdownHeader = document.querySelector('.dropdown-header');
@@ -58,28 +63,7 @@
             this.parentElement.classList.toggle('open');
         });
     });
-    //
-    // document.addEventListener('DOMContentLoaded', function () {
-    //     var calendarEl = document.getElementById('calendar');
-    //     var calendar = new FullCalendar.Calendar(calendarEl, {
-    //         initialView: 'dayGridMonth', // 월별 보기
-    //         locale: 'ko', // 한국어 설정
-    //         events: function (fetchInfo, successCallback, failureCallback) {
-    //             // 📌 API에서 근무 일정 가져오기
-    //             $.ajax({
-    //                 url: '/attend/calendar-events',
-    //                 method: 'GET',
-    //                 success: function (data) {
-    //                     successCallback(data);
-    //                 },
-    //                 error: function () {
-    //                     alert('근무 일정을 불러오는 데 실패했습니다.');
-    //                 }
-    //             });
-    //         }
-    //     });
-    //     calendar.render();
-    // });
+
 </script>
 </body>
 </html>

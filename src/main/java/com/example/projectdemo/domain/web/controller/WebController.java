@@ -236,20 +236,7 @@ public class WebController {
             return createdTime;
         }
     }
-
-
-    /**
-     * 마이페이지
-     */
-    @GetMapping("/mypage")
-    public String mypage() {return "mypage/mypage";}
-
-    /**
-     * 주소록
-     */
-    @GetMapping("/contact")
-    public String contact() {return "contact/contact";}
-
+    
     /**
      * 사이드바 프래그먼트 경로
      */
