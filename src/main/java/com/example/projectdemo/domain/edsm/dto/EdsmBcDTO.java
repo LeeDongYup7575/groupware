@@ -19,10 +19,20 @@ public class EdsmBcDTO {
     private String content;
     private String retentionPeriod;
     private String securityGrade;
-    private int drafterId;
+    private String drafterName;
+    private String drafterId;
     private Timestamp drafterDate;//current_timestamp
     private Timestamp approvalDate;//null
     private String status;//enum
+
+
+    public String getDrafterName() {
+        return drafterName;
+    }
+
+    public void setDrafterName(String drafterName) {
+        this.drafterName = drafterName;
+    }
 
     public int getId() {
         return id;
@@ -72,11 +82,11 @@ public class EdsmBcDTO {
         this.securityGrade = securityGrade;
     }
 
-    public int getDrafterId() {
+    public String getDrafterId() {
         return drafterId;
     }
 
-    public void setDrafterId(int drafterId) {
+    public void setDrafterId(String drafterId) {
         this.drafterId = drafterId;
     }
 
