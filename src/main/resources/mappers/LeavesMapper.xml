@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.leave.dao.LeavesDAO">
+
+    <insert id="insertByLeaves" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO edsm_document
+        (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date ,status)
+        VALUES
+            (4, '휴가신청서', #{content},'3년','B등급', #{drafterId}, current_date,null,'진행')
+    </insert>
+
+</mapper>
