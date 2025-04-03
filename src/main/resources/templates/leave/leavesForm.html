@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>TECH X - 근태 관리</title>
+    <link rel="stylesheet" href="/assets/css/leave/leavesForm.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+</head>
+<body>
+<!-- 헤더 -->
+<div class="header">
+    <div class="logo">TECH X</div>
+    <div class="title">근태 관리</div>
+</div>
+
+<div class="container">
+    <!-- 좌측 사이드바 -->
+    <div class="sidebar">
+        <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
+        <ul class="menu">
+            <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
+            <li class="dropdown active open">
+                <div class="dropdown-header">
+                    <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
+                </div>
+                <ul class="submenu">
+                    <li><i class="fas fa-calendar-alt"></i> 휴가/근무</li>
+                    <li><i class="fas fa-chart-line"></i> 근무 현황</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="total">
+        <!-- 메인 콘텐츠 영역 -->
+        <div class="main-content">
+            <div class="add-btn" style="margin-bottom: 20px">
+                <button class="button">기안하기</button>
+            </div>
+
+            <div class="form-section">
+                <h3 class="form-header">기본설정</h3>
+
+                <div class="form-row">
+                    <div class="form-label">문서 종류</div>
+                    <div class="form-input">
+                        휴가신청서
+                    </div>
+                    <div class="form-label" style="margin-left: 20px;">작성자</div>
+                    <div class="form-input">하이웍스산업 대표이사</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-label">보존 연한</div>
+                    <div class="form-input">
+                        3년(보존연한)
+                    </div>
+                    <div class="form-label" style="margin-left: 20px;">보안 등급</div>
+                    <div class="form-input">
+                        B 등급
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-label">결재선</div>
+                    <button class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
+                </div>
+
+                <div class="approval-container">
+                    <!-- 신청라인 -->
+                    <div class="approval-line">
+                        <div class="approval-header">
+                            신청
+                        </div>
+
+                        <div class="approval-body">
+                            <div class="approval-body-cell">
+                                <div class="approval-stamp">신청</div>
+                                <div class="approval-name">하이웍스산업 대표이사</div>
+                                <div class="approval-date">2025.04.01</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 결재 라인 -->
+                    <div class="approval-line approval-line-2">
+                        <div class="approval-header approval-header-2">
+                            <div class="approval-header-cell approval-header-cell-2">결재라인</div>
+                        </div>
+
+                        <div class="approval-body approval-body-2">
+                            <div class="approval-body-cell approval-body-cell-2">
+                                결재라인을 설정해주세요
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-label">휴가 현황</div>
+                    <div class="form-input">
+                        잔여 휴가 19일 4시간 (연차 19일 4시간)
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-label">휴가 신청</div>
+                    <div class="form-input">
+                        <button class="button small-button" id="addDateButton">추가</button>
+                    </div>
+                </div>
+
+                <div id="dateSelectionContainer">
+                    <!-- 날짜 선택 영역 템플릿 -->
+                    <div class="form-row date-selection">
+                        <div class="radio-group">
+                            <input type="radio" id="full-day-0" name="time-type-0" class="full-day" checked>
+                            <label for="full-day-0">종일</label>
+                            <input type="radio" id="half-day-0" name="time-type-0" class="half-day">
+                            <label for="half-day-0">시간</label>
+                        </div>
+                        <div class="time-controls">
+                            <select class="time-select hour-select">
+                                <option>09</option>
+                                <option>10</option>
+                                <option>11</option>
+                                <option>12</option>
+                                <option>13</option>
+                                <option>14</option>
+                                <option>15</option>
+                                <option>16</option>
+                                <option>17</option>
+                                <option>18</option>
+                            </select>
+                            <span>시</span>
+                            <select class="time-select minute-select">
+                                <option>00</option>
+                                <option>30</option>
+                            </select>
+                            <span>분</span>
+                            <span>부터</span>
+                            <select class="time-select duration-select">
+                                <option>4시간</option>
+                                <option>8시간</option>
+                            </select>
+                        </div>
+                        <input type="text" class="date-input datepicker" value="2025-03-28 (금)">
+                        <button class="remove-button"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-label">사유</div>
+                    <div class="form-input">
+                        <textarea class="reason-textarea" placeholder="휴가 사유를 입력하세요"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main2-contents">
+            <div class="attachment-section">
+                <label class="attachment-label">첨부</label>
+                <div class="attachment-links">
+                    <a href="#" class="attachment-link">파일 첨부</a>
+                    <a href="#" class="attachment-link">관련문서 첨부</a>
+                </div>
+
+                <div class="attachment-drop-area">
+                    여기로 파일을 끌어다 놓으세요
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 모달 창 (사원 선택) -->
+<div id="employeeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>사원 선택</h3>
+        <ul class="employee-list">
+            <li data-empid="1">이사 홍길동</li>
+            <li data-empid="2">부장 김철수</li>
+            <li data-empid="3">차장 이영희</li>
+            <li data-empid="4">과장 박지성</li>
+        </ul>
+        <button id="saveApprovalLine" class="button">선택 완료</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // 드롭다운 메뉴
+        $('.dropdown-header').click(function() {
+            $(this).parent().toggleClass('open');
+        });
+
+        // 결재선 설정 버튼 클릭 시 모달 열기
+        $("#approvalSettingButton").click(function() {
+            $("#employeeModal").fadeIn();
+        });
+
+        // 모달 닫기 버튼 클릭
+        $(".close").click(function() {
+            $("#employeeModal").fadeOut();
+        });
+
+        // 사원 목록 클릭 시 선택 토글
+        $(".employee-list li").click(function() {
+            $(this).toggleClass("selected");
+        });
+
+        // 선택 완료 버튼 클릭 시 선택된 사원들을 결재라인에 추가
+        $("#saveApprovalLine").click(function() {
+            var selectedEmployees = [];
+            $(".employee-list li.selected").each(function() {
+                var empName = $(this).text();
+                var empId = $(this).data("empid");
+                selectedEmployees.push({ id: empId, name: empName });
+            });
+
+            if (selectedEmployees.length > 0) {
+                var approvalBody = $(".approval-line-2 .approval-body-2");
+                approvalBody.empty();
+                selectedEmployees.reverse(); // 배열 순서 반대로 변경
+
+                selectedEmployees.forEach(function(emp) {
+                    var cell = '<div class="approval-body-cell">' +
+                        '<div class="approval-stamp">대기</div>' +
+                        '<div class="approval-name">' + emp.name + '</div>' +
+                        '<div class="approval-date">2025.04.01</div>' +
+                        '</div>';
+                    approvalBody.append(cell);
+                });
+                $("#employeeModal").fadeOut();
+            }
+        });
+
+        // 초기화: 첫 번째 행의 datepicker 설정
+        $(".datepicker").val(getCurrentDate());
+        initDatepicker(".datepicker");
+
+        // 종일/시간 라디오 버튼 변경 이벤트
+        $(document).on("change", ".full-day, .half-day", function() {
+            toggleTimeControls($(this).closest(".date-selection"));
+        });
+
+        // 추가 버튼 클릭 이벤트
+        $("#addDateButton").click(function() {
+            var rowCount = $(".date-selection").length;
+
+            if (rowCount >= 5) {
+                alert("최대 5개까지만 추가할 수 있습니다.");
+                return;
+            }
+
+            var newRow = $(".date-selection").first().clone();
+
+            var newIndex = rowCount;
+            newRow.find('.full-day').attr('id', 'full-day-' + newIndex).attr('name', 'time-type-' + newIndex);
+            newRow.find('label[for="full-day-0"]').attr('for', 'full-day-' + newIndex);
+            newRow.find('.half-day').attr('id', 'half-day-' + newIndex).attr('name', 'time-type-' + newIndex);
+            newRow.find('label[for="half-day-0"]').attr('for', 'half-day-' + newIndex);
+
+            newRow.find('.datepicker').removeClass("hasDatepicker").val(getCurrentDate()); // 기존 datepicker 클래스 제거 후 새 날짜 설정
+            newRow.find('.full-day').prop('checked', true);
+            toggleTimeControls(newRow);
+
+            // 삭제 버튼 추가
+            newRow.find('.remove-button').remove();
+            newRow.append('<button type="button" class="remove-button"><i class="fas fa-times"></i></button>');
+
+
+            $("#dateSelectionContainer").append(newRow);
+            initDatepicker(newRow.find('.datepicker')); // 추가된 요소에 datepicker 적용
+        });
+
+        // 삭제 버튼 클릭 이벤트
+        $(document).on("click", ".remove-button", function() {
+            if ($(".date-selection").length > 1) {
+                $(this).closest(".date-selection").remove();
+            }
+        });
+
+        // 초기 종일/시간 설정
+        toggleTimeControls($(".date-selection").first());
+
+        // 함수: 종일/시간 토글
+        function toggleTimeControls(row) {
+            var timeControls = row.find('.time-controls');
+            if (row.find('.full-day').is(':checked')) {
+                timeControls.hide();
+            } else {
+                timeControls.show();
+            }
+        }
+
+        // 함수: datepicker 초기화
+        function initDatepicker(selector) {
+            $(selector).datepicker({
+                dateFormat: 'yy-mm-dd (D)',
+                dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+                dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+                monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                showMonthAfterYear: true,
+                yearSuffix: '년',
+                firstDay: 0
+            });
+        }
+
+        // 함수: 현재 날짜 반환
+        function getCurrentDate() {
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = ('0' + (now.getMonth() + 1)).slice(-2);
+            var day = ('0' + now.getDate()).slice(-2);
+            var dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+            var dayOfWeek = dayNames[now.getDay()];
+
+            return year + '-' + month + '-' + day + ' (' + dayOfWeek + ')';
+        }
+    });
+
+</script>
+</body>
+</html>
