@@ -1,5 +1,7 @@
 package com.example.projectdemo.domain.edsm.dto;
 
+import com.example.projectdemo.domain.edsm.enums.ApprovalStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.sql.Timestamp;
@@ -9,9 +11,10 @@ public class ApprovalLineDTO {
 
 
     private int documentId;
-    private int drafterId;
-    private int approverId;
+    private String drafterId;
+    private String approverId;
     private int approvalNo;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private String status;
     private Timestamp approvalAt;
     private String reason;
@@ -24,19 +27,19 @@ public class ApprovalLineDTO {
         this.documentId = documentId;
     }
 
-    public int getDrafterId() {
+    public String getDrafterId() {
         return drafterId;
     }
 
-    public void setDrafterId(int drafterId) {
+    public void setDrafterId(String drafterId) {
         this.drafterId = drafterId;
     }
 
-    public int getApproverId() {
+    public String getApproverId() {
         return approverId;
     }
 
-    public void setApproverId(int approverId) {
+    public void setApproverId(String approverId) {
         this.approverId = approverId;
     }
 

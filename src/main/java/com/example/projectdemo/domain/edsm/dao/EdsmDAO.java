@@ -7,6 +7,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class EdsmDAO {
 
@@ -24,6 +26,11 @@ public class EdsmDAO {
     public int insertByBcApprovalLine(ApprovalLineDTO aldto) {
 
         return mybatis.insert("Edsm.InsertByBcApproval", aldto);
+
+    }
+
+    public List<EdsmBcDTO> selectByAllDocument(String empNum) {
+        return mybatis.selectList("Edsm.SelectByAllDocument", empNum);
 
     }
 

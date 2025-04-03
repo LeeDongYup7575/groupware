@@ -19,7 +19,27 @@
         INSERT INTO groupware.approval_line
         (document_id, drafter_id, approver_id, approval_no, status, approved_at, reason)
         VALUES
-            (#{documentId}, #{drafterId}, #{approverId}, #{approvalNo}, '대기', current_date, null)
+            (#{documentId}, #{drafterId}, #{approverId}, #{approvalNo}, #{status}, current_date, null)
     </insert>
 
+
+    <!-- 나의 모든 문서 확인-->
+    <select id="SelectByAllDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE ed.status = '진행'
+          AND ed.drafter_id = #{empNum}
+    </select>
 </mapper>

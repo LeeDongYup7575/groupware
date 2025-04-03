@@ -85,18 +85,17 @@
             <th>기안일</th>
             <th>구분</th>
             <th>상태</th>
-            <th>문서 수</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td class="doc-number">GA-품의-2025032-002</td>
-            <td>품의 결의서</td>
-            <td>김대리</td>
-            <td>2025-03-25</td>
-            <td>결재</td>
-            <td><span class="status">대기</span></td>
-            <td>1</td>
+        <tr th:each="doc : ${allDocumentList}">
+            <td th:text="'업무-'+${doc.id}"></td>
+            <td th:text="${doc.title}"></td>
+            <td th:text="${doc.drafterName}"></td>
+            <td th:text="${doc.drafterDate}"></td>
+            <td th:text="${doc.edsmFormId}"></td>
+            <td th:text="${doc.status}"></td>
+
         </tr>
         </tbody>
     </table>
