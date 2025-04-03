@@ -1,5 +1,6 @@
 package com.example.projectdemo.domain.chat.dao;
 
+import com.example.projectdemo.domain.chat.dto.MemberShipDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,5 +36,8 @@ public class MembershipDAO {
     }
     public boolean isAdmin(Map<String, Object> params) {
         return mybatis.selectOne("memberShip.isAdmin", params);
+    }
+    public List<MemberShipDTO> getUserList(int roomid) {
+        return mybatis.selectList("memberShip.getUserList", roomid);
     }
 }

@@ -1,11 +1,18 @@
 package com.example.projectdemo.domain.chat.service;
 
 import com.example.projectdemo.domain.chat.dao.MembershipDAO;
+import com.example.projectdemo.domain.chat.dto.ChatUserDTO;
+import com.example.projectdemo.domain.chat.dto.MemberShipDTO;
+import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -38,6 +45,30 @@ public class MembershipService {
             System.out.println("방 나가기 완료");
             return "ExitChatroom";
         }
+
+    }
+
+    public List<ChatUserDTO> getUserList(int userid, int roomid) {
+
+        List<MemberShipDTO> list = membershipDAO.getUserList(roomid);
+
+                System.out.println(list.get(1).getId() + " : " + list.get(1).getEmpId());
+        List<ChatUserDTO> memberList = new ArrayList<>();
+        for (MemberShipDTO dto : list) {
+            System.out.println(dto.getEmpId() + " : 직원고유번호");
+            int id = dto.getEmpId();
+            EmployeesDTO emp = employeesMapper.findById(id);
+
+            if (emp != null) {
+                String name = emp.getName();
+                memberList.add(new ChatUserDTO(id, name));
+            } else {
+                System.out.println("❗ 직원 정보 없음: ID = " + id);
+                // 필요하다면 에러 응답 대신 continue 해서 무시
+            }
+        }
+        return memberList;
+
 
     }
 }
