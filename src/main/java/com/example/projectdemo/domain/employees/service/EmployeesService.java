@@ -3,6 +3,7 @@ package com.example.projectdemo.domain.employees.service;
 import com.example.projectdemo.config.PasswordEncoder;
 import com.example.projectdemo.domain.auth.service.EmailService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
@@ -219,5 +220,13 @@ public class EmployeesService {
         response.put("lastLogin", lastLoginStr);
 
         return response;
+    }
+
+    /**
+     * 마이페이지 사용자 정보(프로필이미지, 전화번호, 개인이메일) 업데이트
+     */
+    public void updateEmpInfo(String empNum, String phone, String email, String profileImgUrl){
+        EmployeesInfoUpdateDTO updatedEmp = new EmployeesInfoUpdateDTO(empNum, phone, email, profileImgUrl);
+        employeeMapper.updateEmpInfo(updatedEmp);
     }
 }

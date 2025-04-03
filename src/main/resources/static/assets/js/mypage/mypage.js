@@ -12,83 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    // // 필요한 요소들 선택
-    // const phoneInput = document.getElementById("phone");
-    // const emailInput = document.getElementById("email");
-    // const submitButton = document.getElementById("submit-button");
-    //
-    // // 전화번호 입력 이벤트 처리 (숫자와 하이픈만 허용)
-    // phoneInput.addEventListener('input', function() {
-    //     // 숫자와 하이픈만 남기고 모두 제거
-    //     this.value = this.value.replace(/[^\d-]/g, '');
-    //
-    //     // 전화번호 형식 검증 (예: 010-1234-5678)
-    //     if (!/^[\d-]+$/.test(this.value)) {
-    //         this.setCustomValidity('전화번호는 숫자와 하이픈(-)만 포함해야 합니다.');
-    //     } else {
-    //         this.setCustomValidity('');
-    //     }
-    // });
-    //
-    // // 이메일 입력 이벤트 처리
-    // emailInput.addEventListener('input', function() {
-    //     // 이메일 형식 검증
-    //     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    //
-    //     if (!emailPattern.test(this.value)) {
-    //         this.setCustomValidity('유효한 이메일 주소를 입력해주세요.');
-    //     } else {
-    //         this.setCustomValidity('');
-    //     }
-    // });
-    //
-    // // 폼 제출 처리
-    // submitButton.addEventListener('click', function() {
-    //     // 유효성 검사
-    //     const isPhoneValid = phoneInput.validity.valid;
-    //     const isEmailValid = personalEmailInput.validity.valid;
-    //
-    //     if (!isPhoneValid) {
-    //         alert('유효한 전화번호를 입력해주세요.');
-    //         phoneInput.focus();
-    //         return;
-    //     }
-    //
-    //     if (!isEmailValid) {
-    //         alert('유효한 이메일 주소를 입력해주세요.');
-    //         personalEmailInput.focus();
-    //         return;
-    //     }
-    //
-    //     // 변경된 데이터 준비
-    //     const updatedData = {
-    //         phone: phoneInput.value,
-    //         email: personalEmailInput.value
-    //     };
-    //
-    //     // Fetch API를 사용하여 서버에 데이터 전송
-    //     fetch('/api/employee/update', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify(updatedData)
-    //     })
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('서버 응답 오류');
-    //             }
-    //             return response.json();
-    //         })
-    //         .then(data => {
-    //             alert('정보가 성공적으로 업데이트되었습니다.');
-    //             console.log('업데이트 성공:', data);
-    //         })
-    //         .catch(error => {
-    //             alert('정보 업데이트 중 오류가 발생했습니다.');
-    //             console.error('업데이트 오류:', error);
-    //         });
-    // });
+
 });
 
 function loadTabContent(tabName) {
@@ -157,7 +81,20 @@ function generateContent(contentName, data) {
     <div class="content-container">
 
       <div class="profile-container">
-        <div class="profile-image"></div>
+        <div class="profile-image">
+            <img src=${data.profileImgUrl} alt="프로필 이미지">
+            
+            
+            <input type="file" id="profile-input" style="display: none;" accept="image/*">
+            <div class="profile-image-controls">
+                <button type="button" class="profile-btn img-delete-btn" title="삭제" onclick="deleteProfileImage()">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button type="button" class="profile-btn img-edit-btn" title="수정" onclick="openImageSelector()">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+        </div>
 
         <div class="profile-info">
           <div class="info-row upper-info-row">
@@ -206,10 +143,11 @@ function generateContent(contentName, data) {
           </div>
         </div>
 
-        <button class="submit-button">저장</button>
+        <button class="submit-button" onclick="updateInfo()">저장</button>
       </div>
     </div>
 `;
+
     } else if (contentName === 'activities') {
         content = `
     <div class="title-container">
@@ -240,7 +178,7 @@ function generateContent(contentName, data) {
         </div>
         <div class="info-row">
           <div class="info-label">비밀번호 변경</div>
-          <div class="info-content"><a href="/auth/change-password" target="_blank">변경하기</a></div>
+          <div class="info-content pw-change"><a href="/auth/change-password" target="_blank">변경하기</a></div>
         </div>
     </div>  
     
@@ -310,4 +248,95 @@ function generateContent(contentName, data) {
         content = `<h2>중요게시글</h2>`;
     }
     return content;
+}
+
+
+
+// 카메라 아이콘 클릭 시 파일 선택 창 열기
+function openImageSelector() {
+    document.getElementById('profile-input').click();
+}
+
+// 파일 선택 시 이미지 미리보기 및 업로드 준비
+document.addEventListener('change', function(event) {
+    if (event.target.id === 'profile-input') {
+        const file = event.target.files[0];
+        if (file) {
+            // 파일 유효성 검사 (이미지 파일인지)
+            if (!file.type.startsWith('image/')) {
+                alert('이미지 파일만 선택할 수 있습니다.');
+                return;
+            }
+
+            // 파일 크기 제한 (예: 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('파일 크기는 5MB 이하여야 합니다.');
+                return;
+            }
+
+            // 이미지 미리보기
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.querySelector('.profile-image img').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+});
+
+// 프로필 이미지 삭제 함수
+function deleteProfileImage() {
+    document.querySelector('.profile-image img').src = '/assets/images/default-profile.png'; // 기본 이미지로 변경
+    document.getElementById('profile-input').value = ''; // 파일 선택 초기화
+}
+
+// 내 정보 업데이트
+function updateInfo() {
+    const phoneInput = document.getElementById("phone");
+    const emailInput = document.getElementById("email");
+    const profileInput = document.getElementById('profile-input');
+
+    // 전화번호 유효성 검사 (숫자와 하이픈만 허용)
+    const phonePattern = /^010-\d{4}-\d{4}$/; // 010-1234-5678 형식
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!phonePattern.test(phoneInput.value)) {
+        alert('전화번호는 010-XXXX-XXXX 형식으로 입력해주세요.');
+        phoneInput.focus();
+        return;
+    }
+
+    if (!emailPattern.test(emailInput.value)) {
+        alert('유효한 이메일 주소를 입력해주세요.');
+        emailInput.focus();
+        return;
+    }
+
+    // FormData 생성
+    const formData = new FormData();
+    formData.append('phone', phoneInput.value);
+    formData.append('email', emailInput.value);
+
+    if (profileInput.files.length > 0) {
+        formData.append('profileImage', profileInput.files[0]);
+    }
+
+    // Fetch API를 사용하여 서버에 데이터 전송
+    fetch('/api/mypage/update', {
+        method: 'PATCH',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('서버 응답 오류');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('정보가 성공적으로 업데이트되었습니다.');
+        })
+        .catch(error => {
+            alert('정보 업데이트 중 오류가 발생했습니다.');
+            console.error(error); // 오류 로그 출력
+        });
 }
