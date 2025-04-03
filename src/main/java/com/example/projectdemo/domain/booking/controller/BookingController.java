@@ -1,7 +1,9 @@
 package com.example.projectdemo.domain.booking.controller;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
+import com.example.projectdemo.domain.booking.dto.MeetingRoomDTO;
 import com.example.projectdemo.domain.booking.dto.SuppliesBookingDTO;
+import com.example.projectdemo.domain.booking.dto.SuppliesDTO;
 import com.example.projectdemo.domain.booking.service.MeetingRoomService;
 import com.example.projectdemo.domain.booking.service.SuppliesService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
@@ -12,11 +14,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/booking")
@@ -123,27 +128,42 @@ public class BookingController {
             return "redirect:/auth/login";
         }
 
-        // 모든 비품 목록
+        // 모든 비품 목록 가져오기
+        List<SuppliesDTO> suppliesList = suppliesService.getAllSupplies();
+
+        // 카테고리 목록 추출 (중복 제거)
+        Set<String> categories = suppliesList.stream()
+                .map(SuppliesDTO::getCategory)
+                .collect(Collectors.toSet());
+
         model.addAttribute("employee", employee);
-        model.addAttribute("supplies", suppliesService.getAllSupplies());
+        model.addAttribute("supplies", suppliesList);
+        model.addAttribute("categories", categories);
         model.addAttribute("myBookings", suppliesService.getBookingsByEmpNum(empNum));
 
         return "booking/booking-supplies";
     }
 
     @GetMapping("/meeting-details")
-    public String bookingDetails(Model model, HttpServletRequest request) {
+    public String meetingDetails(Model model, HttpServletRequest request, @RequestParam(required = false) Integer roomId) {
         String empNum = (String)request.getAttribute("empNum");
         if (empNum == null) {
             return "redirect:/auth/login";
         }
+
         EmployeesDTO employee = employeeService.findByEmpNum(empNum);
         if (employee == null) {
             return "redirect:/auth/login";
         }
+
         model.addAttribute("employee", employee);
-        model.addAttribute("meetingRooms", meetingRoomService.getAllMeetingRooms());
-        model.addAttribute("myBookings", meetingRoomService.getBookingsByEmpNum(empNum));
+
+        // 회의실 ID가 있는 경우 해당 회의실 정보 추가
+        if (roomId != null) {
+            MeetingRoomDTO roomInfo = meetingRoomService.getMeetingRoomById(roomId);
+            model.addAttribute("selectedRoom", roomInfo);
+        }
+
         return "booking/booking-meeting-details";
     }
 

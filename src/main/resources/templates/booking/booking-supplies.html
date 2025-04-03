@@ -107,63 +107,67 @@
             text-align: center;
             margin: 0 0.5rem;
         }
+        .header-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-btn {
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1rem;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-btn:hover {
+            color: #0056b3;
+        }
+
+        .back-btn i {
+            margin-right: 0.5rem;
+        }
+
+        h1 {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <button id="back-btn" class="back-btn" onclick="window.location.href='/booking/main'">
+        <i class="fas fa-arrow-left"></i> 뒤로가기
+    </button>
     <h1>비품 예약</h1>
 
     <div class="filter-section">
         <select id="category-filter">
             <option value="">카테고리 선택</option>
-            <option value="laptop">노트북</option>
-            <option value="projector">프로젝터</option>
-            <option value="whiteboard">화이트보드</option>
+            <!-- 카테고리 동적 생성 -->
+            <option th:each="category : ${categories}" th:value="${category}" th:text="${category}"></option>
         </select>
     </div>
 
     <div class="supplies-grid" id="supplies-list">
-        <div class="supplies-card" data-id="laptop-1" data-category="laptop" data-total-quantity="5">
-            <span class="available">5대 남음</span>
-            <img src="/api/placeholder/200/150" alt="노트북 1">
-            <h3>노트북 1</h3>
-            <p>MacBook Pro</p>
+        <!-- 비품 카드 동적 생성 -->
+        <div th:each="supply : ${supplies}" class="supplies-card"
+             th:data-id="${supply.id}"
+             th:data-category="${supply.category}"
+             th:data-total-quantity="${supply.availableQuantity}">
+
+            <span class="available" th:text="${supply.availableQuantity + '개 남음'}"></span>
+            <img th:src="@{/api/placeholder/200/150}" th:alt="${supply.name}">
+            <h3 th:text="${supply.name}"></h3>
+            <p th:text="${supply.description}"></p>
             <div class="quantity-selector">
                 <button class="minus">-</button>
-                <input type="number" value="0" min="0" max="5" readonly>
-                <button class="plus">+</button>
-            </div>
-        </div>
-        <div class="supplies-card" data-id="laptop-2" data-category="laptop" data-total-quantity="3">
-            <span class="available">3대 남음</span>
-            <img src="/api/placeholder/200/150" alt="노트북 2">
-            <h3>노트북 2</h3>
-            <p>Dell XPS</p>
-            <div class="quantity-selector">
-                <button class="minus">-</button>
-                <input type="number" value="0" min="0" max="3" readonly>
-                <button class="plus">+</button>
-            </div>
-        </div>
-        <div class="supplies-card" data-id="projector-1" data-category="projector" data-total-quantity="2">
-            <span class="available">2대 남음</span>
-            <img src="/api/placeholder/200/150" alt="프로젝터 1">
-            <h3>프로젝터 1</h3>
-            <p>4K 프로젝터</p>
-            <div class="quantity-selector">
-                <button class="minus">-</button>
-                <input type="number" value="0" min="0" max="2" readonly>
-                <button class="plus">+</button>
-            </div>
-        </div>
-        <div class="supplies-card" data-id="whiteboard-1" data-category="whiteboard" data-total-quantity="3">
-            <span class="available">3개 남음</span>
-            <img src="/api/placeholder/200/150" alt="화이트보드 1">
-            <h3>화이트보드 1</h3>
-            <p>이동식 화이트보드</p>
-            <div class="quantity-selector">
-                <button class="minus">-</button>
-                <input type="number" value="0" min="0" max="3" readonly>
+                <input type="number" value="0" min="0" th:max="${supply.availableQuantity}" readonly>
                 <button class="plus">+</button>
             </div>
         </div>
@@ -172,7 +176,7 @@
     <button id="next-btn" class="btn" disabled>다음 단계</button>
 </div>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
         const suppliesCards = document.querySelectorAll('.supplies-card');
         const nextBtn = document.getElementById('next-btn');
@@ -258,6 +262,7 @@
             }
         });
     });
+
 </script>
 </body>
 </html>
