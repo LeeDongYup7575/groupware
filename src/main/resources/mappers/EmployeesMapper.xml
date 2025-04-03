@@ -140,4 +140,16 @@
         WHERE
             emp_num = #{empNum}
     </select>
+
+    <!-- 마이페이지 회원정보(프로필이미지, 전화번호, 개인이메일) 수정 -->
+    <update id="updateEmpInfo">
+        UPDATE
+            employees
+        SET
+            phone = #{updatedEmp.phone},
+            email = #{updatedEmp.email},
+            profile_img_url = #{updatedEmp.profileImgUrl}
+        WHERE
+            emp_num = #{updatedEmp.empNum}
+    </update>
 </mapper>

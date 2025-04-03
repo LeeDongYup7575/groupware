@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.employees.mapper;
 
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -58,4 +59,6 @@ public interface EmployeesMapper {
 
     // 마지막 로그인 시간 조회
     LocalDateTime selectLastLogin(@Param("empNum") String empNum);
+
+    int updateEmpInfo(@Param("updatedEmp") EmployeesInfoUpdateDTO updatedEmp);
 }
