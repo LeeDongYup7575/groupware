@@ -1,5 +1,22 @@
 
 /* 사이드바 */
+:root {
+    --primary-color: #0183D4;
+    --primary-light: #DDF6FF;
+    --primary-dark: #0066a8;
+    --secondary-color: #f3f4f6;
+    --sidebar-bg: #f3f7fb;
+    --sidebar-hover: #e8f0f8;
+    --sidebar-active: #e1ebf5;
+    --sidebar-active-border: #0078d4;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --sidebar-width: 250px;
+    --header-height: 80px;
+}
+
 .sidebar {
     width: var(--sidebar-width);
     background-color: var(--sidebar-bg);
@@ -81,6 +98,16 @@
     font-size: 1.2rem;
     color: var(--text-color);
 }
+
+.sidebar-menu li .submenu {
+    /*display: none;*/
+    padding-left: 25px;
+}
+
+.sidebar-menu li .submenu.active {
+    display: block;
+}
+
 
 /* 반응형 스타일 */
 @media (max-width: 1200px) {

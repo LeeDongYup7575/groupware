@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 사이드바</title>
+</head>
+<body>
+<!-- 공통 사이드바 스타일 포함 -->
+<th:block th:fragment="sidebarAssets">
+    <link rel="stylesheet" th:href="@{/css/fragments/sidebar-common.css}">
+</th:block>
+<script>
+    function openChat() {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            alert("로그인이 필요합니다");
+            return;
+        }
+
+        // 새 창 열기
+        const url = `http://10.10.55.57:3000?token=${encodeURIComponent(token)}`;
+        const newWindow = window.open(url, "_blank");
+
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+            alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
+        }
+    }
+</script>
+<!-- 게시판 사이드바 -->
+<div th:fragment="sidebar" id="sidebar" class="sidebar">
+    <div class="sidebar-menu">
+        <ul>
+            <li><a th:href="@{/board/write}"><span class="sidebar-icon">🖋️</span> 글쓰기</a></li>
+            <li><a th:href="@{/board/important}"><span class="sidebar-icon">⭐</span> 중요 게시물</a></li>
+
+            <!-- 전사 게시판 (토글) -->
+            <li class="toggle-menu">
+                <a href="">
+                    <span class="sidebar-icon">📢</span> 전사 게시판 &nbsp;
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <ul id="all-menu" class="submenu">
+                    <li><a th:href="@{/board/notice}"><span class="sidebar-icon">📄</span> 사내공지</a></li>
+                    <li><a th:href="@{/board/free}"><span class="sidebar-icon">💬</span> 자유게시판</a></li>
+                </ul>
+            </li>
+
+            <!-- 그룹 게시판 (토글) -->
+            <li class="toggle-menu">
+                <a href="">
+                    <span class="sidebar-icon">👥</span> 그룹 게시판 &nbsp;
+                    <i class="fas fa-chevron-down"></i>
+                </a>
+                <ul id="group-menu" class="submenu">
+                    <li><a th:href="@{/board/football}"><span class="sidebar-icon">⚽</span> 축구동호회</a></li>
+                    <li><a th:href="@{/board/movie}"><span class="sidebar-icon">🎥</span> 영화동호회</a></li>
+                </ul>
+            </li>
+
+            <li><a th:href="@{/board/create}"><span class="sidebar-icon">➕</span> 게시판 만들기</a></li>
+            <li><a th:href="@{/board/manage}"><span class="sidebar-icon">🛠 </span> 게시판 관리</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- 공통 사이드바 스크립트 포함 -->
+<th:block th:fragment="sidebarScripts">
+    <script th:src="@{/js/fragments/sidebar-common.js}"></script>
+</th:block>
+
+</body>
+</html>
