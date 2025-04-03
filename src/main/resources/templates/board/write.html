@@ -1,36 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{board/board-layout :: html(
+        '게시글 작성',
+        ~{::style},
+        ~{::#content},
+        ~{::script}
+      )}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>그룹웨어 시스템 - 게시판 - 글쓰기</title>
-
-    <!-- 폰트 및 아이콘 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- 헤더 에셋 포함 -->
-    <th:block th:replace="fragments/header :: headerAssets"></th:block>
-
-    <!-- 사이드바 스타일 포함 -->
-    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+    <style>
+        /* 게시물 상세 페이지 스타일 */
+        .board-view {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        .board-view-header {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        /* 추가 스타일 */
+    </style>
 </head>
 <body>
-<!-- 헤더 포함 -->
-<div th:replace="fragments/header :: header"></div>
+<div id="content">
+    <h1 class="page-title">게시물 상세</h1>
 
-<!-- 메인 콘텐츠 -->
-<div class="main-content">
-    board write test<br>
-    board write test<br>
-    board write test<br>
-    board write test<br>
-    board write test<br>
+    <div class="board-view">
+        <div class="board-view-header">
+            <h2 class="board-title">게시물 제목 예시</h2>
+            <div class="board-info">
+                <span>작성자: 관리자</span>
+                <span>등록일: 2023-07-15</span>
+                <span>조회수: 10</span>
+            </div>
+        </div>
+
+        <div class="board-content">
+            <p>게시물 내용이 여기에 표시됩니다.</p>
+            <p>여러 줄의 내용을 표시할 수 있습니다.</p>
+        </div>
+
+        <div class="board-actions">
+            <button class="btn btn-primary">수정</button>
+            <button class="btn btn-danger">삭제</button>
+            <a href="/board/list" class="btn btn-secondary">목록</a>
+        </div>
+    </div>
 </div>
 
-<!-- 헤더 관련 스크립트 포함 -->
-<div th:replace="fragments/header :: headerScripts"></div>
+<script>
+    // 게시물 상세 페이지 스크립트
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('게시물 상세 페이지 로드됨');
+    });
+</script>
 </body>
 </html>
