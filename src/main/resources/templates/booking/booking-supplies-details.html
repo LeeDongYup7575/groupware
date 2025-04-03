@@ -71,11 +71,65 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
+        .header-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .back-btn {
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-right: 1rem;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        .back-btn:hover {
+            color: #0056b3;
+        }
+        .back-btn i {
+            margin-right: 0.5rem;
+        }
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .success-message {
+            color: #28a745;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>비품 예약 상세</h1>
+    <div class="header-section">
+        <button id="back-btn" class="back-btn">
+            <i class="fas fa-arrow-left"></i> 뒤로가기
+        </button>
+        <h1>비품 예약 상세</h1>
+    </div>
+
+    <div id="error-message" class="error-message">
+        선택한 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.
+    </div>
+
+    <div id="success-message" class="success-message">
+        예약이 가능한 시간입니다.
+    </div>
 
     <div class="selected-supplies" id="selected-supplies-list">
         <!-- 선택된 비품들이 여기에 동적으로 추가됩니다 -->
@@ -89,12 +143,12 @@
 
         <div class="form-group">
             <label for="start-time">시작 시간</label>
-            <input type="time" id="start-time" required>
+            <input type="time" id="start-time" required step="600">
         </div>
 
         <div class="form-group">
             <label for="end-time">종료 시간</label>
-            <input type="time" id="end-time" required>
+            <input type="time" id="end-time" required step="600">
         </div>
 
         <div class="form-group">
@@ -102,15 +156,27 @@
             <textarea id="purpose" rows="4" placeholder="비품 사용 목적을 간단히 작성해주세요" required></textarea>
         </div>
 
-        <button type="submit" class="btn" id="submit-booking">예약 신청</button>
+        <button type="button" id="check-availability" class="btn">예약 가능 여부 확인</button>
+        <button type="submit" id="submit-booking" class="btn" style="display:none;">예약 신청</button>
     </form>
 </div>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
         // Parse query parameters
         const urlParams = new URLSearchParams(window.location.search);
         const selectedSupplies = [];
+        const backBtn = document.getElementById('back-btn');
+        const bookingForm = document.getElementById('booking-form');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const checkAvailabilityBtn = document.getElementById('check-availability');
+        const submitBookingBtn = document.getElementById('submit-booking');
+
+        // 뒤로가기 버튼
+        backBtn.addEventListener('click', function() {
+            window.location.href = '/booking/supplies';
+        });
 
         // Collect selected supplies from URL
         urlParams.forEach((value, key) => {
@@ -130,60 +196,224 @@
 
         // Populate selected supplies list
         const selectedSuppliesList = document.getElementById('selected-supplies-list');
-        selectedSupplies.forEach(supply => {
-            const supplyItem = document.createElement('div');
-            supplyItem.classList.add('selected-supplies-item');
-            supplyItem.innerHTML = `
-                    <span>${supply.id}</span>
-                    <span>수량: ${supply.quantity}개</span>
-                `;
-            selectedSuppliesList.appendChild(supplyItem);
-        });
+
+        // API를 호출하여 비품 상세 정보 가져오기
+        const fetchSupplyDetails = async (supplyId) => {
+            try {
+                const response = await fetch(`/api/booking/supplies/${supplyId}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching supply details:', error);
+                return null;
+            }
+        };
+
+        const populateSuppliesList = async () => {
+            for (const supply of selectedSupplies) {
+                const supplyDetails = await fetchSupplyDetails(supply.id);
+                const supplyItem = document.createElement('div');
+                supplyItem.classList.add('selected-supplies-item');
+
+                if (supplyDetails) {
+                    supplyItem.innerHTML = `
+                        <span>${supplyDetails.name || supply.id}</span>
+                        <span>수량: ${supply.quantity}개</span>
+                    `;
+                } else {
+                    supplyItem.innerHTML = `
+                        <span>비품 ID: ${supply.id}</span>
+                        <span>수량: ${supply.quantity}개</span>
+                    `;
+                }
+
+                selectedSuppliesList.appendChild(supplyItem);
+            }
+        };
+
+        populateSuppliesList();
 
         // Set min date to today
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').setAttribute('min', today);
 
-        // Form submission
-        const bookingForm = document.getElementById('booking-form');
+        // 시간 입력 필드 변경 감지
+        document.getElementById('booking-date').addEventListener('change', resetAvailabilityCheck);
+        document.getElementById('start-time').addEventListener('change', function() {
+            formatTimeToTenMinuteIntervals(this);
+            resetAvailabilityCheck();
+        });
+        document.getElementById('end-time').addEventListener('change', function() {
+            formatTimeToTenMinuteIntervals(this);
+            resetAvailabilityCheck();
+        });
+
+        // 예약 가능 여부 확인 상태 초기화
+        function resetAvailabilityCheck() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            checkAvailabilityBtn.style.display = 'block';
+            submitBookingBtn.style.display = 'none';
+        }
+
+        // 10분 단위로 시간 맞추기
+        function formatTimeToTenMinuteIntervals(inputElement) {
+            const timeValue = inputElement.value;
+            if (!timeValue) return;
+
+            const [hours, minutes] = timeValue.split(':').map(Number);
+            const roundedMinutes = Math.round(minutes / 10) * 10;
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = (roundedMinutes === 60 ? 0 : roundedMinutes).toString().padStart(2, '0');
+
+            // 분이 60이 되면 시간 증가
+            const newHours = roundedMinutes === 60 ? (hours + 1) % 24 : hours;
+            const formattedHoursAdjusted = newHours.toString().padStart(2, '0');
+
+            inputElement.value = `${formattedHoursAdjusted}:${formattedMinutes}`;
+        }
+
+        // 시간 유효성 검증 함수
+        function validateTimeInputs() {
+            const bookingDate = document.getElementById('booking-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            // 입력값 검증
+            if (!bookingDate || !startTime || !endTime) {
+                alert('날짜와 시간을 모두 입력해주세요.');
+                return false;
+            }
+
+            // 현재 시간 가져오기
+            const now = new Date();
+            const currentDate = now.toISOString().split('T')[0];
+
+            // 시간 유효성 검증
+            const start = new Date(`${bookingDate}T${startTime}`);
+            const end = new Date(`${bookingDate}T${endTime}`);
+
+            // 과거 시간 검증
+            if (bookingDate === currentDate && start < now) {
+                alert('과거 시간으로 예약할 수 없습니다.');
+                return false;
+            }
+
+            // 시작/종료 시간 순서 검증
+            if (start >= end) {
+                alert('종료 시간은 시작 시간보다 늦어야 합니다.');
+                return false;
+            }
+
+            // 최소 예약 시간 검증 (예: 30분)
+            const minDuration = 30; // 분 단위
+            const durationMs = end.getTime() - start.getTime();
+            const durationMinutes = durationMs / (1000 * 60);
+
+            if (durationMinutes < minDuration) {
+                alert(`최소 예약 시간은 ${minDuration}분입니다.`);
+                return false;
+            }
+
+            // 업무 시간 확인 (예: 9:00 ~ 18:00)
+            const workStart = new Date(`${bookingDate}T09:00`);
+            const workEnd = new Date(`${bookingDate}T18:00`);
+
+            if (start < workStart || end > workEnd) {
+                alert('예약은 업무 시간 내에만 가능합니다 (9:00 ~ 18:00).');
+                return false;
+            }
+
+            // 10분 단위 시간 검증
+            if (start.getMinutes() % 10 !== 0 || end.getMinutes() % 10 !== 0) {
+                alert('시간은 10분 단위로만 선택 가능합니다.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 예약 가능 여부 확인
+        checkAvailabilityBtn.addEventListener('click', function() {
+            // 먼저 시간 유효성 검증
+            if (!validateTimeInputs()) {
+                return;
+            }
+
+            const bookingDate = document.getElementById('booking-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            // 모든 선택된 비품에 대해 예약 가능 여부 확인
+            const availabilityChecks = selectedSupplies.map(supply => {
+                return fetch(`/api/booking/supplies/${supply.id}/available?quantity=${supply.quantity}&startDate=${bookingDate}&startTime=${startTime}&endDate=${bookingDate}&endTime=${endTime}`)
+                    .then(response => response.json());
+            });
+
+            Promise.all(availabilityChecks)
+                .then(results => {
+                    // 모든 비품이 예약 가능해야 함
+                    const allAvailable = results.every(result => result.available);
+
+                    if (allAvailable) {
+                        errorMessage.style.display = 'none';
+                        successMessage.style.display = 'block';
+                        checkAvailabilityBtn.style.display = 'none';
+                        submitBookingBtn.style.display = 'block';
+                    } else {
+                        errorMessage.style.display = 'block';
+                        successMessage.style.display = 'none';
+                        submitBookingBtn.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('예약 가능 여부를 확인하는데 실패했습니다.');
+                });
+        });
+
+        // 예약 신청
         bookingForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Collect form data
+            // 예약 시간이 변경되었는지 확인
+            if (checkAvailabilityBtn.style.display === 'block') {
+                alert('시간이 변경되었습니다. 예약 가능 여부를 다시 확인해주세요.');
+                return;
+            }
+
+            // 최종 유효성 검증 다시 수행
+            if (!validateTimeInputs()) {
+                resetAvailabilityCheck();
+                return;
+            }
+
+            // 폼 데이터 수집
             const bookingData = {
                 supplies: selectedSupplies,
-                date: document.getElementById('booking-date').value,
+                startDate: document.getElementById('booking-date').value,
+                endDate: document.getElementById('booking-date').value,
                 startTime: document.getElementById('start-time').value,
                 endTime: document.getElementById('end-time').value,
                 purpose: document.getElementById('purpose').value
             };
 
-            // Validate times
-            const startTime = new Date(`2023-01-01T${bookingData.startTime}`);
-            const endTime = new Date(`2023-01-01T${bookingData.endTime}`);
-
-            if (startTime >= endTime) {
-                alert('종료 시간은 시작 시간보다 늦어야 합니다.');
-                return;
-            }
-
-            // Submit booking
-            fetch('/api/booking/supplies', {
+            // API 호출로 예약 등록
+            fetch('/api/booking/supplies-bookings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(bookingData)
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('비품 예약이 완료되었습니다.');
-                        // Redirect to booking confirmation or main page
-                        window.location.href = '/booking/main';
-                    } else {
-                        alert('예약에 실패했습니다: ' + (data.message || '알 수 없는 오류'));
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('서버 응답이 올바르지 않습니다.');
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    alert('비품 예약이 완료되었습니다.');
+                    window.location.href = '/booking/main';
                 })
                 .catch(error => {
                     console.error('Error:', error);

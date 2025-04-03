@@ -131,4 +131,13 @@
             id = #{empId}
     </update>
 
+    <!-- 마지막 로그인 시간 조회 -->
+    <select id="selectLastLogin">
+        SELECT
+            last_login
+        FROM
+            employees
+        WHERE
+            emp_num = #{empNum}
+    </select>
 </mapper>

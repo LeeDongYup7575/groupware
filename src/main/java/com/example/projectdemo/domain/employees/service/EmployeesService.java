@@ -13,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmployeesService {
@@ -202,5 +205,19 @@ public class EmployeesService {
         }
 
         return new String(tempPassword);
+    }
+
+    /**
+     * 마지막 로그인 시간 가져오기
+     */
+    public Map<String, String> selectLastLogin(String empNum) {
+        LocalDateTime lastLogin = employeeMapper.selectLastLogin(empNum);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String lastLoginStr = lastLogin.format(formatter);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("lastLogin", lastLoginStr);
+
+        return response;
     }
 }

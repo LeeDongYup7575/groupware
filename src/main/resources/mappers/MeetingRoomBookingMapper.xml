@@ -76,6 +76,14 @@
         ORDER BY b.start
     </select>
 
+    <select id="findAllMeetingRooms" resultType="com.example.projectdemo.domain.booking.entity.MeetingRoom">
+        SELECT * FROM meeting_room
+    </select>
+
+    <select id="findMeetingRoomById" resultMap="meetingRoomResultMap">
+        SELECT * FROM meeting_room WHERE id = #{id}
+    </select>
+
     <insert id="insertMeetingRoomBooking" parameterType="com.example.projectdemo.domain.booking.entity.MeetingRoomBooking"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO meeting_room_booking (

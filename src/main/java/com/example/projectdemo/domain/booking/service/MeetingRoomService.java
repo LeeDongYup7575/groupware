@@ -33,7 +33,8 @@ public class MeetingRoomService {
 
     // 특정 회의실 조회
     public MeetingRoomDTO getMeetingRoomById(Integer id) {
-        return convertToDto(meetingRoomMapper.findMeetingRoomById(id));
+        MeetingRoom meetingRoom = meetingRoomMapper.findMeetingRoomById(id);
+        return convertToDto(meetingRoom);
     }
 
     // 모든 회의실 예약 조회

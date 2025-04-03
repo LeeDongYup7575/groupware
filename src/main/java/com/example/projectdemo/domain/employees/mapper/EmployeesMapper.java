@@ -56,4 +56,6 @@ public interface EmployeesMapper {
             @Param("empId") Integer empId,
             @Param("attendStatus") String attendStatus);
 
+    // 마지막 로그인 시간 조회
+    LocalDateTime selectLastLogin(@Param("empNum") String empNum);
 }
