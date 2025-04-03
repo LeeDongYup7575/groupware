@@ -31,17 +31,18 @@ body {
 main {
     display: flex;
     min-height: 100vh;
+    margin-top: 80px;
 }
 
 /* SIDEBAR */
-.sidebar {
+.mypage-sidebar {
     min-width: 250px;
     background-color: #f3f7fb;
     padding: 20px 0;
     border-right: 1px solid #e5e5e5;
 }
 
-.sidebar-item {
+.mypage-sidebar-item {
     padding: 12px 20px;
     display: flex;
     align-items: center;
@@ -50,21 +51,21 @@ main {
     margin-bottom: 5px;
 }
 
-.sidebar-item:hover {
+.mypage-sidebar-item:hover {
     background-color: #e8f0f8;
 }
 
-.sidebar-item.active {
+.mypage-sidebar-item.active {
     background-color: #e1ebf5;
     border-left: 4px solid #0078d4;
 }
 
-.sidebar-icon {
+.mypage-sidebar-icon {
     margin-right: 10px;
     font-size: 18px;
 }
 
-.sidebar-link {
+.mypage-sidebar-link {
     font-size: 14px;
 }
 /*  */

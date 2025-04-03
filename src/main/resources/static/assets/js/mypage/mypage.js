@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadTabContent(tabName) {
     // 모든 sidebar-item에서 active 클래스 제거
-    document.querySelectorAll('.sidebar-item').forEach(item => {
+    document.querySelectorAll('.mypage-sidebar-item').forEach(item => {
         item.classList.remove('active');
     });
 
