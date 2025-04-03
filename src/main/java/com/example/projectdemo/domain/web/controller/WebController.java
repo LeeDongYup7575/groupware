@@ -1,12 +1,14 @@
 package com.example.projectdemo.domain.web.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.auth.service.LogoutService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
 import com.example.projectdemo.domain.notification.model.Notice;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,7 @@ public class WebController {
     private final EmployeesService employeesService;
     private final JwtTokenUtil jwtTokenUtil;
     private final NoticeCrawler noticeCrawler;
+    private final LogoutService logoutService;
 
     // 메모리 캐시
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
@@ -29,10 +32,89 @@ public class WebController {
     private static final long CACHE_EXPIRY_TIME_MS = 3600000;
 
     @Autowired
-    public WebController(EmployeesService employeesService, JwtTokenUtil jwtTokenUtil, NoticeCrawler noticeCrawler) {
+    public WebController(EmployeesService employeesService, JwtTokenUtil jwtTokenUtil, NoticeCrawler noticeCrawler,
+                         LogoutService logoutService) {
         this.employeesService = employeesService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.noticeCrawler = noticeCrawler;
+        this.logoutService = logoutService;
+    }
+
+    /**
+     * 인트로 페이지 (루트 경로)
+     * 유효한 토큰이 있으면 메인 페이지로 리다이렉트
+     */
+    @GetMapping(value = {"/"})
+    public String intro(HttpServletRequest request) {
+        // 요청에서 토큰 확인
+        String token = getTokenFromRequest(request);
+
+        if (token != null && jwtTokenUtil.validateToken(token)) {
+            // 유효한 토큰이 있으면 메인 페이지로 리다이렉트
+            System.out.println("유효한 토큰이 있어 메인 페이지로 리다이렉트합니다.");
+            return "redirect:/main";
+        }
+
+        // 토큰이 없거나 유효하지 않으면 인트로 페이지 표시
+        return "intro";
+    }
+
+    /**
+     * 로그아웃 처리
+     */
+    @GetMapping("/auth/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // 요청에서 토큰 확인
+        String token = getTokenFromRequest(request);
+
+        if (token != null) {
+            // 토큰을 블랙리스트에 추가
+            logoutService.blacklistToken(token);
+            System.out.println("로그아웃: 토큰이 블랙리스트에 추가되었습니다.");
+        }
+
+        // 쿠키 제거
+        Cookie accessTokenCookie = new Cookie("accessToken", null);
+        accessTokenCookie.setMaxAge(0);
+        accessTokenCookie.setPath("/");
+        response.addCookie(accessTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setPath("/");
+        response.addCookie(refreshTokenCookie);
+
+        // 인트로 페이지로 리다이렉트
+        return "redirect:/";
+    }
+
+    /**
+     * 요청에서 토큰 추출
+     */
+    private String getTokenFromRequest(HttpServletRequest request) {
+        // 1. 헤더에서 토큰 확인
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+
+        // 2. 쿼리 파라미터에서 토큰 확인
+        String tokenParam = request.getParameter("token");
+        if (tokenParam != null && !tokenParam.isEmpty()) {
+            return tokenParam;
+        }
+
+        // 3. 쿠키에서 토큰 확인
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -255,13 +337,10 @@ public class WebController {
     }
 
     /**
-     * 비밀번호 변경 페이지
+     * 약관동의 페이지 이동
      */
     @GetMapping("/auth/agreement")
     public String agreement() {
         return "auth/privacy-agreement";
     }
-
-
-
 }

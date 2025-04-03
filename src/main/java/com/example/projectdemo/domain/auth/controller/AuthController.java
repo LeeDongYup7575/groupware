@@ -3,10 +3,13 @@ package com.example.projectdemo.domain.auth.controller;
 import com.example.projectdemo.domain.auth.dto.*;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.EmailService;
+import com.example.projectdemo.domain.auth.service.LogoutService;
 import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +38,7 @@ public class AuthController {
     private final EmployeesService employeeService;
     private final EmailService emailService;
     private final ProfileUploadService profileUploadService;
+    private final LogoutService logoutService;
 
     @Autowired
     public AuthController(JwtTokenUtil jwtTokenUtil,
@@ -42,13 +46,15 @@ public class AuthController {
                           PasswordEncoder passwordEncoder,
                           EmployeesService employeeService,
                           EmailService emailService,
-                          ProfileUploadService profileUploadService) {
+                          ProfileUploadService profileUploadService,
+                          LogoutService logoutService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeeMapper = employeeMapper;
         this.passwordEncoder = passwordEncoder;
         this.employeeService = employeeService;
         this.emailService = emailService;
         this.profileUploadService = profileUploadService;
+        this.logoutService = logoutService;
     }
 
     @PostMapping("/login")
@@ -170,6 +176,40 @@ public class AuthController {
                             "message", e.getMessage()
                     ));
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            HttpServletResponse response) {
+
+        // 헤더에서 토큰 추출
+        String token = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        // 토큰이 유효하면 블랙리스트에 추가
+        if (token != null) {
+            logoutService.blacklistToken(token);
+            System.out.println("토큰 블랙리스트 추가 성공: " + token.substring(0, Math.min(10, token.length())) + "...");
+            System.out.println("현재 블랙리스트 크기: " + logoutService.getBlacklistSize());
+        } else {
+            System.out.println("로그아웃 처리: 토큰이 제공되지 않았습니다.");
+        }
+
+        // 쿠키 제거
+        Cookie accessTokenCookie = new Cookie("accessToken", null);
+        accessTokenCookie.setMaxAge(0);
+        accessTokenCookie.setPath("/");
+        response.addCookie(accessTokenCookie);
+
+        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setPath("/");
+        response.addCookie(refreshTokenCookie);
+
+        return ResponseEntity.ok(Map.of("message", "로그아웃이 성공적으로 처리되었습니다."));
     }
 
     @PostMapping("/verify-employee")
@@ -339,6 +379,47 @@ public class AuthController {
                             "status", HttpStatus.BAD_REQUEST.value(),
                             "error", HttpStatus.BAD_REQUEST.getReasonPhrase(),
                             "message", e.getMessage()
+                    ));
+        }
+    }
+
+    /**
+     * 토큰 유효성 검증 API
+     */
+    @PostMapping("/validate-token")
+    public ResponseEntity<?> validateToken(
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        // 헤더에서 토큰 추출
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("토큰 검증 실패: Authorization 헤더가 없거나 잘못된 형식입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "valid", false,
+                            "message", "인증 토큰이 없거나 형식이 잘못되었습니다."
+                    ));
+        }
+
+        String token = authHeader.substring(7);
+        System.out.println("토큰 검증 시작: " + token.substring(0, Math.min(10, token.length())) + "...");
+
+        // 토큰 유효성 검증
+        if (jwtTokenUtil.validateToken(token)) {
+            // 토큰에서 사원번호 추출
+            String empNum = jwtTokenUtil.getEmpNumFromToken(token);
+            System.out.println("토큰 검증 성공: 사원번호 " + empNum);
+
+            return ResponseEntity.ok(Map.of(
+                    "valid", true,
+                    "empNum", empNum,
+                    "message", "유효한 토큰입니다."
+            ));
+        } else {
+            System.out.println("토큰 검증 실패: 만료되었거나 유효하지 않은 토큰입니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "valid", false,
+                            "message", "만료되었거나 유효하지 않은 토큰입니다."
                     ));
         }
     }

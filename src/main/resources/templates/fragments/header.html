@@ -570,22 +570,64 @@
                 }
             }
 
+
             // 로그아웃 버튼 클릭 이벤트
             const logoutButton = document.getElementById('logout-button');
             if (logoutButton) {
                 logoutButton.addEventListener('click', function(e) {
                     e.preventDefault();
 
-                    // 로컬 스토리지에서 토큰 제거
-                    localStorage.removeItem('accessToken');
-                    localStorage.removeItem('refreshToken');
-                    localStorage.removeItem('empNum');
-                    localStorage.removeItem('name');
-                    localStorage.removeItem('email');
-                    localStorage.removeItem('role');
+                    // 토큰 가져오기
+                    const token = localStorage.getItem('accessToken');
 
-                    // intro.html 페이지로 이동
-                    window.location.href = '/';
+                    // 서버에 로그아웃 요청 보내기
+                    fetch('/api/auth/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': token ? `Bearer ${token}` : '',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(response => {
+                            console.log('로그아웃 응답 상태:', response.status);
+
+                            // 로컬 스토리지에서 토큰 및 사용자 정보 제거
+                            localStorage.removeItem('accessToken');
+                            localStorage.removeItem('refreshToken');
+                            localStorage.removeItem('empNum');
+                            localStorage.removeItem('name');
+                            localStorage.removeItem('email');
+                            localStorage.removeItem('role');
+
+                            // 세션 스토리지도 초기화
+                            sessionStorage.clear();
+
+                            // 쿠키 삭제
+                            document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                            document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+                            // 인트로 페이지로 이동
+                            window.location.href = '/';
+                        })
+                        .catch(error => {
+                            console.error('로그아웃 요청 중 오류:', error);
+
+                            // 오류가 발생해도 클라이언트 측 토큰은 제거
+                            localStorage.removeItem('accessToken');
+                            localStorage.removeItem('refreshToken');
+                            localStorage.removeItem('empNum');
+                            localStorage.removeItem('name');
+                            localStorage.removeItem('email');
+                            localStorage.removeItem('role');
+                            sessionStorage.clear();
+
+                            // 쿠키 삭제
+                            document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                            document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+                            // 인트로 페이지로 이동
+                            window.location.href = '/';
+                        });
                 });
             }
 

@@ -1,8 +1,10 @@
 package com.example.projectdemo.domain.auth.jwt;
 
+import com.example.projectdemo.domain.auth.service.LogoutService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,9 @@ public class JwtTokenUtil {
 
     @Value("${jwt.qr.expiration:300}") // 기본값 5분 (초 단위)
     private long qrExpiration;
+
+    @Autowired
+    private LogoutService logoutService;
 
     /**
      * Base64 URL-safe 디코딩된 시크릿 키 생성
@@ -102,7 +107,7 @@ public class JwtTokenUtil {
      * 직원 정보로 액세스 토큰 생성
      */
     public String generateToken(EmployeesDTO employee) {
-        System.out.println("geneate token: "+employee);
+        System.out.println("generate token: "+employee);
         Map<String, Object> claims = new HashMap<>();
         // 기본 인증 정보
         claims.put("id", employee.getId());
@@ -206,10 +211,16 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 토큰 검증
+     * 토큰 검증 (블랙리스트 확인 추가)
      */
     public Boolean validateToken(String token) {
         try {
+            // 블랙리스트 확인 (로그아웃된 토큰인지)
+            if (logoutService.isTokenBlacklisted(token)) {
+                System.out.println("블랙리스트에 있는 토큰입니다.");
+                return false;
+            }
+
             Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
