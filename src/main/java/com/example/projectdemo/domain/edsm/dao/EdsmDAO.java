@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.edsm.dao;
 
 
+import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
 import com.example.projectdemo.domain.edsm.dto.EdsmBcDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,15 @@ public class EdsmDAO {
     private SqlSession mybatis;
 
 
-    public int insertByBc(EdsmBcDTO edsmBcDTO) {
+    public int insertByBc(EdsmBcDTO bcdto) {
 
-       return mybatis.insert("Edsm.InsertByBc", edsmBcDTO);
+       return mybatis.insert("Edsm.InsertByBc", bcdto);
+
+    }
+
+    public int insertByBcApprovalLine(ApprovalLineDTO aldto) {
+
+        return mybatis.insert("Edsm.InsertByBcApproval", aldto);
 
     }
 

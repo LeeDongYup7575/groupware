@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+
+
+
+
+
+
 <!-- 헤더 -->
 <div class="header">
   <div class="logo">TECH X</div>
@@ -70,16 +76,28 @@
     </div>
   </div>
 
+
+
+
+
+
+
+<!-- 결재 컨테이너 -->
   <div class="main-container">
     <div class="total">
+
+
       <!-- 실제 폼 시작 -->
       <form id="documentForm" action="/edsm/submit" method="post" enctype="multipart/form-data">
+
         <!-- 기본설정 영역 -->
         <div class="form-section">
-          <h3 class="form-header">기본설정</h3>
+          <h3 class="form-header">전자 결재 기안</h3>
           <div class="form-row">
-            <!-- 문서종류 -->
+
+            <!-- 문서 양식 종류 -->
             <div class="form-label">문서 종류</div>
+
             <div class="form-input">
               <select id="documentType" name="documentType">
                 <option value="1" th:selected="${documentType == 1}">업무연락</option>
@@ -87,18 +105,34 @@
                 <option value="loa" th:selected="${documentType == 'loa'}">품의서</option>
               </select>
             </div>
-            <!-- 작성자 (서버에서 세팅된 변수 사용) -->
-            <div class="form-label" style="margin-left: 20px;">작성자</div>
+            <!-- 문서 양식 번호
+            1 = 업무연락
+            2 = 지출결의서
+            3 = 품의서
+            -->
+
+            <!-- 작성자 (서버에서 세팅된 변수 사용- 타임리프문을 이용해서 가져옴) -->
+            <div class="form-label" style="margin-left: 20px;">작성자</div> <!-- 작성자(기안자) = drafter -->
+
             <div class="form-input">
-                <span id="writerInfo"
-                      th:attr="data-writernum=${employee.empNum}, data-writerposition=${employee.positionTitle}, data-writername=${employee.name}"
-                      th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                <span id="drafterInfo"
+                      th:attr="data-drafterId=${employee.empNum}, data-drafterposition=${employee.positionTitle}, data-draftername=${employee.name}" th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                      <!--
+                      <속성값 설명>
+                      drafterId = 기안자 사번
+                      drafterposition = 기안자 직급
+                      draftername = 기안자 이름
+                      -->
                 </span>
-              <input type="hidden" name="writerEmpNum" th:value="${employee.empNum}" />
-              <input type="hidden" name="writerPosition" th:value="${employee.positionTitle}" />
-              <input type="hidden" name="writerName" th:value="${employee.name}" />
+              <!-- 기안자 정보를 form으로 보내기위해 히든 입력창 생성 -->
+              <input type="hidden" name="drafterId" th:value="${employee.empNum}" />
+              <input type="hidden" name="drafterPosition" th:value="${employee.positionTitle}" />
+              <input type="hidden" name="drafterName" th:value="${employee.name}" />
             </div>
           </div>
+
+
+
           <div class="form-row">
             <!-- 보존 연한 -->
             <div class="form-label">보존 연한</div>
@@ -110,62 +144,83 @@
                 <option value="무기한">무기한</option>
               </select>
             </div>
+
+
+
             <!-- 보안 등급 -->
             <div class="form-label" style="margin-left: 20px;">보안 등급</div>
             <div class="form-input">
               <select name="securityGrade">
-                <option value="S 등급">S 등급</option>
-                <option value="A 등급">A 등급</option>
-                <option value="B 등급">B 등급</option>
-                <option value="C 등급">C 등급</option>
+                <option value="S등급">S등급</option>
+                <option value="A등급">A등급</option>
+                <option value="B등급">B등급</option>
+                <option value="C등급">C등급</option>
               </select>
             </div>
           </div>
         </div>
 
+
+
+
         <!-- 결재선 영역 -->
         <div class="form-section">
           <div class="form-row">
-            <div class="form-label">결재선</div>
+            <div class="form-label">결재라인</div>
+
+
             <!-- 결재라인은 모달로 설정한 후, hidden 필드에 JSON 또는 구분자로 저장 -->
             <button type="button" class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
           </div>
+
+          <!-- 신청 라인 (기안자 정보 사용) -->
           <div class="approval-container">
-            <!-- 신청 라인 (작성자 정보 사용) -->
             <div class="approval-line">
               <div class="approval-header">신청</div>
               <div class="approval-body">
                 <div class="approval-body-cell">
-                  <div class="approval-stamp">신청</div>
-                  <div class="approval-name" th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
-                  <div class="approval-date">2025.04.01</div>
+                  <div class="drafter-stamp">신청</div>
+                  <div class="drafter-name" th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
+                  <div class="drafter-date">{현재날짜가져오기}</div>
                 </div>
               </div>
             </div>
+
+
             <!-- 결재 라인 (모달에서 동적 추가) -->
             <div class="approval-line approval-line-2">
               <div class="approval-header approval-header-2">
                 <div class="approval-header-cell approval-header-cell-2">결재라인</div>
               </div>
+
+
               <div class="approval-body approval-body-2">
                 <div class="approval-body-cell approval-body-cell-2">결재라인을 설정해주세요</div>
               </div>
             </div>
           </div>
-          <!-- 결재라인 정보를 hidden 필드로 폼에 포함 -->
+
+
+          <!-- 결재라인 정보를 hidden 필드로 폼에 포함
+               스크립트에서 동적으로 추가 될거임.
+           -->
+
           <input type="hidden" name="approvalLine" id="approvalLine" value="" />
         </div>
+
 
         <!-- 본문 입력 영역 -->
         <div class="main2-contents">
           <div class="form-contents">
             <label class="contents-label" for="title">제목</label>
-            <input type="text" id="title" name="title" class="label-input" placeholder="제목을 입력해주세요.">
+            <input type="text" id="title" name="title" class="label-input" placeholder="업무연락신청서">
           </div>
           <div class="form-contents">
-            <label class="contents-label" for="body">본문</label>
-            <textarea id="body" name="body" class="label-textarea" placeholder="내용을 입력해주세요."></textarea>
+            <label class="contents-label" for="content">본문</label>
+            <textarea id="content" name="content" class="label-textarea" placeholder="내용을 입력해주세요."></textarea>
           </div>
+
+
           <!-- 파일첨부 영역 -->
           <div class="attachment-section">
             <label class="attachment-label" for="fileAttachment">첨부</label>
@@ -195,7 +250,7 @@
       <h3>사원 선택</h3>
       <ul class="employee-list">
         <li th:each="emp : ${list_emp}"
-            th:attr="data-num=${emp.empNum}, data-position=${emp.positionTitle}, data-name=${emp.name}"
+            th:attr="data-approvernum=${emp.empNum}, data-approverposition=${emp.positionTitle}, data-approvername=${emp.name}"
             th:text="${emp.positionTitle} + ' ' + ${emp.name}">
         </li>
       </ul>
@@ -251,7 +306,7 @@
       // 선택된 li들의 순서를 재할당 (1부터 시작)
       $(".employee-list li.selected").each(function(index) {
         $(this).attr("data-order", index + 1);
-        console.log("순서:", index + 1, "사원번호:", $(this).data("num"));
+
       });
     });
 
@@ -260,11 +315,11 @@
       var selectedEmployees = [];
       $(".employee-list li.selected").each(function(index) {
         let order = $(this).attr("data-order");  // 이미 할당된 순서를 사용
-        var empNum = $(this).data("num");
-        var empPosition = $(this).data("position");
-        var empName = $(this).data("name");
-        selectedEmployees.push({ id: empNum, order: order, position: empPosition, name: empName });
-        console.log("순서:", order, "사원번호:", empNum);
+        var approverId = $(this).data("approvernum");
+        var approverPosition = $(this).data("approverposition");
+        var approverName = $(this).data("approvername");
+        selectedEmployees.push({ approverId: approverId, approvalNo: order, position: approverPosition, name: approverName });
+        console.log("순서:", order, "사원번호:", approverId);
       });
 
       // 선택된 사원 정보를 hidden 필드에 JSON 문자열로 저장 (서버에 전달)
@@ -275,7 +330,7 @@
       approvalBody.empty();
       selectedEmployees.forEach(function(emp) {
         var cell = '<div class="approval-body-cell-2" data-order="'+ emp.order +'">' +
-                '<div class="approval-stamp">' + emp.order + '</div>' +
+                '<div class="approval-stamp">' + "{대기,반려,승인}" + '</div>' +
                 '<div class="approval-name">' + emp.position + ' ' + emp.name + '</div>' +
                 '<div class="approval-date">2025.04.01</div>' +
                 '</div>';

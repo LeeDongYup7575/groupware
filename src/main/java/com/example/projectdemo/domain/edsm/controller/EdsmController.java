@@ -2,12 +2,16 @@ package com.example.projectdemo.domain.edsm.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
+import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
 import com.example.projectdemo.domain.edsm.dto.EdsmBcDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -160,13 +164,13 @@ public class EdsmController {
 
     @PostMapping("/submit")
     public String bcSubmit(@RequestParam("documentType") int edsmFormId,
-                           @RequestParam("writerEmpNum") int draftId,
+                           @RequestParam("drafterId") int draftId,
                            @RequestParam("title") String title,
-                           @RequestParam("body") String content,
+                           @RequestParam("content") String content,
                            @RequestParam("retentionPeriod") String retentionPeriod,
                            @RequestParam("securityGrade") String securityGrade,
-                           @RequestParam("writerPosition") String writerPosition,
-                           @RequestParam("writerName") String writerName,
+                           @RequestParam("drafterPosition") String writerPosition,
+                           @RequestParam("drafterName") String writerName,
                            @RequestParam("approvalLine") String approvalLine, // JSON 문자열
                            @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
                            Model model, HttpServletRequest request) {
@@ -199,6 +203,21 @@ public class EdsmController {
         bcdto.setStatus("진행");//상태
 
         edao.insertByBc(bcdto);
+        int documentId = bcdto.getId();  // 생성된 문서의 id
+
+// JSON 문자열을 List<ApprovalLineDTO>로 파싱 후, documentId 설정
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            List<ApprovalLineDTO> approvalLines = mapper.readValue(approvalLine,
+                    new com.fasterxml.jackson.core.type.TypeReference<List<ApprovalLineDTO>>() {});
+            for (ApprovalLineDTO aldto : approvalLines) {
+                aldto.setDocumentId(documentId); // 명시적으로 문서 id 설정
+                aldto.setDrafterId(draftId);      // 필요시 기안자 id도 설정
+                edao.insertByBcApprovalLine(aldto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return "redirect:/edsm/main";
     }
