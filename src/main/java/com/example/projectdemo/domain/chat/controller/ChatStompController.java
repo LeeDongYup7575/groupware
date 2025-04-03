@@ -48,6 +48,12 @@ public class ChatStompController {
 
     @GetMapping("/message/{roomId}")
     public List<ChatMessageDTO> getMessagesByRoom(@PathVariable int roomId) {
-        return chatMessageService.getMessagesByRoom(roomId);
+        List<ChatMessageDTO>list = chatMessageService.getMessagesByRoom(roomId);
+        if(!list.isEmpty()){
+            return list;
+        } else {
+            return null;
+        }
+
     }
 }
