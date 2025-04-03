@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH X - 회의실 예약</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+            background-color: white;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .room-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .room-card:hover {
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            transform: scale(1.05);
+        }
+        .room-card.selected {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .room-card img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .filter-section {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-section select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>회의실 예약</h1>
+
+    <div class="filter-section">
+        <select id="capacity-filter">
+            <option value="">인원 수 선택</option>
+            <option value="4">4인실</option>
+            <option value="6">6인실</option>
+            <option value="10">10인실</option>
+            <option value="15">15인실</option>
+        </select>
+
+        <select id="location-filter">
+            <option value="">위치 선택</option>
+            <option value="1F">1층</option>
+            <option value="2F">2층</option>
+            <option value="3F">3층</option>
+        </select>
+    </div>
+
+    <div class="room-grid" id="room-list">
+        <div class="room-card" data-id="meeting-room-1" data-capacity="4" data-location="1F">
+            <img src="/api/placeholder/200/150" alt="회의실 1">
+            <h3>회의실 1</h3>
+            <p>4인실 / 1층</p>
+        </div>
+        <div class="room-card" data-id="meeting-room-2" data-capacity="6" data-location="2F">
+            <img src="/api/placeholder/200/150" alt="회의실 2">
+            <h3>회의실 2</h3>
+            <p>6인실 / 2층</p>
+        </div>
+        <div class="room-card" data-id="meeting-room-3" data-capacity="10" data-location="2F">
+            <img src="/api/placeholder/200/150" alt="회의실 3">
+            <h3>회의실 3</h3>
+            <p>10인실 / 2층</p>
+        </div>
+        <div class="room-card" data-id="meeting-room-4" data-capacity="15" data-location="3F">
+            <img src="/api/placeholder/200/150" alt="회의실 4">
+            <h3>회의실 4</h3>
+            <p>15인실 / 3층</p>
+        </div>
+    </div>
+
+    <button id="next-btn" class="btn" disabled>다음 단계</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roomCards = document.querySelectorAll('.room-card');
+        const nextBtn = document.getElementById('next-btn');
+        const capacityFilter = document.getElementById('capacity-filter');
+        const locationFilter = document.getElementById('location-filter');
+        let selectedRoom = null;
+
+        // Room selection
+        roomCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                roomCards.forEach(c => c.classList.remove('selected'));
+
+                // Select current card
+                this.classList.add('selected');
+                selectedRoom = this.getAttribute('data-id');
+                nextBtn.disabled = false;
+            });
+        });
+
+        // Filtering
+        function filterRooms() {
+            const selectedCapacity = capacityFilter.value;
+            const selectedLocation = locationFilter.value;
+
+            roomCards.forEach(card => {
+                const capacity = card.getAttribute('data-capacity');
+                const location = card.getAttribute('data-location');
+
+                const matchCapacity = !selectedCapacity || capacity === selectedCapacity;
+                const matchLocation = !selectedLocation || location === selectedLocation;
+
+                if (matchCapacity && matchLocation) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        capacityFilter.addEventListener('change', filterRooms);
+        locationFilter.addEventListener('change', filterRooms);
+
+        // Next button
+        nextBtn.addEventListener('click', function() {
+            if (selectedRoom) {
+                // Navigate to booking details page, passing selected room
+                window.location.href = `/booking/meeting-room-details?roomId=${selectedRoom}`;
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -4,14 +4,185 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TECH X - 예약시스템</title>
-  <link rel="stylesheet" href="/assets/css/attend/attendMain.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .content-area {
-      margin-left: 250px;
-      padding: 20px;
+    /* 중요: 헤더 스타일과 충돌하지 않도록 명시적 범위 지정 */
+    .container .sidebar {
+      position: fixed;
+      width: 250px;
+      height: calc(100% - 80px); /* 기본 헤더 높이(80px)를 뺀 높이 */
+      background-color: #f8f9fa;
+      border-right: 1px solid #e9ecef;
+      padding: 20px 0;
+      left: 0;
+      top: 80px; /* 기본 헤더 높이와 동일하게 설정 */
+      overflow-y: auto;
+      transition: all 0.3s ease;
+      z-index: 900; /* 헤더의 z-index(1000)보다 낮게 설정 */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
     }
 
+    /* Add Button Styles */
+    .add-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 15px 20px;
+      padding: 12px;
+      width: calc(100% - 30px);
+      background-color: #4e73df;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    .add-button:hover {
+      background-color: #375bd2;
+    }
+
+    .add-button i {
+      margin-right: 8px;
+    }
+
+    /* Menu Styles */
+    .menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu li {
+      margin-bottom: 5px;
+    }
+
+    .menu li a,
+    .dropdown-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: #5a5c69;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .menu li a i,
+    .dropdown-header i:first-child {
+      margin-right: 10px;
+      width: 16px;
+      text-align: center;
+    }
+
+    .menu li a:hover,
+    .dropdown-header:hover {
+      background-color: #eaecf4;
+      color: #4e73df;
+    }
+
+    .menu li.active a {
+      color: #4e73df;
+      background-color: #eaecf4;
+      border-left: 4px solid #4e73df;
+      font-weight: 600;
+    }
+
+    /* Dropdown Styles */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-header {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+    }
+
+    .dropdown-icon {
+      transition: transform 0.3s;
+      position: absolute;
+      right: 20px;
+    }
+
+    .dropdown.open .dropdown-icon {
+      transform: rotate(180deg);
+    }
+
+    .submenu {
+      list-style: none;
+      padding-left: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: #f1f3f9;
+    }
+
+    .dropdown.open .submenu {
+      max-height: 200px; /* Adjust based on your submenu size */
+    }
+
+    .submenu li a {
+      padding-left: 46px;
+      font-size: 0.85rem;
+    }
+
+    .submenu li a:hover {
+      background-color: #e6e9f4;
+    }
+
+    /* Content Area */
+    .container .content-area {
+      margin-left: 250px;
+      padding: 20px;
+      margin-top: 80px; /* 기본 헤더 높이와 동일하게 설정 */
+    }
+
+    /* 컨테이너 설정 */
+    .container {
+      min-height: 100vh;
+      padding-top: 0; /* 헤더가 fixed이므로 컨테이너에 패딩 불필요 */
+      position: relative;
+      width: auto; /* 컨테이너의 너비를 자동으로 설정 */
+      margin-left: 0; /* 마진 제거하여 헤더와 간섭 방지 */
+      margin-right: 0;
+      overflow-x: hidden; /* 가로 스크롤 방지 */
+    }
+
+    /* 헤더 스크롤 시 사이드바/컨텐츠 위치 자동 조정 */
+    @media (min-width: 769px) {
+      .gw-navbar.gw-navbar-scrolled ~ .container .sidebar {
+        top: 60px; /* 스크롤된 헤더 높이 */
+        height: calc(100% - 60px);
+      }
+
+      .gw-navbar.gw-navbar-scrolled ~ .container .content-area {
+        margin-top: 60px; /* 스크롤된 헤더 높이 */
+      }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container .sidebar {
+        width: 0;
+        padding: 20px 0;
+        transition: all 0.3s ease;
+      }
+
+      .container .sidebar.active {
+        width: 250px;
+      }
+
+      .container .content-area {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+
+    /*본문 css 시작*/
     .card {
       background-color: #fff;
       border-radius: 8px;
@@ -125,24 +296,25 @@
     }
   </style>
 </head>
+
+<!-- 헤더 에셋 포함 -->
+<th:block th:replace="fragments/header :: headerAssets"></th:block>
+
 <body>
-<header>
-  <div class="logo">
-    <h1>TECH X</h1>
-    <span class="title">예약 페이지</span>
-  </div>
-</header>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
 
 <div class="container">
   <div class="sidebar">
-    <button class="add-button"><i class="fas fa-plus"></i>예약 시스템</button>
+    <button class="add-button"><i class="fas fa-plus"></i>예약 하기</button>
     <ul class="menu">
-      <li class="active"><i class="fas fa-file-alt"></i>
+      <li class="active">
         <a th:href="@{/booking/main}"><i class="fas fa-calendar-alt"></i>전체 예약 현황</a></li>
 
       <li class="dropdown">
         <div class="dropdown-header">
-          <i class="fas fa-chevron-down dropdown-icon"></i>나의 예약 목록
+          <i class="fas fa-list"></i>나의 예약 목록
+          <i class="fas fa-chevron-down dropdown-icon"></i>
         </div>
         <ul class="submenu">
           <li><a th:href="@{/booking/meeting-room}"><i class="fas fa-building"></i>회의실 예약</a></li>
@@ -410,6 +582,8 @@
     });
   });
 </script>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
 
 </body>
 </html>

@@ -10,25 +10,32 @@
 
   <!-- 헤더 에셋 포함 -->
   <th:block th:replace="fragments/header :: headerAssets"></th:block>
+  <!-- 사이드바 스타일 포함 -->
+  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 
 </head>
 <body>
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+<!-- 사이드바 -->
+<!--<div th:replace="fragments/sidebar/main-sidebar :: sidebar"></div>-->
+
 
 <main>
-  <div class="sidebar">
-    <div class="sidebar-item" id="info" onclick="loadTabContent('info')">
-      <span class="sidebar-icon">👤</span>
-      <span class="sidebar-link">내 정보</span>
+  <div class="mypage-sidebar">
+    <div class="mypage-sidebar-item" id="info" onclick="loadTabContent('info')">
+      <span class="mypage-sidebar-icon">👤</span>
+      <span class="mypage-sidebar-link">내 정보</span>
     </div>
-    <div class="sidebar-item" id="activities" onclick="loadTabContent('activities')">
-      <span class="sidebar-icon">📋</span>
-      <span class="sidebar-link">나의 활동</span>
+    <div class="mypage-sidebar-item" id="activities" onclick="loadTabContent('activities')">
+      <span class="mypage-sidebar-icon">📋</span>
+      <span class="mypage-sidebar-link">나의 활동</span>
     </div>
-    <div class="sidebar-item" id="security" onclick="loadTabContent('security')">
-      <span class="sidebar-icon">🔒</span>
-      <span class="sidebar-link">보안</span>
+    <div class="mypage-sidebar-item" id="security" onclick="loadTabContent('security')">
+      <span class="mypage-sidebar-icon">🔒</span>
+      <span class="mypage-sidebar-link">보안</span>
     </div>
   </div>
 

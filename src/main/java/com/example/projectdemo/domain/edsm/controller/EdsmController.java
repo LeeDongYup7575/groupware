@@ -1,6 +1,8 @@
 package com.example.projectdemo.domain.edsm.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
+import com.example.projectdemo.domain.edsm.dto.EdsmBcDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
@@ -9,9 +11,14 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -26,6 +33,9 @@ public class EdsmController {
     private JwtTokenUtil jwt;
 
     @Autowired
+    EdsmDAO edao;
+
+    @Autowired
     private EmployeesService employeeService;
 
     @Autowired
@@ -33,7 +43,21 @@ public class EdsmController {
 
     @RequestMapping("/main")
     public String main(Model model, HttpServletRequest request) {
+// JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String)request.getAttribute("empNum");
 
+        if (empNum == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
 
     model.addAttribute("main","전체");
 
@@ -88,21 +112,64 @@ public class EdsmController {
     @RequestMapping("/bc")
     public String inputBc(Model model, HttpServletRequest request) {
 
-
-
-
-    String bc = "bc";
-    model.addAttribute("bc",bc);
+        int bc = 1;
+        model.addAttribute("bc", bc);
 
         List<EmployeesDTO> list = employeesMapper.selectEmpAll();
         List<EmployeesDTO> empList = new ArrayList<>();
-        for(int i = 0; list.size()>i; i++) {
+        for (int i = 0; i < list.size(); i++) {
             String empNum1 = list.get(i).getEmpNum();
             EmployeesDTO list_emp = employeeService.findByEmpNum(empNum1);
             empList.add(list_emp);
         }
+
+        // 사번(empNum)을 기준으로 오름차순 정렬 (Java 8 이상 사용)
+        empList.sort(Comparator.comparing(EmployeesDTO::getEmpNum).reversed());
         model.addAttribute("list_emp", empList);
 
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String) request.getAttribute("empNum");
+
+        if (empNum == null) { // 예외 처리
+            return "redirect:/edsm/edsmMain";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { // 예외 처리
+            return "redirect:/edsm/edsmMain";
+        }
+
+        model.addAttribute("employee", employee);
+
+        return "edsm/edsmInputBc";
+    }
+
+    @RequestMapping("/loa")
+    public String inputLoa(Model model) {
+
+        String loa = "loa";
+        model.addAttribute("loa",loa);
+
+        List<EmployeesDTO> list = employeesMapper.selectEmpAll();
+        model.addAttribute("list",list);
+        return "edsm/edsmInputLoa";
+    }
+
+
+    @PostMapping("/submit")
+    public String bcSubmit(@RequestParam("documentType") int edsmFormId,
+                           @RequestParam("writerEmpNum") int draftId,
+                           @RequestParam("title") String title,
+                           @RequestParam("body") String content,
+                           @RequestParam("retentionPeriod") String retentionPeriod,
+                           @RequestParam("securityGrade") String securityGrade,
+                           @RequestParam("writerPosition") String writerPosition,
+                           @RequestParam("writerName") String writerName,
+                           @RequestParam("approvalLine") String approvalLine, // JSON 문자열
+                           @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
+                           Model model, HttpServletRequest request) {
 
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String)request.getAttribute("empNum");
@@ -121,20 +188,19 @@ public class EdsmController {
         model.addAttribute("employee", employee);
 
 
-        return "edsm/edsmInputBc";
+
+        EdsmBcDTO bcdto = new EdsmBcDTO();
+        bcdto.setEdsmFormId(edsmFormId);//문서양식아이디
+        bcdto.setTitle(title);//기안 문서 제목
+        bcdto.setContent(content);//기안 문서 본문 내용
+        bcdto.setRetentionPeriod(retentionPeriod);//기안 문서 보존연한
+        bcdto.setSecurityGrade(securityGrade);//기안문서 보안등급
+        bcdto.setDrafterId(draftId);//기안자 사원번호
+        bcdto.setStatus("진행");//상태
+
+        edao.insertByBc(bcdto);
+
+        return "redirect:/edsm/main";
     }
-
-    @RequestMapping("/loa")
-    public String inputLoa(Model model) {
-
-        String loa = "loa";
-        model.addAttribute("loa",loa);
-
-        List<EmployeesDTO> list = employeesMapper.selectEmpAll();
-        model.addAttribute("list",list);
-        return "edsm/edsmInputLoa";
-    }
-
-
 
 }

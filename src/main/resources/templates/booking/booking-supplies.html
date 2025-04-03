@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH X - 비품 예약</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+            background-color: white;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .supplies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .supplies-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .supplies-card:hover {
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            transform: scale(1.05);
+        }
+        .supplies-card.selected {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        .supplies-card img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .supplies-card .available {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .filter-section {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filter-section select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .quantity-selector button {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+        }
+        .quantity-selector input {
+            width: 50px;
+            text-align: center;
+            margin: 0 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>비품 예약</h1>
+
+    <div class="filter-section">
+        <select id="category-filter">
+            <option value="">카테고리 선택</option>
+            <option value="laptop">노트북</option>
+            <option value="projector">프로젝터</option>
+            <option value="whiteboard">화이트보드</option>
+        </select>
+    </div>
+
+    <div class="supplies-grid" id="supplies-list">
+        <div class="supplies-card" data-id="laptop-1" data-category="laptop" data-total-quantity="5">
+            <span class="available">5대 남음</span>
+            <img src="/api/placeholder/200/150" alt="노트북 1">
+            <h3>노트북 1</h3>
+            <p>MacBook Pro</p>
+            <div class="quantity-selector">
+                <button class="minus">-</button>
+                <input type="number" value="0" min="0" max="5" readonly>
+                <button class="plus">+</button>
+            </div>
+        </div>
+        <div class="supplies-card" data-id="laptop-2" data-category="laptop" data-total-quantity="3">
+            <span class="available">3대 남음</span>
+            <img src="/api/placeholder/200/150" alt="노트북 2">
+            <h3>노트북 2</h3>
+            <p>Dell XPS</p>
+            <div class="quantity-selector">
+                <button class="minus">-</button>
+                <input type="number" value="0" min="0" max="3" readonly>
+                <button class="plus">+</button>
+            </div>
+        </div>
+        <div class="supplies-card" data-id="projector-1" data-category="projector" data-total-quantity="2">
+            <span class="available">2대 남음</span>
+            <img src="/api/placeholder/200/150" alt="프로젝터 1">
+            <h3>프로젝터 1</h3>
+            <p>4K 프로젝터</p>
+            <div class="quantity-selector">
+                <button class="minus">-</button>
+                <input type="number" value="0" min="0" max="2" readonly>
+                <button class="plus">+</button>
+            </div>
+        </div>
+        <div class="supplies-card" data-id="whiteboard-1" data-category="whiteboard" data-total-quantity="3">
+            <span class="available">3개 남음</span>
+            <img src="/api/placeholder/200/150" alt="화이트보드 1">
+            <h3>화이트보드 1</h3>
+            <p>이동식 화이트보드</p>
+            <div class="quantity-selector">
+                <button class="minus">-</button>
+                <input type="number" value="0" min="0" max="3" readonly>
+                <button class="plus">+</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="next-btn" class="btn" disabled>다음 단계</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const suppliesCards = document.querySelectorAll('.supplies-card');
+        const nextBtn = document.getElementById('next-btn');
+        const categoryFilter = document.getElementById('category-filter');
+        let selectedSupplies = [];
+
+        // Quantity selector
+        suppliesCards.forEach(card => {
+            const minusBtn = card.querySelector('.minus');
+            const plusBtn = card.querySelector('.plus');
+            const quantityInput = card.querySelector('input');
+            const totalQuantity = parseInt(card.getAttribute('data-total-quantity'));
+
+            minusBtn.addEventListener('click', function() {
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue > 0) {
+                    quantityInput.value = currentValue - 1;
+                    updateSelectedSupplies(card);
+                }
+            });
+
+            plusBtn.addEventListener('click', function() {
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue < totalQuantity) {
+                    quantityInput.value = currentValue + 1;
+                    updateSelectedSupplies(card);
+                }
+            });
+        });
+
+        // Update selected supplies
+        function updateSelectedSupplies(card) {
+            const quantityInput = card.querySelector('input');
+            const supplyId = card.getAttribute('data-id');
+            const quantity = parseInt(quantityInput.value);
+
+            // Remove from selected if quantity is 0
+            selectedSupplies = selectedSupplies.filter(item => item.id !== supplyId);
+
+            // Add to selected if quantity > 0
+            if (quantity > 0) {
+                selectedSupplies.push({
+                    id: supplyId,
+                    name: card.querySelector('h3').textContent,
+                    quantity: quantity
+                });
+            }
+
+            // Update next button
+            nextBtn.disabled = selectedSupplies.length === 0;
+
+            // Visual feedback
+            quantity > 0 ? card.classList.add('selected') : card.classList.remove('selected');
+        }
+
+        // Filtering
+        function filterSupplies() {
+            const selectedCategory = categoryFilter.value;
+
+            suppliesCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+
+                if (!selectedCategory || category === selectedCategory) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        categoryFilter.addEventListener('change', filterSupplies);
+
+        // Next button
+        nextBtn.addEventListener('click', function() {
+            if (selectedSupplies.length > 0) {
+                // Convert selected supplies to query string
+                const suppliesQuery = selectedSupplies.map(item =>
+                    `supplyId=${encodeURIComponent(item.id)}&quantity=${item.quantity}`
+                ).join('&');
+
+                // Navigate to booking details page
+                window.location.href = `/booking/supplies-details?${suppliesQuery}`;
+            }
+        });
+    });
+</script>
+</body>
+</html>

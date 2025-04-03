@@ -32,6 +32,10 @@ body {
     color: #333;
 }
 
+.total {
+    width: 100%;
+}
+
 /* 전체 레이아웃 */
 .container {
     display: flex;
@@ -41,101 +45,109 @@ body {
 /* 좌측 사이드바 */
 .sidebar {
     width: 250px;
-    background-color: #f3f7fb;
+    background-color: white;
     padding: 20px 0;
-    border-right: 1px solid #e5e5e5;
-    flex-shrink: 0;
+    border-right: 1px solid #e0e0e0;
 }
 
-.total {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-#documentForm {
-    width: 100%;
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.create-button {
-    background-color: #4a90e2;
+.add-button {
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 0 15px 20px;
-    width: calc(100% - 30px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 4px;
+    width: 90%;
+    margin: 0 auto 20px;
+    display: block;
     cursor: pointer;
     font-size: 14px;
 }
 
-.create-button i {
+.add-button i {
     margin-right: 5px;
 }
 
-.create-button:hover {
-    background-color: #3a80d2;
+.menu {
+    list-style: none;
 }
 
-/* 메뉴 스타일 */
-.menu-section {
-    margin-bottom: 20px;
+.menu > li {
+    cursor: pointer;
+    color: #555;
 }
 
-.menu-header {
+.menu > li > i,
+.dropdown-header > i:first-child {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.menu > li:not(.dropdown) {
+    padding: 12px 20px;
     display: flex;
     align-items: center;
-    padding: 10px 15px;
-    color: #333;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
 }
 
-.menu-header i {
-    margin-right: 8px;
+/* 드롭다운 메뉴 스타일 */
+.dropdown {
+    position: relative;
 }
 
-.menu-header:hover {
-    background-color: #e6f0fb;
-}
-
-.menu-items {
-    padding-left: 15px;
-}
-
-.menu-item {
+.dropdown-header {
+    padding: 12px 20px;
     display: flex;
     align-items: center;
-    padding: 8px 10px 8px 25px;
-    color: #333;
-    font-size: 14px;
-    cursor: pointer;
 }
 
-.menu-item:hover {
-    background-color: #e6f0fb;
+.dropdown.active .dropdown-header {
+    background-color: #e6f7ee;
+    color: #009688;
+    border-left: 3px solid #009688;
 }
 
-.menu-item.active {
-    background-color: #e6f0fb;
-    color: #4a90e2;
-    font-weight: 500;
+.dropdown-icon {
+    transition: transform 0.3s ease;
+    margin-right: 8px !important;
 }
 
-.menu-item i {
-    margin-right: 8px;
-    width: 18px;
+.dropdown.open .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    list-style: none;
+    background-color: #f5f5f5;
+}
+
+.dropdown.open .submenu {
+    max-height: 200px;
+}
+
+.submenu li {
+    padding: 10px 20px 10px 45px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.submenu li:hover {
+    background-color: #e8e8e8;
+}
+
+.submenu li i {
+    margin-right: 10px;
+    width: 20px;
     text-align: center;
     color: #666;
+}
+
+.submenu a {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* 메인 콘텐츠 영역 */
@@ -159,15 +171,14 @@ body {
     background-color: #f5f5f5;
 }
 
-
-.main-container{
-    width: 100%;
+.small-button {
+    padding: 3px 8px;
+    font-size: 12px;
 }
 
 /* 양식 스타일 */
 .form-section {
     margin-bottom: 20px;
-    width: 100%;
 }
 
 .form-header {
@@ -180,19 +191,70 @@ body {
     display: flex;
     margin-bottom: 10px;
     align-items: center;
-    width: 100%;
 }
 
 .form-label {
     width: 100px;
     color: #555;
     font-size: 14px;
-    flex-shrink: 0;
 }
 
 .form-input {
     flex: 1;
     padding: 5px 10px;
+}
+
+/* 날짜 선택 영역 */
+.date-selection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.date-input {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 150px;
+}
+
+.date-select, .time-select {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 3px;
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.remove-button:hover {
+    color: #f44336;
+}
+
+/* 사유 영역 */
+.reason-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
 }
 
 /* 셀렉트 박스 스타일 */
@@ -209,8 +271,8 @@ select {
 
 /* 결재선 영역 */
 .approval-container {
-    width: 100%;
-    margin: 15px 0;
+    max-width: 800px;
+    margin: 0 auto;
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
@@ -228,12 +290,12 @@ select {
     padding: 12px 15px;
     font-weight: bold;
     border: 1px solid #ddd;
-    text-align: center; /* 텍스트 가운데 정렬 */
+    text-align: center;
     margin-bottom: 10px;
 }
 
 .approval-header-cell {
-    text-align: center; /* 헤더 셀도 가운데 정렬 */
+    text-align: center;
 }
 
 .approval-body {
@@ -253,7 +315,6 @@ select {
     justify-content: center;
     align-items: center;
     margin: 0 5px;
-    min-width: 120px;
 }
 
 .approval-body-cell:first-child {
@@ -277,7 +338,7 @@ select {
 .approval-stamp {
     width: 60px;
     height: 60px;
-    border: 2px solid #5858FFFF;
+    border: 2px solid #5858FF;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -309,49 +370,15 @@ select {
     border-top: 1px solid #eee;
 }
 
-/* 메인 콘텐츠 영역 */
+/* 첨부파일 영역 */
 .main2-contents {
-    width: 100%;
-    padding: 20px 0;
+    flex: 1;
+    padding: 20px;
     background-color: #fff;
 }
 
-/* 폼 스타일 */
-.form-contents {
-    margin-bottom: 25px;
-    width: 100%;
-}
-
-.contents-label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
-}
-
-.label-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.label-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    min-height: 200px;
-    resize: vertical;
-    font-size: 14px;
-}
-
-/* 첨부파일 영역 */
 .attachment-section {
     margin-bottom: 20px;
-    width: 100%;
 }
 
 .attachment-label {
@@ -403,6 +430,7 @@ select {
     overflow: auto;
     background-color: rgba(0,0,0,0.5);
 }
+
 /* 모달 컨텐츠 */
 .modal-content {
     background-color: #fff;
@@ -413,6 +441,7 @@ select {
     position: relative;
     border-radius: 5px;
 }
+
 /* 닫기 버튼 */
 .close {
     color: #aaa;
@@ -423,6 +452,7 @@ select {
     font-weight: bold;
     cursor: pointer;
 }
+
 .employee-list {
     list-style: none;
     padding: 0;
@@ -431,35 +461,162 @@ select {
     overflow-y: auto;
     border: 1px solid #ddd;
 }
+
 .employee-list li {
     padding: 10px;
     border-bottom: 1px solid #eee;
     cursor: pointer;
 }
+
 .employee-list li:hover {
     background-color: #f2f2f2;
 }
+
 .selected {
     background-color: #e0f7fa;
 }
 
-/* 수정된 부분: 중첩된 컨테이너 문제 해결 */
-.container .container {
-    display: block;
-    width: 100%;
+.date-selection {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* 필요시 줄바꿈 허용 */
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
-/* 폼 제출 버튼 영역 */
-.form-row button[type="submit"] {
-    margin-top: 20px;
-    background-color: #4a90e2;
-    color: white;
-    padding: 10px 20px;
-    border: none;
+/* 라디오 버튼 그룹 스타일 조정 */
+.radio-group {
+    min-width: 100px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 5px;
+}
+
+.radio-group label {
+    margin-right: 15px;
+}
+
+/* 시간 컨트롤 영역 스타일 수정 */
+.time-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 요소 간 간격 */
+    flex-wrap: wrap; /* 필요시 줄바꿈 */
+    margin-right: 20px;
+}
+
+/* select 박스와 텍스트 간격 조정 */
+.time-select {
+    margin-right: 5px;
+    min-width: 60px; /* 최소 너비 설정 */
+}
+
+/* 텍스트 요소 간격 조정 */
+.time-controls span {
+    margin: 0 5px;
+    white-space: nowrap;
+}
+
+/* 날짜 입력 필드 스타일 */
+.date-input {
+    cursor: pointer;
+    background-color: #fff;
+    min-width: 150px;
+    margin-right: 10px;
+}
+
+/* 삭제 버튼 위치 조정 */
+.remove-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+
+/* 달력 스타일 조정 */
+.ui-datepicker {
+    font-size: 12px;
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ddd;
     border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    z-index: 1000 !important;
+}
+
+.ui-datepicker-header {
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    padding: 8px;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    font-weight: bold;
+    margin: 0 30px;
+}
+
+.ui-datepicker-prev, .ui-datepicker-next {
+    position: absolute;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
     cursor: pointer;
 }
 
-.form-row button[type="submit"]:hover {
-    background-color: #3a80d2;
+.ui-datepicker-prev {
+    left: 8px;
+}
+
+.ui-datepicker-next {
+    right: 8px;
+}
+
+.ui-datepicker-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ui-datepicker-calendar th {
+    padding: 5px;
+    text-align: center;
+    font-weight: normal;
+    border: none;
+}
+
+.ui-datepicker-calendar td {
+    padding: 2px;
+    text-align: center;
+}
+
+.ui-datepicker-calendar a {
+    display: block;
+    padding: 5px;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 4px;
+    color: #333;
+}
+
+.ui-datepicker-calendar .ui-state-default {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+}
+
+.ui-datepicker-calendar .ui-state-active {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.ui-datepicker-calendar .ui-state-hover {
+    background-color: #e9f2ff;
+    border: 1px solid #4a90e2;
 }
