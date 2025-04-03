@@ -36,12 +36,9 @@
     </div>
 
     <div class="total">
+        <form id="documentForm" action="/leaves/submitLeave" method="post" enctype="multipart/form-data">
         <!-- 메인 콘텐츠 영역 -->
         <div class="main-content">
-            <div class="add-btn" style="margin-bottom: 20px">
-                <button class="button">기안하기</button>
-            </div>
-
             <div class="form-section">
                 <h3 class="form-header">기본설정</h3>
 
@@ -51,7 +48,14 @@
                         휴가신청서
                     </div>
                     <div class="form-label" style="margin-left: 20px;">작성자</div>
-                    <div class="form-input">하이웍스산업 대표이사</div>
+                    <div class="form-input">
+                        <span id="writerInfo"
+                              th:attr="data-writernum=${employee.empNum}, data-writerposition=${employee.positionTitle}, data-writername=${employee.name}"
+                              th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                        </span>
+                        <input type="hidden" name="drafterId" th:value="${employee.empNum}">
+                        <input type="hidden" name="empId" th:value="${employee.id}">
+                    </div>
                 </div>
 
                 <div class="form-row">
@@ -78,11 +82,10 @@
                         <div class="approval-header">
                             신청
                         </div>
-
                         <div class="approval-body">
                             <div class="approval-body-cell">
                                 <div class="approval-stamp">신청</div>
-                                <div class="approval-name">하이웍스산업 대표이사</div>
+                                <div class="approval-name" th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
                                 <div class="approval-date">2025.04.01</div>
                             </div>
                         </div>
@@ -162,7 +165,7 @@
                 <div class="form-row">
                     <div class="form-label">사유</div>
                     <div class="form-input">
-                        <textarea class="reason-textarea" placeholder="휴가 사유를 입력하세요"></textarea>
+                        <textarea class="reason-textarea" name="reason" placeholder="휴가 사유를 입력하세요"></textarea>
                     </div>
                 </div>
             </div>
@@ -181,6 +184,10 @@
                 </div>
             </div>
         </div>
+        <div class="add-btn" style="margin-bottom: 20px">
+            <button type="submit" class="button">기안하기</button>
+        </div>
+    </form>
     </div>
 </div>
 
@@ -190,10 +197,10 @@
         <span class="close">&times;</span>
         <h3>사원 선택</h3>
         <ul class="employee-list">
-            <li data-empid="1">이사 홍길동</li>
-            <li data-empid="2">부장 김철수</li>
-            <li data-empid="3">차장 이영희</li>
-            <li data-empid="4">과장 박지성</li>
+            <li th:each="emp : ${empList}"
+                th:data-empid="${emp.empNum}"
+                th:text="${emp.positionTitle} + ' ' + ${emp.name}">
+            </li>
         </ul>
         <button id="saveApprovalLine" class="button">선택 완료</button>
     </div>
