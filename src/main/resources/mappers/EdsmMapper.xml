@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="Edsm">
 
+    <!-- 전자결재문서 삽입 (문서 테이블) -->
     <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO groupware.edsm_document
-            (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date ,status)
+        (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date, status)
         VALUES
-            (#{edsmFormId}, #{title}, #{content},#{retentionPeriod},#{securityGrade}, #{drafterId}, current_date,null,'진행')
+        (#{edsmFormId}, #{title}, #{content}, #{retentionPeriod}, #{securityGrade}, #{drafterId}, current_date, null, '진행')
+        <selectKey order="AFTER" keyProperty="id" resultType="int">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
     </insert>
 
-
+    <!-- 결재라인 삽입 (결재라인 테이블) -->
+    <insert id="InsertByBcApproval" parameterType="com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO">
+        INSERT INTO groupware.approval_line
+        (document_id, drafter_id, approver_id, approval_no, status, approved_at, reason)
+        VALUES
+            (#{documentId}, #{drafterId}, #{approverId}, #{approvalNo}, '대기', current_date, null)
+    </insert>
 
 </mapper>
-
