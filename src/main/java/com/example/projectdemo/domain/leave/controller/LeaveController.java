@@ -1,10 +1,11 @@
 package com.example.projectdemo.domain.leave.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
-import com.example.projectdemo.domain.edsm.dto.EdsmBcDTO;
+import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import com.example.projectdemo.domain.leave.service.LeavesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,8 @@ public class LeaveController {
             return "redirect:/attend/main";
         }
 
+        int canUseLeaves = employee.getTotalLeave()-employee.getUsedLeave();
+
         List<EmployeesDTO> empAllList = employeeMapper.selectEmpAll();
         List<EmployeesDTO> empList = new ArrayList<>();
         for(int i = 0; empAllList.size()>i; i++) {
@@ -63,18 +66,56 @@ public class LeaveController {
 
         model.addAttribute("empList", empList);
         model.addAttribute("employee", employee);
+        model.addAttribute("canUseLeaves", canUseLeaves);
 
         return "/leave/leavesForm";
     }
 
+
+    @RequestMapping("/leavesHistory")
+    public String leavesHistory(Model model, HttpServletRequest request) {
+
+        int empId = (int)request.getAttribute("id");
+        String drafterId = (String)request.getAttribute("empNum");
+        System.out.println("drafterId: " + drafterId);
+        System.out.println("empId: " + empId);
+        if (empId == 0) { //예외처리
+            return "redirect:/auth/login";
+        }
+        EmployeesDTO employee = employeeMapper.findById(empId);
+        if (employee == null) { //예외처리
+            return "redirect:/auth/login";
+        }
+
+        int canUseLeaves = employee.getTotalLeave()-employee.getUsedLeave();
+
+        LeavesDTO leavesdto = new LeavesDTO();
+        String leavesStatus = leavesService.selectByStatus(drafterId, leavesdto.getEdsmDocId());
+
+        leavesdto.setStatus(leavesStatus);
+
+        List<LeavesDTO> leavesList = leavesService.selectAllLeaves(empId);
+
+        model.addAttribute("leavesList", leavesList);
+        model.addAttribute("employee", employee);
+        model.addAttribute("canUseLeaves", canUseLeaves);
+
+        return "/attend/attendLeavesHistory";
+    }
+
     @PostMapping("/submitLeave")
     public String submitLeave(
-            @RequestParam("reason") String content,
             @RequestParam("drafterId") String drafterId,
+            @RequestParam("empId") String empId,
+            @RequestParam("leaveStartDate[]") List<String> leaveStartDates,
+            @RequestParam("leaveEndDate[]") List<String> leaveEndDates,
+            @RequestParam("leaveType[]") List<String> leaveTypes,
+            @RequestParam("leaveHours[]") List<String> leaveHours,
+            @RequestParam("reason") String content,
             HttpServletRequest request,
             Model model) {
 
-        EdsmBcDTO bcdto = new EdsmBcDTO();
+        EdsmBusinessContactDTO bcdto = new EdsmBusinessContactDTO();
 
         String empNum = (String)request.getAttribute("empNum");
 
@@ -88,14 +129,31 @@ public class LeaveController {
         if (employee == null) { //예외처리
             return "redirect:/attend/main";
         }
+
         model.addAttribute("employee", employee);
-        bcdto.setContent(content);//기안 문서 사유 내용
-        bcdto.setDrafterId(drafterId);//기안자 사원번호
+        bcdto.setContent(content); // 기안 문서 사유 내용
+        bcdto.setDrafterId(drafterId); // 기안자 사원번호
 
-       leavesService.insertByLeaves(bcdto);
+        int edsmDocId = leavesService.insertByEdsm(bcdto);
 
-       System.out.println(bcdto);
+        for (int i = 0; i < leaveStartDates.size(); i++) {
+            LeavesDTO leavesdto = new LeavesDTO();
 
-       return "redirect:/attend/leavesHistory";
+            leavesdto.setEmpId(drafterId);
+            leavesdto.setStartDate(leaveStartDates.get(i));
+            leavesdto.setEndDate(leaveEndDates.get(i));
+            String leaveTypeValue = leaveTypes.get(i).replace("[", "").replace("]", "");
+            leavesdto.setLeaveType(leaveTypeValue);
+            leavesdto.setReason(content);
+            leavesdto.setEdsmDocId(edsmDocId);
+
+            leavesService.insertByLeaves(leavesdto);
+        }
+
+        return "redirect:/leaves/leavesHistory";
     }
+
+
+
+
 }

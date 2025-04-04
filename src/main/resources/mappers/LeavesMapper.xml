@@ -3,11 +3,30 @@
 
 <mapper namespace="com.example.projectdemo.domain.leave.dao.LeavesDAO">
 
-    <insert id="insertByLeaves" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertByEdsm" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO edsm_document
         (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date ,status)
         VALUES
-            (4, '휴가신청서', #{content},'3년','B등급', #{drafterId}, current_date,null,'진행')
+            ('1004', '휴가신청서', #{content},'3년','B등급', #{drafterId}, current_date,null,'진행')
+
+        <selectKey order="AFTER" keyProperty="id" resultType="int">
+            select LAST_INSERT_ID()
+        </selectKey>
     </insert>
+
+    <insert id="insertByLeaves" parameterType="com.example.projectdemo.domain.leave.dto.LeavesDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO leaves
+        (emp_id, edsm_document_id, leave_type, start_date, end_date, status ,reason, created_at)
+        VALUES
+            (#{empId}, #{edsmDocId}, #{leaveType}, #{startDate},#{endDate},'진행',#{reason},current_timestamp)
+    </insert>
+
+    <select id="selectByStatus" resultType="java.lang.String">
+        select status from edsm_document where edsm_form_id = '1004' and drafter_id = #{drafterId} and id = #{edsmDocId}
+    </select>
+
+    <select id="selectAllLeaves" resultType="com.example.projectdemo.domain.leave.dto.LeavesDTO">
+        select * from leaves where emp_id = #{empId}
+    </select>
 
 </mapper>

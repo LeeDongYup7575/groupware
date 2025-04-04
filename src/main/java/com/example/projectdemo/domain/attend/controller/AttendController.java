@@ -75,12 +75,6 @@ public class AttendController {
         return "/attend/attendWorkSchedule";
     }
 
-
-    @RequestMapping("/leavesHistory")
-    public String leavesHistory(Model model) {
-        return "/attend/attendLeavesHistory";
-    }
-
     @RequestMapping("/annualStatistics")
     public String annualStatistics(Model model, HttpServletRequest request,
                                    @RequestParam(required = false) Integer year) {
