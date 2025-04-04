@@ -101,7 +101,7 @@
     <div class="dashboard-row">
       <div class="dashboard-section section-left">
         <h4 class="card-title">근태관리</h4>
-        <p class="date-info">2025년 03월 26일 (화) 10:56:43</p>
+        <p class="date-info" th:text="${formattedDate}">2025년 03월 26일 (화) 10:56:43</p>
 
         <div class="attendance-info">
           <div class="attendance-row">
@@ -118,7 +118,6 @@
 
       <div class="dashboard-section section-right">
         <h4 class="card-title">회의실 예약 현황</h4>
-
         <div class="timetable-container">
           <table class="timetable">
             <thead>
@@ -130,38 +129,25 @@
               <th>12:00</th>
               <th>13:00</th>
               <th>14:00</th>
+              <th>15:00</th>
+              <th>16:00</th>
+              <th>17:00</th>
+              <th>18:00</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>1번 회의실</td>
+            <!-- 회의실별 예약 현황 표시 -->
+            <tr th:each="roomNumber : ${#numbers.sequence(1, 4)}">
+              <td th:text="${'회의실'+roomNumber}">회의실</td>
               <td colspan="6" style="position: relative;">
-                <div class="reservation-bar" style="width: 25%; left: 50%; background-color: #90caf9;">
-                  오후 10:30 - 12:30
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>2번 회의실</td>
-              <td colspan="6" style="position: relative;">
-                <div class="reservation-bar" style="width: 25%; left: 0; background-color: #a5d6a7;">
-                  오전 09:30 - 11:30
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>3번 회의실</td>
-              <td colspan="6" style="position: relative;">
-                <div class="reservation-bar" style="width: 33%; left: 17%; background-color: #90caf9;">
-                  오전 10:00 - 12:00
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>4번 회의실</td>
-              <td colspan="6" style="position: relative;">
-                <div class="reservation-bar" style="width: 33%; left: 0; background-color: #fff59d;">
-                  오전 09:00 - 11:00
+                <!-- 해당 회의실의 예약만 필터링하여 표시 -->
+                <div th:each="booking : ${meetingRoomBookings}"
+                     th:if="${booking.roomId == roomNumber}"
+                     class="reservation-bar"
+                     th:style="${'width: ' + bookingUtils.calculateWidth(booking) + '%; left: ' + bookingUtils.calculatePosition(booking) + '%; background-color: ' + bookingUtils.getBookingColor(booking)}">
+                  <span th:text="${@stringUtils.removeFirstNChars(bookingUtils.formatBookingTime(booking), 3)}">예약 시간</span>
+
+
                 </div>
               </td>
             </tr>
@@ -256,6 +242,17 @@
           </div>
         </div>
       </div>
+      <!-- 프로필 및 게시판 섹션 -->
+<!--      <div class="profile-stats">-->
+<!--        <div class="stat-item">-->
+<!--          <div class="stat-label">결재할 문서</div>-->
+<!--          <div class="stat-value" th:text="${pendingApprovals != null ? pendingApprovals : '0'}">6</div>-->
+<!--        </div>-->
+<!--        <div class="stat-item">-->
+<!--          <div class="stat-label">내 예약/대여 현황</div>-->
+<!--          <div class="stat-value" th:text="${myBookingsCount}">1</div>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
   </div>
 </div>
