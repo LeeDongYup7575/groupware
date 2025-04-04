@@ -70,7 +70,7 @@ public class LeaveController {
     @PostMapping("/submitLeave")
     public String submitLeave(
             @RequestParam("reason") String content,
-            @RequestParam("drafterId") int drafterId,
+            @RequestParam("drafterId") String drafterId,
             HttpServletRequest request,
             Model model) {
 
