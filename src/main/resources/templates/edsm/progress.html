@@ -89,13 +89,12 @@
         </thead>
         <tbody>
         <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
+            <td th:text="${doc.id}"></td>
             <td th:text="${doc.title}"></td>
             <td th:text="${doc.drafterName}"></td>
             <td th:text="${doc.drafterDate}"></td>
             <td th:text="${doc.edsmFormId}"></td>
             <td th:text="${doc.status}"></td>
-
         </tr>
         </tbody>
     </table>
@@ -103,9 +102,6 @@
 
 
 <script>
-    $("#wait").on("click", function () {
-        location.href = "/edsm/wait";
-    });
 
     $("#main").on("click", function () {
         location.href = "/edsm/main";
@@ -120,7 +116,7 @@
     });
 
     $("#create-button").on("click", function () {
-        location.href = "/edsm/create";
+        location.href = "/edsmForm/input";
     });
 </script>
 </body>

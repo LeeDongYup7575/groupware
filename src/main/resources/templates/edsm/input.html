@@ -82,19 +82,22 @@
             <h3 class="form-header">기본설정</h3>
 
             <div class="form-row">
+                <!-- 문서 양식 종류 -->
                 <div class="form-label">문서 종류</div>
-                <div class="form-input">
-                    <select>
-                        <option>공통</option>
-                    </select>
-                    <select id="formSelect">
-                        <option value="">양식선택</option>
-                        <option value="bc">업무연락</option>
-                        <option value="cdv">지출결의서</option>
-                        <option value="loa">품의서</option>
 
+                <div class="form-input">
+                    <select id="documentType" name="documentType">
+                        <option>선택</option>
+                        <option value="1001" th:selected="${documentType == 'BusinessContact'}">업무연락</option>
+                        <option value="1002" th:selected="${documentType == 'cashDisbuVoucher'}">지출결의서</option>
+                        <option value="1003" th:selected="${documentType == 'letterOfApproval'}">품의서</option>
                     </select>
                 </div>
+                <!-- 문서 양식 번호
+                1001 = 업무연락
+                1002 = 지출결의서
+                1003 = 품의서
+                -->
                 <div class="form-label" style="margin-left: 20px;">작성자</div>
                 <div class="form-input" th:text="${name}"></div>
             </div>
@@ -127,9 +130,6 @@
 
 
 <script>
-    $("#wait").on("click", function () {
-        location.href = "/edsm/wait";
-    });
 
     $("#main").on("click", function () {
         location.href = "/edsm/main";
@@ -144,25 +144,16 @@
     });
 
     $("#create-button").on("click", function () {
-        location.href = "/edsm/create";
+        location.href = "/edsmForm/input";
     });
 
 
-    //form 양식 값 가져오기
-    $("#formSelect").on("change", function() {
+    // form select 변경 이벤트
+    $("#documentType").on("change", function() {
         var selectedValue = $(this).val();
+
         console.log("선택된 값:", selectedValue);
-        if(selectedValue == "bc"){
-            location.href = "/edsm/bc";
-        }else if(selectedValue == "cdv"){
-            location.href = "/edsm/cdv";
-        }else if(selectedValue == "loa"){
-            location.href = "/edsm/loa";
-        }else{
-            alert("양식을 확인해주세요");
-        }
-
-
+        location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
     });
 
 

@@ -12,6 +12,13 @@ body {
     line-height: 1.5;
 }
 
+.main-container{
+    margin: 20px;
+    width: 100%;
+
+}
+
+
 /* 헤더 */
 .header {
     display: flex;
@@ -221,8 +228,8 @@ select:hover, select:focus {
 
 /* 결재선 영역 */
 .approval-container {
-    max-width: 800px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 15px 0;
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
@@ -250,7 +257,8 @@ select:hover, select:focus {
 
 .approval-body {
     display: flex;
-    justify-content: space-between;
+    margin: 20px;
+    justify-content: space-evenly;
 }
 
 .approval-body-cell {
@@ -264,6 +272,7 @@ select:hover, select:focus {
     justify-content: center;
     align-items: center;
     margin: 0 5px;
+    min-width: 120px;
 }
 
 .approval-body-cell:first-child {
@@ -279,7 +288,7 @@ select:hover, select:focus {
     font-weight: bold;
 }
 
-.approval-date {
+.approval-message {
     font-size: 12px;
     color: #777;
 }
@@ -292,9 +301,20 @@ select:hover, select:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #5858FFFF;
+    color: #5858ff;
     font-weight: bold;
     transform: rotate(-15deg);
+}
+
+
+.drafter-name {
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.drafter-date {
+    font-size: 12px;
+    color: #777;
 }
 
 /* 입력 필드 스타일 */
@@ -374,19 +394,46 @@ select:hover, select:focus {
 }
 
 /* 파일첨부영역 */
-.upload-box {
-    border: 2px dashed #ddd;
-    padding: 30px;
-    text-align: center;
-    color: #888;
-    border-radius: 4px;
-    margin-top: 10px;
-    transition: border-color 0.2s, background-color 0.2s;
+.attachment-section {
+    margin-bottom: 20px;
+    width: 100%;
 }
 
-.upload-box:hover {
-    border-color: #4a90e2;
-    background-color: #f5faff;
+.attachment-label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.attachment-links {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.attachment-link {
+    color: #4a90e2;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    border-right: 1px solid #ddd;
+    padding-right: 10px;
+}
+
+.attachment-link:last-child {
+    border-right: none;
+}
+
+.attachment-drop-area {
+    border: 1px dashed #ddd;
+    border-radius: 4px;
+    padding: 25px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    background-color: #fafafa;
+    margin-top: 10px;
 }
 
 .form-group {
@@ -453,30 +500,49 @@ select:hover, select:focus {
 }
 
 
-
-/* 반응형 스타일 */
-@media (max-width: 768px) {
-    .container {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #e5e5e5;
-    }
-
-    .form-row {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .form-label {
-        width: 100%;
-        margin-bottom: 5px;
-    }
-
-    .form-input {
-        width: 100%;
-    }
+/* 폼 제출 버튼 영역 */
+.form-row button[type="submit"] {
+    margin-top: 20px;
+    background-color: #4a90e2;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
+
+.form-row button[type="submit"]:hover {
+    background-color: #3a80d2;
+}
+/* 폼 스타일 */
+.form-contents {
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.contents-label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500;
+}
+
+.label-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.label-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 200px;
+    resize: vertical;
+    font-size: 14px;
+}
+
