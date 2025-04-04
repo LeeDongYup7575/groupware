@@ -88,7 +88,7 @@
 
 
       <!-- 실제 폼 시작 -->
-      <form id="documentForm" action="/edsm/submit" method="post" enctype="multipart/form-data">
+      <form id="documentForm" action="/edsmForm/business_submit" method="post" enctype="multipart/form-data">
 
         <!-- 기본설정 영역 -->
         <div class="form-section">
@@ -100,15 +100,16 @@
 
             <div class="form-input">
               <select id="documentType" name="documentType">
-                <option value="1" th:selected="${documentType == 1}">업무연락</option>
-                <option value="cdv" th:selected="${documentType == 'cdv'}">지출결의서</option>
-                <option value="loa" th:selected="${documentType == 'loa'}">품의서</option>
+                <option>선택</option>
+                <option value="1001" th:selected="${documentType == '1001'}">업무연락</option>
+                <option value="1002" th:selected="${documentType == '1002'}">지출결의서</option>
+                <option value="1003" th:selected="${documentType == '1003'}">품의서</option>
               </select>
             </div>
             <!-- 문서 양식 번호
-            1 = 업무연락
-            2 = 지출결의서
-            3 = 품의서
+            1001 = 업무연락
+            1002 = 지출결의서
+            1003 = 품의서
             -->
 
             <!-- 작성자 (서버에서 세팅된 변수 사용- 타임리프문을 이용해서 가져옴) -->
@@ -179,10 +180,23 @@
               <div class="approval-header">신청</div>
               <div class="approval-body">
                 <div class="approval-body-cell">
-                  <div class="drafter-stamp">신청</div>
-                  <div class="drafter-name" th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
-                  <div class="drafter-date">{현재날짜가져오기}</div>
+                  <div class="drafter-stamp" style="
+                      width: 60px;
+                      height: 60px;
+                      border: 2px solid green;
+                      border-radius: 50%;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      color: green;
+                      font-weight: bold;
+                      transform: rotate(-15deg);">신청</div>
+
+                  <div class="drafter-name" style="margin: 5px 0;font-weight: bold;"
+                       th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
+                  <div class="drafter-date" style="font-size: 12px;color: #777;" th:text="${currentTime}"></div>
                 </div>
+
               </div>
             </div>
 
@@ -190,12 +204,15 @@
             <!-- 결재 라인 (모달에서 동적 추가) -->
             <div class="approval-line approval-line-2">
               <div class="approval-header approval-header-2">
-                <div class="approval-header-cell approval-header-cell-2">결재라인</div>
+                <div class="approval-header-cell approval-header-cell-2"></div>
+
               </div>
 
 
               <div class="approval-body approval-body-2">
-                <div class="approval-body-cell approval-body-cell-2">결재라인을 설정해주세요</div>
+                <div class="approval-body-cell approval-body-cell-2" >
+                <div class="approval-message">결재라인을 입력해주세요</div>
+                </div>
               </div>
             </div>
           </div>
@@ -222,16 +239,14 @@
 
 
           <!-- 파일첨부 영역 -->
+          <!-- 파일첨부 영역 -->
           <div class="attachment-section">
-            <label class="attachment-label" for="fileAttachment">첨부</label>
             <div class="attachment-links">
-              <a href="#" class="attachment-link">파일 첨부</a>
-              <a href="#" class="attachment-link">관련문서 첨부</a>
             </div>
+            <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple />
             <div class="attachment-drop-area">
-              여기로 파일을 끌어다 놓으세요
+              첨부파일이 없습니다.
             </div>
-            <input type="file" id="fileAttachment" name="fileAttachment" multiple />
           </div>
         </div>
 
@@ -261,15 +276,22 @@
 
 <script th:inline="javascript">
   $(document).ready(function() {
+    //작성자 정보 전역변수설정
+    //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
+    var drafter = {
+      id: /*[[${employee.empNum}]]*/,
+      position: /*[[${employee.positionTitle}]]*/,
+      name: /*[[${employee.name}]]*/
+    };
+
+
     // 초기화 및 이벤트 바인딩
     var storedValue = [[${bc}]];
     if (storedValue) {
       $("#formSelect").val(storedValue);
     }
 
-    $("#wait").on("click", function () {
-      location.href = "/edsm/wait";
-    });
+
     $("#main").on("click", function () {
       location.href = "/edsm/main";
     });
@@ -280,14 +302,14 @@
       location.href = "/edsm/complete";
     });
     $("#create-button").on("click", function () {
-      location.href = "/edsm/create";
+      location.href = "/edsm/input";
     });
 
     // form select 변경 이벤트
     $("#documentType").on("change", function() {
       var selectedValue = $(this).val();
       console.log("선택된 값:", selectedValue);
-      location.href = "/edsm/" + selectedValue + "?documentType=" + selectedValue;
+      location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
     });
 
     // 결재선 설정 버튼 클릭 시 모달 열기
@@ -310,29 +332,37 @@
       });
     });
 
-    // 선택 완료 버튼 클릭 시 선택된 사원들을 결재라인에 추가
     $("#saveApprovalLine").on("click", function () {
       var selectedEmployees = [];
+
+
+      // 모달에서 선택된 사원들의 정보를 2번 순서부터 추가
       $(".employee-list li.selected").each(function(index) {
-        let order = $(this).attr("data-order");  // 이미 할당된 순서를 사용
+        var order = index + 1;  // 작성자가 1번이므로 2부터 시작
         var approverId = $(this).data("approvernum");
         var approverPosition = $(this).data("approverposition");
         var approverName = $(this).data("approvername");
-        selectedEmployees.push({ approverId: approverId, approvalNo: order, position: approverPosition, name: approverName });
-        console.log("순서:", order, "사원번호:", approverId);
+
+        selectedEmployees.push({
+          approverId: approverId,
+          approvalNo: order,
+          position: approverPosition,
+          name: approverName,
+          status: '' // 기본 상태를 필요에 따라 지정 (예: 대기)
+        });
       });
 
-      // 선택된 사원 정보를 hidden 필드에 JSON 문자열로 저장 (서버에 전달)
+      // 선택된 사원 정보를 hidden 필드에 JSON 문자열로 저장
       $("#approvalLine").val(JSON.stringify(selectedEmployees));
 
-      // 결재라인 영역 업데이트 (선택된 순서대로 왼쪽부터 표시)
+      // 결재라인 영역 업데이트 (작성자 포함)
       var approvalBody = $(".approval-line-2 .approval-body-2");
       approvalBody.empty();
       selectedEmployees.forEach(function(emp) {
-        var cell = '<div class="approval-body-cell-2" data-order="'+ emp.order +'">' +
-                '<div class="approval-stamp">' + "{대기,반려,승인}" + '</div>' +
+        var cell = '<div class="approval-body-cell-2" data-order="'+ emp.approvalNo +'">' +
+                '<div class="approval-stamp">' + (emp.status ? emp.status : "대기") + '</div>' +
                 '<div class="approval-name">' + emp.position + ' ' + emp.name + '</div>' +
-                '<div class="approval-date">2025.04.01</div>' +
+                '<div class="approval-date"></div>' +
                 '</div>';
         approvalBody.append(cell);
       });

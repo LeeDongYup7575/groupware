@@ -4,11 +4,11 @@
 <mapper namespace="Edsm">
 
     <!-- 전자결재문서 삽입 (문서 테이블) -->
-    <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO" useGeneratedKeys="true" keyProperty="id">
+    <insert id="InsertByEd" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO groupware.edsm_document
         (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date, status)
         VALUES
-        (#{edsmFormId}, #{title}, #{content}, #{retentionPeriod}, #{securityGrade}, #{drafterId}, current_date, null, '진행')
+        (#{edsmFormId}, #{title}, #{content}, #{retentionPeriod}, #{securityGrade}, #{drafterId}, CURRENT_TIMESTAMP, null, #{status})
         <selectKey order="AFTER" keyProperty="id" resultType="int">
             SELECT LAST_INSERT_ID()
         </selectKey>
@@ -19,12 +19,12 @@
         INSERT INTO groupware.approval_line
         (document_id, drafter_id, approver_id, approval_no, status, approved_at, reason)
         VALUES
-            (#{documentId}, #{drafterId}, #{approverId}, #{approvalNo}, #{status}, current_date, null)
+            (#{documentId}, #{drafterId}, #{approverId}, #{approvalNo}, #{status}, CURRENT_TIMESTAMP, null)
     </insert>
 
 
     <!-- 나의 모든 문서 확인-->
-    <select id="SelectByAllDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmBcDTO">
+    <select id="SelectByAllDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
         SELECT
             ed.id,
             ed.edsm_form_id AS edsmFormId,
@@ -42,4 +42,13 @@
         WHERE ed.status = '진행'
           AND ed.drafter_id = #{empNum}
     </select>
+
+
+
+    <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO">
+        INSERT INTO groupware.business_contact
+        (edsm_document_id, drafter_id, title, content)
+        VALUES
+            (#{edsmDocumentId}, #{drafterId}, #{title}, #{content})
+    </insert>
 </mapper>
