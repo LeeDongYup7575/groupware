@@ -142,13 +142,59 @@
         </div>
 
         <div class="form-group">
-            <label for="start-time">시작 시간</label>
-            <input type="time" id="start-time" required step="600">
+            <label for="start-time-hour">시작 시간</label>
+            <div style="display: flex; gap: 10px;">
+                <select id="start-time-hour" style="flex: 1;">
+                    <option value="" disabled selected>시</option>
+                    <option value="09">09시</option>
+                    <option value="10">10시</option>
+                    <option value="11">11시</option>
+                    <option value="12">12시</option>
+                    <option value="13">13시</option>
+                    <option value="14">14시</option>
+                    <option value="15">15시</option>
+                    <option value="16">16시</option>
+                    <option value="17">17시</option>
+                </select>
+                <select id="start-time-minute" style="flex: 1;">
+                    <option value="" disabled selected>분</option>
+                    <option value="00">00분</option>
+                    <option value="10">10분</option>
+                    <option value="20">20분</option>
+                    <option value="30">30분</option>
+                    <option value="40">40분</option>
+                    <option value="50">50분</option>
+                </select>
+                <input type="hidden" id="start-time" required>
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="end-time">종료 시간</label>
-            <input type="time" id="end-time" required step="600">
+            <label for="end-time-hour">종료 시간</label>
+            <div style="display: flex; gap: 10px;">
+                <select id="end-time-hour" style="flex: 1;">
+                    <option value="" disabled selected>시</option>
+                    <option value="10">10시</option>
+                    <option value="11">11시</option>
+                    <option value="12">12시</option>
+                    <option value="13">13시</option>
+                    <option value="14">14시</option>
+                    <option value="15">15시</option>
+                    <option value="16">16시</option>
+                    <option value="17">17시</option>
+                    <option value="18">18시</option>
+                </select>
+                <select id="end-time-minute" style="flex: 1;">
+                    <option value="" disabled selected>분</option>
+                    <option value="00">00분</option>
+                    <option value="10">10분</option>
+                    <option value="20">20분</option>
+                    <option value="30">30분</option>
+                    <option value="40">40분</option>
+                    <option value="50">50분</option>
+                </select>
+                <input type="hidden" id="end-time" required>
+            </div>
         </div>
 
         <div class="form-group">
@@ -172,6 +218,102 @@
         const successMessage = document.getElementById('success-message');
         const checkAvailabilityBtn = document.getElementById('check-availability');
         const submitBookingBtn = document.getElementById('submit-booking');
+
+        // 시간 드롭다운 이벤트 리스너 추가
+        document.getElementById('start-time-hour').addEventListener('change', updateStartTime);
+        document.getElementById('start-time-minute').addEventListener('change', updateStartTime);
+        document.getElementById('end-time-hour').addEventListener('change', updateEndTime);
+        document.getElementById('end-time-minute').addEventListener('change', updateEndTime);
+
+        // 시작 시간 업데이트 함수
+        function updateStartTime() {
+            const hour = document.getElementById('start-time-hour').value;
+            const minute = document.getElementById('start-time-minute').value;
+
+            if (hour && minute) {
+                document.getElementById('start-time').value = `${hour}:${minute}`;
+                resetAvailabilityCheck();
+                updateEndTimeOptions();
+            }
+        }
+
+        // 종료 시간 업데이트 함수
+        function updateEndTime() {
+            const hour = document.getElementById('end-time-hour').value;
+            const minute = document.getElementById('end-time-minute').value;
+
+            if (hour && minute) {
+                document.getElementById('end-time').value = `${hour}:${minute}`;
+                resetAvailabilityCheck();
+            }
+        }
+
+        // 종료 시간 옵션 업데이트 (최소 1시간 이후)
+        function updateEndTimeOptions() {
+            const startHour = document.getElementById('start-time-hour').value;
+            const startMinute = document.getElementById('start-time-minute').value;
+
+            if (!startHour || !startMinute) return;
+
+            const endHourSelect = document.getElementById('end-time-hour');
+            const endMinuteSelect = document.getElementById('end-time-minute');
+
+            // 모든 옵션 초기화
+            for (let i = 0; i < endHourSelect.options.length; i++) {
+                endHourSelect.options[i].disabled = false;
+            }
+
+            for (let i = 0; i < endMinuteSelect.options.length; i++) {
+                endMinuteSelect.options[i].disabled = false;
+            }
+
+            // 시작 시간보다 이전 시간 비활성화
+            const startHourNum = parseInt(startHour);
+
+            for (let i = 1; i < endHourSelect.options.length; i++) {
+                const hourValue = endHourSelect.options[i].value;
+                if (hourValue && parseInt(hourValue) < startHourNum) {
+                    endHourSelect.options[i].disabled = true;
+                }
+            }
+
+            // 최소 1시간 보장
+            const minEndTime = new Date();
+            minEndTime.setHours(startHourNum, parseInt(startMinute), 0, 0);
+            minEndTime.setHours(minEndTime.getHours() + 1); // 1시간 추가
+
+            const minEndHour = minEndTime.getHours().toString().padStart(2, '0');
+            const minEndMinute = minEndTime.getMinutes().toString().padStart(2, '0');
+
+            // 같은 시간대의 경우, 최소 1시간 이상 차이나는 분만 선택 가능하도록
+            for (let i = 1; i < endHourSelect.options.length; i++) {
+                const hourValue = endHourSelect.options[i].value;
+                if (hourValue && parseInt(hourValue) < parseInt(minEndHour)) {
+                    endHourSelect.options[i].disabled = true;
+                }
+            }
+
+            if (endHourSelect.value === startHour || (parseInt(endHourSelect.value) === parseInt(minEndHour))) {
+                for (let i = 1; i < endMinuteSelect.options.length; i++) {
+                    const minuteValue = endMinuteSelect.options[i].value;
+                    if (minuteValue && parseInt(minuteValue) < parseInt(minEndMinute)) {
+                        endMinuteSelect.options[i].disabled = true;
+                    }
+                }
+            }
+
+            // 현재 선택된 값이 무효하면 리셋
+            if (endHourSelect.selectedIndex > 0 && endHourSelect.options[endHourSelect.selectedIndex].disabled) {
+                endHourSelect.selectedIndex = 0;
+            }
+
+            if (endMinuteSelect.selectedIndex > 0 && endMinuteSelect.options[endMinuteSelect.selectedIndex].disabled) {
+                endMinuteSelect.selectedIndex = 0;
+            }
+
+            // 시간 입력값 업데이트
+            updateEndTime();
+        }
 
         // 뒤로가기 버튼
         backBtn.addEventListener('click', function() {
@@ -238,14 +380,6 @@
 
         // 시간 입력 필드 변경 감지
         document.getElementById('booking-date').addEventListener('change', resetAvailabilityCheck);
-        document.getElementById('start-time').addEventListener('change', function() {
-            formatTimeToTenMinuteIntervals(this);
-            resetAvailabilityCheck();
-        });
-        document.getElementById('end-time').addEventListener('change', function() {
-            formatTimeToTenMinuteIntervals(this);
-            resetAvailabilityCheck();
-        });
 
         // 예약 가능 여부 확인 상태 초기화
         function resetAvailabilityCheck() {
@@ -253,23 +387,6 @@
             successMessage.style.display = 'none';
             checkAvailabilityBtn.style.display = 'block';
             submitBookingBtn.style.display = 'none';
-        }
-
-        // 10분 단위로 시간 맞추기
-        function formatTimeToTenMinuteIntervals(inputElement) {
-            const timeValue = inputElement.value;
-            if (!timeValue) return;
-
-            const [hours, minutes] = timeValue.split(':').map(Number);
-            const roundedMinutes = Math.round(minutes / 10) * 10;
-            const formattedHours = hours.toString().padStart(2, '0');
-            const formattedMinutes = (roundedMinutes === 60 ? 0 : roundedMinutes).toString().padStart(2, '0');
-
-            // 분이 60이 되면 시간 증가
-            const newHours = roundedMinutes === 60 ? (hours + 1) % 24 : hours;
-            const formattedHoursAdjusted = newHours.toString().padStart(2, '0');
-
-            inputElement.value = `${formattedHoursAdjusted}:${formattedMinutes}`;
         }
 
         // 시간 유효성 검증 함수
@@ -304,28 +421,13 @@
                 return false;
             }
 
-            // 최소 예약 시간 검증 (예: 30분)
-            const minDuration = 30; // 분 단위
+            // 최소 예약 시간 검증 (1시간)
+            const minDuration = 60; // 분 단위
             const durationMs = end.getTime() - start.getTime();
             const durationMinutes = durationMs / (1000 * 60);
 
             if (durationMinutes < minDuration) {
                 alert(`최소 예약 시간은 ${minDuration}분입니다.`);
-                return false;
-            }
-
-            // 업무 시간 확인 (예: 9:00 ~ 18:00)
-            const workStart = new Date(`${bookingDate}T09:00`);
-            const workEnd = new Date(`${bookingDate}T18:00`);
-
-            if (start < workStart || end > workEnd) {
-                alert('예약은 업무 시간 내에만 가능합니다 (9:00 ~ 18:00).');
-                return false;
-            }
-
-            // 10분 단위 시간 검증
-            if (start.getMinutes() % 10 !== 0 || end.getMinutes() % 10 !== 0) {
-                alert('시간은 10분 단위로만 선택 가능합니다.');
                 return false;
             }
 
