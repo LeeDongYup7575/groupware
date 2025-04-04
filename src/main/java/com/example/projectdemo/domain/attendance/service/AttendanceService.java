@@ -54,7 +54,7 @@ public class AttendanceService {
                     .workDate(today)
                     .checkIn(now)
                     .status(status)
-                    .workHours(BigDecimal.ZERO) // Initialize with zero
+                    .workHours(BigDecimal.ZERO)
                     .build();
 
             attendanceMapper.insertAttendance(attendance);
@@ -132,19 +132,6 @@ public class AttendanceService {
     }
 
 
-//    @Transactional
-//    public Attendance processAttendanceById(Integer empId, String attendanceType) {
-//        switch (attendanceType) {
-//            case "출근":
-//            case "지각":
-//                return recordCheckIn(empId);
-//            case "퇴근":
-//            case "조퇴":
-//                return recordCheckOut(empId);
-//            default:
-//                throw new IllegalArgumentException("Invalid attendance type: " + attendanceType);
-//        }
-//    }
     @Transactional
     public Attendance processAttendanceById(Integer empId, String attendanceType) {
         // enum 이름인지 먼저 확인

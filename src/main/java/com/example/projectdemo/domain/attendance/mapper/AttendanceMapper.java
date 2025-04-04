@@ -40,4 +40,11 @@ public interface AttendanceMapper {
             @Param("workHours") java.math.BigDecimal workHours);
 
     void calculateWorkHours(@Param("id") Integer id);
+
+    /**
+     * 특정 날짜에 출근했지만 퇴근 기록이 없는 직원들의 출근 기록을 조회
+     * @param workDate 조회할 날짜
+     * @return 출근했지만 퇴근하지 않은 직원들의 출근 기록 목록
+     */
+    List<Attendance> findCheckedInWithoutCheckout(@Param("workDate") LocalDate workDate);
 }
