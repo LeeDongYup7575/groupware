@@ -132,6 +132,11 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- JSON 처리를 위한 의존성 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
         <!-- MapStruct -->
         <dependency>
             <groupId>org.mapstruct</groupId>

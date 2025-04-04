@@ -73,4 +73,12 @@
           AND work_date BETWEEN #{startDate} AND #{endDate}
         ORDER BY work_date ASC
     </select>
+
+    <select id="findCheckedInWithoutCheckout" resultType="com.example.projectdemo.domain.attendance.entity.Attendance">
+        SELECT *
+        FROM attendance
+        WHERE work_date = #{workDate}
+          AND check_in IS NOT NULL
+          AND check_out IS NULL
+    </select>
 </mapper>

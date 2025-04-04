@@ -2,6 +2,9 @@ package com.example.projectdemo.domain.web.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.LogoutService;
+import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
+import com.example.projectdemo.domain.booking.service.MeetingRoomService;
+import com.example.projectdemo.domain.booking.util.BookingTimeUtils;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
@@ -15,6 +18,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +32,7 @@ public class WebController {
     private final JwtTokenUtil jwtTokenUtil;
     private final NoticeCrawler noticeCrawler;
     private final LogoutService logoutService;
+    private final MeetingRoomService meetingRoomService;
 
     // 메모리 캐시
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
@@ -33,11 +41,12 @@ public class WebController {
 
     @Autowired
     public WebController(EmployeesService employeesService, JwtTokenUtil jwtTokenUtil, NoticeCrawler noticeCrawler,
-                         LogoutService logoutService) {
+                         LogoutService logoutService,  MeetingRoomService meetingRoomService) {
         this.employeesService = employeesService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.noticeCrawler = noticeCrawler;
         this.logoutService = logoutService;
+        this.meetingRoomService = meetingRoomService;
     }
 
     /**
@@ -117,8 +126,11 @@ public class WebController {
         return null;
     }
 
+
     /**
      * 로그인 후 페이지
+     * facade 패턴으로 바꿀 예정이니 다들 print할 내용에 대해 로직 추가해주시면
+     * 리팩토링 갈기겠습니다 - 미르
      */
     @GetMapping("/main")
     public String mainPage(HttpServletRequest request,
@@ -179,8 +191,6 @@ public class WebController {
             return "redirect:/auth/login";
         }
 
-        System.out.println("인증된 사용자 번호: " + empNum);
-
         // 토큰에서 추가 정보 추출 또는 DB에서 사용자 정보 로드
         EmployeesDTO employee = employeesService.findByEmpNum(empNum);
         if (employee == null) {
@@ -194,6 +204,35 @@ public class WebController {
         // 공지사항 데이터 로드 및 모델에 추가
         List<Notice> notices = getCachedNotices();
         model.addAttribute("notices", notices);
+
+        // 오늘 날짜의 예약 정보 조회
+        LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+
+        // 오늘의 회의실 예약 목록
+        List<MeetingRoomBookingDTO> meetingRoomBookings =
+                meetingRoomService.getBookingsByDateRange(startOfDay, endOfDay);
+        model.addAttribute("meetingRoomBookings", meetingRoomBookings);
+
+        // 내 회의실 예약 목록
+        List<MeetingRoomBookingDTO> myMeetingRoomBookings =
+                meetingRoomService.getBookingsByEmpNum(empNum);
+        model.addAttribute("myMeetingRoomBookings", myMeetingRoomBookings);
+
+        // 내 예약 개수 계산
+        int myBookingsCount = myMeetingRoomBookings.size();
+        model.addAttribute("myBookingsCount", myBookingsCount);
+
+        // 현재 날짜 정보 추가
+        LocalDateTime now = LocalDateTime.now();
+        model.addAttribute("currentDate", now);
+
+        // 현재 날짜를 포맷팅하여 추가 (화면에 표시할 용도)
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 (E) HH:mm:ss");
+        model.addAttribute("formattedDate", now.format(dateFormatter));
+
+        // 회의실 유틸리티 추가
+        model.addAttribute("bookingUtils", new BookingTimeUtils());
 
         return "/main";
     }

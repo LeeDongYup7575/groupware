@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공유 주소록</title>
+  <link rel="stylesheet" href="/assets/css/contact/contact.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="/assets/js/contact/contact.js"></script>
+  <!-- 헤더 에셋 포함 -->
+  <th:block th:replace="fragments/header :: headerAssets"></th:block>
+  <!-- 사이드바 스타일 포함 -->
+  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+  
+</head>
+<body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+
+<main>
+  <!-- 사이드바 -->
+  <div class="contact-sidebar">
+    <h3>📖 공유 주소록</h3>
+    <div class="contact-sidebar-item active" onclick="filterList('all')">전체</div>
+    <div class="contact-sidebar-item" onclick="filterList('개발팀')">개발팀</div>
+    <div class="contact-sidebar-item" onclick="filterList('영업팀')">영업팀</div>
+    <div class="contact-sidebar-item" onclick="filterList('인사팀')">인사팀</div>
+  </div>
+
+  <!-- 메인 콘텐츠 -->
+  <section class="contact-main">
+    <!-- 검색창 -->
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="이름, 이메일, 전화번호 검색">
+      <button class="search-input-del-button">×</button>
+    </div>
+
+    <!-- 주소록 테이블 -->
+    <table class="contact-table">
+      <thead>
+      <tr>
+        <th class="cel"></th>
+        <th class="name-col">이름</th>
+        <th class="email-col">이메일</th>
+        <th class="phone-col">전화번호</th>
+        <th class="dep-col">부서</th>
+      </tr>
+      </thead>
+      <tbody id="contactList">
+      <tr th:each="contact : ${employeeContacts}" th:attr="data-team=${contact.depName}">
+        <td class="cel"></td>
+        <td class="name-col" th:text="${contact.name}"></td>
+        <td th:text="${contact.internalEmail}"></td>
+        <td th:text="${contact.phone}"></td>
+        <td th:text="${contact.depName}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -33,7 +33,7 @@
       <li class="active"><a href="#"><span class="sidebar-icon">📧</span> 이메일</a></li>
       <li><a th:href="@{/board}"><span class="sidebar-icon">📋</span> 게시판</a></li>
       <li><a href="#" onclick="event.preventDefault(); openChat();"><span class="sidebar-icon">💬</span> 메시지</a></li>
-      <li><a href="#"><span class="sidebar-icon">📅</span> 일정</a></li>
+      <li><a th:href="@{/videochat}"><span class="sidebar-icon">🖥️</span> 화상채팅</a></li>
       <li><a href="#"><span class="sidebar-icon">📨</span> 공용 메일</a></li>
       <li><a href="#"><span class="sidebar-icon">📚</span> 주소록</a></li>
       <li><a th:href="@{/booking/main}"><span class="sidebar-icon">🔖</span> 예약</a></li>
@@ -42,7 +42,7 @@
       <li><a th:href="@{/edsm/main}"><span class="sidebar-icon">📝</span> 전자결재</a></li>
       <li><a href="#"><span class="sidebar-icon">👥</span> 조직도</a></li>
       <li><a href="#"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a></li>
-      <li><a href="#"><span class="sidebar-icon">❓</span> FAQ</a></li>
+      <li><a th:href="@{/faq}"><span class="sidebar-icon">❓</span> FAQ</a></li>
     </ul>
   </div>
 </div>
