@@ -1,4 +1,3 @@
-// HTML 파일의 </body> 태그 바로 앞에 다음 스크립트를 추가하세요
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     let tab = urlParams.get('tab');
@@ -9,10 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loadTabContent(tab); // 탭에 맞는 내용 로드
-
-
-
-
 });
 
 function loadTabContent(tabName) {

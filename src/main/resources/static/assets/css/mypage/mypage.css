@@ -2,41 +2,23 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    font-family: 'Noto Sans KR';
 }
 
 body {
     background-color: white;
 }
 
-/* HEADER */
-.header{
-    height: 80px;
-    border-bottom: 1px solid #ddd;
-}
-.header .logo{
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding-left: 20px;
-
-
-    color: #333;
-    font-size: 24px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-/*  */
-
 main {
     display: flex;
-    min-height: 100vh;
-    margin-top: 80px;
+    height: 100vh;
+    padding-top: 80px;
 }
 
 /* SIDEBAR */
 .mypage-sidebar {
     min-width: 250px;
+    height: 100%;
     background-color: #f3f7fb;
     padding: 20px 0;
     border-right: 1px solid #e5e5e5;
@@ -71,7 +53,7 @@ main {
 /*  */
 
 .main-section {
-    padding: 0 40px 30px;
+    padding: 0 40px;
     width: 1200px;
 }
 .title-container h1 {
