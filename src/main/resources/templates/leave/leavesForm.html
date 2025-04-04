@@ -28,8 +28,8 @@
                     <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
                 </div>
                 <ul class="submenu">
-                    <li><i class="fas fa-calendar-alt"></i> 휴가/근무</li>
-                    <li><i class="fas fa-chart-line"></i> 근무 현황</li>
+                    <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i> 휴가/근무</a></li>
+                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
                 </ul>
             </li>
         </ul>
@@ -109,7 +109,7 @@
             <div class="form-section">
                 <div class="form-row">
                     <div class="form-label">휴가 현황</div>
-                    <div class="form-input">
+                    <div class="form-input" th:text="'잔여휴가 '+ ${canUseLeaves}+'일'">
                         잔여 휴가 19일 4시간 (연차 19일 4시간)
                     </div>
                 </div>
@@ -155,7 +155,13 @@
                                 <option>8시간</option>
                             </select>
                         </div>
-                        <input type="text" class="date-input datepicker" value="2025-03-28 (금)">
+                        <input type="text" class="date-input datepicker" value="">
+
+                        <input type="hidden" name="leaveStartDate[]" class="leave-start-date">
+                        <input type="hidden" name="leaveEndDate[]" class="leave-end-date">
+                        <input type="hidden" name="leaveType[]" class="leave-type">
+                        <input type="hidden" name="leaveHours[]" class="leave-hours">
+
                         <button class="remove-button"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
@@ -261,6 +267,7 @@
         // 종일/시간 라디오 버튼 변경 이벤트
         $(document).on("change", ".full-day, .half-day", function() {
             toggleTimeControls($(this).closest(".date-selection"));
+            updateHiddenFields($(this).closest(".date-selection"));
         });
 
         // 추가 버튼 클릭 이벤트
@@ -288,9 +295,9 @@
             newRow.find('.remove-button').remove();
             newRow.append('<button type="button" class="remove-button"><i class="fas fa-times"></i></button>');
 
-
             $("#dateSelectionContainer").append(newRow);
             initDatepicker(newRow.find('.datepicker')); // 추가된 요소에 datepicker 적용
+            updateHiddenFields(newRow); // 새 행의 hidden 필드 초기화
         });
 
         // 삭제 버튼 클릭 이벤트
@@ -302,6 +309,29 @@
 
         // 초기 종일/시간 설정
         toggleTimeControls($(".date-selection").first());
+
+        // 초기 hidden 필드 값 설정
+        $(".date-selection").each(function() {
+            updateHiddenFields($(this));
+        });
+
+        // datepicker 변경 이벤트
+        $(document).on("change", ".datepicker", function() {
+            updateHiddenFields($(this).closest(".date-selection"));
+        });
+
+        // 시간 선택 변경 이벤트
+        $(document).on("change", ".time-select", function() {
+            updateHiddenFields($(this).closest(".date-selection"));
+        });
+
+        // 폼 제출 이벤트 처리
+        $("#documentForm").submit(function(e) {
+            // 각 날짜 선택 행에 대해 hidden 필드 값 설정
+            $(".date-selection").each(function() {
+                updateHiddenFields($(this));
+            });
+        });
 
         // 함수: 종일/시간 토글
         function toggleTimeControls(row) {
@@ -338,8 +368,39 @@
 
             return year + '-' + month + '-' + day + ' (' + dayOfWeek + ')';
         }
-    });
 
+        // 함수: hidden 필드 업데이트
+        function updateHiddenFields(row) {
+            var dateValue = row.find(".datepicker").val();
+
+            // 날짜 문자열에서 "(요일)" 부분 제거
+            var dateOnly = dateValue ? dateValue.split(" (")[0] : "";
+
+            // 종일/시간 선택에 따라 처리
+            if (row.find('.full-day').is(':checked')) {
+                // 종일 선택 시
+                row.find(".leave-start-date").val(dateOnly);
+                row.find(".leave-end-date").val(dateOnly);
+                row.find(".leave-type").val("연차");
+                row.find(".leave-hours").val("8");
+            } else {
+                // 시간 선택 시
+                var hour = row.find(".hour-select").val();
+                var minute = row.find(".minute-select").val();
+                var duration = row.find(".duration-select").val();
+                var hours = duration === "4시간" ? "4" : "8";
+
+                // 시작 시간 설정
+                var startDateTime = dateOnly + " " + hour + ":" + minute;
+                row.find(".leave-start-date").val(startDateTime);
+
+                // 종료 시간 계산 (단순화를 위해 동일 날짜 사용)
+                row.find(".leave-end-date").val(dateOnly + " 18:00");
+                row.find(".leave-type").val("반차");
+                row.find(".leave-hours").val(hours);
+            }
+        }
+    });
 </script>
 </body>
 </html>

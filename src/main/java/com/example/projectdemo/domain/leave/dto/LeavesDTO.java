@@ -8,15 +8,14 @@ import java.util.Date;
 @Data
 public class LeavesDTO {
     private int id;
-    private int empId;
-    private int approverId;
+    private String empId;
+    private int edsmDocId;
     private String leaveType;
-    private Date startDate;
-    private Date endDate;
+    private String startDate;
+    private String endDate;
     private String status;
     private String reason;
-    private int edsmDocId;
     private Timestamp createAt;
-    private Timestamp updateAt;
+
             
 }
