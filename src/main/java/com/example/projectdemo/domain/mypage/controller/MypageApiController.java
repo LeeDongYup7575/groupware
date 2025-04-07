@@ -56,13 +56,16 @@ public class MypageApiController {
     public ResponseEntity<?> update(HttpServletRequest request,
                                     @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
                                     @RequestParam("phone") String phone,
-                                    @RequestParam("email") String email) {
+                                    @RequestParam("email") String email,
+                                    @RequestParam("isImageDeleted") boolean isImageDeleted) {
         String empNum = (String)request.getAttribute("empNum");
 
         // 프로필 이미지 처리 - 로컬 파일 시스템에 저장
-        String profileImgUrl = "/assets/images/default-profile.png";  // 기본 이미지
+        String profileImgUrl = null;  // 기본 이미지
 
-        if (profileImage != null && !profileImage.isEmpty()) {
+        if(isImageDeleted){
+            profileImgUrl = "/assets/images/default-profile.png";
+        } else if (profileImage != null && !profileImage.isEmpty()) {
             try {
                 // 로컬 파일 시스템에 업로드
                 profileImgUrl = profileUploadService.uploadProfileImage(profileImage);
