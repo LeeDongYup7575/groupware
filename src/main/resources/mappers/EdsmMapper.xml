@@ -39,16 +39,69 @@
             emp.name AS drafterName
         FROM groupware.edsm_document ed
                  JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
-        WHERE ed.status = '진행'
-          AND ed.drafter_id = #{empNum}
+        WHERE
+          ed.drafter_id = #{empNum}
     </select>
 
 
-
+ <!-- 업무연락 테이블 정보 입력 -->
     <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO">
         INSERT INTO groupware.business_contact
         (edsm_document_id, drafter_id, title, content)
         VALUES
             (#{edsmDocumentId}, #{drafterId}, #{title}, #{content})
     </insert>
+
+    <!-- 품의서 테이블 정보 입력 -->
+    <insert id="InsertByLac" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmLetterOfApprovalDTO">
+        INSERT INTO groupware.letter_of_approval
+            (edsm_document_id, drafter_id, title, content, expected_cost)
+        VALUES
+            (#{edsmDocumentId}, #{drafterId}, #{title}, #{content}, #{expectedCost})
+    </insert>
+
+
+
+    <!-- 문서 번호를 통한 결재문서 정보 조회-->
+    <select id="SelectByDocumentId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT * FROM groupware.edsm_document where  id = #{id}
+
+    </select>
+
+    <!-- 문서 번호를 통한 결재문서 정보 조회-->
+    <select id="SelectByDocumentIdFromApprovalLine" resultType="com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO">
+        SELECT
+            al.document_id,
+            al.approval_no,
+            al.status,
+            al.approved_at,
+            al.reason,
+            drafter.emp_num AS drafterId,
+            drafter.name AS drafterName,
+            posD.title AS drafterPosition,
+            approver.emp_num AS approverId,
+            approver.name AS approverName,
+            posA.title AS approverPosition,
+            dept.name AS departmentName
+        FROM groupware.approval_line al
+                 JOIN groupware.employees drafter ON al.drafter_id = drafter.emp_num
+                 JOIN groupware.positions posD ON drafter.pos_id = posD.id
+                 JOIN groupware.employees approver ON al.approver_id = approver.emp_num
+                 JOIN groupware.positions posA ON approver.pos_id = posA.id
+                 JOIN groupware.departments dept ON drafter.dep_id = dept.id
+        WHERE al.document_id = #{id}
+        ORDER BY al.approval_no ASC;
+    </select>
+
+    <update id="UpdateApprovalStatus" parameterType="map">
+        UPDATE groupware.approval_line
+        SET status = #{status},
+            approved_at = NOW()
+        WHERE document_id = #{documentId}
+          AND approver_id = #{approverId}
+          AND approval_no = #{approvalNo}
+    </update>
+
+
+
 </mapper>
