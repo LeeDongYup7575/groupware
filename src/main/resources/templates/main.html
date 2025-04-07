@@ -106,11 +106,17 @@
         <div class="attendance-info">
           <div class="attendance-row">
             <div class="attendance-label">출근시간</div>
-            <div class="attendance-value">미등록</div>
+            <div class="attendance-value"
+                 th:each="attendance : ${attendanceListByDate}"
+                 th:text="${attendance.checkIn != null} ? ${attendance.checkIn} : '미등록'">
+            </div>
           </div>
           <div class="attendance-row">
             <div class="attendance-label">퇴근시간</div>
-            <div class="attendance-value">미등록</div>
+            <div class="attendance-value"
+                 th:each="attendance : ${attendanceListByDate}"
+                 th:text="${attendance.checkOut != null} ? ${attendance.checkOut} : '미등록'">
+            </div>
           </div>
         </div>
 

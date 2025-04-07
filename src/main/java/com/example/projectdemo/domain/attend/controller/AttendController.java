@@ -6,6 +6,7 @@ import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.leave.service.LeavesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,8 +35,12 @@ public class AttendController {
     @Autowired
     private EmployeesService employeeService;
 
+    @Autowired
+    private LeavesService leavesService;
+
     @RequestMapping("/main")
     public String list(Model model, HttpServletRequest request) {
+
 
         int empId = (int)request.getAttribute("id");
 

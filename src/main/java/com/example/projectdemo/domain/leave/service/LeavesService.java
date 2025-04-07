@@ -31,4 +31,8 @@ public class LeavesService {
     public List<LeavesDTO> selectAllLeaves(int empId){
         return leavesDAO.selectByLeaves(empId);
     }
+
+    public int updateByLeaves(){
+        return leavesDAO.updateByLeaves();
+    }
 }
