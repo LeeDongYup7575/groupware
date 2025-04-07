@@ -1,188 +1,63 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the add button
-    document.querySelector(".add-button").onclick = function() {
-        location.href = "/leaves/leavesForm";
-    };
+    const calendarEl = document.getElementById('calendar');
 
-    // Set up dropdown menu functionality
-    const dropdownHeader = document.querySelector('.dropdown-header');
-    if (dropdownHeader) {
-        dropdownHeader.addEventListener('click', function() {
-            this.parentElement.classList.toggle('open');
-        });
-    }
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale: 'ko',  // 한국어 설정
+        initialView: 'dayGridMonth',  // 초기 뷰: 월간 뷰
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        // 중요! 이벤트 시간 표시 형식 설정
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false  // 24시간 형식 사용
+        },
+        events: function(fetchInfo, successCallback, failureCallback) {
+            // 서버에서 근태 데이터를 가져오기
+            fetch('/attend/getWorkSchedule')
+                .then(response => response.json())
+                .then(data => {
+                    // 데이터를 FullCalendar에 맞게 변환하여 전달
+                    const events = data.map(item => {
+                        const event = {
+                            title: item.title,
+                            start: new Date(item.start),
+                            description: item.description,
+                            // 시간을 이벤트의 일부로 표시
+                            displayEventTime: true
+                        };
 
-    // Initialize calendar
-    var calendarEl = document.getElementById('calendar');
+                        // 이벤트 색상 설정
+                        if (item.title.includes('출근')) {
+                            event.backgroundColor = '#28a745';  // 녹색
+                        } else if (item.title.includes('퇴근')) {
+                            event.backgroundColor = '#007bff';  // 파란색
+                        } else if (item.title.includes('지각')) {
+                            event.backgroundColor = '#dc3545';  // 빨간색
+                        }
 
-    if (calendarEl) {
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'ko',
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev',
-                center: 'title',
-                right: 'next'
-            },
-            titleFormat: { year: 'numeric', month: 'long' },
-            dayHeaderFormat: { weekday: 'short' },
-            height: 'auto',
-            fixedWeekCount: false,
-            showNonCurrentDates: true,
-
-            // Events definition (work schedules, vacations, etc.)
-            events: [
-                // Normal work days
-                {
-                    title: '정 09:00 - 18:00',
-                    start: '2025-03-04',
-                    end: '2025-03-05',
-                    display: 'block',
-                    backgroundColor: '#f5f5f5',
-                    textColor: '#888'
-                },
-                {
-                    title: '정 09:00 - 18:00',
-                    start: '2025-03-05',
-                    end: '2025-03-06',
-                    display: 'block',
-                    backgroundColor: '#f5f5f5',
-                    textColor: '#888'
-                },
-                {
-                    title: '정 09:00 - 18:00',
-                    start: '2025-03-06',
-                    end: '2025-03-07',
-                    display: 'block',
-                    backgroundColor: '#f5f5f5',
-                    textColor: '#888'
-                },
-                {
-                    title: '정 09:00 - 18:00',
-                    start: '2025-03-07',
-                    end: '2025-03-08',
-                    display: 'block',
-                    backgroundColor: '#f5f5f5',
-                    textColor: '#888'
-                },
-                {
-                    title: '정 09:00 - 18:00',
-                    start: '2025-03-08',
-                    end: '2025-03-09',
-                    display: 'block',
-                    backgroundColor: '#f5f5f5',
-                    textColor: '#888'
-                },
-                // Late arrival
-                {
-                    title: '출근 09:16',
-                    start: '2025-03-12',
-                    display: 'block',
-                    backgroundColor: '#fff',
-                    textColor: '#888'
-                },
-                {
-                    title: '지각',
-                    start: '2025-03-12',
-                    display: 'block',
-                    backgroundColor: '#fff',
-                    textColor: '#ff6b6b'
-                },
-                // Vacation
-                {
-                    title: '연차(종일)',
-                    start: '2025-03-20',
-                    display: 'block',
-                    backgroundColor: '#fff',
-                    textColor: '#4a9fff'
-                },
-                {
-                    title: '연차(종일)',
-                    start: '2025-03-21',
-                    display: 'block',
-                    backgroundColor: '#fff',
-                    textColor: '#4a9fff'
-                }
-            ],
-
-            // Custom rendering for date cells
-            dayCellDidMount: function(info) {
-                // Weekend color handling
-                if (info.date.getDay() === 0) { // Sunday
-                    info.el.style.backgroundColor = '#fff9f9';
-                } else if (info.date.getDay() === 6) { // Saturday
-                    info.el.style.backgroundColor = '#f9f9ff';
-                }
-            }
-        });
-
-        calendar.render();
-
-        // Add weekly summary after calendar rendering
-        setTimeout(addWeeklySummary, 100);
-    }
-
-    // Weekly summary function
-    function addWeeklySummary() {
-        // Create weekly summary container
-        const summaryContainer = document.createElement('div');
-        summaryContainer.className = 'weekly-summary';
-        summaryContainer.style.position = 'absolute';
-        summaryContainer.style.right = '0';
-        summaryContainer.style.top = '72px';
-        summaryContainer.style.width = '180px';
-        summaryContainer.style.height = 'calc(100% - 72px)';
-        summaryContainer.style.borderLeft = '1px solid #ddd';
-        summaryContainer.style.backgroundColor = '#f9f9f9';
-        summaryContainer.style.overflow = 'hidden';
-
-        // Add title
-        const title = document.createElement('div');
-        title.textContent = '주간합계';
-        title.style.padding = '10px';
-        title.style.textAlign = 'center';
-        title.style.fontWeight = 'bold';
-        title.style.borderBottom = '1px solid #ddd';
-        summaryContainer.appendChild(title);
-
-        // Weekly data (example data that would normally come from API)
-        const weeklyData = [
-            { week: 1, worked: '00시간 00분', real: '00시간 00분' },
-            { week: 2, worked: '00시간 00분', total: '40시간 00분', real: '00시간 00분' },
-            { week: 3, worked: '00시간 00분', real: '00시간 00분' },
-            { week: 4, worked: '16시간 00분', real: '00시간 00분' },
-            { week: 5, worked: '00시간 00분', real: '00시간 00분' },
-            { week: 6, worked: '00시간 00분', real: '00시간 00분' }
-        ];
-
-        // Add summary info for each week
-        weeklyData.forEach((data, index) => {
-            const weekSummary = document.createElement('div');
-            weekSummary.style.padding = '10px';
-            weekSummary.style.borderBottom = '1px solid #eee';
-            weekSummary.style.fontSize = '12px';
-            weekSummary.style.height = '108px'; // Height adjusted for a week
-
-            weekSummary.innerHTML = `
-                <div>휴가: ${data.worked}</div>
-                ${data.total ? `<div>계: ${data.total}</div>` : ''}
-                <div>실근무: ${data.real}</div>
-            `;
-
-            summaryContainer.appendChild(weekSummary);
-        });
-
-        // Add weekly summary element to the calendar container
-        const calendarContainer = document.querySelector('.fc-view-harness');
-        if (calendarContainer) {
-            calendarContainer.style.position = 'relative';
-            calendarContainer.appendChild(summaryContainer);
-
-            // Adjust calendar width
-            const calendar = document.querySelector('.fc');
-            if (calendar) {
-                calendar.style.width = 'calc(100% - 10px)';
-            }
+                        return event;
+                    });
+                    successCallback(events);  // FullCalendar에 이벤트 데이터 전달
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    failureCallback(error);  // 오류 발생 시 실패 콜백 호출
+                });
+        },
+        eventClick: function(info) {
+            // 이벤트 클릭 시 동작
+            const eventTime = info.event.start.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+            alert(info.event.title + ' - ' + eventTime);
         }
-    }
+    });
+
+    calendar.render();
 });

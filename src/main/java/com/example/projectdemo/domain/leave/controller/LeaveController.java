@@ -21,7 +21,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -78,8 +80,8 @@ public class LeaveController {
     public String leavesHistory(@RequestParam(value = "year", required = false) Integer year,
                                 Model model, HttpServletRequest request) {
 
-        int empId = (int)request.getAttribute("id");
-        String drafterId = (String)request.getAttribute("empNum");
+        int empId = (int) request.getAttribute("id");
+        String drafterId = (String) request.getAttribute("empNum");
 
         if (empId == 0) return "redirect:/auth/login";
 
@@ -88,15 +90,51 @@ public class LeaveController {
 
         int canUseLeaves = employee.getTotalLeave() - employee.getUsedLeave();
 
-        LeavesDTO leavesdto = new LeavesDTO();
-        String leavesStatus = leavesService.selectByStatus(drafterId, leavesdto.getEdsmDocId());
-        leavesdto.setStatus(leavesStatus);
-
-        // ✅ 현재 연도 지정 (없으면 올해)
         LocalDate now = LocalDate.now();
         int currentYear = (year != null) ? year : now.getYear();
 
-        // ✅ 해당 연도의 휴가 신청 내역만 필터링
+        LocalDate hireDate = employee.getHireDate();
+        Map<LocalDate, Integer> leaveGrantMap = new LinkedHashMap<>();
+
+        int hireDay = hireDate.getDayOfMonth();
+        LocalDate oneYearAfterHire = hireDate.plusYears(1);
+
+        if (now.isBefore(oneYearAfterHire)) {
+            // ✅ 입사 1년 미만일 경우 (현재가 1년 안)
+            LocalDate grantCursor = hireDate.plusMonths(1);
+            while (!grantCursor.isAfter(now)) {
+                if (grantCursor.getYear() == currentYear) {
+                    int day = Math.min(hireDay, grantCursor.lengthOfMonth());
+                    leaveGrantMap.put(grantCursor.withDayOfMonth(day), 1);
+                }
+                grantCursor = grantCursor.plusMonths(1);
+            }
+        } else {
+            // ✅ 입사 1년 이상인 경우
+            LocalDate grantCursor = hireDate.plusMonths(1);
+            LocalDate endOfMonthlyGrants = oneYearAfterHire.minusDays(1); // 1년차 마지막 날까지
+
+            while (!grantCursor.isAfter(endOfMonthlyGrants)) {
+                if (grantCursor.getYear() == currentYear) {
+                    int day = Math.min(hireDay, grantCursor.lengthOfMonth());
+                    leaveGrantMap.put(grantCursor.withDayOfMonth(day), 1);
+                }
+                grantCursor = grantCursor.plusMonths(1);
+            }
+
+            // ✅ 1년 이상 분기: 매년 15개
+            grantCursor = oneYearAfterHire;
+            while (!grantCursor.isAfter(now)) {
+                if (grantCursor.getYear() == currentYear) {
+                    int day = Math.min(hireDay, grantCursor.lengthOfMonth());
+                    leaveGrantMap.put(grantCursor.withDayOfMonth(day), 15);
+                }
+                grantCursor = grantCursor.plusYears(1);
+            }
+        }
+
+
+        // 휴가 신청 내역 필터링 (해당 연도만)
         List<LeavesDTO> allLeavesList = leavesService.selectAllLeaves(empId);
         List<LeavesDTO> leavesList = allLeavesList.stream()
                 .filter(leave -> {
@@ -105,35 +143,16 @@ public class LeaveController {
                 })
                 .collect(Collectors.toList());
 
-        // ✅ 연차 생성일 계산
-        LocalDate hireDate = employee.getHireDate(); // 입사일
-        List<LocalDate> allGrantDates = new ArrayList<>();
-
-        if (ChronoUnit.YEARS.between(hireDate, now) >= 1) {
-            int years = (int) ChronoUnit.YEARS.between(hireDate.plusYears(1), now);
-            for (int i = 0; i <= years; i++) {
-                allGrantDates.add(LocalDate.of(hireDate.plusYears(1).getYear() + i, 1, 1));
-            }
-        } else {
-            int months = (int) ChronoUnit.MONTHS.between(hireDate, now);
-            for (int i = 1; i <= Math.min(months, 11); i++) {
-                allGrantDates.add(hireDate.plusMonths(i));
-            }
-        }
-
-        // ✅ 해당 연도만 필터링
-        List<LocalDate> leaveGrantDates = allGrantDates.stream()
-                .filter(date -> date.getYear() == currentYear)
-                .collect(Collectors.toList());
-
         model.addAttribute("leavesList", leavesList);
         model.addAttribute("employee", employee);
         model.addAttribute("canUseLeaves", canUseLeaves);
-        model.addAttribute("leaveGrantDates", leaveGrantDates);
-        model.addAttribute("selectedYear", currentYear); // 프론트에서 표시용
+        model.addAttribute("leaveGrantMap", leaveGrantMap);
+        model.addAttribute("selectedYear", currentYear);
 
         return "/attend/attendLeavesHistory";
     }
+
+
 
 
     @PostMapping("/submitLeave")

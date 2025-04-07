@@ -17,7 +17,7 @@ public class AttendDAO {
     private SqlSession mybatis;
 
     public List<AttendDTO> selectByEmpId(int empId) {
-        return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getAttendById", empId);
+        return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.selectByEmpId", empId);
     }
 
     public List<AttendDTO> selectByEmpIdAndDate(int empId) {

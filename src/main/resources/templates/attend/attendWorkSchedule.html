@@ -7,20 +7,22 @@
     <link rel="stylesheet" href="/assets/css/attend/attendWorkSchedule.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-
-    <!-- jQuery 먼저 로드 -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/fullcalendar@6.1.8/main.min.css">
 
     <!-- FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/ko.global.min.js"></script>
+    <script src="https://unpkg.com/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://unpkg.com/fullcalendar@6.1.8/locales/ko.global.min.js"></script>
+
+
 </head>
 <body>
 <header>
     <div class="logo">
         <h1>TECH X</h1>
         <span class="title">근태 관리</span>
+    </div>
+    <div class="mobile-menu-toggle">
+        <i class="fas fa-bars"></i>
     </div>
 </header>
 
@@ -29,13 +31,13 @@
         <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
         <ul class="menu">
             <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
-            <li class="dropdown active">
+            <li class="dropdown active open">
                 <div class="dropdown-header">
                     <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
                 </div>
                 <ul class="submenu">
                     <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i>휴가/근무</a></li>
-                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                    <li class="active"><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
                 </ul>
             </li>
         </ul>
@@ -48,7 +50,9 @@
             <a href="/attend/annualStatistics"><button class="tab-button">연간통계</button></a>
             <a href="/attend/workDetails"><button class="tab-button">근무신청내역</button></a>
         </div>
-        <div id="calendar"></div>
+        <div class="calendar-container">
+            <div id="calendar"></div>
+        </div>
     </div>
 </div>
 
