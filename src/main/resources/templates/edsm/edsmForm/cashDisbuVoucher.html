@@ -9,8 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 아이콘 사용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- jQuery UI CSS (예: Smoothness 테마) -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+    <!-- jQuery UI 스크립트 -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <!-- jQuery UI 다국어 지원 스크립트 (한국어) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/jquery-ui-i18n.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 </head>
 <body>
 <!-- 헤더 -->
@@ -219,16 +225,13 @@
 
         <div class="form-group">
                 <div style="margin-bottom: 20px;">
-                    <span style="margin-right: 10px;">회계 기준월</span>
-                    <select id="year"></select>
-                    <span>년</span>
-                    <select id="month"></select>
-                    <span>월</span>
+                    <label for="accountingDate">회계 기준일</label>
+                    <input type="text" id="accountingDate" name="accountingDate" placeholder="날짜 선택" style="width: 300px;">
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <span style="margin-right: 10px;">지출자</span>
-                    <span class="file-input"> 클릭 후 입력 </span>
+                    <span class="spender-input"> 클릭 후 입력 </span>
                 </div>
 
                 <div style="margin-bottom: 20px;">
@@ -263,19 +266,73 @@
     </div>
 
         <!-- 결재선 설정 모달 -->
-        <div id="employeeModal" class="modal">
+        <div id="approvalModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h3>사원 선택</h3>
-                <ul class="employee-list">
-                    <li th:each="emp : ${list_emp}"
-                        th:attr="data-approvernum=${emp.empNum}, data-approverposition=${emp.positionTitle}, data-approvername=${emp.name}"
-                        th:text="${emp.positionTitle} + ' ' + ${emp.name}">
-                    </li>
-                </ul>
+                <h3>결재라인 선택</h3><br/>
+                <div class="approval-modal-container" style="display: flex; gap: 20px;">
+                    <!-- 왼쪽: 전체 사원 목록 -->
+                    <div class="available-employees" style="width: 45%;">
+                        <!-- 부서 필터 추가 -->
+                        <div class="department-filter" style="margin-bottom: 10px;">
+                            <label for="departmentFilter">부서 선택:</label>
+                            <select id="departmentFilter">
+                                <option value="">전체 부서</option>
+                                <!-- 예시 옵션, 실제 값은 데이터에 맞게 수정 -->
+                                <option value="1">개발팀</option>
+                                <option value="2">영업팀</option>
+                                <option value="3">인사팀</option>
+                            </select>
+                        </div>
+                        <ul id="availableList" style="border: 1px solid #ddd; height: 300px; overflow-y: auto; padding: 10px;">
+                            <!-- 타임리프로 전체 사원 목록 반복 처리 -->
+                            <li th:each="emp : ${list_emp}"
+                                th:attr="data-department=${emp.depId}, data-employee-id=${emp.empNum}, data-employee-position=${emp.positionTitle}, data-employee-name=${emp.name}"
+                                th:text="${emp.positionTitle} + ' ' + ${emp.name}"
+                                style="cursor: pointer; padding: 5px; border-bottom: 1px solid #eee;">
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 오른쪽: 선택된 결재라인 (순서 변경 가능) -->
+                    <div class="selected-employees" style="width: 45%;">
+                        <h4>선택된 결재라인 (순서 변경 가능)</h4>
+                        <ul id="selectedList" style="border: 1px solid #ddd; min-height: 300px; padding: 10px;">
+                            <!-- 선택된 사원들이 여기에 추가됨 -->
+                        </ul>
+                    </div>
+                </div>
+                <br/>
                 <button id="saveApprovalLine" class="button">선택 완료</button>
             </div>
         </div>
+
+        <!-- 지출자 설정 모달 -->
+        <div id="spenderModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>지출자 선택</h3><br/>
+                <!-- 부서 선택 요소 추가 -->
+                <div class="department-selection">
+                    <label for="departmentSelect">부서 선택:</label>
+                    <select id="departmentSelect-spender">
+                        <option value="">전체 부서</option>
+                        <option value="1">개발팀</option>
+                        <option value="2">영업팀</option>
+                        <option value="3">인사팀</option>
+                    </select>
+                </div>
+                <!-- 사원 리스트 (타임리프 예시) -->
+                <ul class="employee-list">
+                    <li th:each="emp : ${list_emp}"
+                        th:attr="data-department=${emp.depId}, data-approvernum=${emp.empNum}, data-approverposition=${emp.positionTitle}, data-approvername=${emp.name}"
+                        th:text="${emp.positionTitle} + ' ' + ${emp.name}">
+                    </li>
+                </ul>
+                <button id="saveSpender" class="button">선택 완료</button>
+            </div>
+        </div>
+
     </div>
 
 
@@ -288,12 +345,12 @@
     $(document).ready(function() {
         //작성자 정보 전역변수설정
         //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
-        var drafter = {
+        let drafter = {
             id: /*[[${employee.empNum}]]*/,
             position: /*[[${employee.positionTitle}]]*/,
             name: /*[[${employee.name}]]*/
         };
-        var storedValue = [[${documentFormId}]];
+        let storedValue = [[${documentFormId}]];
         if (storedValue) {
             $("#formSelect").val(storedValue);
         }
@@ -311,106 +368,161 @@
             location.href = "/edsm/input";
         });
 
+        $(function() {
+            // 한국어 로케일 설정
+            $.datepicker.setDefaults($.datepicker.regional['ko']);
+            $("#accountingDate").datepicker({
+                dateFormat: "yy-mm-dd",  // 년-월-일 형식
+                showAnim: "slideDown",   // 열릴 때 애니메이션 효과
+                changeMonth: true,       // 월 변경 드롭다운
+                changeYear: true,        // 연도 변경 드롭다운
+                yearRange: "2000:+10"    // 연도 범위 (2000년부터 현재 연도 + 10년까지)
+            });
+        });
+
+        //지출자 모달 열기
+        $(".spender-input").on("click", function() {
+            $("#spenderModal").fadeIn();
+        });
+        // 지출자 모달 닫기 버튼 클릭
+        $(".close").on("click", function () {
+            $("#spenderModal").fadeOut();
+        });
+
+        // 지출자 부서 선택 시 리스트 필터링
+        $("#departmentSelect-spender").on("change", function() {
+            let selectedDept = $(this).val();
+            console.log(selectedDept);
+            if(selectedDept) {
+                $(".employee-list li").hide();
+                $(".employee-list li[data-department='" + selectedDept + "']").show();
+            } else {
+                $(".employee-list li").show();
+            }
+        });
+
+        // 지출자 모달 내부의 사원 리스트(li)를 클릭하면 다른 항목의 선택을 해제하고, 클릭한 항목만 선택 처리
+        $("#spenderModal").on("click", ".employee-list li", function() {
+            // 지출자 모달 내부의 모든 li 선택 해제
+            $("#spenderModal .employee-list li").removeClass("selected");
+            // 클릭한 항목에만 selected 클래스 추가
+            $(this).addClass("selected");
+        });
+
+        $("#saveSpender").on("click", function () {
+            // spenderModal 내부에서 선택된 직원(li.selected) 가져오기 (하나만 선택)
+            let selected = $("#spenderModal .employee-list li.selected");
+            if(selected.length === 0){
+                alert("지출자를 선택해주세요.");
+                return;
+            }
+            // 만약 여러 개 선택되어 있다면 첫 번째 항목만 사용 (필요에 따라 단일 선택 UI로 변경)
+            let $selected = $(selected[0]);
+            let position = $selected.data("approverposition");
+            let name = $selected.data("approvername");
+
+            // spender-input 영역에 선택한 직원의 직급과 이름 표시
+            $(".spender-input").text(position + " " + name);
+
+            // 만약 "지출자 변경" 버튼이 아직 없다면 추가
+            if($(".spender-change-btn").length === 0) {
+                $(".spender-input").after('<button class="spender-change-btn" type="button">지출자 변경</button>');
+                // 지출자 변경 버튼 클릭 시 모달 다시 열기
+                $(".spender-change-btn").on("click", function(){
+                    $("#spenderModal").fadeIn();
+                });
+            }
+
+            // 모달 닫기
+            $("#spenderModal").fadeOut();
+        });
+
         // form select 변경 이벤트
         $("#documentType").on("change", function() {
-            var selectedValue = $(this).val();
+            let selectedValue = $(this).val();
             console.log("선택된 값:", selectedValue);
             location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
         });
 
-        // 결재선 설정 버튼 클릭 시 모달 열기
+        // 모달 열기, 닫기
         $("#approvalSettingButton").on("click", function () {
-            $("#employeeModal").fadeIn();
+            $("#approvalModal").fadeIn();
         });
-
-        // 모달 닫기 버튼 클릭
         $(".close").on("click", function () {
-            $("#employeeModal").fadeOut();
+            $("#approvalModal").fadeOut();
         });
 
-        // 사원 목록 클릭 시 선택 및 순서 재할당
-        $(".employee-list").on("click", "li", function () {
-            $(this).toggleClass("selected");
-            // 선택된 li들의 순서를 재할당 (1부터 시작)
-            $(".employee-list li.selected").each(function(index) {
-                $(this).attr("data-order", index + 1);
-
-            });
+        // 부서 필터 변경 시 availableList 필터링
+        $("#departmentFilter").on("change", function() {
+            let selectedDept = $(this).val();
+            if(selectedDept) {
+                $("#availableList li").hide();
+                $("#availableList li[data-department='" + selectedDept + "']").show();
+            } else {
+                $("#availableList li").show();
+            }
         });
 
-        $("#saveApprovalLine").on("click", function () {
-            var selectedEmployees = [];
+        // availableList의 li 클릭 시, 선택된 사원을 오른쪽 목록에 추가 (중복 방지)
+        $("#availableList").on("click", "li", function () {
+            let $li = $(this);
+            let empId = $li.data("employee-id");
+            if ($("#selectedList li[data-employee-id='" + empId + "']").length === 0) {
+                let newItem = $('<li></li>')
+                    .attr("data-employee-id", empId)
+                    .attr("data-employee-position", $li.data("employee-position"))
+                    .attr("data-employee-name", $li.data("employee-name"))
+                    .text($li.data("employee-position") + " " + $li.data("employee-name"))
+                    .css({
+                        padding: "5px",
+                        border: "1px solid #ccc",
+                        marginBottom: "5px",
+                        background: "#f9f9f9",
+                        cursor: "pointer"
+                    });
+                $("#selectedList").append(newItem);
+            }
+        });
 
+        // 오른쪽 선택된 리스트 항목 클릭 시 삭제 (위임 이벤트)
+        $(document).on("click", "#selectedList li", function() {
+            $(this).remove();
+        });
 
-            // 모달에서 선택된 사원들의 정보를 2번 순서부터 추가
-            $(".employee-list li.selected").each(function(index) {
-                var order = index + 1;  // 작성자가 1번이므로 2부터 시작
-                var approverId = $(this).data("approvernum");
-                var approverPosition = $(this).data("approverposition");
-                var approverName = $(this).data("approvername");
+        // selectedList를 Sortable로 설정하여 순서 변경 가능하도록 함
+        $("#selectedList").sortable({
+            placeholder: "ui-state-highlight"
+        });
+        $("#selectedList").disableSelection();
+
+        // "선택 완료" 버튼에 대한 위임 이벤트 바인딩
+        $(document).on("click", "#saveApprovalLine", function () {
+            let selectedEmployees = [];
+            $("#selectedList li").each(function(index) {
+                let $li = $(this);
                 selectedEmployees.push({
-                    approverId: approverId,
-                    approvalNo: order,
-                    position: approverPosition,
-                    name: approverName,
-                    status: '' // 기본 상태를 필요에 따라 지정 (예: 대기)
+                    approverId: $li.data("employee-id"),
+                    approvalNo: index + 1,
+                    position: $li.data("employee-position"),
+                    name: $li.data("employee-name"),
+                    status: ''
                 });
             });
-
-            // 선택된 사원 정보를 hidden 필드에 JSON 문자열로 저장
             $("#approvalLine").val(JSON.stringify(selectedEmployees));
-
-            // 결재라인 영역 업데이트 (작성자 포함)
-            var approvalBody = $(".approval-line-2 .approval-body-2");
+            // 결재라인 영역 업데이트 ()
+            let approvalBody = $(".approval-line-2 .approval-body-2");
             approvalBody.empty();
             selectedEmployees.forEach(function(emp) {
-                var cell = '<div class="approval-body-cell-2" data-order="'+ emp.approvalNo +'">' +
+                let cell = '<div class="approval-body-cell-2" data-order="'+ emp.approvalNo +'">' +
                     '<div class="approval-stamp">' + (emp.status ? emp.status : "대기") + '</div>' +
                     '<div class="approval-name">' + emp.position + ' ' + emp.name + '</div>' +
-                    '<div class="approval-date">2025.04.01</div>' +
                     '</div>';
                 approvalBody.append(cell);
             });
-
-            $("#employeeModal").fadeOut();
-        });
-
-        setDateSelectBox();
-
-        $("#year").select2({
-            dropdownAutoWidth: true,
-            width: '10%'
-            // Select2에서는 기본 드롭다운에 스크롤이 적용되어 옵션이 많을 경우 스크롤됩니다.
-        });
-
-        $("#month").select2({
-            dropdownAutoWidth: true,
-            width: '10%'
-            // Select2에서는 기본 드롭다운에 스크롤이 적용되어 옵션이 많을 경우 스크롤됩니다.
+            $("#approvalModal").fadeOut();
         });
 
 
-
-
-    function setDateSelectBox(){
-        var now = new Date();
-        var now_year = now.getFullYear();
-
-        $("#year").append("<option value=''>선택</option>");
-
-        // 2005년 부터 올해까지
-        for(var i = now_year; i >= 2010; i--){
-            $("#year").append("<option value='"+ i +"'>"+ i + " 년" +"</option>");
-        }
-
-
-        $("#month").append("<option value=''>선택</option>");
-
-        // 2005년 부터 올해까지
-        for(var i = 1; i <= 12; i++){
-            $("#month").append("<option value='"+ i +"'>"+ i + " 월" +"</option>");
-            }
-        }
     });
 </script>
 </body>

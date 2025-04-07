@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href= "/assets/css/edsm/edsmLetterOfApproval.css" />
+  <link rel="stylesheet" href="/assets/css/edsm/edsmBusinessContact.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <title>전자결재</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,6 +13,8 @@
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 </head>
 <body>
+
+
 <!-- 헤더 -->
 <div class="header">
   <div class="logo">TECH X</div>
@@ -26,7 +28,6 @@
       <i class="fas fa-plus"></i>
       작성하기
     </button>
-
     <div class="menu-section">
       <div class="menu-header">
         <i class="fas fa-chevron-down"></i>
@@ -37,7 +38,6 @@
           <i class="fas fa-folder"></i>
           전체
         </div>
-
         <div class="menu-item" id="progress">
           <i class="fas fa-spinner"></i>
           진행
@@ -48,7 +48,6 @@
         </div>
       </div>
     </div>
-
     <div class="menu-section">
       <div class="menu-header">
         <i class="fas fa-chevron-down"></i>
@@ -75,12 +74,19 @@
     </div>
   </div>
 
-  <!-- 메인 콘텐츠 영역 -->
-  <!-- 결재 컨테이너 -->
+
+
+
+
+
+
+<!-- 결재 컨테이너 -->
   <div class="main-container">
     <div class="total">
+
+
       <!-- 실제 폼 시작 -->
-      <form id="documentForm" action="/edsmForm/letter_submit" method="post" enctype="multipart/form-data">
+      <form id="documentForm" action="/edsmForm/business_submit" method="post" enctype="multipart/form-data">
 
         <!-- 기본설정 영역 -->
         <div class="form-section">
@@ -153,10 +159,15 @@
           </div>
         </div>
 
+
+
+
         <!-- 결재선 영역 -->
         <div class="form-section">
           <div class="form-row">
             <div class="form-label">결재라인</div>
+
+
             <!-- 결재라인은 모달로 설정한 후, hidden 필드에 JSON 또는 구분자로 저장 -->
             <button type="button" class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
           </div>
@@ -191,14 +202,14 @@
             <!-- 결재 라인 (모달에서 동적 추가) -->
             <div class="approval-line approval-line-2">
               <div class="approval-header approval-header-2">
-                <div class="approval-header-cell approval-header-cell-2">결재라인</div>
+                <div class="approval-header-cell approval-header-cell-2"></div>
+
               </div>
 
 
               <div class="approval-body approval-body-2">
                 <div class="approval-body-cell approval-body-cell-2" >
-
-                  <div class="approval-message">결재라인을 입력해주세요</div>
+                <div class="approval-message">결재라인을 입력해주세요</div>
                 </div>
               </div>
             </div>
@@ -212,29 +223,28 @@
           <input type="hidden" name="approvalLine" id="approvalLine" value="" />
         </div>
 
-        <div class="form-group">
-          <label>제목</label>
-          <input type="text" name="title" placeholder="제목입력" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-        </div>
 
-
-        <div class="form-contents">
-          <label class="contents-label" for="content">품의내용</label>
-
-          <textarea id="content" name="content" class="label-textarea" placeholder="예시)&#10;품의사유 :&#10;용도 :&#10;구매처 :"></textarea>
-          <label class="contents-label" for="content">예상비용</label>
-          <input type="text" name="expectedCost" placeholder="금액을 입력하세요" style="width: 100%; padding: 8px; border: 1px solid #ddd;">
-        </div>
-
-
-
-        <!-- 파일첨부 영역 -->
-        <div class="attachment-section">
-          <div class="attachment-links">
+        <!-- 본문 입력 영역 -->
+        <div class="main2-contents">
+          <div class="form-contents">
+            <label class="contents-label" for="title">제목</label>
+            <input type="text" id="title" name="title" class="label-input" placeholder="업무연락신청서">
           </div>
-          <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple />
-          <div class="attachment-drop-area">
-            첨부파일이 없습니다.
+          <div class="form-contents">
+            <label class="contents-label" for="content">본문</label>
+            <textarea id="content" name="content" class="label-textarea" placeholder="내용을 입력해주세요."></textarea>
+          </div>
+
+
+          <!-- 파일첨부 영역 -->
+          <!-- 파일첨부 영역 -->
+          <div class="attachment-section">
+            <div class="attachment-links">
+            </div>
+            <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple />
+            <div class="attachment-drop-area">
+              첨부파일이 없습니다.
+            </div>
           </div>
         </div>
 
@@ -244,68 +254,68 @@
         </div>
       </form>
     </div>
+  </div>
 
-    <!-- 결재선 설정 모달 -->
-    <div id="approvalModal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3>결재라인 선택</h3><br/>
-        <div class="approval-modal-container" style="display: flex; gap: 20px;">
-          <!-- 왼쪽: 전체 사원 목록 -->
-          <div class="available-employees" style="width: 45%;">
-            <!-- 부서 필터 추가 -->
-            <div class="department-filter" style="margin-bottom: 10px;">
-              <label for="departmentFilter">부서 선택:</label>
-              <select id="departmentFilter">
-                <option value="">전체 부서</option>
-                <!-- 예시 옵션, 실제 값은 데이터에 맞게 수정 -->
-                <option value="1">개발팀</option>
-                <option value="2">영업팀</option>
-                <option value="3">인사팀</option>
-              </select>
-            </div>
-            <ul id="availableList" style="border: 1px solid #ddd; height: 300px; overflow-y: auto; padding: 10px;">
-              <!-- 타임리프로 전체 사원 목록 반복 처리 -->
-              <li th:each="emp : ${list_emp}"
-                  th:attr="data-department=${emp.depId}, data-employee-id=${emp.empNum}, data-employee-position=${emp.positionTitle}, data-employee-name=${emp.name}"
-                  th:text="${emp.positionTitle} + ' ' + ${emp.name}"
-                  style="cursor: pointer; padding: 5px; border-bottom: 1px solid #eee;">
-              </li>
-            </ul>
+  <!-- 결재선 설정 모달 -->
+  <div id="approvalModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>결재라인 선택</h3><br/>
+      <div class="approval-modal-container" style="display: flex; gap: 20px;">
+        <!-- 왼쪽: 전체 사원 목록 -->
+        <div class="available-employees" style="width: 45%;">
+          <!-- 부서 필터 추가 -->
+          <div class="department-filter" style="margin-bottom: 10px;">
+            <label for="departmentFilter">부서 선택:</label>
+            <select id="departmentFilter">
+              <option value="">전체 부서</option>
+              <!-- 예시 옵션, 실제 값은 데이터에 맞게 수정 -->
+              <option value="1">개발팀</option>
+              <option value="2">영업팀</option>
+              <option value="3">인사팀</option>
+            </select>
           </div>
-
-          <!-- 오른쪽: 선택된 결재라인 (순서 변경 가능) -->
-          <div class="selected-employees" style="width: 45%;">
-            <h4>선택된 결재라인 (순서 변경 가능)</h4>
-            <ul id="selectedList" style="border: 1px solid #ddd; min-height: 300px; padding: 10px;">
-              <!-- 선택된 사원들이 여기에 추가됨 -->
-            </ul>
-          </div>
+          <ul id="availableList" style="border: 1px solid #ddd; height: 300px; overflow-y: auto; padding: 10px;">
+            <!-- 타임리프로 전체 사원 목록 반복 처리 -->
+            <li th:each="emp : ${list_emp}"
+                th:attr="data-department=${emp.depId}, data-employee-id=${emp.empNum}, data-employee-position=${emp.positionTitle}, data-employee-name=${emp.name}"
+                th:text="${emp.positionTitle} + ' ' + ${emp.name}"
+                style="cursor: pointer; padding: 5px; border-bottom: 1px solid #eee;">
+            </li>
+          </ul>
         </div>
-        <br/>
-        <button id="saveApprovalLine" class="button">선택 완료</button>
+
+        <!-- 오른쪽: 선택된 결재라인 (순서 변경 가능) -->
+        <div class="selected-employees" style="width: 45%;">
+          <h4>선택된 결재라인 (순서 변경 가능)</h4>
+          <ul id="selectedList" style="border: 1px solid #ddd; min-height: 300px; padding: 10px;">
+            <!-- 선택된 사원들이 여기에 추가됨 -->
+          </ul>
+        </div>
       </div>
+      <br/>
+      <button id="saveApprovalLine" class="button">선택 완료</button>
     </div>
-
-
-
+  </div>
 </div>
 
-
 <script th:inline="javascript">
-
   $(document).ready(function() {
     //작성자 정보 전역변수설정
     //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
-    var drafter = {
+    let drafter = {
       id: /*[[${employee.empNum}]]*/,
       position: /*[[${employee.positionTitle}]]*/,
       name: /*[[${employee.name}]]*/
     };
-    var storedValue = [[${documentFormId}]];
+
+
+    // 초기화 및 이벤트 바인딩
+    let storedValue = [[${bc}]];
     if (storedValue) {
       $("#formSelect").val(storedValue);
     }
+
 
     $("#main").on("click", function () {
       location.href = "/edsm/main";
@@ -322,7 +332,7 @@
 
     // form select 변경 이벤트
     $("#documentType").on("change", function() {
-      var selectedValue = $(this).val();
+      let selectedValue = $(this).val();
       console.log("선택된 값:", selectedValue);
       location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
     });
@@ -404,8 +414,6 @@
       });
       $("#approvalModal").fadeOut();
     });
-
-
   });
 </script>
 </body>
