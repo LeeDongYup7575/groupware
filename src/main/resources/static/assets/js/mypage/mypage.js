@@ -252,6 +252,9 @@ function openImageSelector() {
     document.getElementById('profile-input').click();
 }
 
+// 프로필 이미지 삭제 플래그
+let isImageDeleted = false;
+
 // 파일 선택 시 이미지 미리보기 및 업로드 준비
 document.addEventListener('change', function(event) {
     if (event.target.id === 'profile-input') {
@@ -269,6 +272,8 @@ document.addEventListener('change', function(event) {
                 return;
             }
 
+            isImageDeleted = false;
+
             // 이미지 미리보기
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -283,6 +288,8 @@ document.addEventListener('change', function(event) {
 function deleteProfileImage() {
     document.querySelector('.profile-image img').src = '/assets/images/default-profile.png'; // 기본 이미지로 변경
     document.getElementById('profile-input').value = ''; // 파일 선택 초기화
+    isImageDeleted = true;
+    console.log(isImageDeleted);
 }
 
 // 내 정보 업데이트
@@ -315,6 +322,8 @@ function updateInfo() {
     if (profileInput.files.length > 0) {
         formData.append('profileImage', profileInput.files[0]);
     }
+
+    formData.append("isImageDeleted", isImageDeleted);
 
     // Fetch API를 사용하여 서버에 데이터 전송
     fetch('/api/mypage/update', {

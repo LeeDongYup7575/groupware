@@ -147,8 +147,10 @@
             employees
         SET
             phone = #{updatedEmp.phone},
-            email = #{updatedEmp.email},
-            profile_img_url = #{updatedEmp.profileImgUrl}
+            email = #{updatedEmp.email}
+            <if test="updatedEmp.profileImgUrl != null">
+                , profile_img_url = #{updatedEmp.profileImgUrl}
+            </if>
         WHERE
             emp_num = #{updatedEmp.empNum}
     </update>
