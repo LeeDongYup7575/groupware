@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ChatRoomDAO {
@@ -19,5 +20,9 @@ public class ChatRoomDAO {
     public int createChatRoom(ChatRoomDTO room) {
         mybatis.insert("chatRoom.createChatRoom", room);
         return room.getId();
+    }
+
+    public List<ChatRoomDTO> searchList(Map<String, Object> params) {
+        return mybatis.selectList("chatRoom.searchList", params);
     }
 }

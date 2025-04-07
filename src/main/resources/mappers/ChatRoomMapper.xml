@@ -14,6 +14,13 @@
             keyProperty="id">        insert into chatrooms
                                      values (default, #{name}, default)
     </insert>
+    <select id="searchList" resultType="com.example.projectdemo.domain.chat.dto.ChatRoomDTO">
+        SELECT c.*
+        FROM membership m
+                 JOIN chatrooms c ON m.chatroom_id = c.id
+        WHERE m.emp_id = #{id}
+          AND c.name LIKE concat('%', #{target}, '%')
 
+    </select>
 
 </mapper>
