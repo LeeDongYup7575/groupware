@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PostsService {
@@ -31,6 +32,20 @@ public class PostsService {
 
         // 저장된 게시글 반환
         return postsDTO;
+    }
+
+    // 게시글 목록 조회
+    public List<PostsDTO> getAllPosts() {
+        return postsMapper.getAllPosts();
+    }
+
+    // 게시글 상세 조회
+    public PostsDTO getPostById(int id) {
+        PostsDTO post = postsMapper.getPostById(id);
+        if (post == null) {
+            throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id=" + id);
+        }
+        return post;
     }
 
 }

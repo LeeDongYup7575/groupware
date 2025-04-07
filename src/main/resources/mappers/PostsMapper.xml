@@ -21,4 +21,37 @@
                  )
     </insert>
 
+    <!-- 게시글 목록 조회 -->
+    <select id="getAllPosts" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">
+        SELECT
+            p.id,
+            p.title,
+            p.emp_id AS empId,
+            e.name AS author,
+            p.views,
+            p.board_id AS boardId,
+            p.created_at AS createdAt
+        FROM posts p
+                 LEFT JOIN employees e ON p.emp_id = e.id
+        ORDER BY p.id DESC
+    </select>
+
+    <!-- 게시글 상세 조회 -->
+    <select id="getPostById" parameterType="int" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">
+        SELECT
+            p.id,
+            p.title,
+            p.content,
+            p.emp_id AS empId,
+            e.name AS author,
+            p.created_at AS createdAt,
+            p.views,
+            p.board_id AS boardId,
+            b.name AS boardName
+        FROM posts p
+                 LEFT JOIN employees e ON p.emp_id = e.id
+                 LEFT JOIN boards b ON p.board_id = b.id
+        WHERE p.id = #{id}
+    </select>
+
 </mapper>

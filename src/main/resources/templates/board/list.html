@@ -30,16 +30,20 @@
                     <th>조회수</th>
                 </tr>
             </thead>
+
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>board list test</td>
-                    <td>관리자</td>
-                    <td>2023-07-15</td>
-                    <td>10</td>
-                </tr>
-                <!-- 반복 게시물 -->
+            <tr th:each="post : ${posts}">
+                <td th:text="${post.id}">1</td>
+                <td><a th:href="@{/board/view/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a></td>
+                <td th:text="${post.author}">작성자</td>
+                <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
+                <td th:text="${post.views}">조회수</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(posts)}">
+                <td colspan="4" class="text-center">게시글이 없습니다.</td>
+            </tr>
             </tbody>
+
         </table>
 
         <div class="pagination">

@@ -21,5 +21,6 @@ public class PostsDTO {
     private Integer views;
     private LocalDateTime createdAt;
     private Integer boardId;
-
+    // 작성자 이름 필드 추가
+    private String author;
 }
