@@ -155,23 +155,4 @@
             emp_num = #{updatedEmp.empNum}
     </update>
 
-    <!-- 모든 사원의 연락처 정보 조회 -->
-    <select id="findAllEmpContacts" resultType="com.example.projectdemo.domain.employees.dto.EmployeeContactsDTO">
-        SELECT
-            employees.emp_num,
-            employees.name,
-            employees.internal_email,
-            employees.phone,
-            employees.dep_id,
-            departments.name AS dep_name
-        FROM
-            employees
-        JOIN
-            departments
-        ON
-            employees.dep_id = departments.id
-        ORDER BY
-            employees.name;
-    </select>
-
 </mapper>

@@ -1,7 +1,7 @@
 package com.example.projectdemo.domain.contact.controller;
 
-import com.example.projectdemo.domain.employees.dto.EmployeeContactsDTO;
-import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.contact.dto.EmployeeContactDTO;
+import com.example.projectdemo.domain.contact.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,12 +15,11 @@ import java.util.List;
 public class ContactController {
 
     @Autowired
-    private EmployeesService employeesService;
+    private ContactService contactService;
 
     @GetMapping
     public String contact(Model model) {
-
-        List<EmployeeContactsDTO> employeeContacts = employeesService.findAllEmpContacts();
+        List<EmployeeContactDTO> employeeContacts = contactService.findAllEmpContacts();
         model.addAttribute("employeeContacts", employeeContacts);
 
         return "contact/contact";

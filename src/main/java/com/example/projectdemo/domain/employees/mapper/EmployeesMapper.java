@@ -1,6 +1,5 @@
 package com.example.projectdemo.domain.employees.mapper;
 
-import com.example.projectdemo.domain.employees.dto.EmployeeContactsDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -64,6 +63,4 @@ public interface EmployeesMapper {
     // 마이페이지 회원정보(프로필이미지, 전화번호, 개인이메일) 수정
     int updateEmpInfo(@Param("updatedEmp") EmployeesInfoUpdateDTO updatedEmp);
 
-    // 모든 사원의 연락처 정보 조회
-    List<EmployeeContactsDTO> findAllEmpContacts();
 }

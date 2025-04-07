@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.projectdemo.domain.contact.mapper.ContactMapper">
+    <!-- 모든 사원의 연락처 정보 조회 -->
+    <select id="findAllEmpContacts" resultType="com.example.projectdemo.domain.contact.dto.EmployeeContactDTO">
+        SELECT
+            employees.emp_num,
+            employees.name,
+            employees.internal_email,
+            employees.phone,
+            employees.dep_id,
+            departments.name AS dep_name
+        FROM
+            employees
+                JOIN
+            departments
+            ON
+                employees.dep_id = departments.id
+        ORDER BY
+            employees.name;
+    </select>
+</mapper>
