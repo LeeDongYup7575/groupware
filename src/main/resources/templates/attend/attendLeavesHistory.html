@@ -40,18 +40,21 @@
             <a href="/attend/workDetails"><button class="tab-button">근무신청내역</button></a>
         </div>
 
+        <!-- 연도 선택 -->
         <div class="date-selector">
             <div class="date-navigator">
                 <button class="nav-button prev-year">&lt;</button>
-                <span class="date-range" id="yearDisplay">2025-01-01 ~ 2025-12-31</span>
+                <span class="date-range" id="yearDisplay" th:text="${selectedYear + '-01-01 ~ ' + selectedYear + '-12-31'}">2025-01-01 ~ 2025-12-31</span>
                 <button class="nav-button next-year">&gt;</button>
             </div>
         </div>
 
-        <div class="section-title" id="leavesHistoryTitle">
+        <div class="section-title" id="leavesHistoryTitle"
+             th:text="'휴가 생성 내역 ' + ${selectedYear + '-01-01 ~ ' + selectedYear + '-12-31'}">
             휴가 생성 내역 2025-01-01 ~ 2025-12-31
         </div>
 
+        <!-- 연차 생성 내역 테이블 -->
         <table class="data-table">
             <thead>
             <tr>
@@ -66,25 +69,29 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="date, iterStat : ${leaveGrantDates}">
-                <td th:text="${date}"></td>
-                <td>1일</td> <!-- 발생 -->
-                <td>1일</td> <!-- 최종 -->
+            <tr th:each="entry : ${leaveGrantMap}">
+                <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>
+                <td th:text="${entry.value + '일'}"></td>
+                <td th:text="${entry.value + '일'}"></td>
                 <td>정기휴가</td>
-                <td>연차 (1일 x 8시간 = 8시간)</td>
+                <td th:text="|연차 (${entry.value}일 x 8시간 = ${entry.value * 8}시간)|"></td>
             </tr>
-            <tr th:if="${leaveGrantDates.isEmpty()}">
+            <tr th:if="${leaveGrantMap.isEmpty()}">
                 <td colspan="5" class="no-data">생성된 연차가 없습니다.</td>
             </tr>
             </tbody>
+
         </table>
 
-        <div class="summary" th:text="'휴가 현황  총 휴가: '+${employee.totalLeave}+'일 | 사용: '+ ${employee.usedLeave}+'일 | 잔여: '+ ${canUseLeaves}+'일'">
-            휴가 현황 총 휴가: 20일 | 사용: 0일 | 잔여: 20일 (연차: 20일)
+        <!-- 요약 -->
+        <div class="summary"
+             th:text="'휴가 현황  총 휴가: '+${employee.totalLeave}+'일 | 사용: '+ ${employee.usedLeave}+'일 | 잔여: '+ ${canUseLeaves}+'일'">
+            휴가 현황 총 휴가: 20일 | 사용: 0일 | 잔여: 20일
         </div>
 
+        <!-- 휴가 신청 내역 -->
         <div class="section-title">
-            휴가 신청 내역 <span id="leaveApplicationDateRange">2025-01-01 ~ 2025-12-31</span>
+            휴가 신청 내역
         </div>
 
         <table class="data-table application-table">
@@ -99,7 +106,7 @@
                 <th>상세</th>
             </tr>
             </thead>
-            <tbody id="leavesTableBody">
+            <tbody>
             <tr th:if="${leavesList.isEmpty()}">
                 <td colspan="7" class="no-data">데이터가 없습니다.</td>
             </tr>
@@ -110,9 +117,7 @@
                 <td>1</td>
                 <td th:text="${leave.startDate} + ' ~ ' + ${leave.endDate}">기간</td>
                 <td th:text="${leave.status}">상태</td>
-                <td>
-                    <button class="detail-button" th:attr="data-reason=${leave.reason}">상세</button>
-                </td>
+                <td><button class="detail-button" th:attr="data-reason=${leave.reason}">상세</button></td>
             </tr>
             </tbody>
         </table>
@@ -120,136 +125,37 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 현재 연도를 저장하는 변수
-        let currentYear = new Date().getFullYear();
+    document.addEventListener('DOMContentLoaded', function () {
+        // 선택된 연도 가져오기
+        let currentYear = parseInt(document.getElementById('yearDisplay').textContent.slice(0, 4));
 
-        // URL에서 year 파라미터가 있으면 해당 값으로 설정
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('year')) {
-            currentYear = parseInt(urlParams.get('year'));
-        }
-
-        // 날짜 표시 업데이트 함수
-        function updateDateDisplay() {
-            const startDate = `${currentYear}-01-01`;
-            const endDate = `${currentYear}-12-31`;
-            document.getElementById('yearDisplay').textContent = `${startDate} ~ ${endDate}`;
-            document.getElementById('leavesHistoryTitle').textContent = `휴가 생성 내역 ${startDate} ~ ${endDate}`;
-
-            // 휴가 신청 내역 제목도 업데이트
-            const applicationTitle = document.querySelector('.section-title:nth-of-type(2)');
-            if (applicationTitle) {
-                applicationTitle.textContent = `휴가 신청 내역 ${startDate} ~ ${endDate}`;
-            }
-        }
-
-        // 이전 연도 버튼 클릭 이벤트
-        document.querySelector('.prev-year').addEventListener('click', function() {
-            currentYear--;
-            // 페이지 리로드 with new year parameter
-            window.location.href = `/leaves/leavesHistory?year=${currentYear}`;
+        // 연도 변경 버튼 클릭 시 페이지 이동
+        document.querySelector('.prev-year').addEventListener('click', function () {
+            location.href = '/leaves/leavesHistory?year=' + (currentYear - 1);
         });
 
-        // 다음 연도 버튼 클릭 이벤트
-        document.querySelector('.next-year').addEventListener('click', function() {
-            currentYear++;
-            // 페이지 리로드 with new year parameter
-            window.location.href = `/leaves/leavesHistory?year=${currentYear}`;
+        document.querySelector('.next-year').addEventListener('click', function () {
+            location.href = '/leaves/leavesHistory?year=' + (currentYear + 1);
         });
 
-        // 휴가 신청 버튼 클릭 이벤트
-        document.querySelector(".add-button").onclick = function() {
+        // 휴가 신청 버튼
+        document.querySelector(".add-button").onclick = function () {
             location.href = "/leaves/leavesForm";
         };
 
-        // 드롭다운 메뉴 기능
-        const dropdownHeader = document.querySelector('.dropdown-header');
-        dropdownHeader.addEventListener('click', function() {
+        // 상세보기 버튼
+        const detailButtons = document.querySelectorAll('.detail-button');
+        detailButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const reason = this.getAttribute('data-reason');
+                alert('사유: ' + reason);
+            });
+        });
+
+        // 드롭다운 토글
+        document.querySelector('.dropdown-header').addEventListener('click', function () {
             this.parentElement.classList.toggle('open');
         });
-
-        // 상세 버튼 이벤트 리스너 등록 함수
-        function attachDetailButtonListeners() {
-            const detailButtons = document.querySelectorAll('.detail-button');
-            detailButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const docReason = this.getAttribute('data-reason');
-                    alert('사유: ' + docReason);
-                });
-            });
-        }
-
-        // 초기 상세 버튼 이벤트 리스너 등록
-        attachDetailButtonListeners();
-
-        // 초기 날짜 표시 업데이트
-        updateDateDisplay();
-    });document.addEventListener('DOMContentLoaded', function() {
-        // 현재 연도를 저장하는 변수
-        let currentYear = new Date().getFullYear();
-
-        // URL에서 year 파라미터가 있으면 해당 값으로 설정
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('year')) {
-            currentYear = parseInt(urlParams.get('year'));
-        }
-
-        // 날짜 표시 업데이트 함수
-        function updateDateDisplay() {
-            const startDate = `${currentYear}-01-01`;
-            const endDate = `${currentYear}-12-31`;
-            document.getElementById('yearDisplay').textContent = `${startDate} ~ ${endDate}`;
-            document.getElementById('leavesHistoryTitle').textContent = `휴가 생성 내역 ${startDate} ~ ${endDate}`;
-
-            // 휴가 신청 내역 제목도 업데이트
-            const applicationTitle = document.querySelector('.section-title:nth-of-type(2)');
-            if (applicationTitle) {
-                applicationTitle.textContent = `휴가 신청 내역 ${startDate} ~ ${endDate}`;
-            }
-        }
-
-        // 이전 연도 버튼 클릭 이벤트
-        document.querySelector('.prev-year').addEventListener('click', function() {
-            currentYear--;
-            // 페이지 리로드 with new year parameter
-            window.location.href = `/leaves/leavesHistory?year=${currentYear}`;
-        });
-
-        // 다음 연도 버튼 클릭 이벤트
-        document.querySelector('.next-year').addEventListener('click', function() {
-            currentYear++;
-            // 페이지 리로드 with new year parameter
-            window.location.href = `/leaves/leavesHistory?year=${currentYear}`;
-        });
-
-        // 휴가 신청 버튼 클릭 이벤트
-        document.querySelector(".add-button").onclick = function() {
-            location.href = "/leaves/leavesForm";
-        };
-
-        // 드롭다운 메뉴 기능
-        const dropdownHeader = document.querySelector('.dropdown-header');
-        dropdownHeader.addEventListener('click', function() {
-            this.parentElement.classList.toggle('open');
-        });
-
-        // 상세 버튼 이벤트 리스너 등록 함수
-        function attachDetailButtonListeners() {
-            const detailButtons = document.querySelectorAll('.detail-button');
-            detailButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const docReason = this.getAttribute('data-reason');
-                    alert('사유: ' + docReason);
-                });
-            });
-        }
-
-        // 초기 상세 버튼 이벤트 리스너 등록
-        attachDetailButtonListeners();
-
-        // 초기 날짜 표시 업데이트
-        updateDateDisplay();
     });
 </script>
 </body>
