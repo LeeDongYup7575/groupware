@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/board")
 public class BoardController {
@@ -15,12 +17,18 @@ public class BoardController {
     @Autowired
     private PostsService postsService;
 
+    /**
+     * 게시판
+     */
+    @GetMapping("")
+    public String board(Model model) {
+//        List<PostsDTO> posts = postsService.getAllPosts();
+//        model.addAttribute("posts", posts);
+        model.addAttribute("pageTitle", "게시판");
+        return "board/list"; //게시글 목록 조회(전체 게시글 보기)
+    }
 
-//        @GetMapping("")
-//        public String board(Model model) {
-//            model.addAttribute("pageTitle", "게시판");
-//            return "board/list";
-//        }
+    //게시글 상세 조회(특정 게시글 보기)
 
     @GetMapping("/write")
     public String showWriteForm(Model model) {
