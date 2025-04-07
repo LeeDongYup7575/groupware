@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.projectdemo.domain.videoconf.mapper.VideoRoomParticipantMapper">
+
+    <resultMap id="participantMap" type="com.example.projectdemo.domain.videoconf.entity.VideoRoomParticipant">
+        <id property="id" column="id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="empNum" column="emp_num"/>
+        <result property="joinedAt" column="joined_at"/>
+        <result property="leftAt" column="left_at"/>
+        <result property="isActive" column="is_active"/>
+    </resultMap>
+
+    <select id="findActiveParticipantsByRoomId" resultMap="participantMap">
+        SELECT * FROM VIDEO_ROOM_PARTICIPANT
+        WHERE room_id = #{roomId} AND is_active = true
+    </select>
+
+    <select id="findActiveParticipant" resultMap="participantMap">
+        SELECT * FROM VIDEO_ROOM_PARTICIPANT
+        WHERE room_id = #{roomId} AND emp_num = #{empNum} AND is_active = true
+            LIMIT 1
+    </select>
+
+    <select id="countActiveParticipants" resultType="int">
+        SELECT COUNT(*) FROM VIDEO_ROOM_PARTICIPANT
+        WHERE room_id = #{roomId} AND is_active = true
+    </select>
+
+    <insert id="addParticipant" parameterType="com.example.projectdemo.domain.videoconf.entity.VideoRoomParticipant" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO VIDEO_ROOM_PARTICIPANT (room_id, emp_num, joined_at, is_active)
+        VALUES (#{roomId}, #{empNum}, #{joinedAt}, #{isActive})
+    </insert>
+
+    <update id="deactivateParticipant">
+        UPDATE VIDEO_ROOM_PARTICIPANT
+        SET is_active = false, left_at = #{leftAt}
+        WHERE room_id = #{roomId} AND emp_num = #{empNum} AND is_active = true
+            LIMIT 1
+    </update>
+
+</mapper>

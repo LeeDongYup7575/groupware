@@ -24,7 +24,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // 화상 채팅용 WebSocket 엔드포인트 추가
         registry.addEndpoint("/ws-videochat")
-                .setAllowedOrigins("http://localhost:8082", "http://localhost:82")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 }

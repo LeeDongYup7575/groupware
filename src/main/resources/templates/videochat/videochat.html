@@ -7,21 +7,26 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #007bff;
+            --primary-color: #4a6cf7;
+            --primary-hover: #3a5be8;
             --secondary-color: #6c757d;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
             --light-color: #f8f9fa;
             --dark-color: #343a40;
-            --border-color: #dee2e6;
+            --border-color: #e6e6e6;
+            --background-color: #f4f7fc;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: var(--background-color);
+            color: #333;
         }
 
         .container {
@@ -34,52 +39,215 @@
 
         .header {
             background-color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1rem;
+            padding: 1.2rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-top: 80px;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary-color);
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button:hover {
+            color: var(--primary-color);
+            background-color: var(--light-color);
+        }
+
         .header h1 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background-color: var(--light-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+
+        .user-info i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+        }
+
+        .user-info .user-dept {
+            color: var(--secondary-color);
+            font-size: 0.85rem;
+        }
+
+        .card {
+            background-color: white;
+            padding: 1.8rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .meetings-container {
+            background-color: white;
+            padding: 1.8rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .meetings-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .meetings-title h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .meetings-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .meeting-item {
+            padding: 1.2rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .meeting-item:hover {
+            background-color: var(--light-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .meeting-item strong {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: block;
+        }
+
+        .meeting-item div:first-child {
+            flex: 1;
+        }
+
+        .meeting-item .participants-count {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-top: 0.3rem;
+        }
+
+        .meeting-item i.fa-lock,
+        .meeting-item i.fa-unlock {
+            font-size: 1.2rem;
+            margin-left: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .meeting-item i.fa-lock {
+            color: var(--primary-color);
+        }
+
+        .empty-meetings {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--secondary-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            font-size: 1.1rem;
         }
 
         .join-form, .room-controls {
             background-color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1rem;
+            padding: 1.8rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.95rem;
         }
 
         .form-group input {
             width: 100%;
-            padding: 0.5rem;
+            padding: 0.8rem 1rem;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .btn {
-            padding: 0.5rem 1rem;
+            padding: 0.7rem 1.2rem;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
         }
 
         .btn-primary {
@@ -88,7 +256,30 @@
         }
 
         .btn-primary:hover {
-            background-color: #0069d9;
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(74, 108, 247, 0.2);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
         }
 
         .btn-danger {
@@ -97,22 +288,30 @@
         }
 
         .btn-danger:hover {
-            background-color: #c82333;
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
         }
 
         .video-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
         .video-box {
             position: relative;
             background-color: #000;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
             aspect-ratio: 16/9;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
         }
 
         .video-box video {
@@ -123,42 +322,49 @@
 
         .video-box .user-name {
             position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
+            bottom: 12px;
+            left: 12px;
+            background-color: rgba(0, 0, 0, 0.6);
             color: white;
-            padding: 0.3rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .video-box.local-video {
-            border: 2px solid var(--primary-color);
+            border: 3px solid var(--primary-color);
         }
 
         .room-controls {
             display: flex;
             justify-content: center;
-            gap: 1rem;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
         }
 
         .control-btn {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             border: none;
             background-color: var(--secondary-color);
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .control-btn:hover {
-            background-color: #5a6268;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .control-btn.mute {
@@ -169,22 +375,29 @@
             background-color: var(--danger-color);
         }
 
+        .control-btn.mute:hover,
+        .control-btn.end-call:hover {
+            background-color: #c0392b;
+        }
+
         .hidden {
             display: none;
         }
 
         .participants {
             background-color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1rem;
+            padding: 1.8rem;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
         }
 
         .participants h2 {
             margin-top: 0;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
         }
 
         .participants-list {
@@ -194,7 +407,7 @@
         }
 
         .participants-list li {
-            padding: 0.5rem;
+            padding: 0.8rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -205,39 +418,184 @@
         }
 
         .participants-list li .status {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background-color: var(--success-color);
-            margin-right: 0.5rem;
+            margin-right: 0.8rem;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 2.5rem;
+            border-radius: 12px;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 1rem auto;
+            }
+
+            .video-container {
+                grid-template-columns: 1fr;
+            }
+
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.1rem;
+            }
+
+            .modal-content {
+                width: 90%;
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
+<!-- 헤더 에셋 포함 -->
+<th:block th:replace="fragments/header :: headerAssets"></th:block>
+
 <body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
+
 <div class="container">
     <div class="header">
-        <h1>TECH X 화상 회의</h1>
-        <div id="room-info" class="hidden">
-            <span>방 ID: <strong id="current-room-id"></strong></span>
+        <div class="header-left">
+            <button id="backButton" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>TECH X 화상 회의</h1>
+        </div>
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span class="user-name" th:text="${employee.name}">사용자 이름</span>
+            <span class="user-dept" th:text="${employee.departmentName}">부서명</span>
+        </div>
+    </div>
+
+    <!-- 진행 중인 회의 목록 -->
+    <div id="meetings-container" class="meetings-container">
+        <div class="meetings-title">
+            <h2>진행 중인 회의</h2>
+            <button id="refreshBtn" class="btn btn-primary">
+                <i class="fas fa-sync-alt"></i> 새로고침
+            </button>
+        </div>
+        <ul class="meetings-list" id="meetings-list">
+            <li class="meeting-item">
+                <div>
+                    <strong>${room.name}</strong>
+                    <div class="participants-count">
+                        <i class="fas fa-users"></i> ${room.participantsCount}명 참가 중
+                    </div>
+                </div>
+                <div>
+                    ${room.hasPassword
+                    ? '<i class="fas fa-lock" title="비밀번호 필요"></i>'
+                    : '<i class="fas fa-unlock" title="비밀번호 없음"></i>'}
+                </div>
+            </li>
+            <!-- 회의 목록을 동적으로 추가-->
+        </ul>
+        <div id="empty-meetings" class="empty-meetings hidden">
+            <i class="fas fa-calendar-times" style="font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 1rem;"></i>
+            <p>진행 중인 회의가 없습니다.</p>
+            <p style="font-size: 0.95rem;">새 회의를 만들거나 나중에 다시 확인해주세요.</p>
+        </div>
+        <div class="buttons-container">
+            <button id="createRoomBtn" class="btn btn-success">
+                <i class="fas fa-plus"></i> 새 회의 만들기
+            </button>
         </div>
     </div>
 
     <!-- 방 참가 폼 -->
-    <div id="join-form" class="join-form">
-        <div class="form-group">
-            <label for="username">이름</label>
-            <input type="text" id="username" placeholder="이름을 입력하세요">
-        </div>
+    <div id="join-form" class="join-form hidden">
         <div class="form-group">
             <label for="roomId">방 ID</label>
             <input type="text" id="roomId" placeholder="참여할 방 ID를 입력하세요">
         </div>
-        <button id="joinBtn" class="btn btn-primary">참가하기</button>
-        <button id="createBtn" class="btn btn-primary">새 방 만들기</button>
+        <div class="form-group">
+            <label for="input-roomPw">비밀번호</label>
+            <input type="password" id="input-roomPw" placeholder="패스워드를 입력하세요">
+        </div>
+        <div class="buttons-container">
+            <button id="cancelJoinFormBtn" class="btn btn-secondary">취소</button>
+            <button id="joinBtn" class="btn btn-primary">참가하기</button>
+        </div>
     </div>
 
     <!-- 화상 채팅 영역 -->
     <div id="video-area" class="hidden">
+        <div id="room-info" class="participants">
+            <h2>회의 정보</h2>
+            <p>방 ID: <strong id="current-room-id"></strong></p>
+            <p>회의명: <strong id="current-room-name"></strong></p>
+        </div>
+
         <div class="video-container" id="video-container">
             <!-- 비디오 요소들이 여기에 동적으로 추가됩니다 -->
         </div>
@@ -266,39 +624,100 @@
     </div>
 </div>
 
+<!-- 비밀번호 입력 모달 -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closePasswordModal">&times;</span>
+        <h3 class="modal-title">회의 비밀번호 입력</h3>
+        <div class="form-group">
+            <label for="roomPassword">비밀번호</label>
+            <input type="password" id="roomPassword" placeholder="회의 비밀번호를 입력하세요">
+        </div>
+        <div class="modal-buttons">
+            <button id="cancelJoinBtn" class="btn btn-secondary">취소</button>
+            <button id="confirmJoinBtn" class="btn btn-primary">참가하기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 새 방 생성 모달 -->
+<div id="createRoomModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeCreateRoomModal">&times;</span>
+        <h3 class="modal-title">새 회의 생성</h3>
+        <div class="form-group">
+            <label for="newRoomName">회의 이름</label>
+            <input type="text" id="newRoomName" placeholder="회의 이름을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="newRoomPassword">비밀번호 (선택사항)</label>
+            <input type="password" id="newRoomPassword" placeholder="비밀번호를 설정하세요 (선택사항)">
+        </div>
+        <div class="modal-buttons">
+            <button id="cancelCreateBtn" class="btn btn-secondary">취소</button>
+            <button id="confirmCreateBtn" class="btn btn-success">생성하기</button>
+        </div>
+    </div>
+</div>
+
+
 <!-- JavaScript 라이브러리 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script th:inline="javascript">
+    // 직원 정보 가져오기 (Thymeleaf에서 전달)
+    const employeeInfo = {
+        empNum: /*[[${employee.empNum}]]*/ '',
+        empName: /*[[${employee.name}]]*/ '',
+        deptName: /*[[${employee.departmentName}]]*/ ''
+    };
+
     // 사용자 정보 및 상태 관리
     const state = {
-        username: '',
+        username: employeeInfo.empName,
+        empNum: employeeInfo.empNum,
+        deptName: employeeInfo.deptName,
+        inputRoomPw: '',
         roomId: '',
+        roomName: '',
+        roomPassword: '',
         localStream: null,
         screenStream: null,
         peerConnections: {}, // 다른 참가자와의 연결을 저장
         isMuted: false,
         isVideoOff: false,
         isScreenSharing: false,
-        participants: {}
+        participants: {},
+        activeRooms: [] // 현재 활성화된 방 목록
     };
 
     // WebRTC 설정
-    // STUN 서버 추가 (실제 환경에서는 TURN 서버도 추가하는 것이 좋습니다)
+    // stun 서버 설정
     const peerConnectionConfig = {
         'iceServers': [
             {'urls': 'stun:stun.stunprotocol.org:3478'},
             {'urls': 'stun:stun.l.google.com:19302'},
-        ]
+            {'urls': 'stun:stun1.l.google.com:19302'},
+            {'urls': 'stun:stun2.l.google.com:19302'},
+            {'urls': 'stun:stun3.l.google.com:19302'},
+            {'urls': 'stun:stun4.l.google.com:19302'}
+        ],
+        iceCandidatePoolSize: 10
     };
 
     // DOM 요소
+    const backButton = document.getElementById('backButton');
+    const meetingsContainer = document.getElementById('meetings-container');
     const joinForm = document.getElementById('join-form');
     const videoArea = document.getElementById('video-area');
-    const usernameInput = document.getElementById('username');
     const roomIdInput = document.getElementById('roomId');
+    const inputRoomPw = document.getElementById('input-roomPw');
     const joinBtn = document.getElementById('joinBtn');
-    const createBtn = document.getElementById('createBtn');
+    const cancelJoinFormBtn = document.getElementById('cancelJoinFormBtn');
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const meetingsList = document.getElementById('meetings-list');
+    const emptyMeetings = document.getElementById('empty-meetings');
     const videoContainer = document.getElementById('video-container');
     const participantsList = document.getElementById('participants-list');
     const toggleAudioBtn = document.getElementById('toggleAudio');
@@ -306,86 +725,514 @@
     const shareScreenBtn = document.getElementById('shareScreen');
     const leaveRoomBtn = document.getElementById('leaveRoom');
     const roomInfo = document.getElementById('room-info');
-    const currentRoomId = document.getElementById('current-room-id');
+    const currentroomId = document.getElementById('current-room-id');
+    const currentRoomName = document.getElementById('current-room-name');
+
+    // 비밀번호 모달 요소
+    const passwordModal = document.getElementById('passwordModal');
+    const roomPasswordInput = document.getElementById('roomPassword');
+    const confirmJoinBtn = document.getElementById('confirmJoinBtn');
+    const cancelJoinBtn = document.getElementById('cancelJoinBtn');
+    const closePasswordModal = document.getElementById('closePasswordModal');
+
+    // 방 생성 모달 요소
+    const createRoomModal = document.getElementById('createRoomModal');
+    const newRoomNameInput = document.getElementById('newRoomName');
+    const newRoomPasswordInput = document.getElementById('newRoomPassword');
+    const confirmCreateBtn = document.getElementById('confirmCreateBtn');
+    const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+    const closeCreateRoomModal = document.getElementById('closeCreateRoomModal');
 
     // WebSocket 연결
     let socket;
     let stompClient;
 
-    // 방 생성 및 참가
-    createBtn.addEventListener('click', () => {
-        state.username = usernameInput.value.trim();
-        if (!state.username) {
-            alert('이름을 입력해주세요.');
-            return;
-        }
+    // 페이지 로드 시 활성 회의 목록 가져오기
+    window.addEventListener('DOMContentLoaded', fetchActiveRooms);
 
-        // 랜덤 방 ID 생성
-        state.roomId = 'room-' + Math.floor(Math.random() * 1000000);
-        joinRoom();
+    // 뒤로가기 버튼 처리
+    backButton.addEventListener('click', () => {
+        window.location.href = '/';
     });
 
+    // 리소스 정리 함수
+    function clearResources() {
+        // 모든 미디어 트랙 중지
+        if (state.localStream) {
+            state.localStream.getTracks().forEach(track => track.stop());
+        }
+
+        if (state.screenStream) {
+            state.screenStream.getTracks().forEach(track => track.stop());
+        }
+
+        // 모든 PeerConnection 종료
+        Object.values(state.peerConnections).forEach(pcWrapper => {
+            if (pcWrapper.connection) {
+                pcWrapper.connection.close();
+            }
+        });
+
+        // WebSocket 연결 종료
+        if (stompClient) {
+            stompClient.disconnect();
+        }
+
+        // 상태 초기화
+        state.localStream = null;
+        state.screenStream = null;
+        state.peerConnections = {};
+        state.participants = {};
+        state.isMuted = false;
+        state.isVideoOff = false;
+        state.isScreenSharing = false;
+    }
+
+    // 페이지 종료 시 리소스 정리
+    window.addEventListener('beforeunload', () => {
+        // 방에 참가 중인 경우 떠나기 메시지 전송
+        if (state.roomId && stompClient) {
+            // 서버에 방 나가기 API 호출 (비동기 처리는 페이지 종료 시 완료되지 않을 수 있음)
+            navigator.sendBeacon(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`);
+
+            // 연결된 참가자들에게 알림
+            sendMessage({
+                from: state.username,
+                empNum: state.empNum,
+                type: 'leave',
+                roomId: state.roomId
+            });
+        }
+
+        clearResources();
+    });
+
+    // 모달 외부 클릭 시 닫기
+    window.addEventListener('click', (event) => {
+        if (event.target === passwordModal) {
+            closePasswordModalFn();
+        }
+        if (event.target === createRoomModal) {
+            closeCreateRoomModalFn();
+        }
+    });
+
+    // 새로고침 버튼 처리
+    refreshBtn.addEventListener('click', fetchActiveRooms);
+
+    // 방 참가 폼 취소 버튼
+    cancelJoinFormBtn.addEventListener('click', () => {
+        joinForm.classList.add('hidden');
+        meetingsContainer.classList.remove('hidden');
+    });
+
+    // 활성 회의 목록 가져오기 (서버에서 가져오는 API 필요)
+    // 기존 JavaScript 코드에서 수정이 필요한 부분만 포함합니다.
+
+    // 활성 회의 목록 가져오기
+    function fetchActiveRooms() {
+        // 서버 API 호출로 실제 활성화된 방 목록을 가져옴
+        fetch('/api/videoconf/rooms')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('방 목록을 가져오는데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(rooms => {
+                updateRoomsList(rooms);
+            })
+            .catch(error => {
+                console.error('방 목록 가져오기 오류:', error);
+                // 오류 발생 시 빈 목록 표시
+                updateRoomsList([]);
+            });
+    }
+
+    // 회의 목록 업데이트
+    function updateRoomsList(rooms) {
+        state.activeRooms = rooms;
+        meetingsList.innerHTML = '';
+
+        if (rooms.length === 0) {
+            emptyMeetings.classList.remove('hidden');
+        } else {
+            emptyMeetings.classList.add('hidden');
+
+            rooms.forEach(room => {
+                const listItem = document.createElement('li');
+                listItem.className = 'meeting-item';
+                listItem.dataset.roomId = room.id;
+
+                listItem.innerHTML = `
+        <div>
+            <strong>${room.name}</strong>
+            <div>참가자: ${room.participantsCount}명</div>
+        </div>
+        <div>
+            ${room.hasPassword ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-unlock"></i>'}
+        </div>
+    `;
+
+                listItem.addEventListener('click', () => handleRoomClick(room));
+                meetingsList.appendChild(listItem);
+            });
+        }
+    }
+
+    // 회의실 클릭 처리
+    function handleRoomClick(room) {
+        state.roomId = room.id;
+        state.roomName = room.name;
+
+        // 비밀번호가 있는 경우 비밀번호 모달 표시
+        if (room.hasPassword) {
+            showPasswordModal(room);
+        } else {
+            // 비밀번호가 없는 경우 바로 참가
+            joinRoom();
+        }
+    }
+
+    // 수동으로 방 ID 입력하여 참가하기
     joinBtn.addEventListener('click', () => {
-        state.username = usernameInput.value.trim();
         state.roomId = roomIdInput.value.trim();
+        state.inputRoomPw = inputRoomPw.value.trim();
 
-        if (!state.username || !state.roomId) {
-            alert('이름과 방 ID를 모두 입력해주세요.');
+        if (!state.roomId) {
+            alert('방 ID를 입력해주세요.');
             return;
         }
+
+        // 방 이름이 없는 경우 방 ID로 설정
+        state.roomName = state.roomId;
+        state.roomPassword = state.inputRoomPw;
 
         joinRoom();
     });
 
-    // 방 참가 함수
-    async function joinRoom() {
+    // 비밀번호 모달 표시
+    function showPasswordModal(room) {
+        passwordModal.style.display = 'block';
+        roomPasswordInput.value = '';
+        roomPasswordInput.focus();
+    }
+
+    // 비밀번호 모달 닫기
+    function closePasswordModalFn() {
+        passwordModal.style.display = 'none';
+    }
+
+    // 비밀번호 확인 버튼 클릭
+    confirmJoinBtn.addEventListener('click', () => {
+        state.roomPassword = roomPasswordInput.value.trim();
+
+        if (!state.roomPassword) {
+            alert('비밀번호를 입력해주세요.');
+            return;
+        }
+
+        // 비밀번호 검증을 서버에 요청
+        fetch(`/api/videoconf/verify-password?roomId=${state.roomId}&password=${state.roomPassword}`)
+            .then(response => response.json())
+            .then(isValid => {
+                if (isValid) {
+                    closePasswordModalFn();
+                    joinRoom();
+                } else {
+                    alert('잘못된 비밀번호입니다. 다시 시도해주세요.');
+                }
+            })
+            .catch(error => {
+                console.error('비밀번호 검증 오류:', error);
+            });
+    });
+
+    // 비밀번호 모달 취소 버튼 클릭
+    cancelJoinBtn.addEventListener('click', closePasswordModalFn);
+    closePasswordModal.addEventListener('click', closePasswordModalFn);
+
+    // 새 방 만들기 버튼 클릭
+    createRoomBtn.addEventListener('click', showCreateRoomModal);
+
+    // 방 생성 모달 표시
+    function showCreateRoomModal() {
+        createRoomModal.style.display = 'block';
+        newRoomNameInput.value = '';
+        newRoomPasswordInput.value = '';
+        newRoomNameInput.focus();
+    }
+
+    // 방 생성 모달 닫기
+    function closeCreateRoomModalFn() {
+        createRoomModal.style.display = 'none';
+    }
+
+    // 방 생성 확인 버튼 클릭
+    confirmCreateBtn.addEventListener('click', () => {
+        const roomName = newRoomNameInput.value.trim();
+        const roomPassword = newRoomPasswordInput.value.trim();
+
+        if (!roomName) {
+            alert('회의 이름을 입력해주세요.');
+            newRoomNameInput.focus();
+            return;
+        }
+
+        // 방 ID 생성
+        state.roomId = 'room-' + Math.floor(Math.random() * 1000000);
+        state.roomName = roomName;
+        state.roomPassword = roomPassword;
+
+        // 서버에 방 생성 정보 전송
+        fetch('/api/videoconf/create-room', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: state.roomId,
+                name: state.roomName,
+                password: state.roomPassword,
+                createdBy: state.empNum,
+                maxParticipants: 8
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('방 생성에 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(room => {
+                closeCreateRoomModalFn();
+                joinRoom();
+            })
+            .catch(error => {
+                console.error('방 생성 오류:', error);
+                alert('방 생성에 실패했습니다. 다시 시도해주세요.');
+            });
+    });
+
+
+    // 방 생성 모달 취소 버튼 클릭
+    cancelCreateBtn.addEventListener('click', closeCreateRoomModalFn);
+    closeCreateRoomModal.addEventListener('click', closeCreateRoomModalFn);
+
+    // const currentVideoRoomId = document.getElementById('current-room-id');
+    // const currentRoomName = document.getElementById('current-room-name');
+
+    // 방 참가 시 세션 스토리지에 방 정보 저장
+    function joinRoom() {
         try {
             // 미디어 스트림 가져오기
-            state.localStream = await navigator.mediaDevices.getUserMedia({
+            navigator.mediaDevices.getUserMedia({
                 audio: true,
                 video: true
+            }).then(stream => {
+                state.localStream = stream;
+
+                // 로컬 비디오 표시
+                addVideoStream(state.username, state.localStream, true);
+
+                // WebSocket 연결
+                connectToWebSocket();
+
+                // UI 업데이트
+                meetingsContainer.classList.add('hidden');
+                joinForm.classList.add('hidden');
+                videoArea.classList.remove('hidden');
+
+                // 회의 정보 표시
+                currentVideoRoomId.textContent = state.roomId;
+                currentRoomName.textContent = state.roomName || state.roomId;
+
+                // 참가자 목록에 자신 추가
+                addParticipant(state.username, true, state.deptName);
+
+                // 세션 스토리지에 방 정보 저장
+                sessionStorage.setItem('roomId', state.roomId);
+                sessionStorage.setItem('roomName', state.roomName);
+                sessionStorage.setItem('roomPassword', state.roomPassword);
+            }).catch(error => {
+                console.error('미디어 장치에 액세스할 수 없습니다:', error);
+                alert('카메라나 마이크에 액세스할 수 없습니다. 권한을 확인해주세요.');
             });
-
-            // 로컬 비디오 표시
-            addVideoStream(state.username, state.localStream, true);
-
-            // WebSocket 연결
-            connectToWebSocket();
-
-            // UI 업데이트
-            joinForm.classList.add('hidden');
-            videoArea.classList.remove('hidden');
-            roomInfo.classList.remove('hidden');
-            currentRoomId.textContent = state.roomId;
-
-            // 참가자 목록에 자신 추가
-            addParticipant(state.username, true);
         } catch (error) {
-            console.error('미디어 장치에 액세스할 수 없습니다:', error);
-            alert('카메라나 마이크에 액세스할 수 없습니다. 권한을 확인해주세요.');
+            console.error('joinRoom 오류:', error);
         }
     }
 
-    // WebSocket 연결 함수
-    function connectToWebSocket() {
-        socket = new SockJS('/ws-videochat');
-        stompClient = Stomp.over(socket);
+    // 페이지 로드 시 세션 스토리지에서 방 정보 복원
+    window.addEventListener('DOMContentLoaded', function() {
+        fetchActiveRooms();
 
-        stompClient.connect({}, onConnected, onError);
+        // 세션 스토리지에서 방 정보 복원
+        const savedRoomId = sessionStorage.getItem('roomId');
+        if (savedRoomId) {
+            // 방 정보 복원
+            state.roomId = savedRoomId;
+            state.roomName = sessionStorage.getItem('roomName') || savedRoomId;
+            state.roomPassword = sessionStorage.getItem('roomPassword') || '';
+
+            console.log("새로고침: 이전 방 정보 복원", state.roomId);
+
+            // 방 재접속 시도
+            fetch(`/api/videoconf/check-room-validity?roomId=${state.roomId}`)
+                .then(response => response.json())
+                .then(isValid => {
+                    if (isValid) {
+                        // 방이 유효한 경우에만 재접속
+                        joinRoom();
+                    } else {
+                        // 방이 더 이상 존재하지 않는 경우
+                        alert('이전 회의가 종료되었습니다.');
+                        sessionStorage.removeItem('roomId');
+                        sessionStorage.removeItem('roomName');
+                        sessionStorage.removeItem('roomPassword');
+                    }
+                })
+                .catch(error => {
+                    console.error('방 유효성 확인 오류:', error);
+                });
+        }
+    });
+
+    // WebSocket 연결 함수 수정
+    function connectToWebSocket() {
+        try {
+            socket = new SockJS('/ws-videochat');
+            stompClient = Stomp.over(socket);
+
+            // 재연결 시도 횟수 관리
+            let reconnectAttempts = 0;
+            const maxReconnectAttempts = 5;
+
+            // 웹소켓 연결 종료 이벤트 핸들러
+            socket.onclose = function(event) {
+                console.log('WebSocket 연결이 종료되었습니다.', event);
+
+                // 방에 참가 중인 경우 방 나가기 요청 전송
+                if (state.roomId) {
+                    fetch(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`, {
+                        method: 'POST'
+                    }).catch(() => {
+                        navigator.sendBeacon(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`);
+                    });
+                }
+
+                // 의도하지 않은 연결 종료인 경우 재연결 시도
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    console.log(`WebSocket 재연결 시도 (${reconnectAttempts + 1}/${maxReconnectAttempts})...`);
+                    reconnectAttempts++;
+
+                    // 1초 후 재연결 시도
+                    setTimeout(connectToWebSocket, 1000);
+                } else {
+                    console.error('최대 재연결 시도 횟수를 초과했습니다.');
+                    alert('서버와의 연결이 끊어졌습니다. 페이지를 새로고침해주세요.');
+                }
+            };
+
+            stompClient.connect({}, onConnected, onError);
+        } catch (error) {
+            console.error('WebSocket 연결 시도 중 오류:', error);
+        }
     }
 
-    // WebSocket 연결 성공 시 콜백
+    // WebSocket 연결 성공 시 콜백 함수 수정
     function onConnected() {
+        console.log("WebSocket 연결 성공");
+
         // 채팅방 구독
         stompClient.subscribe('/topic/videochat', onMessageReceived);
 
-        // 사용자 입장 메시지 전송
-        sendMessage({
-            from: state.username,
-            type: 'join',
-            roomId: state.roomId
-        });
+        // 서버에 방 참가 정보 전송
+        fetch('/api/videoconf/join-room', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                roomId: state.roomId,
+                roomName: state.roomName,
+                roomPassword: state.roomPassword,
+                empNum: state.empNum,
+                empName: state.username,
+                deptName: state.deptName
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('방 참가에 실패했습니다.');
+                }
+                return response.text();
+            })
+            .then(result => {
+                console.log('방 참가 성공:', result);
+
+                // 현재 방에 있는 모든 참가자 목록 조회
+                return fetch(`/api/videoconf/participants?roomId=${state.roomId}`);
+            })
+            .then(response => response.json())
+            .then(participants => {
+                console.log('현재 참가자 목록:', participants);
+
+                // 참가자 목록 초기화
+                participantsList.innerHTML = '';
+
+                // 자신을 참가자 목록에 먼저 추가
+                addParticipant(state.username, true, state.deptName);
+
+                // 다른 참가자들 추가 및 연결 설정
+                participants.forEach(participant => {
+                    // 자신은 이미 추가했으므로 제외
+                    if (participant.empNum !== state.empNum) {
+                        console.log(`기존 참가자 추가: ${participant.empName}`);
+                        addParticipant(participant.empName, false, participant.deptName);
+
+                        // 기존 참가자와 피어 연결 생성
+                        const pcWrapper = createPeerConnection(participant.empName);
+                        const peerConnection = pcWrapper.connection;
+
+                        // 로컬 스트림 추가
+                        if (state.localStream) {
+                            state.localStream.getTracks().forEach(track => {
+                                peerConnection.addTrack(track, state.localStream);
+                            });
+                        }
+
+                        // Offer SDP 생성 및 전송
+                        peerConnection.createOffer()
+                            .then(offer => peerConnection.setLocalDescription(offer))
+                            .then(() => {
+                                sendMessage({
+                                    from: state.username,
+                                    empNum: state.empNum,
+                                    deptName: state.deptName,
+                                    type: 'offer',
+                                    payload: peerConnection.localDescription,
+                                    roomId: state.roomId,
+                                    to: participant.empName
+                                });
+                            })
+                            .catch(error => console.error('Offer 생성 오류:', error));
+                    }
+                });
+
+                // WebSocket으로 다른 참가자들에게 입장 알림
+                sendMessage({
+                    from: state.username,
+                    empNum: state.empNum,
+                    deptName: state.deptName,
+                    type: 'join',
+                    roomId: state.roomId,
+                    roomName: state.roomName
+                });
+            })
+            .catch(error => {
+                console.error('방 참가 API 오류:', error);
+                alert('방 참가에 실패했습니다. 다시 시도해주세요.');
+                leaveRoom();
+            });
     }
+
 
     // WebSocket 연결 오류 시 콜백
     function onError(error) {
@@ -401,62 +1248,89 @@
     // 메시지 수신 처리 함수
     function onMessageReceived(payload) {
         const message = JSON.parse(payload.body);
+        console.log("메시지 수신:", message);
 
-        // 같은 방에 있는 메시지만 처리
-        if (message.roomId !== state.roomId) {
+        const messageRoomId = message.roomId || message.videoRoomId;
+
+        if (messageRoomId !== state.roomId) {
             return;
         }
 
         switch (message.type) {
             case 'join':
-                // 새 참가자가 입장한 경우
-                handleNewUser(message.from);
+                if (message.empNum !== state.empNum) {
+                    console.log("입장 메시지 수신:", message.from);
+                    handleNewUser(message.from, message.empNum, message.deptName);
+                }
                 break;
             case 'offer':
-                // Offer SDP를 받은 경우
+                console.log("Offer 메시지 수신:", message.from);
                 handleOffer(message.from, message.payload);
                 break;
             case 'answer':
-                // Answer SDP를 받은 경우
+                console.log("Answer 메시지 수신:", message.from);
                 handleAnswer(message.from, message.payload);
                 break;
             case 'ice':
-                // ICE 후보를 받은 경우
+                console.log("ICE 후보 메시지 수신:", message.from);
                 handleIceCandidate(message.from, message.payload);
                 break;
             case 'leave':
-                // 참가자가 퇴장한 경우
+                console.log("퇴장 메시지 수신:", message.from);
                 handleUserLeft(message.from);
+                break;
+            case 'room-info':
+                console.log("방 정보 업데이트 메시지 수신");
+                updateRoomsList(message.payload);
                 break;
         }
     }
 
-    // 신규 사용자 처리 함수
-    function handleNewUser(username) {
-        if (username === state.username) return; // 자기 자신이면 무시
 
-        console.log(`새 사용자 ${username}가 참가했습니다.`);
+    // 신규 사용자 처리 함수 수정
+    function handleNewUser(username, empNum, deptName) {
+        // 이미 참가자 목록에 있는 경우 무시
+        if (state.participants[username]) {
+            console.log(`${username}은 이미 참가자 목록에 있습니다.`);
+            return;
+        }
+
+        console.log(`새 사용자 ${username}(${deptName})가 참가했습니다.`);
 
         // 참가자 목록에 추가
-        addParticipant(username, false);
+        addParticipant(username, false, deptName);
 
         // 새 PeerConnection 생성
-        const peerConnection = createPeerConnection(username);
+        const pcWrapper = createPeerConnection(username);
+        const peerConnection = pcWrapper.connection;
 
         // 로컬 스트림 추가
-        state.localStream.getTracks().forEach(track => {
-            peerConnection.addTrack(track, state.localStream);
-        });
+        if (state.localStream) {
+            state.localStream.getTracks().forEach(track => {
+                console.log(`${username}와의 연결에 로컬 트랙 추가: ${track.kind}`);
+                peerConnection.addTrack(track, state.localStream);
+            });
+        } else {
+            console.error("로컬 스트림이 없습니다. 미디어 접근 권한을 확인하세요.");
+            return;
+        }
 
         // Offer SDP 생성 및 전송
         peerConnection.createOffer()
-            .then(offer => peerConnection.setLocalDescription(offer))
+            .then(offer => {
+                console.log(`${username}에게 보낼 Offer 생성 완료`);
+                return peerConnection.setLocalDescription(offer);
+            })
             .then(() => {
+                console.log(`${username}에게 Offer 전송`);
                 sendMessage({
                     from: state.username,
+                    empNum: state.empNum,
+                    deptName: state.deptName,
                     type: 'offer',
                     payload: peerConnection.localDescription,
-                    roomId: state.roomId
+                    roomId: state.roomId,
+                    to: username
                 });
             })
             .catch(error => console.error('Offer 생성 오류:', error));
@@ -469,10 +1343,11 @@
         console.log(`${username}로부터 Offer를 받았습니다.`);
 
         // PeerConnection 생성
-        const peerConnection = createPeerConnection(username);
+        const pcWrapper = createPeerConnection(username);
+        const peerConnection = pcWrapper.connection;
 
         // 원격 SDP 설정
-        peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+        pcWrapper.setRemoteDescription(offer)
             .then(() => {
                 // 로컬 스트림 추가
                 state.localStream.getTracks().forEach(track => {
@@ -487,9 +1362,12 @@
                 // Answer SDP 전송
                 sendMessage({
                     from: state.username,
+                    empNum: state.empNum,
+                    deptName: state.deptName,
                     type: 'answer',
                     payload: peerConnection.localDescription,
-                    roomId: state.roomId
+                    roomId: state.roomId,
+                    to: username // 특정 사용자에게만 전송
                 });
             })
             .catch(error => console.error('Answer 생성 오류:', error));
@@ -501,29 +1379,37 @@
 
         console.log(`${username}로부터 Answer를 받았습니다.`);
 
-        const peerConnection = state.peerConnections[username];
-        if (peerConnection) {
-            peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
+        const pcWrapper = state.peerConnections[username];
+        if (pcWrapper) {
+            pcWrapper.setRemoteDescription(answer)
                 .catch(error => console.error('원격 SDP 설정 오류:', error));
         }
     }
 
     // ICE 후보 처리 함수
+    // ICE 후보 처리 함수
     function handleIceCandidate(username, candidate) {
         if (username === state.username) return; // 자기 자신이면 무시
 
-        console.log(`${username}로부터 ICE 후보를 받았습니다.`);
+        console.log(`${username}로부터 ICE 후보를 받았습니다.`, candidate);
 
-        const peerConnection = state.peerConnections[username];
-        if (peerConnection) {
-            peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-                .catch(error => console.error('ICE 후보 추가 오류:', error));
+        const pcWrapper = state.peerConnections[username];
+        if (pcWrapper) {
+            pcWrapper.addIceCandidate(candidate)
+                .then(() => console.log(`${username}의 ICE 후보 추가 성공`))
+                .catch(err => console.error(`${username}의 ICE 후보 추가 오류:`, err));
+        } else {
+            console.warn(`${username}와의 연결이 없습니다. ICE 후보 무시`);
         }
     }
 
     // 사용자 퇴장 처리 함수
     function handleUserLeft(username) {
-        console.log(`사용자 ${username}가 퇴장했습니다.`);
+
+        if (!username) {
+            console.warn('유효하지 않은 사용자의 퇴장 메시지입니다.');
+            return;
+        }
 
         // 참가자 목록에서 제거
         removeParticipant(username);
@@ -535,10 +1421,22 @@
         }
 
         // PeerConnection 정리
-        const peerConnection = state.peerConnections[username];
-        if (peerConnection) {
-            peerConnection.close();
+        const pcWrapper = state.peerConnections[username];
+        if (pcWrapper) {
+            if (pcWrapper.connection) {
+                pcWrapper.connection.close();
+            }
             delete state.peerConnections[username];
+        }
+    }
+
+    // WebRTC 연결 상태 변경 처리 함수
+    function handleConnectionStateChange(username, connectionState) {
+        console.log(`${username}와의 연결 상태: ${connectionState}`);
+
+        // 연결이 끊어진 경우 참가자 상태 업데이트
+        if (connectionState === 'disconnected' || connectionState === 'failed' || connectionState === 'closed') {
+            updateParticipantStatus(username, false);
         }
     }
 
@@ -546,16 +1444,68 @@
     function createPeerConnection(username) {
         const peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
-        state.peerConnections[username] = peerConnection;
+        // ICE 후보 큐 관리를 위한 변수들
+        const iceCandidatesQueue = [];
+        let isRemoteDescriptionSet = false;
+
+        // PeerConnection 참조 저장
+        const pcWrapper = {
+            connection: peerConnection,
+            iceCandidatesQueue: iceCandidatesQueue,
+            isRemoteDescriptionSet: false,
+
+            // 원격 설명 설정 메서드
+            setRemoteDescription: async function(desc) {
+                try {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(desc));
+                    this.isRemoteDescriptionSet = true;
+
+                    // 큐에 있는 ICE 후보들 처리
+                    console.log(`${username}에 대한 큐에 저장된 ICE 후보 ${iceCandidatesQueue.length}개 처리 중`);
+                    while (iceCandidatesQueue.length > 0) {
+                        const candidate = iceCandidatesQueue.shift();
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+                            .catch(error => console.error('큐의 ICE 후보 추가 오류:', error));
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('원격 설명 설정 오류:', error);
+                    return false;
+                }
+            },
+
+            // ICE 후보 추가 메서드
+            addIceCandidate: async function(candidate) {
+                if (this.isRemoteDescriptionSet) {
+                    try {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+                        return true;
+                    } catch (error) {
+                        console.error('ICE 후보 추가 오류:', error);
+                        return false;
+                    }
+                } else {
+                    // 원격 설명이 설정되기 전이면 큐에 저장
+                    console.log(`${username}에 대한 ICE 후보를 큐에 저장 (원격 설명 대기 중)`);
+                    iceCandidatesQueue.push(candidate);
+                    return true;
+                }
+            }
+        };
+
+        state.peerConnections[username] = pcWrapper;
 
         // ICE 후보 이벤트 처리
         peerConnection.onicecandidate = event => {
             if (event.candidate) {
                 sendMessage({
                     from: state.username,
+                    empNum: state.empNum,
+                    deptName: state.deptName,
                     type: 'ice',
                     payload: event.candidate,
-                    roomId: state.roomId
+                    roomId: state.roomId,
+                    to: username // 특정 사용자에게만 전송
                 });
             }
         };
@@ -570,7 +1520,29 @@
             }
         };
 
-        return peerConnection;
+        // 연결 상태 변경 감지
+        peerConnection.onconnectionstatechange = () => {
+            handleConnectionStateChange(username, peerConnection.connectionState);
+        };
+
+        // ICE 연결 상태 모니터링 추가
+        peerConnection.oniceconnectionstatechange = () => {
+            console.log(`${username}와의 ICE 연결 상태 변경: ${peerConnection.iceConnectionState}`);
+
+            // ICE 상태가 실패하면 재시도
+            if (peerConnection.iceConnectionState === 'failed') {
+                console.warn(`${username}와의 ICE 연결 실패, 재시도 중...`);
+                // ICE 재협상 시도
+                peerConnection.restartIce();
+            }
+        };
+
+        // ICE 수집 상태 모니터링 추가
+        peerConnection.onicegatheringstatechange = () => {
+            console.log(`${username}와의 ICE 수집 상태: ${peerConnection.iceGatheringState}`);
+        };
+
+        return pcWrapper;
     }
 
     // 비디오 스트림 추가 함수
@@ -601,20 +1573,40 @@
     }
 
     // 참가자 목록에 추가
-    function addParticipant(username, isLocal) {
-        state.participants[username] = true;
+    function addParticipant(username, isLocal, deptName = '') {
+        state.participants[username] = {
+            online: true,
+            isLocal: isLocal,
+            deptName: deptName
+        };
 
         const li = document.createElement('li');
         li.id = `participant-${username}`;
 
         const status = document.createElement('div');
         status.className = 'status';
+        status.title = '접속 중';
+
+        const nameInfo = document.createElement('div');
+        nameInfo.style.display = 'flex';
+        nameInfo.style.flexDirection = 'column';
 
         const name = document.createElement('span');
         name.textContent = username + (isLocal ? ' (나)' : '');
+        name.style.fontWeight = 'bold';
+
+        const dept = document.createElement('span');
+        dept.textContent = deptName || '';
+        dept.style.fontSize = '0.8rem';
+        dept.style.color = '#6c757d';
+
+        nameInfo.appendChild(name);
+        if (deptName) {
+            nameInfo.appendChild(dept);
+        }
 
         li.appendChild(status);
-        li.appendChild(name);
+        li.appendChild(nameInfo);
         participantsList.appendChild(li);
     }
 
@@ -625,6 +1617,24 @@
         const li = document.getElementById(`participant-${username}`);
         if (li) {
             li.remove();
+        }
+    }
+
+    // 참가자 상태 업데이트
+    function updateParticipantStatus(username, isOnline) {
+        if (state.participants[username]) {
+            state.participants[username].online = isOnline;
+
+            const statusElement = document.querySelector(`#participant-${username} .status`);
+            if (statusElement) {
+                if (isOnline) {
+                    statusElement.style.backgroundColor = 'var(--success-color)';
+                    statusElement.title = '접속 중';
+                } else {
+                    statusElement.style.backgroundColor = 'var(--secondary-color)';
+                    statusElement.title = '연결 끊김';
+                }
+            }
         }
     }
 
@@ -677,14 +1687,16 @@
                 const videoTrack = screenStream.getVideoTracks()[0];
 
                 // 모든 피어 연결에 새 트랙 추가
-                Object.values(state.peerConnections).forEach(pc => {
-                    const senders = pc.getSenders();
-                    const videoSender = senders.find(sender =>
-                        sender.track && sender.track.kind === 'video'
-                    );
+                Object.values(state.peerConnections).forEach(pcWrapper => {
+                    if (pcWrapper.connection) {
+                        const senders = pcWrapper.connection.getSenders();
+                        const videoSender = senders.find(sender =>
+                            sender.track && sender.track.kind === 'video'
+                        );
 
-                    if (videoSender) {
-                        videoSender.replaceTrack(videoTrack);
+                        if (videoSender) {
+                            videoSender.replaceTrack(videoTrack);
+                        }
                     }
                 });
 
@@ -724,14 +1736,16 @@
 
         if (videoTrack) {
             // 모든 피어 연결 업데이트
-            Object.values(state.peerConnections).forEach(pc => {
-                const senders = pc.getSenders();
-                const videoSender = senders.find(sender =>
-                    sender.track && sender.track.kind === 'video'
-                );
+            Object.values(state.peerConnections).forEach(pcWrapper => {
+                if (pcWrapper.connection) {
+                    const senders = pcWrapper.connection.getSenders();
+                    const videoSender = senders.find(sender =>
+                        sender.track && sender.track.kind === 'video'
+                    );
 
-                if (videoSender) {
-                    videoSender.replaceTrack(videoTrack);
+                    if (videoSender) {
+                        videoSender.replaceTrack(videoTrack);
+                    }
                 }
             });
 
@@ -749,61 +1763,209 @@
 
     // 통화 종료 기능
     leaveRoomBtn.addEventListener('click', () => {
-        // 방 나가기 메시지 전송
-        sendMessage({
-            from: state.username,
-            type: 'leave',
-            roomId: state.roomId
-        });
+        // 서버에 방 나가기 API 호출
+        fetch(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('방 나가기에 실패했습니다.');
+                }
+                return response.text();
+            })
+            .then(result => {
+                console.log('방 나가기 성공:', result);
 
-        // 모든 리소스 정리
-        clearResources();
+                // 방 나가기 메시지 전송
+                sendMessage({
+                    from: state.username,
+                    empNum: state.empNum,
+                    type: 'leave',
+                    roomId: state.roomId
+                });
 
-        // UI 초기화
-        joinForm.classList.remove('hidden');
-        videoArea.classList.add('hidden');
-        roomInfo.classList.add('hidden');
+                // 모든 리소스 정리
+                clearResources();
 
-        // 비디오 컨테이너 비우기
-        videoContainer.innerHTML = '';
+                // UI 초기화
+                meetingsContainer.classList.remove('hidden');
+                joinForm.classList.add('hidden');
+                videoArea.classList.add('hidden');
 
-        // 참가자 목록 비우기
-        participantsList.innerHTML = '';
+                // 비디오 컨테이너 비우기
+                videoContainer.innerHTML = '';
+
+                // 참가자 목록 비우기
+                participantsList.innerHTML = '';
+
+                // 방 목록 새로고침
+                fetchActiveRooms();
+            })
+            .catch(error => {
+                console.error('방 나가기 API 오류:', error);
+                alert('방 나가기에 실패했습니다. 다시 시도해주세요.');
+            });
     });
-
-    // 리소스 정리 함수
-    function clearResources() {
-        // 모든 미디어 트랙 중지
-        if (state.localStream) {
-            state.localStream.getTracks().forEach(track => track.stop());
-        }
-
-        if (state.screenStream) {
-            state.screenStream.getTracks().forEach(track => track.stop());
-        }
-
-        // 모든 PeerConnection 종료
-        Object.values(state.peerConnections).forEach(pc => pc.close());
-
-        // WebSocket 연결 종료
-        if (stompClient) {
-            stompClient.disconnect();
-        }
-
-        // 상태 초기화
-        state.localStream = null;
-        state.screenStream = null;
-        state.peerConnections = {};
-        state.participants = {};
-        state.isMuted = false;
-        state.isVideoOff = false;
-        state.isScreenSharing = false;
-    }
 
     // 페이지 종료 시 리소스 정리
     window.addEventListener('beforeunload', () => {
+        // 방에 참가 중인 경우 떠나기 메시지 전송
+        if (state.roomId) {
+            // 서버에 방 나가기 API 호출 (비동기 처리는 페이지 종료 시 완료되지 않을 수 있음)
+            navigator.sendBeacon(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`);
+
+            // 연결된 참가자들에게 알림
+            if (stompClient && stompClient.connected) {
+                sendMessage({
+                    from: state.username,
+                    empNum: state.empNum,
+                    type: 'leave',
+                    roomId: state.roomId
+                });
+            }
+        }
+
         clearResources();
     });
+
+    // 방 나가기 함수 정의
+    // function leaveRoom() {
+    //     // 서버에 방 나가기 API 호출
+    //     fetch(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`, {
+    //         method: 'POST'
+    //     })
+    //         .then(response => {
+    //             if (!response.ok) {
+    //                 throw new Error('방 나가기에 실패했습니다.');
+    //             }
+    //             return response.text();
+    //         })
+    //         .then(result => {
+    //             console.log('방 나가기 성공:', result);
+    //
+    //             // 연결된 참가자들에게 알림
+    //             if (stompClient && stompClient.connected) {
+    //                 sendMessage({
+    //                     from: state.username,
+    //                     empNum: state.empNum,
+    //                     type: 'leave',
+    //                     roomId: state.roomId
+    //                 });
+    //             }
+    //
+    //             // 모든 리소스 정리
+    //             clearResources();
+    //
+    //             // UI 초기화
+    //             meetingsContainer.classList.remove('hidden');
+    //             joinForm.classList.add('hidden');
+    //             videoArea.classList.add('hidden');
+    //
+    //             // 비디오 컨테이너 비우기
+    //             videoContainer.innerHTML = '';
+    //
+    //             // 참가자 목록 비우기
+    //             participantsList.innerHTML = '';
+    //
+    //             // 방 목록 새로고침
+    //             fetchActiveRooms();
+    //         })
+    //         .catch(error => {
+    //             console.error('방 나가기 API 오류:', error);
+    //             alert('방 나가기에 실패했습니다. 다시 시도해주세요.');
+    //         });
+    // }
+    // 방 나가기 함수에서 세션 스토리지 정리
+    // 나가기 요청 중복 방지를 위한 상태 변수 추가
+    state.isLeaving = false;
+
+    // 방 나가기 함수 수정
+    function leaveRoom() {
+        // 이미 나가기 처리 중이면 무시
+        if (state.isLeaving) {
+            console.log('이미 방 나가기 처리 중입니다.');
+            return;
+        }
+
+        state.isLeaving = true;
+
+        // 서버에 방 나가기 API 호출
+        fetch(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('방 나가기에 실패했습니다.');
+                }
+                return response.text();
+            })
+            .then(result => {
+                console.log('방 나가기 성공:', result);
+
+                // 연결된 참가자들에게 알림
+                if (stompClient && stompClient.connected) {
+                    sendMessage({
+                        from: state.username,
+                        empNum: state.empNum,
+                        type: 'leave',
+                        roomId: state.roomId
+                    });
+                }
+
+                // 세션 스토리지에서 방 정보 제거
+                sessionStorage.removeItem('roomId');
+                sessionStorage.removeItem('roomName');
+                sessionStorage.removeItem('roomPassword');
+
+                // 모든 리소스 정리
+                clearResources();
+
+                // UI 초기화
+                meetingsContainer.classList.remove('hidden');
+                joinForm.classList.add('hidden');
+                videoArea.classList.add('hidden');
+
+                // 비디오 컨테이너 비우기
+                videoContainer.innerHTML = '';
+
+                // 참가자 목록 비우기
+                participantsList.innerHTML = '';
+
+                // 방 목록 새로고침
+                fetchActiveRooms();
+
+                // 나가기 상태 초기화
+                state.isLeaving = false;
+            })
+            .catch(error => {
+                console.error('방 나가기 API 오류:', error);
+                alert('방 나가기에 실패했습니다. 다시 시도해주세요.');
+                // 오류가 발생해도 상태 초기화
+                state.isLeaving = false;
+            });
+    }
+
+    // 페이지 가시성 변경 이벤트 리스너 추가
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'hidden' && state.roomId && !state.isLeaving) {
+            // 백그라운드로 전환될 때 방 나가기 요청 전송
+            state.isLeaving = true;
+            navigator.sendBeacon(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`);
+        }
+    });
+
+    // 페이지 언로드 전 이벤트 리스너 (새로고침 또는 페이지 종료 시)
+    window.addEventListener('beforeunload', () => {
+        if (state.roomId && !state.isLeaving) {
+            // 방 나가기 API 호출
+            state.isLeaving = true;
+            navigator.sendBeacon(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`);
+        }
+        clearResources();
+    });
+
 </script>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
 </body>
 </html>

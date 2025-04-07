@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.projectdemo.domain.videoconf.mapper.VideoRoomMapper">
+
+    <resultMap id="videoRoomMap" type="com.example.projectdemo.domain.videoconf.entity.VideoRoom">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="password" column="password"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="isActive" column="is_active"/>
+        <result property="maxParticipants" column="max_participants"/>
+    </resultMap>
+
+    <select id="findActiveRooms" resultMap="videoRoomMap">
+        SELECT * FROM VIDEO_ROOM
+        WHERE is_active = true
+    </select>
+
+    <select id="findActiveRoomById" resultMap="videoRoomMap">
+        SELECT * FROM VIDEO_ROOM
+        WHERE id = #{roomId} AND is_active = true
+    </select>
+
+    <select id="findPublicRooms" resultMap="videoRoomMap">
+        SELECT * FROM VIDEO_ROOM
+        WHERE is_active = true AND (password IS NULL OR password = '')
+    </select>
+
+    <select id="findRoomsByCreator" resultMap="videoRoomMap">
+        SELECT * FROM VIDEO_ROOM
+        WHERE created_by = #{empNum} AND is_active = true
+    </select>
+
+    <insert id="createRoom" parameterType="com.example.projectdemo.domain.videoconf.entity.VideoRoom">
+        INSERT INTO VIDEO_ROOM (id, name, password, created_by, created_at, is_active, max_participants)
+        VALUES (#{id}, #{name}, #{password}, #{createdBy}, #{createdAt}, #{isActive}, #{maxParticipants})
+    </insert>
+
+    <update id="deactivateRoom">
+        UPDATE VIDEO_ROOM
+        SET is_active = false
+        WHERE id = #{roomId}
+    </update>
+
+</mapper>
