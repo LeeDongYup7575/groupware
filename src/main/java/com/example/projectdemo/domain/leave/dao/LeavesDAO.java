@@ -2,6 +2,8 @@ package com.example.projectdemo.domain.leave.dao;
 
 
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
+import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.entity.Employees;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +37,9 @@ public class LeavesDAO {
 
     public List<LeavesDTO> selectByLeaves(int empId){
         return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.selectAllLeaves", empId);
+    }
+
+    public int updateByLeaves(){
+        return mybatis.update("com.example.projectdemo.domain.leave.dao.LeavesDAO.updateByLeaves");
     }
 }

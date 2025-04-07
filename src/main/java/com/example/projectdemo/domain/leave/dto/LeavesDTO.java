@@ -17,5 +17,4 @@ public class LeavesDTO {
     private String reason;
     private Timestamp createAt;
 
-            
 }

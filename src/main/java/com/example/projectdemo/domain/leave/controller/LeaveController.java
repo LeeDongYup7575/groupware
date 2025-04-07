@@ -19,8 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/leaves")
@@ -73,35 +75,66 @@ public class LeaveController {
 
 
     @RequestMapping("/leavesHistory")
-    public String leavesHistory(Model model, HttpServletRequest request) {
+    public String leavesHistory(@RequestParam(value = "year", required = false) Integer year,
+                                Model model, HttpServletRequest request) {
 
         int empId = (int)request.getAttribute("id");
         String drafterId = (String)request.getAttribute("empNum");
-        System.out.println("drafterId: " + drafterId);
-        System.out.println("empId: " + empId);
-        if (empId == 0) { //예외처리
-            return "redirect:/auth/login";
-        }
-        EmployeesDTO employee = employeeMapper.findById(empId);
-        if (employee == null) { //예외처리
-            return "redirect:/auth/login";
-        }
 
-        int canUseLeaves = employee.getTotalLeave()-employee.getUsedLeave();
+        if (empId == 0) return "redirect:/auth/login";
+
+        EmployeesDTO employee = employeeMapper.findById(empId);
+        if (employee == null) return "redirect:/auth/login";
+
+        int canUseLeaves = employee.getTotalLeave() - employee.getUsedLeave();
 
         LeavesDTO leavesdto = new LeavesDTO();
         String leavesStatus = leavesService.selectByStatus(drafterId, leavesdto.getEdsmDocId());
-
         leavesdto.setStatus(leavesStatus);
 
-        List<LeavesDTO> leavesList = leavesService.selectAllLeaves(empId);
+        // ✅ 현재 연도 지정 (없으면 올해)
+        LocalDate now = LocalDate.now();
+        int currentYear = (year != null) ? year : now.getYear();
+
+        // ✅ 해당 연도의 휴가 신청 내역만 필터링
+        List<LeavesDTO> allLeavesList = leavesService.selectAllLeaves(empId);
+        List<LeavesDTO> leavesList = allLeavesList.stream()
+                .filter(leave -> {
+                    LocalDate startDate = LocalDate.parse(leave.getStartDate());
+                    return startDate.getYear() == currentYear;
+                })
+                .collect(Collectors.toList());
+
+        // ✅ 연차 생성일 계산
+        LocalDate hireDate = employee.getHireDate(); // 입사일
+        List<LocalDate> allGrantDates = new ArrayList<>();
+
+        if (ChronoUnit.YEARS.between(hireDate, now) >= 1) {
+            int years = (int) ChronoUnit.YEARS.between(hireDate.plusYears(1), now);
+            for (int i = 0; i <= years; i++) {
+                allGrantDates.add(LocalDate.of(hireDate.plusYears(1).getYear() + i, 1, 1));
+            }
+        } else {
+            int months = (int) ChronoUnit.MONTHS.between(hireDate, now);
+            for (int i = 1; i <= Math.min(months, 11); i++) {
+                allGrantDates.add(hireDate.plusMonths(i));
+            }
+        }
+
+        // ✅ 해당 연도만 필터링
+        List<LocalDate> leaveGrantDates = allGrantDates.stream()
+                .filter(date -> date.getYear() == currentYear)
+                .collect(Collectors.toList());
 
         model.addAttribute("leavesList", leavesList);
         model.addAttribute("employee", employee);
         model.addAttribute("canUseLeaves", canUseLeaves);
+        model.addAttribute("leaveGrantDates", leaveGrantDates);
+        model.addAttribute("selectedYear", currentYear); // 프론트에서 표시용
 
         return "/attend/attendLeavesHistory";
     }
+
 
     @PostMapping("/submitLeave")
     public String submitLeave(

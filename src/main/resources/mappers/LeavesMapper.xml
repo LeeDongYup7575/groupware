@@ -29,4 +29,23 @@
         select * from leaves where emp_id = #{empId}
     </select>
 
+    <update id="updateByLeaves">
+        UPDATE employees
+        SET total_leave = total_leave +
+        CASE
+            WHEN TIMESTAMPDIFF(MONTH, hire_date, CURDATE()) &lt; 12
+                 AND DAY(hire_date) = DAY(CURDATE()) THEN 1
+
+            WHEN TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &gt;= 1
+                 AND MONTH(hire_date) = MONTH(CURDATE())
+                 AND DAY(hire_date) = DAY(CURDATE()) THEN 15
+            ELSE 0
+        END
+    </update>
+
+
+
+
+
+
 </mapper>

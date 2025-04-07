@@ -1,5 +1,7 @@
 package com.example.projectdemo.domain.web.controller;
 
+import com.example.projectdemo.domain.attend.dto.AttendDTO;
+import com.example.projectdemo.domain.attend.service.AttendService;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.LogoutService;
 import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
@@ -33,6 +35,7 @@ public class WebController {
     private final NoticeCrawler noticeCrawler;
     private final LogoutService logoutService;
     private final MeetingRoomService meetingRoomService;
+    private final AttendService attendService;
 
     // 메모리 캐시
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
@@ -41,12 +44,14 @@ public class WebController {
 
     @Autowired
     public WebController(EmployeesService employeesService, JwtTokenUtil jwtTokenUtil, NoticeCrawler noticeCrawler,
-                         LogoutService logoutService,  MeetingRoomService meetingRoomService) {
+                         LogoutService logoutService, MeetingRoomService meetingRoomService,
+                         AttendService attendService) {
         this.employeesService = employeesService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.noticeCrawler = noticeCrawler;
         this.logoutService = logoutService;
         this.meetingRoomService = meetingRoomService;
+        this.attendService = attendService;
     }
 
     /**
@@ -233,6 +238,14 @@ public class WebController {
 
         // 회의실 유틸리티 추가
         model.addAttribute("bookingUtils", new BookingTimeUtils());
+
+        // 근태관리 출 퇴근 시간 추가
+        int empId = (int)request.getAttribute("id");
+        if (empId == 0) { //예외처리
+            return "redirect:/auth/login";
+        }
+        List<AttendDTO>attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
+        model.addAttribute("attendanceListByDate", attendanceListByDate);
 
         return "/main";
     }
