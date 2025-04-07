@@ -2,7 +2,6 @@ package com.example.projectdemo.domain.employees.service;
 
 import com.example.projectdemo.config.PasswordEncoder;
 import com.example.projectdemo.domain.auth.service.EmailService;
-import com.example.projectdemo.domain.employees.dto.EmployeeContactsDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
@@ -17,7 +16,6 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -232,10 +230,4 @@ public class EmployeesService {
         employeeMapper.updateEmpInfo(updatedEmp);
     }
 
-    /**
-     * 모든 사원의 연락처 정보 조회
-     */
-    public List<EmployeeContactsDTO> findAllEmpContacts() {
-        return employeeMapper.findAllEmpContacts();
-    }
 }

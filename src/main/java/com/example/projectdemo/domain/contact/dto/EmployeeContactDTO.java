@@ -1,4 +1,4 @@
-package com.example.projectdemo.domain.employees.dto;
+package com.example.projectdemo.domain.contact.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeContactsDTO {
+public class EmployeeContactDTO {
     private String empNum;
     private String name;
     private String internalEmail;
