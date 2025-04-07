@@ -6,7 +6,9 @@ import com.example.projectdemo.domain.chat.dto.MemberShipDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -21,8 +23,10 @@ public class MembershipService {
     private MembershipDAO membershipDAO;
     @Autowired
     private EmployeesMapper employeesMapper;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
-
+    @Transactional
     public String deleteMembership(int roomid, int userid) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("roomid", roomid);
@@ -35,6 +39,9 @@ public class MembershipService {
             int rs = membershipDAO.deleteChatRoom(roomid);
             if (rs > 0) {
                 System.out.println("방삭제 완료");
+                Map<String,Object> payload = new HashMap<>();
+                payload.put("roomid", roomid);
+                messagingTemplate.convertAndSend("/topic/roomDeleted", payload);
                 return "success";
             } else {
                 System.out.println("방 삭제 실패");
@@ -52,7 +59,7 @@ public class MembershipService {
 
         List<MemberShipDTO> list = membershipDAO.getUserList(roomid);
 
-                System.out.println(list.get(1).getId() + " : " + list.get(1).getEmpId());
+        System.out.println(list.get(1).getId() + " : " + list.get(1).getEmpId());
         List<ChatUserDTO> memberList = new ArrayList<>();
         for (MemberShipDTO dto : list) {
             System.out.println(dto.getEmpId() + " : 직원고유번호");
