@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{board/board-layout :: html(
+        '게시글 상세',
+        ~{::style},
+        ~{::#contents},
+        ~{::script}
+      )}">
+<head>
+    <title th:text="${post.title} + ' - 게시판'">게시글 제목 - 게시판</title>
+    <style>
+        /* 페이지별 추가 스타일 */
+        /* 페이지별 추가 스타일 */
+    </style>
+</head>
+<body>
+    <div id="contents">
+        <div class="container">
+            <div class="header">
+                <h1 th:text="${post.title}">게시글 제목</h1>
+                <a href="/board" class="back-button">목록으로</a>
+            </div>
+
+            <div class="post-info">
+            <span>
+                <strong>작성자:</strong> <span th:text="${post.author}">작성자</span>
+            </span>
+                <span>
+                <strong>작성일:</strong> <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01</span>
+            </span>
+            </div>
+
+            <div class="post-content" th:utext="${post.content}">
+                게시글 내용입니다.
+            </div>
+
+            <div class="action-buttons">
+                <a th:href="@{/board/edit/{id}(id=${post.id})}" class="btn btn-primary">수정</a>
+                <button onclick="confirmDelete()">삭제</button>
+            </div>
+        </div>
+
+        <form id="deleteForm" th:action="@{/board/delete/{id}(id=${post.id})}" method="post" style="display:none;"></form>
+
+        <script>
+            function confirmDelete() {
+                if (confirm("선택한 글을 삭제하시겠습니까?")) {
+                    document.getElementById('deleteForm').submit();
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>

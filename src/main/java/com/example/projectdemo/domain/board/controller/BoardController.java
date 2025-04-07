@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/board")
@@ -15,12 +18,22 @@ public class BoardController {
     @Autowired
     private PostsService postsService;
 
+    /**
+     * 게시판
+     */
+    @GetMapping("")
+    public String getAllPosts(Model model) {
+        List<PostsDTO> posts = postsService.getAllPosts();
+        model.addAttribute("posts", posts);
+        return "board/list"; //게시글 목록 조회(전체 게시글 보기)
+    }
 
-//        @GetMapping("")
-//        public String board(Model model) {
-//            model.addAttribute("pageTitle", "게시판");
-//            return "board/list";
-//        }
+    @GetMapping("/view/{id}")
+    public String viewPost(@PathVariable int id, Model model) {
+        PostsDTO post = postsService.getPostById(id);
+        model.addAttribute("post", post);
+        return "board/view"; //게시글 상세 조회(특정 게시글 보기)
+    }
 
     @GetMapping("/write")
     public String showWriteForm(Model model) {
