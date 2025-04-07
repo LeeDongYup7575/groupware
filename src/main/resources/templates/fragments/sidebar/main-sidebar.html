@@ -30,12 +30,12 @@
 <div th:fragment="sidebar" id="sidebar" class="sidebar">
   <div class="sidebar-menu">
     <ul>
-      <li class="active"><a href="#"><span class="sidebar-icon">📧</span> 이메일</a></li>
+      <li><a th:href="@{/mail}"><span class="sidebar-icon">📧</span> 이메일</a></li>
       <li><a th:href="@{/board}"><span class="sidebar-icon">📋</span> 게시판</a></li>
       <li><a href="#" onclick="event.preventDefault(); openChat();"><span class="sidebar-icon">💬</span> 메시지</a></li>
       <li><a th:href="@{/videochat}"><span class="sidebar-icon">🖥️</span> 화상채팅</a></li>
       <li><a href="#"><span class="sidebar-icon">📨</span> 공용 메일</a></li>
-      <li><a href="#"><span class="sidebar-icon">📚</span> 주소록</a></li>
+      <li><a th:href="@{/contact}"><span class="sidebar-icon">📚</span> 주소록</a></li>
       <li><a th:href="@{/booking/main}"><span class="sidebar-icon">🔖</span> 예약</a></li>
       <li><a href="#"><span class="sidebar-icon">📂</span> 문서 관리</a></li>
       <li><a th:href="@{/attend/main}"><span class="sidebar-icon">⏰</span> 근무/경비처리</a></li>
