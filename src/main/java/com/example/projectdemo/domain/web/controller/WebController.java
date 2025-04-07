@@ -379,14 +379,6 @@ public class WebController {
         return "fragments/sidebar/main-sidebar :: sidebar";
     }
 
-    /**
-     * 게시판
-     */
-    @GetMapping("/board")
-    public String board(Model model) {
-        model.addAttribute("pageTitle", "게시판");
-        return "board/list";
-    }
 
     /**
      * 약관동의 페이지 이동
