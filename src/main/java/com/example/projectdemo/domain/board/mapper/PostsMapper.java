@@ -27,5 +27,8 @@ public interface PostsMapper {
     // 게시글 상세 조회
     PostsDTO getPostById(Integer id);
 
+    // 게시글 수정 메서드 추가
+    int updatePost(PostsDTO post);
+
 
 }

@@ -9,9 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -83,13 +81,6 @@ public class BoardController {
         return "board/view";
     }
 
-    @GetMapping("/view/{id}")
-    public String viewPost(@PathVariable int id, Model model) {
-        PostsDTO post = postsService.getPostById(id);
-        model.addAttribute("post", post);
-        return "board/view"; //게시글 상세 조회(특정 게시글 보기)
-    }
-
     @GetMapping("/write")
     public String showWriteForm(Model model) {
         model.addAttribute("PostsDTO", new PostsDTO());
@@ -110,6 +101,57 @@ public class BoardController {
     public String manageBoard() {
         return "board/manage"; // 게시판 관리
     }
+
+    // 게시글 수정 폼 표시
+    @GetMapping("/edit/{id}")
+    public String editPostForm(@PathVariable int id, HttpServletRequest request, Model model) {
+        int empId = (int)request.getAttribute("id");
+
+        // 게시글 정보 조회
+        PostsDTO post = postsService.getPostById(id);
+
+        // 게시글이 없거나 수정 권한이 없는 경우
+        if (post == null || !postsService.canModifyPost(empId, id)) {
+            return "redirect:/board/post/" + id + "?error=unauthorized";
+        }
+
+        // 게시글 정보를 모델에 추가
+        model.addAttribute("post", post);
+        model.addAttribute("board", boardsService.getBoardById(post.getBoardId()));
+
+        return "board/edit";
+    }
+
+    // 게시글 수정 처리
+    @PostMapping("/edit/{id}")
+    public String updatePost(@PathVariable int id,
+                             @ModelAttribute PostsDTO post,
+                             HttpServletRequest request) {
+        int empId = (int)request.getAttribute("id");
+
+        // 기존 게시글 확인
+        PostsDTO existingPost = postsService.getPostById(id);
+
+        // 게시글이 없거나 수정 권한이 없는 경우
+        if (existingPost == null || !postsService.canModifyPost(empId, id)) {
+            return "redirect:/board/post/" + id + "?error=unauthorized";
+        }
+
+        // 변경할 수 없는 필드는 기존 값으로 설정
+        post.setId(id);
+        post.setEmpId(empId);
+        post.setBoardId(existingPost.getBoardId());
+
+        // 게시글 수정
+        boolean updated = postsService.updatePost(post);
+
+        if (updated) {
+            return "redirect:/board/post/" + id + "?success=true";
+        } else {
+            return "redirect:/board/edit/" + id + "?error=failed";
+        }
+    }
+
 }
 
 

@@ -34,7 +34,7 @@
             <tbody>
             <tr th:each="post : ${posts}">
                 <td th:text="${post.id}">1</td>
-                <td><a th:href="@{/board/view/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a></td>
+                <td><a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a></td>
                 <td th:text="${post.author}">작성자</td>
                 <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
                 <td th:text="${post.views}">조회수</td>
