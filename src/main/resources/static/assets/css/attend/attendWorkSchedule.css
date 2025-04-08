@@ -8,6 +8,7 @@
 
 body {
     background-color: #f5f6fa;
+    overflow-x: hidden;
 }
 
 /* Header */
@@ -15,6 +16,12 @@ header {
     background-color: white;
     padding: 15px 20px;
     border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .logo {
@@ -33,6 +40,13 @@ header {
     font-size: 1.2rem;
 }
 
+.mobile-menu-toggle {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
 /* Layout */
 .container {
     display: flex;
@@ -45,6 +59,11 @@ header {
     background-color: white;
     padding: 20px 0;
     border-right: 1px solid #e0e0e0;
+    transition: transform 0.3s ease, width 0.3s ease;
+    height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+    overflow-y: auto;
 }
 
 .add-button {
@@ -58,6 +77,11 @@ header {
     display: block;
     cursor: pointer;
     font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.add-button:hover {
+    background-color: #0069d9;
 }
 
 .add-button i {
@@ -84,6 +108,11 @@ header {
     padding: 12px 20px;
     display: flex;
     align-items: center;
+    transition: background-color 0.2s;
+}
+
+.menu > li:not(.dropdown):hover {
+    background-color: #f5f5f5;
 }
 
 /* 드롭다운 메뉴 스타일 */
@@ -95,6 +124,11 @@ header {
     padding: 12px 20px;
     display: flex;
     align-items: center;
+    transition: background-color 0.2s;
+}
+
+.dropdown-header:hover {
+    background-color: #f5f5f5;
 }
 
 .dropdown.active .dropdown-header {
@@ -129,10 +163,16 @@ header {
     position: relative;
     display: flex;
     align-items: center;
+    transition: background-color 0.2s;
 }
 
 .submenu li:hover {
     background-color: #e8e8e8;
+}
+
+.submenu li.active {
+    background-color: #e0f2f1;
+    color: #009688;
 }
 
 .submenu li i {
@@ -145,18 +185,34 @@ header {
 .submenu a {
     text-decoration: none;
     color: inherit;
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 /* Content */
 .content {
     flex: 1;
     padding: 20px;
+    overflow-x: hidden;
 }
 
 .tab-menu {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
     margin-bottom: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+}
+
+.tab-menu::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+.tab-menu a {
+    text-decoration: none;
 }
 
 .tab-button {
@@ -167,6 +223,12 @@ header {
     font-size: 14px;
     color: #666;
     position: relative;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.tab-button:hover {
+    color: #0078d7;
 }
 
 .tab-button.active {
@@ -183,96 +245,49 @@ header {
     height: 2px;
     background-color: #0078d7;
 }
+
+/* 기본적인 캘린더 스타일 */
 #calendar {
-    width: 100%;
-    height: calc(100vh - 200px);
-    font-family: 'Noto Sans KR', sans-serif;
-    margin: 20px 0;
+    width: 100%;  /* 화면 가득 차도록 설정 */
+    max-width: 1200px;  /* 최대 너비를 더 넓게 설정 */
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
 }
 
-/* 헤더 버튼 스타일 */
-.fc-prev-button, .fc-next-button {
-    background-color: transparent !important;
-    border: none !important;
-    color: #333 !important;
-    box-shadow: none !important;
+/* FullCalendar에서 사용하는 기본 스타일을 수정하기 위한 CSS */
+.fc-header-toolbar {
+    background-color:white;
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-/* 헤더 타이틀 스타일 */
-.fc-toolbar-title {
-    font-size: 22px !important;
-    font-weight: bold;
+.fc-button {
+    background-color: #007bff !important;
+    color: white;
+    border-radius: 5px;
 }
 
-/* 요일 헤더 스타일 */
-.fc-col-header-cell {
-    background-color: #f8f9fa;
-    padding: 10px 0;
+.fc-button:hover {
+    background-color: #7eb2ea;
 }
 
-/* 날짜 셀 스타일 */
-.fc-daygrid-day {
-    height: 120px;
+.fc-title {
+    font-size: 18px;
 }
 
-/* 다른 달 날짜 스타일 */
-.fc-day-other .fc-daygrid-day-number {
-    opacity: 0.3;
-}
-
-/* 일요일 색상 */
-.fc-day-sun .fc-daygrid-day-number {
-    color: #ff4d4d;
-}
-
-/* 토요일 색상 */
-.fc-day-sat .fc-daygrid-day-number {
-    color: #4d79ff;
-}
-
-/* 이벤트 스타일 */
 .fc-event {
-    border-radius: 0;
-    font-size: 12px;
+    border-radius: 5px;
+    padding: 5px;
 }
 
-/* 날짜 번호 스타일 */
-.fc-daygrid-day-number {
-    font-size: 16px;
-    font-weight: bold;
-    padding: 8px;
+/* 모바일에서 더 나은 UI를 위해 작은 화면에서는 캘린더 크기를 조정 */
+@media (max-width: 768px) {
+    #calendar {
+        max-width: 100%;
+        margin: 0;
+    }
 }
 
-/* 오늘 날짜 스타일 */
-.fc-day-today {
-    background-color: #f0f8ff !important;
-}
-
-/* 이벤트 스타일 */
-.fc-event {
-    border: none;
-    padding: 2px 4px;
-}
-
-.fc-daygrid-event-harness {
-    margin-top: 2px;
-}
-
-/* 주간 합계 스타일 */
-.weekly-summary {
-    font-size: 12px;
-    color: #333;
-}
-
-.weekly-summary div {
-    margin-bottom: 5px;
-}
-
-/* 지각, 휴가 등 텍스트 색상 */
-.late-text {
-    color: #ff6b6b;
-}
-
-.leave-text {
-    color: #4a9fff;
-}

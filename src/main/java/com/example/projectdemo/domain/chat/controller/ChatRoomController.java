@@ -33,13 +33,21 @@ public class ChatRoomController {
 
     @GetMapping("/getaddlist")
     public ResponseEntity<List<EmployeesDTO>> getAddList(HttpServletRequest request) {
-        int id=(int) request.getAttribute("id");
+        int id = (int) request.getAttribute("id");
         return ResponseEntity.ok(chatRoomService.getAddList(id));
     }
+
     @PostMapping("/addroom")
     public ResponseEntity<ChatRoomDTO> addRoom(@RequestBody ChatRoomRequestDTO request, HttpServletRequest resq) {
-        int id=(int) resq.getAttribute("id");
+        int id = (int) resq.getAttribute("id");
         return ResponseEntity.ok(chatRoomService.addRoom(request, id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ChatRoomDTO>> search(HttpServletRequest request,@RequestParam String target) {
+        int id = (int)request.getAttribute("id");
+        System.out.println(target);
+        return ResponseEntity.ok(chatRoomService.searchList(target,id));
     }
 
 }
