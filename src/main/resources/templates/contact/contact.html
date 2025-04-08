@@ -22,14 +22,14 @@
 <main>
   <!-- 사이드바 -->
   <div class="contact-sidebar">
+    <button class="add-contact-btn">+ 주소 추가</button>
     <h3>📖 공유 주소록</h3>
-    <div class="contact-sidebar-item active" onclick="filterList('all')">전체</div>
-    <div class="contact-sidebar-item" onclick="filterList('개발팀')">개발팀</div>
-    <div class="contact-sidebar-item" onclick="filterList('영업팀')">영업팀</div>
-    <div class="contact-sidebar-item" onclick="filterList('인사팀')">인사팀</div>
+    <div id="shared-tab-container">
+      <div class="contact-sidebar-item active" data-tab="shared" data-dept="all" onclick="handleSidebarClick('shared', 'all')">전체</div>
+    </div>
     <br/>
     <h3>📖 개인 주소록</h3>
-    <div class="contact-sidebar-item">전체</div>
+    <div class="contact-sidebar-item" data-tab="personal" data-dept="all" onclick="handleSidebarClick('personal', 'all')">전체</div>
   </div>
 
   <!-- 메인 콘텐츠 -->
@@ -49,22 +49,49 @@
         <th class="name-col">이름</th>
         <th class="email-col">이메일</th>
         <th class="phone-col">전화번호</th>
-        <th class="dep-col">부서</th>
+        <th class="info-col">부서</th>
       </tr>
       </thead>
       <tbody id="contactList">
-      <tr th:each="contact : ${employeeContacts}" th:attr="data-team=${contact.depName}">
-        <td class="cel"></td>
-        <td class="name-col" th:text="${contact.name}"></td>
-        <td th:text="${contact.internalEmail}"></td>
-        <td th:text="${contact.phone}"></td>
-        <td th:text="${contact.depName}"></td>
-      </tr>
+
       </tbody>
     </table>
   </section>
 </main>
 
-<script src="script.js"></script>
+<!-- 모달 영역 -->
+<div id="contact-modal" class="modal-overlay hidden">
+  <div class="contact-form-container">
+    <div class="form-header">주소 추가</div>
+    <div class="contact-type">개인 주소록</div>
+
+    <div class="form-group">
+      <label class="required">이름</label>
+      <input type="text" placeholder="이름을 입력하세요">
+    </div>
+
+    <div class="form-group">
+      <label>이메일</label>
+      <input type="email" placeholder="이메일을 입력하세요">
+    </div>
+
+    <div class="form-group">
+      <label>전화</label>
+      <input type="tel" placeholder="전화번호를 입력하세요">
+    </div>
+
+    <div class="form-group">
+      <label>메모</label>
+      <textarea placeholder="메모를 입력하세요 (최대 300자)" maxlength="300"></textarea>
+      <div class="counter"><span id="char-count">0</span>/300</div>
+    </div>
+
+    <div class="form-footer">
+      <button class="contact-form-btn contact-cancel-btn">취소</button>
+      <button class="contact-form-btn contact-save-btn">저장</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
