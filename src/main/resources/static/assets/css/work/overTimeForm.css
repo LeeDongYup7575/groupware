@@ -1,18 +1,16 @@
-/* 기본 스타일 리셋 */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Noto Sans KR', sans-serif;
 }
-a{
-    text-decoration-line: none;
-}
 
 body {
     background-color: #f5f5f5;
 }
-
+a{
+    text-decoration-line: none;
+}
 /* 헤더 */
 .header {
     display: flex;
@@ -168,15 +166,11 @@ body {
     border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
+
 }
 
 .button:hover {
     background-color: #f5f5f5;
-}
-
-.small-button {
-    padding: 3px 8px;
-    font-size: 12px;
 }
 
 /* 양식 스타일 */
@@ -207,69 +201,11 @@ body {
     padding: 5px 10px;
 }
 
-/* 날짜 선택 영역 */
-.date-selection {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-.date-input {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 150px;
-}
-
-.date-select, .time-select {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.radio-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.radio-group input[type="radio"] {
-    margin-right: 3px;
-}
-
-.remove-button {
-    background: none;
-    border: none;
-    color: #999;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.remove-button:hover {
-    color: #f44336;
-}
-
-/* 사유 영역 */
-.reason-textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-}
-
-/* 셀렉트 박스 스타일 */
-select {
-    padding: 5px 25px 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23333' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
+.form-input input[type="text"],
+.form-input select {
+    padding: 5px 10px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
 }
 
 /* 결재선 영역 */
@@ -320,14 +256,6 @@ select {
     margin: 0 5px;
 }
 
-.approval-body-cell:first-child {
-    margin-left: 0;
-}
-
-.approval-body-cell:last-child {
-    margin-right: 0;
-}
-
 .approval-name {
     margin: 5px 0;
     font-weight: bold;
@@ -349,28 +277,6 @@ select {
     color: #5858ff;
     font-weight: bold;
     transform: rotate(-15deg);
-}
-
-/* 입력 필드 스타일 */
-.text-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-::placeholder {
-    color: #aaa;
-    font-size: 13px;
-}
-
-/* 푸터 버튼 영역 */
-.form-actions {
-    text-align: right;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
 }
 
 /* 첨부파일 영역 */
@@ -456,175 +362,6 @@ select {
     cursor: pointer;
 }
 
-.employee-list {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-}
-
-.employee-list li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-}
-
-.employee-list li:hover {
-    background-color: #f2f2f2;
-}
-
-.selected {
-    background-color: #e0f7fa;
-}
-
-.date-selection {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap; /* 필요시 줄바꿈 허용 */
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-/* 라디오 버튼 그룹 스타일 조정 */
-.radio-group {
-    min-width: 100px;
-    margin-right: 15px;
-    display: flex;
-    align-items: center;
-}
-
-.radio-group input[type="radio"] {
-    margin-right: 5px;
-}
-
-.radio-group label {
-    margin-right: 15px;
-}
-
-/* 시간 컨트롤 영역 스타일 수정 */
-.time-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* 요소 간 간격 */
-    flex-wrap: wrap; /* 필요시 줄바꿈 */
-    margin-right: 20px;
-}
-
-/* select 박스와 텍스트 간격 조정 */
-.time-select {
-    margin-right: 5px;
-    min-width: 60px; /* 최소 너비 설정 */
-}
-
-/* 텍스트 요소 간격 조정 */
-.time-controls span {
-    margin: 0 5px;
-    white-space: nowrap;
-}
-
-/* 날짜 입력 필드 스타일 */
-.date-input {
-    cursor: pointer;
-    background-color: #fff;
-    min-width: 150px;
-    margin-right: 10px;
-}
-
-/* 삭제 버튼 위치 조정 */
-.remove-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-}
-
-/* 달력 스타일 조정 */
-.ui-datepicker {
-    font-size: 12px;
-    width: 250px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-    z-index: 1000 !important;
-}
-
-.ui-datepicker-header {
-    background-color: #f8f8f8;
-    border-bottom: 1px solid #ddd;
-    border-radius: 4px 4px 0 0;
-    padding: 8px;
-}
-
-.ui-datepicker-title {
-    text-align: center;
-    font-weight: bold;
-    margin: 0 30px;
-}
-
-.ui-datepicker-prev, .ui-datepicker-next {
-    position: absolute;
-    top: 8px;
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    cursor: pointer;
-}
-
-.ui-datepicker-prev {
-    left: 8px;
-}
-
-.ui-datepicker-next {
-    right: 8px;
-}
-
-.ui-datepicker-calendar {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.ui-datepicker-calendar th {
-    padding: 5px;
-    text-align: center;
-    font-weight: normal;
-    border: none;
-}
-
-.ui-datepicker-calendar td {
-    padding: 2px;
-    text-align: center;
-}
-
-.ui-datepicker-calendar a {
-    display: block;
-    padding: 5px;
-    text-decoration: none;
-    text-align: center;
-    border-radius: 4px;
-    color: #333;
-}
-
-.ui-datepicker-calendar .ui-state-default {
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-}
-
-.ui-datepicker-calendar .ui-state-active {
-    background-color: #007bff;
-    color: white;
-    border: 1px solid #007bff;
-}
-
-.ui-datepicker-calendar .ui-state-hover {
-    background-color: #e9f2ff;
-    border: 1px solid #4a90e2;
-}
-
-/* 모달 내부의 두 영역 스타일 */
 #approvalModal .available-employees ul,
 #approvalModal .selected-employees ul {
     list-style: none;
@@ -641,4 +378,131 @@ select {
     margin-bottom: 5px;
     background: #f9f9f9;
     cursor: pointer;
+}
+
+/* 근무시간 테이블 */
+.work-time-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.work-time-table th,
+.work-time-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.work-time-table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+}
+
+/* 사유 영역 */
+.reason-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+/* 시간 선택 영역 */
+.time-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.time-selector select {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.add-btn {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+/* 검증 섹션 스타일 */
+.validation-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 30px;
+}
+
+.validation-info {
+    margin-bottom: 15px;
+}
+
+.validation-description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.work-time-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.work-time-table th,
+.work-time-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+}
+
+.work-time-table th {
+    background-color: #e9ecef;
+    font-weight: 500;
+    color: #495057;
+}
+
+.work-time-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.standard-row {
+    background-color: #e8f4f8 !important;
+}
+
+.current-row {
+    background-color: #fff !important;
+}
+
+.estimation-row {
+    background-color: #fdf9e8 !important;
+    font-weight: 500;
+}
+
+.overtime-hours {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.overtime-hours.expected {
+    background-color: #fff3cd;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.validation-note {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.validation-note i {
+    color: #0d6efd;
 }

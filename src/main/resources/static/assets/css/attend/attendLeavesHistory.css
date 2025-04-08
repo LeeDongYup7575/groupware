@@ -6,6 +6,10 @@
     font-family: 'Noto Sans KR', sans-serif;
 }
 
+a{
+    text-decoration-line: none;
+}
+
 body {
     background-color: #f5f6fa;
 }

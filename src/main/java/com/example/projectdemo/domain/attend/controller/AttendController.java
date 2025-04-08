@@ -77,72 +77,6 @@ public class AttendController {
         return "/attend/attendMain";
     }
 
-    @RequestMapping("/workSchedule")
-    public String workSchedule(Model model) {
-        return "/attend/attendWorkSchedule";
-    }
-
-    @RequestMapping("/getWorkSchedule")
-    @ResponseBody
-    public List<Map<String, Object>> getWorkSchedule(HttpServletRequest request) {
-        int empId = (int) request.getAttribute("id");
-
-        if (empId == 0) {
-            throw new IllegalArgumentException("Invalid Employee ID");
-        }
-
-        // 근태 기록을 DB에서 가져오기
-        List<AttendDTO> attendList = attendService.selectByEmpId(empId);
-
-        // 근태 기록을 FullCalendar에 맞는 형식으로 변환
-        List<Map<String, Object>> events = new ArrayList<>();
-
-        for (AttendDTO attend : attendList) {
-            if (attend.getWorkDate() != null) {
-                // 출근 정보 이벤트
-                if (attend.getCheckIn() != null) {
-                    Map<String, Object> eventIn = new HashMap<>();
-                    Calendar calendarIn = Calendar.getInstance();
-                    calendarIn.setTime(attend.getWorkDate());  // workDate를 설정
-                    calendarIn.set(Calendar.HOUR_OF_DAY, attend.getCheckIn().getHours());
-                    calendarIn.set(Calendar.MINUTE, attend.getCheckIn().getMinutes());
-                    calendarIn.set(Calendar.SECOND, 0);  // 초는 0으로 설정
-
-                    eventIn.put("start", calendarIn.getTime());
-
-                    // 출근시간이 지각이면 지각 표시, 아니면 출근만 표시 (시간 제외)
-                    if ("지각".equals(attend.getStatus())) {
-                        eventIn.put("title", "오전 지각");
-                    } else {
-                        eventIn.put("title", "오전 출근");
-                    }
-                    eventIn.put("description", "직원 ID: " + empId);
-                    events.add(eventIn);
-                }
-
-                // 퇴근 정보 이벤트
-                if (attend.getCheckOut() != null) {
-                    Map<String, Object> eventOut = new HashMap<>();
-                    Calendar calendarOut = Calendar.getInstance();
-                    calendarOut.setTime(attend.getWorkDate());  // workDate를 설정
-                    calendarOut.set(Calendar.HOUR_OF_DAY, attend.getCheckOut().getHours());
-                    calendarOut.set(Calendar.MINUTE, attend.getCheckOut().getMinutes());
-                    calendarOut.set(Calendar.SECOND, 0);  // 초는 0으로 설정
-
-                    // 퇴근 이벤트에 start 속성 추가 (필수)
-                    eventOut.put("start", calendarOut.getTime());
-
-                    // 퇴근 시간 표시 (시간 제외)
-                    eventOut.put("title", "오후 퇴근");
-                    eventOut.put("description", "직원 ID: " + empId);
-                    events.add(eventOut);
-                }
-            }
-        }
-
-        return events;  // JSON 형식으로 반환
-    }
-
 
     @RequestMapping("/annualStatistics")
     public String annualStatistics(Model model, HttpServletRequest request,
@@ -216,10 +150,4 @@ public class AttendController {
         return "/attend/attendAnnualStatistics";
     }
 
-
-
-    @RequestMapping("/workDetails")
-    public String workDetails(Model model) {
-        return "/attend/attendWorkDetails";
-    }
 }

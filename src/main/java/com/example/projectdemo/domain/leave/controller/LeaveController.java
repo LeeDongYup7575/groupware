@@ -1,12 +1,16 @@
 package com.example.projectdemo.domain.leave.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
+import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
+import com.example.projectdemo.domain.edsm.enums.ApprovalStatus;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import com.example.projectdemo.domain.leave.service.LeavesService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,6 +44,9 @@ public class LeaveController {
     private EmployeesMapper employeeMapper;
 
     @Autowired
+    private EdsmDAO edsmDAO;
+
+    @Autowired
     private EmployeesService employeeService;
 
     @RequestMapping("/leavesForm")
@@ -68,9 +75,12 @@ public class LeaveController {
             empList.add(list_emp);
         }
 
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+
         model.addAttribute("empList", empList);
         model.addAttribute("employee", employee);
         model.addAttribute("canUseLeaves", canUseLeaves);
+        model.addAttribute("today", today);
 
         return "/leave/leavesForm";
     }
@@ -100,7 +110,7 @@ public class LeaveController {
         LocalDate oneYearAfterHire = hireDate.plusYears(1);
 
         if (now.isBefore(oneYearAfterHire)) {
-            // ✅ 입사 1년 미만일 경우 (현재가 1년 안)
+            // ✅ 입사 1년 미만
             LocalDate grantCursor = hireDate.plusMonths(1);
             while (!grantCursor.isAfter(now)) {
                 if (grantCursor.getYear() == currentYear) {
@@ -110,9 +120,9 @@ public class LeaveController {
                 grantCursor = grantCursor.plusMonths(1);
             }
         } else {
-            // ✅ 입사 1년 이상인 경우
+            // ✅ 입사 1년 이상
             LocalDate grantCursor = hireDate.plusMonths(1);
-            LocalDate endOfMonthlyGrants = oneYearAfterHire.minusDays(1); // 1년차 마지막 날까지
+            LocalDate endOfMonthlyGrants = oneYearAfterHire.minusDays(1);
 
             while (!grantCursor.isAfter(endOfMonthlyGrants)) {
                 if (grantCursor.getYear() == currentYear) {
@@ -122,7 +132,6 @@ public class LeaveController {
                 grantCursor = grantCursor.plusMonths(1);
             }
 
-            // ✅ 1년 이상 분기: 매년 15개
             grantCursor = oneYearAfterHire;
             while (!grantCursor.isAfter(now)) {
                 if (grantCursor.getYear() == currentYear) {
@@ -133,15 +142,23 @@ public class LeaveController {
             }
         }
 
-
-        // 휴가 신청 내역 필터링 (해당 연도만)
+        // ✅ 연차 내역 전체 조회
         List<LeavesDTO> allLeavesList = leavesService.selectAllLeaves(empId);
+
+        // ✅ 해당 연도 필터링
         List<LeavesDTO> leavesList = allLeavesList.stream()
                 .filter(leave -> {
                     LocalDate startDate = LocalDate.parse(leave.getStartDate());
                     return startDate.getYear() == currentYear;
                 })
                 .collect(Collectors.toList());
+
+        // ✅ 각 연차의 edsm status 값 조회 후 세팅
+        for (LeavesDTO leave : leavesList) {
+            int edsmDocId = leave.getEdsmDocId();
+            String status = leavesService.selectByStatus(drafterId, edsmDocId);
+            leave.setStatus(status); // 해당 leave 객체에 상태 설정
+        }
 
         model.addAttribute("leavesList", leavesList);
         model.addAttribute("employee", employee);
@@ -155,6 +172,7 @@ public class LeaveController {
 
 
 
+
     @PostMapping("/submitLeave")
     public String submitLeave(
             @RequestParam("drafterId") String drafterId,
@@ -164,6 +182,7 @@ public class LeaveController {
             @RequestParam("leaveType[]") List<String> leaveTypes,
             @RequestParam("leaveHours[]") List<String> leaveHours,
             @RequestParam("reason") String content,
+            @RequestParam("approvalLine") String approvalLine,
             HttpServletRequest request,
             Model model) {
 
@@ -188,6 +207,8 @@ public class LeaveController {
 
         int edsmDocId = leavesService.insertByEdsm(bcdto);
 
+
+
         for (int i = 0; i < leaveStartDates.size(); i++) {
             LeavesDTO leavesdto = new LeavesDTO();
 
@@ -199,7 +220,42 @@ public class LeaveController {
             leavesdto.setReason(content);
             leavesdto.setEdsmDocId(edsmDocId);
 
+
             leavesService.insertByLeaves(leavesdto);
+        }
+
+        // 결재라인 리스트 준비 :
+        // 1) 기안자(작성자)는 결재라인의 첫번째에 추가하며, approvalNo는 1, status는 무조건 "승인"
+        List<ApprovalLineDTO> finalApprovalList = new ArrayList<>();
+        ApprovalLineDTO drafterApproval = new ApprovalLineDTO();
+        drafterApproval.setDocumentId(edsmDocId);
+        drafterApproval.setDrafterId(drafterId);
+        drafterApproval.setApproverId(drafterId); // 기안자 자신이 첫번째 결재자로 고정됨
+        drafterApproval.setApprovalNo(1);
+        drafterApproval.setStatus(ApprovalStatus.APPROVED.getLabel());
+        finalApprovalList.add(drafterApproval);
+
+        // 2) JSON 문자열을 파싱하여 추가 결재자 목록 처리 (순번 2부터 부여)
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            List<ApprovalLineDTO> additionalApprovals = mapper.readValue(approvalLine,
+                    new com.fasterxml.jackson.core.type.TypeReference<List<ApprovalLineDTO>>() {});
+            int seq = 2;
+            for (ApprovalLineDTO dto : additionalApprovals) {
+                dto.setDocumentId(edsmDocId);
+                dto.setDrafterId(drafterId);
+                dto.setApprovalNo(seq++);
+                // 추가 결재자는 기본적으로 "대기" 상태로 둘 수 있으며,
+                // 필요에 따라 여기서 status 값을 변경할 수 있습니다.
+                dto.setStatus(ApprovalStatus.PENDING.getLabel());
+                finalApprovalList.add(dto);
+            }
+            // 최종 결재라인 리스트 전체를 DB에 저장
+            for (ApprovalLineDTO alDto : finalApprovalList) {
+                edsmDAO.insertByApprovalLine(alDto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return "redirect:/leaves/leavesHistory";
