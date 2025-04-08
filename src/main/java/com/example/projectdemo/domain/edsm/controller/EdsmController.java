@@ -69,6 +69,35 @@ public class EdsmController {
     }
 
 
+
+    //결재 상태 <예정>
+    @RequestMapping("/expected")
+    public String excepted(Model model, HttpServletRequest request) {
+// JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String)request.getAttribute("empNum");
+
+        if (empNum == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("expected","예정");
+
+
+        List<EdsmDocumentDTO> expectedDocument = edao.selectByAllApprovalFromId(empNum);
+        model.addAttribute("expectedDocumentList",expectedDocument);
+
+        return "edsm/expected";
+    }
+
+
     //결재 상태 <진행 중>
     @RequestMapping("/progress")
     public String progress(Model model, HttpServletRequest request) {

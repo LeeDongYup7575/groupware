@@ -44,6 +44,22 @@
     </select>
 
 
+    <!-- 로그인한 사원이 결재권이 있는 문서 출력 -->
+    <select id="selectByAllApprovalFromId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT d.*, e.name AS drafterName, d.draft_date AS drafterDate
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum}
+          AND a.status = '대기'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM groupware.approval_line a2
+            WHERE a2.document_id = d.id
+              AND a2.status = '반려'
+        )
+    </select>
+
  <!-- 업무연락 테이블 정보 입력 -->
     <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO">
         INSERT INTO groupware.business_contact

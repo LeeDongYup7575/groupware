@@ -88,7 +88,7 @@
                 <div class="form-input">
                     <select id="documentType" name="documentType">
                         <option>선택</option>
-                        <option value="1001" th:selected="${documentType == 'BusinessContact'}">업무연락</option>
+                        <option value="1001" th:selected="${documentType == 'businessContact'}">업무연락</option>
                         <option value="1002" th:selected="${documentType == 'cashDisbuVoucher'}">지출결의서</option>
                         <option value="1003" th:selected="${documentType == 'letterOfApproval'}">품의서</option>
                     </select>
@@ -134,6 +134,10 @@
     $("#main").on("click", function () {
         location.href = "/edsm/main";
     });
+    $("#expected").on("click", function () {
+        location.href = "/edsm/expected";
+    });
+
 
     $("#progress").on("click", function () {
         location.href = "/edsm/progress";

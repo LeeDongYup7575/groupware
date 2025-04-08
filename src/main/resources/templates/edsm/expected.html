@@ -77,7 +77,7 @@
 
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
-    <div class="tab-header" th:text="${main}"></div>
+    <div class="tab-header"></div>
     <span>업무연락</span>
     <table class="document-table">
         <thead>
@@ -91,66 +91,19 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
+        <tr th:each="exdoc : ${expectedDocumentList}">
+            <td th:text="'업무-'+${exdoc.id}"></td>
             <td>
-                <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                <a th:href="@{'/edsmDetail/businessContact/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
             </td>
-            <td th:text="${doc.drafterName}"></td>
-            <td th:text="${doc.drafterDate}"></td>
-            <td th:text="${doc.edsmFormId}"></td>
-            <td th:text="${doc.status}"></td>
+            <td th:text="${exdoc.drafterName}"></td>
+            <td th:text="${exdoc.drafterDate}"></td>
+            <td th:text="${exdoc.edsmFormId}"></td>
+            <td th:text="${exdoc.status}"></td>
         </tr>
         </tbody>
     </table>
 
-    <span>지출결의서</span>
-    <table class="document-table">
-        <thead>
-        <tr>
-            <th>문서 번호</th>
-            <th>제목</th>
-            <th>기안자</th>
-            <th>기안일</th>
-            <th>구분</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
-            <td th:text="${doc.title}"></td>
-            <td th:text="${doc.drafterName}"></td>
-            <td th:text="${doc.drafterDate}"></td>
-            <td th:text="${doc.edsmFormId}"></td>
-            <td th:text="${doc.status}"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <span>품의서</span>
-    <table class="document-table">
-        <thead>
-        <tr>
-            <th>문서 번호</th>
-            <th>제목</th>
-            <th>기안자</th>
-            <th>기안일</th>
-            <th>구분</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
-            <td th:text="${doc.title}"></td>
-            <td th:text="${doc.drafterName}"></td>
-            <td th:text="${doc.drafterDate}"></td>
-            <td th:text="${doc.edsmFormId}"></td>
-            <td th:text="${doc.status}"></td>
-        </tr>
-        </tbody>
-    </table>
 </div>
 
 

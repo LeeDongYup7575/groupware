@@ -122,7 +122,7 @@ public class EdsmFormController {
 
 
 
-        return "businessContact";
+        return "edsm/edsmForm/businessContact";
     }
 
     //지출결의서
@@ -166,7 +166,7 @@ public class EdsmFormController {
         empList.sort(Comparator.comparing(EmployeesDTO::getEmpNum).reversed());
         model.addAttribute("list_emp", empList);
 
-        return "edsm/edsmForm/CashDisbuVoucher";
+        return "edsm/edsmForm/cashDisbuVoucher";
     }
 
 
