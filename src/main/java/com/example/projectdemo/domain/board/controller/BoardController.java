@@ -1,13 +1,15 @@
 package com.example.projectdemo.domain.board.controller;
 
+import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.board.dto.BoardsDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.service.BoardsService;
 import com.example.projectdemo.domain.board.service.PostsService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,21 +20,62 @@ public class BoardController {
     @Autowired
     private PostsService postsService;
 
-    /**
-     * 게시판
-     */
+    @Autowired
+    private BoardsService boardsService;
+
+
+    // 통합 게시판 - 모든 권한 있는 게시판의 게시글 보기
     @GetMapping("")
-    public String getAllPosts(Model model) {
-        List<PostsDTO> posts = postsService.getAllPosts();
+    public String integratedBoard(HttpServletRequest request, Model model) {
+        // 현재 로그인한 사용자 정보 가져오기
+        int empId = (int)request.getAttribute("id");
+
+        // 접근 가능한 모든 게시글 조회
+        List<PostsDTO> posts = postsService.getAccessiblePosts(empId);
+
         model.addAttribute("posts", posts);
-        return "board/list"; //게시글 목록 조회(전체 게시글 보기)
+        model.addAttribute("boardName", "통합 게시판");
+
+        return "board/integrated-list";
     }
 
-    @GetMapping("/view/{id}")
-    public String viewPost(@PathVariable int id, Model model) {
+    // 특정 게시판의 게시글 목록 보기
+    @GetMapping("/{boardId}")
+    public String boardPosts(@PathVariable Integer boardId, HttpServletRequest request, Model model) {
+        int empId = (int)request.getAttribute("id");
+
+        // 게시판 접근 권한 확인
+        if (!boardsService.hasAccess(empId, boardId)) {
+            return "board/access-denied";
+        }
+
+        BoardsDTO board = boardsService.getBoardById(boardId);
+        List<PostsDTO> posts = postsService.getPostsByBoardId(boardId);
+
+        model.addAttribute("board", board);
+        model.addAttribute("posts", posts);
+        model.addAttribute("boardName", board.getName());
+
+        return "board/list";
+    }
+
+    // 게시글 상세 보기
+    @GetMapping("/post/{id}")
+    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model) {
+        int empId = (int)request.getAttribute("id");
+
         PostsDTO post = postsService.getPostById(id);
+        BoardsDTO board = boardsService.getBoardById(post.getBoardId());
+
+        // 게시판 접근 권한 확인
+        if (!boardsService.hasAccess(empId, board.getId())) {
+            return "board/access-denied";
+        }
+
         model.addAttribute("post", post);
-        return "board/view"; //게시글 상세 조회(특정 게시글 보기)
+        model.addAttribute("board", board);
+
+        return "board/view";
     }
 
     @GetMapping("/write")
@@ -46,26 +89,6 @@ public class BoardController {
         return "board/important"; // 중요 게시물 페이지
     }
 
-    @GetMapping("/notice")
-    public String notices() {
-        return "board/notice"; // 사내공지
-    }
-
-    @GetMapping("/free")
-    public String freeBoard() {
-        return "board/free"; // 자유게시판
-    }
-
-    @GetMapping("/football")
-    public String footballClub() {
-        return "board/football"; // 축구동호회
-    }
-
-    @GetMapping("/movies")
-    public String movieClub() {
-        return "board/movies"; // 영화동호회
-    }
-
     @GetMapping("/create")
     public String createBoard() {
         return "board/create"; // 게시판 만들기
@@ -75,6 +98,57 @@ public class BoardController {
     public String manageBoard() {
         return "board/manage"; // 게시판 관리
     }
+
+    // 게시글 수정 폼 표시
+    @GetMapping("/edit/{id}")
+    public String editPostForm(@PathVariable int id, HttpServletRequest request, Model model) {
+        int empId = (int)request.getAttribute("id");
+
+        // 게시글 정보 조회
+        PostsDTO post = postsService.getPostById(id);
+
+        // 게시글이 없거나 수정 권한이 없는 경우
+        if (post == null || !postsService.canModifyPost(empId, id)) {
+            return "redirect:/board/post/" + id + "?error=unauthorized";
+        }
+
+        // 게시글 정보를 모델에 추가
+        model.addAttribute("post", post);
+        model.addAttribute("board", boardsService.getBoardById(post.getBoardId()));
+
+        return "board/edit";
+    }
+
+    // 게시글 수정 처리
+    @PostMapping("/edit/{id}")
+    public String updatePost(@PathVariable int id,
+                             @ModelAttribute PostsDTO post,
+                             HttpServletRequest request) {
+        int empId = (int)request.getAttribute("id");
+
+        // 기존 게시글 확인
+        PostsDTO existingPost = postsService.getPostById(id);
+
+        // 게시글이 없거나 수정 권한이 없는 경우
+        if (existingPost == null || !postsService.canModifyPost(empId, id)) {
+            return "redirect:/board/post/" + id + "?error=unauthorized";
+        }
+
+        // 변경할 수 없는 필드는 기존 값으로 설정
+        post.setId(id);
+        post.setEmpId(empId);
+        post.setBoardId(existingPost.getBoardId());
+
+        // 게시글 수정
+        boolean updated = postsService.updatePost(post);
+
+        if (updated) {
+            return "redirect:/board/post/" + id + "?success=true";
+        } else {
+            return "redirect:/board/edit/" + id + "?error=failed";
+        }
+    }
+
 }
 
 

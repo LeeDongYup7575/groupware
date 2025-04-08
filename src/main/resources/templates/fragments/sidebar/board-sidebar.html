@@ -31,6 +31,7 @@
     <div class="sidebar-menu">
         <ul>
             <li><a th:href="@{/board/write}"><span class="sidebar-icon">🖋️</span> 글쓰기</a></li>
+            <li><a th:href="@{/board}"><span class="sidebar-icon">📋</span> 통합 게시판</a></li>
             <li><a th:href="@{/board/important}"><span class="sidebar-icon">⭐</span> 중요 게시물</a></li>
 
             <!-- 전사 게시판 (토글) -->
@@ -40,8 +41,8 @@
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <ul id="all-menu" class="submenu">
-                    <li><a th:href="@{/board/notice}"><span class="sidebar-icon">📄</span> 사내공지</a></li>
-                    <li><a th:href="@{/board/free}"><span class="sidebar-icon">💬</span> 자유게시판</a></li>
+                    <li><a th:href="@{/board/1}"><span class="sidebar-icon">📄</span> 사내공지</a></li>
+                    <li><a th:href="@{/board/2}"><span class="sidebar-icon">💬</span> 자유게시판</a></li>
                 </ul>
             </li>
 
@@ -52,8 +53,8 @@
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <ul id="group-menu" class="submenu">
-                    <li><a th:href="@{/board/football}"><span class="sidebar-icon">⚽</span> 축구동호회</a></li>
-                    <li><a th:href="@{/board/movie}"><span class="sidebar-icon">🎥</span> 영화동호회</a></li>
+                    <li><a th:href="@{/board/3}"><span class="sidebar-icon">⚽</span> 축구동호회</a></li>
+                    <li><a th:href="@{/board/4}"><span class="sidebar-icon">🎥</span> 영화동호회</a></li>
                 </ul>
             </li>
 
