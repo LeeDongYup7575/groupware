@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 //        registry.addEndpoint("/ws").setAllowedOrigins("http://10.10.55.57:3000").withSockJS();
-        registry.addEndpoint("/ws").setAllowedOrigins("http://10.10.55.57:3000","http://172.20.10.3:3000","http://172.30.1.74:3000");
+        registry.addEndpoint("/ws").setAllowedOrigins("http://10.10.55.7:3000","http://172.20.10.3:3000","http://172.30.1.74:3000");
 
         // 화상 채팅용 WebSocket 엔드포인트 추가
         registry.addEndpoint("/ws-videochat")
