@@ -45,6 +45,12 @@ public class EdsmDAO {
         return mybatis.selectList("Edsm.SelectByAllDocument", empNum);
 
     }
+
+    // 로그인된 사번을 기준으로 로그인자가 결재권 있는 문서 리스트 출력
+    public List<EdsmDocumentDTO> selectByAllApprovalFromId(String empNum) {
+        return mybatis.selectList("Edsm.selectByAllApprovalFromId", empNum);
+
+    }
     
     // 문서번호를 통한 Detail 출력
     public List<EdsmDocumentDTO> selectByDocumentId(int id) {
