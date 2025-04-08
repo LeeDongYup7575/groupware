@@ -6,9 +6,12 @@
     font-family: 'Noto Sans KR', sans-serif;
 }
 
+a{
+    text-decoration-line: none;
+}
+
 body {
     background-color: #f5f6fa;
-    overflow-x: hidden;
 }
 
 /* Header */
@@ -16,12 +19,6 @@ header {
     background-color: white;
     padding: 15px 20px;
     border-bottom: 1px solid #e0e0e0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
 }
 
 .logo {
@@ -40,13 +37,6 @@ header {
     font-size: 1.2rem;
 }
 
-.mobile-menu-toggle {
-    display: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #333;
-}
-
 /* Layout */
 .container {
     display: flex;
@@ -59,11 +49,6 @@ header {
     background-color: white;
     padding: 20px 0;
     border-right: 1px solid #e0e0e0;
-    transition: transform 0.3s ease, width 0.3s ease;
-    height: calc(100vh - 60px);
-    position: sticky;
-    top: 60px;
-    overflow-y: auto;
 }
 
 .add-button {
@@ -77,11 +62,6 @@ header {
     display: block;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.2s;
-}
-
-.add-button:hover {
-    background-color: #0069d9;
 }
 
 .add-button i {
@@ -108,11 +88,6 @@ header {
     padding: 12px 20px;
     display: flex;
     align-items: center;
-    transition: background-color 0.2s;
-}
-
-.menu > li:not(.dropdown):hover {
-    background-color: #f5f5f5;
 }
 
 /* 드롭다운 메뉴 스타일 */
@@ -124,11 +99,6 @@ header {
     padding: 12px 20px;
     display: flex;
     align-items: center;
-    transition: background-color 0.2s;
-}
-
-.dropdown-header:hover {
-    background-color: #f5f5f5;
 }
 
 .dropdown.active .dropdown-header {
@@ -163,16 +133,10 @@ header {
     position: relative;
     display: flex;
     align-items: center;
-    transition: background-color 0.2s;
 }
 
 .submenu li:hover {
     background-color: #e8e8e8;
-}
-
-.submenu li.active {
-    background-color: #e0f2f1;
-    color: #009688;
 }
 
 .submenu li i {
@@ -185,34 +149,18 @@ header {
 .submenu a {
     text-decoration: none;
     color: inherit;
-    display: flex;
-    align-items: center;
-    width: 100%;
 }
 
 /* Content */
 .content {
     flex: 1;
     padding: 20px;
-    overflow-x: hidden;
 }
 
 .tab-menu {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
     margin-bottom: 20px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-    scrollbar-width: none; /* Firefox */
-}
-
-.tab-menu::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Edge */
-}
-
-.tab-menu a {
-    text-decoration: none;
 }
 
 .tab-button {
@@ -223,12 +171,6 @@ header {
     font-size: 14px;
     color: #666;
     position: relative;
-    white-space: nowrap;
-    transition: color 0.2s;
-}
-
-.tab-button:hover {
-    color: #0078d7;
 }
 
 .tab-button.active {
@@ -246,48 +188,44 @@ header {
     background-color: #0078d7;
 }
 
-/* 기본적인 캘린더 스타일 */
-#calendar {
-    width: 100%;  /* 화면 가득 차도록 설정 */
-    max-width: 1200px;  /* 최대 너비를 더 넓게 설정 */
-    margin: 0 auto;
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 20px;
+.year-navigation {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-/* FullCalendar에서 사용하는 기본 스타일을 수정하기 위한 CSS */
-.fc-header-toolbar {
-    background-color:white;
-    color: black;
+.year-navigation h2 {
+    margin: 0 15px;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.prev-year {
+    color: #555;
+    text-decoration: none;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #e0e0e0;
     padding: 10px;
-    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
 }
 
-.fc-button {
-    background-color: #007bff !important;
-    color: white;
-    border-radius: 5px;
+.data-table th {
+    background-color: #f7f7f7;
+    font-weight: normal;
 }
 
-.fc-button:hover {
-    background-color: #7eb2ea;
+.summary {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #555;
 }
-
-.fc-title {
-    font-size: 18px;
-}
-
-.fc-event {
-    border-radius: 5px;
-    padding: 5px;
-}
-
-/* 모바일에서 더 나은 UI를 위해 작은 화면에서는 캘린더 크기를 조정 */
-@media (max-width: 768px) {
-    #calendar {
-        max-width: 100%;
-        margin: 0;
-    }
-}
-

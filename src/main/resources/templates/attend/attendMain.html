@@ -19,14 +19,14 @@
     <div class="sidebar">
         <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
         <ul class="menu">
-            <li><i class="fas fa-file-alt"></i> 신청서 작성</li>
+            <li><a href="/works/overTimeForm"><i class="fas fa-file-alt"></i> 연장 근무 신청</a></li>
             <li class="dropdown active">
                 <div class="dropdown-header">
                     <i class="fas fa-chevron-down dropdown-icon"></i>내 근무
                 </div>
                 <ul class="submenu">
                     <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i>휴가/근무</a></li>
-                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                    <li><a href="/works/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
                 </ul>
             </li>
         </ul>
@@ -63,7 +63,7 @@
                             <span class="value" th:text="${canUseLeaves}">0일</span>
                         </div>
                         <div class="stat">
-                            <span class="label"><a href="/attend/leavesHistory">휴가 현황</a></span>
+                            <span class="label"><a href="/leaves/leavesHistory">휴가 현황</a></span>
                             <span class="value vacation-link"><a href="/leaves/leavesForm">휴가 신청</a></span>
                         </div>
                     </div>
@@ -105,11 +105,10 @@
                         <div class="work-hours">
                             <div class="schedule">9시 출근</div>
                             <div class="time-range">09:00 ~ 18:00 (소정 8시간)</div>
-                            <button class="schedule-btn"><a href="/attend/workSchedule">내 근무 계획</a></button>
+                            <button class="schedule-btn"><a href="/works/workSchedule">내 근무 계획</a></button>
                         </div>
                         <div class="buttons">
-                            <button class="request-btn">연장근무신청</button>
-                            <button class="request-btn">휴일근무신청</button>
+                            <button class="request-btn" id="overTimeBtn">연장근무신청</button>
                         </div>
                     </div>
                 </div>
@@ -145,6 +144,10 @@
 </div>
 
 <script>
+    document.querySelector(".request-btn").onclick = function() {
+        location.href = "/works/overTimeForm";
+    };
+
 
     document.querySelector(".add-button").onclick = function() {
         location.href = "/leaves/leavesForm";

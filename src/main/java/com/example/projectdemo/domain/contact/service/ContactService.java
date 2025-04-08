@@ -13,9 +13,16 @@ public class ContactService {
     private ContactMapper contactMapper;
 
     /**
-     * 모든 사원의 연락처 정보 조회
+     * 공유주소록(사원연락처) 조회
      */
-    public List<EmployeeContactDTO> findAllEmpContacts() {
+    public List<EmployeeContactDTO> getSharedContacts() {
         return contactMapper.findAllEmpContacts();
+    }
+
+    /**
+     * 부서별 공유주소록(사원연락처) 조회
+     */
+    public List<EmployeeContactDTO> getSharedContactsByDepartment(String depName){
+        return contactMapper.findEmpContactsByDepartment(depName);
     }
 }

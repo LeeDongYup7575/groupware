@@ -325,7 +325,7 @@ function updateInfo() {
 
     formData.append("isImageDeleted", isImageDeleted);
 
-    // Fetch API를 사용하여 서버에 데이터 전송
+    // update 처리
     fetch('/api/mypage/update', {
         method: 'PATCH',
         body: formData
