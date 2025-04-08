@@ -16,4 +16,6 @@ public class EmployeeContactDTO {
     private String phone;
     private Integer depId;
     private String depName;
+    private Integer posId;
+    private String posTitle;
 }

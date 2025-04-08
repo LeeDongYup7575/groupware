@@ -9,13 +9,47 @@
             employees.internal_email,
             employees.phone,
             employees.dep_id,
-            departments.name AS dep_name
+            departments.name AS dep_name,
+            employees.pos_id,
+            positions.title AS pos_title
         FROM
             employees
                 JOIN
             departments
             ON
                 employees.dep_id = departments.id
+                JOIN
+            positions
+            ON
+                employees.pos_id = positions.id
+        ORDER BY
+            employees.name;
+    </select>
+
+
+    <!-- 부서별 공유주소록(사원연락처) 조회 -->
+    <select id="findEmpContactsByDepartment" resultType="com.example.projectdemo.domain.contact.dto.EmployeeContactDTO">
+        SELECT
+            employees.emp_num,
+            employees.name,
+            employees.internal_email,
+            employees.phone,
+            employees.dep_id,
+            departments.name AS dep_name,
+            employees.pos_id,
+            positions.title AS pos_title
+        FROM
+            employees
+                JOIN
+            departments
+            ON
+                employees.dep_id = departments.id
+                JOIN
+            positions
+            ON
+                employees.pos_id = positions.id
+        WHERE
+            departments.name = #{depName}
         ORDER BY
             employees.name;
     </select>
