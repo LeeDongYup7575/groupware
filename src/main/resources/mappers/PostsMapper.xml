@@ -54,4 +54,63 @@
         WHERE p.id = #{id}
     </select>
 
+
+
+
+<!--    <select id="getPostsByBoardId" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">-->
+<!--        SELECT p.*, b.name as boardName, e.name as author-->
+<!--        FROM posts p-->
+<!--                 JOIN boards b ON p.board_id = b.id-->
+<!--                 JOIN employees e ON p.emp_id = e.id-->
+<!--        WHERE p.board_id = #{boardId}-->
+<!--        ORDER BY p.created_at DESC-->
+<!--    </select>-->
+
+    <!-- 특정 게시판의 게시글 목록 조회 -->
+    <select id="getPostsByBoardId" parameterType="Integer" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">
+        SELECT
+            p.id,
+            p.emp_id as empId,
+            p.title,
+            p.content,
+            p.views,
+            p.created_at as createdAt,
+            p.board_id as boardId,
+            b.name as boardName,
+            e.name as author
+        FROM
+            posts p
+                JOIN
+            boards b ON p.board_id = b.id
+                JOIN
+            employees e ON p.emp_id = e.id
+        WHERE
+            p.board_id = #{boardId}
+        ORDER BY
+            p.created_at DESC
+    </select>
+
+<!--    <select id="getPostById" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">-->
+<!--        SELECT p.*, b.name as boardName, e.name as author-->
+<!--        FROM posts p-->
+<!--                 JOIN boards b ON p.board_id = b.id-->
+<!--                 JOIN employees e ON p.emp_id = e.id-->
+<!--        WHERE p.id = #{id}-->
+<!--    </select>-->
+
+    <select id="getAccessiblePostsByEmpId" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">
+        SELECT p.*, b.name as boardName, e.name as author
+        FROM posts p
+                 JOIN boards b ON p.board_id = b.id
+                 JOIN employees e ON p.emp_id = e.id
+        WHERE
+            b.is_global = 1
+           OR p.board_id IN (
+            SELECT board_id FROM board_permissions WHERE emp_id = #{empId}
+        )
+        ORDER BY p.created_at DESC
+    </select>
+
+
+
 </mapper>

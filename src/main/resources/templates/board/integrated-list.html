@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{board/board-layout :: html(
+        '통합게시판 목록',
+        ~{::style},
+        ~{::#contents},
+        ~{::script}
+      )}">
+<head>
+    <style>
+        /* 페이지별 추가 스타일 */
+        th, td{border: 1px solid;}
+        /* 페이지별 추가 스타일 */
+    </style>
+</head>
+<body>
+<div id="contents">
+    <h1 class="page-title">통합게시판 목록</h1>
+
+    <div class="board-search">
+        <!-- 검색 폼 -->
+    </div>
+
+    <table class="board-list-table">
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>게시판</th>
+            <th>작성일</th>
+            <th>조회수</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="post : ${posts}">
+            <td th:text="${post.id}">1</td>
+            <td>
+                <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
+            </td>
+            <td th:text="${post.author}">작성자</td>
+            <td th:text="${post.boardName}">게시판명</td>
+            <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">날짜</td>
+            <td th:text="${post.views}">조회수</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(posts)}">
+            <td colspan="6" class="text-center">게시글이 없습니다.</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+    <div class="pagination">
+        <!-- 페이지네이션 -->
+    </div>
+</div>
+
+</body>
+</html>

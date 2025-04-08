@@ -23,4 +23,6 @@ public class PostsDTO {
     private Integer boardId;
     // 작성자 이름 필드 추가
     private String author;
+    // 게시판 이름 필드 추가
+    private String boardName;
 }

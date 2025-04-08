@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PostsService {
@@ -46,6 +48,23 @@ public class PostsService {
             throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id=" + id);
         }
         return post;
+    }
+
+
+
+    // 특정 게시판의 게시글 목록 조회
+    public List<PostsDTO> getPostsByBoardId(Integer boardId) {
+        return postsMapper.getPostsByBoardId(boardId);
+    }
+
+    // 게시글 상세 조회
+    public PostsDTO getPostById(Integer id) {
+        return postsMapper.getPostById(id);
+    }
+
+    // 통합 게시판 - 사용자가 접근 가능한 모든 게시판의 게시글 조회
+    public List<PostsDTO> getAccessiblePosts(Integer empId) {
+        return postsMapper.getAccessiblePostsByEmpId(empId);
     }
 
 }

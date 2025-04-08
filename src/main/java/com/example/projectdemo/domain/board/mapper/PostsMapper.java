@@ -18,6 +18,12 @@ public interface PostsMapper {
     // 게시글 목록 조회
     List<PostsDTO> getAllPosts();
 
+    // 사용자가 접근 가능한 모든 게시판의 게시글 조회
+    List<PostsDTO> getAccessiblePostsByEmpId(int empId);
+
+    // 특정 게시판의 게시글 조회
+    List<PostsDTO> getPostsByBoardId(Integer boardId);
+
     // 게시글 상세 조회
     PostsDTO getPostById(Integer id);
 
