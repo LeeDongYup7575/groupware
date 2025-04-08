@@ -63,9 +63,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             // CORS 프리플라이트 요청에 필요한 헤더 설정
-//            response.setHeader("Access-Control-Allow-Origin", "http://10.10.55.57:3000";
+            response.setHeader("Access-Control-Allow-Origin", "http://10.10.55.57:3000");
 //            response.setHeader("Access-Control-Allow-Origin", "http://192.168.1.175:3000");
-            response.setHeader("Access-Control-Allow-Origin", "http://172.20.10.3:3000"); // 필요에 따라 도메인 제한 가능
+//            response.setHeader("Access-Control-Allow-Origin", "http://172.30.1.74:3000"); // 필요에 따라 도메인 제한 가능
             response.setHeader("Access-Control-Allow-Credentials", "true");
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
