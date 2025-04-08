@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="utf-8" />
-    <title>TECH X - 근태 관리</title>
-    <link rel="stylesheet" href="/assets/css/leave/leavesForm.css" />
+    <title>TECH X - 연장근무 신청</title>
+    <link rel="stylesheet" href="/assets/css/work/overTimeForm.css" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
@@ -20,7 +20,7 @@
 <div class="container">
     <!-- 좌측 사이드바 -->
     <div class="sidebar">
-        <button class="add-button"><i class="fas fa-plus"></i> 휴가 신청</button>
+        <button class="add-button"><i class="fas fa-plus"></i>휴가 신청</button>
         <ul class="menu">
             <li><a href="/works/overTimeForm"><i class="fas fa-file-alt"></i> 연장 근무 신청</a></li>
             <li class="dropdown active open">
@@ -29,14 +29,14 @@
                 </div>
                 <ul class="submenu">
                     <li><a href="/attend/main"><i class="fas fa-calendar-alt"></i> 휴가/근무</a></li>
-                    <li><a href="/attend/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
+                    <li><a href="/works/workSchedule"><i class="fas fa-chart-line"></i> 근무 현황</a></li>
                 </ul>
             </li>
         </ul>
     </div>
 
     <div class="total">
-        <form id="documentForm" action="/leaves/submitLeave" method="post" enctype="multipart/form-data">
+        <form id="documentForm" action="/works/submitOverTime" method="post" enctype="multipart/form-data">
             <!-- 메인 콘텐츠 영역 -->
             <div class="main-content">
                 <div class="form-section">
@@ -45,13 +45,13 @@
                     <div class="form-row">
                         <div class="form-label">문서 종류</div>
                         <div class="form-input">
-                            휴가신청서
+                            연장근무신청서
                         </div>
                         <div class="form-label" style="margin-left: 20px;">작성자</div>
                         <div class="form-input">
                             <span id="writerInfo"
-                                  th:attr="data-writernum=${employee.empNum}, data-writerposition=${employee.positionTitle}, data-writername=${employee.name}"
-                                  th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                                th:attr="data-writernum=${employee.empNum}, data-writerposition=${employee.positionTitle}, data-writername=${employee.name}"
+                                th:text="${employee.positionTitle} + ' ' + ${employee.name}">
                             </span>
                             <input type="hidden" name="drafterId" th:value="${employee.empNum}">
                             <input type="hidden" name="empId" th:value="${employee.id}">
@@ -107,89 +107,100 @@
                     </div>
                 </div>
 
+                <!-- 연장근무 시간 입력 -->
                 <div class="form-section">
-                    <div class="form-row">
-                        <div class="form-label">휴가 현황</div>
-                        <div class="form-input" th:text="'잔여휴가 '+ ${canUseLeaves}+'일'"></div>
-                    </div>
+                    <h3 class="form-header">연장근무시간</h3>
 
                     <div class="form-row">
-                        <div class="form-label">휴가 신청</div>
+                        <div class="form-label">근무일</div>
                         <div class="form-input">
-                            <button type="button" class="button small-button" id="addDateButton">추가</button>
+                            <input type="text" id="workDate" name="workDate" class="datepicker" value="2025-04-08 (화)" readonly>
                         </div>
                     </div>
 
-                    <div id="dateSelectionContainer">
-                        <!-- 날짜 선택 영역 템플릿 -->
-                        <div class="form-row date-selection">
-                            <div class="radio-group">
-                                <input type="radio" id="full-day-0" name="time-type-0" class="full-day" checked>
-                                <label for="full-day-0">종일</label>
-                                <input type="radio" id="half-day-0" name="time-type-0" class="half-day">
-                                <label for="half-day-0">시간</label>
-                            </div>
-                            <div class="time-controls">
-                                <select class="time-select hour-select">
-                                    <option>09</option>
-                                    <option>10</option>
-                                    <option>11</option>
-                                    <option>12</option>
-                                    <option>13</option>
-                                    <option>14</option>
-                                    <option>15</option>
-                                    <option>16</option>
-                                    <option>17</option>
-                                    <option>18</option>
-                                </select>
-                                <span>시</span>
-                                <select class="time-select minute-select">
-                                    <option>00</option>
-                                    <option>30</option>
-                                </select>
-                                <span>분</span>
-                                <span>부터</span>
-                                <select class="time-select duration-select">
-                                    <option>4시간</option>
-                                    <option>8시간</option>
-                                </select>
-                            </div>
-                            <input type="text" class="date-input datepicker" value="">
-
-                            <input type="hidden" name="leaveStartDate[]" class="leave-start-date">
-                            <input type="hidden" name="leaveEndDate[]" class="leave-end-date">
-                            <input type="hidden" name="leaveType[]" class="leave-type">
-                            <input type="hidden" name="leaveHours[]" class="leave-hours">
-
-                            <button class="remove-button"><i class="fas fa-times"></i></button>
+                    <div class="form-row">
+                        <div class="form-label">연장근무시간</div>
+                        <div class="form-input time-selector">
+                            <select name="startHour" id="startHour">
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select>
+                            <span>시</span>
+                            <select name="startMinute" id="startMinute">
+                                <option value="00">00</option>
+                                <option value="30">30</option>
+                            </select>
+                            <span>분</span>
+                            <span style="margin: 0 10px;">~</span>
+                            <select name="endHour" id="endHour">
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                            </select>
+                            <span>시</span>
+                            <select name="endMinute" id="endMinute">
+                                <option value="00">00</option>
+                                <option value="30">30</option>
+                            </select>
+                            <span>분</span>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-section">
+
                     <div class="form-row">
                         <div class="form-label">사유</div>
                         <div class="form-input">
-                            <textarea class="reason-textarea" name="reason" placeholder="휴가 사유를 입력하세요"></textarea>
+                            <textarea class="reason-textarea" name="reason" placeholder="연장근무 사유를 입력하세요"></textarea>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="main2-contents">
-                <div class="attachment-section">
-                    <label class="attachment-label">첨부</label>
-                    <div class="attachment-links">
-                        <a href="#" class="attachment-link">파일 첨부</a>
-                        <a href="#" class="attachment-link">관련문서 첨부</a>
-                    </div>
-
-                    <div class="attachment-drop-area">
-                        여기로 파일을 끌어다 놓으세요
-                    </div>
+            <!-- HTML 수정 부분 -->
+            <div class="form-section validation-section">
+                <h3 class="form-header">근무시간 검증</h3>
+                <div class="validation-info">
+                    <div class="validation-description">이번 달 근무시간 현황</div>
+                </div>
+                <table class="work-time-table">
+                    <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>소정근무</th>
+                        <th>연장/휴일근무</th>
+                        <th>총 근무시간</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="standard-row">
+                        <td>기준 시간</td>
+                        <td>176시간</td>
+                        <td>0시간</td>
+                        <td>176시간</td>
+                    </tr>
+                    <tr class="current-row">
+                        <td>현재 누적</td>
+                        <td>136시간</td>
+                        <td><span class="overtime-hours">1시간</span></td>
+                        <td>137시간</td>
+                    </tr>
+                    <tr class="estimation-row">
+                        <td>신청 후 예상</td>
+                        <td>136시간</td>
+                        <td><span class="overtime-hours expected">3시간</span></td>
+                        <td>139시간</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="validation-note">
+                    <i class="fas fa-info-circle"></i>
+                    월 최대 연장근무 한도: 12시간
                 </div>
             </div>
-            <div class="add-btn" style="margin-bottom: 20px">
+            <div class="add-btn">
                 <button type="submit" class="button">기안하기</button>
             </div>
         </form>
@@ -323,146 +334,17 @@
             $("#approvalModal").fadeOut();
         });
 
-        // 초기화: 첫 번째 행의 datepicker 설정
-        $(".datepicker").val(getCurrentDate());
-        initDatepicker(".datepicker");
-
-        // 종일/시간 라디오 버튼 변경 이벤트
-        $(document).on("change", ".full-day, .half-day", function() {
-            toggleTimeControls($(this).closest(".date-selection"));
-            updateHiddenFields($(this).closest(".date-selection"));
+        // datepicker 초기화
+        $("#workDate").datepicker({
+            dateFormat: 'yy-mm-dd (D)',
+            dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+            dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+            monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            showMonthAfterYear: true,
+            yearSuffix: '년',
+            firstDay: 0
         });
-
-        // 추가 버튼 클릭 이벤트
-        $("#addDateButton").click(function() {
-            var rowCount = $(".date-selection").length;
-
-            if (rowCount >= 5) {
-                alert("최대 5개까지만 추가할 수 있습니다.");
-                return;
-            }
-
-            var newRow = $(".date-selection").first().clone();
-
-            var newIndex = rowCount;
-            newRow.find('.full-day').attr('id', 'full-day-' + newIndex).attr('name', 'time-type-' + newIndex);
-            newRow.find('label[for="full-day-0"]').attr('for', 'full-day-' + newIndex);
-            newRow.find('.half-day').attr('id', 'half-day-' + newIndex).attr('name', 'time-type-' + newIndex);
-            newRow.find('label[for="half-day-0"]').attr('for', 'half-day-' + newIndex);
-
-            newRow.find('.datepicker').removeClass("hasDatepicker").val(getCurrentDate()); // 기존 datepicker 클래스 제거 후 새 날짜 설정
-            newRow.find('.full-day').prop('checked', true);
-            toggleTimeControls(newRow);
-
-            // 삭제 버튼 추가
-            newRow.find('.remove-button').remove();
-            newRow.append('<button type="button" class="remove-button"><i class="fas fa-times"></i></button>');
-
-            $("#dateSelectionContainer").append(newRow);
-            initDatepicker(newRow.find('.datepicker')); // 추가된 요소에 datepicker 적용
-            updateHiddenFields(newRow); // 새 행의 hidden 필드 초기화
-        });
-
-        // 삭제 버튼 클릭 이벤트
-        $(document).on("click", ".remove-button", function() {
-            if ($(".date-selection").length > 1) {
-                $(this).closest(".date-selection").remove();
-            }
-        });
-
-        // 초기 종일/시간 설정
-        toggleTimeControls($(".date-selection").first());
-
-        // 초기 hidden 필드 값 설정
-        $(".date-selection").each(function() {
-            updateHiddenFields($(this));
-        });
-
-        // datepicker 변경 이벤트
-        $(document).on("change", ".datepicker", function() {
-            updateHiddenFields($(this).closest(".date-selection"));
-        });
-
-        // 시간 선택 변경 이벤트
-        $(document).on("change", ".time-select", function() {
-            updateHiddenFields($(this).closest(".date-selection"));
-        });
-
-        // 폼 제출 이벤트 처리
-        $("#documentForm").submit(function(e) {
-            // 각 날짜 선택 행에 대해 hidden 필드 값 설정
-            $(".date-selection").each(function() {
-                updateHiddenFields($(this));
-            });
-        });
-
-        // 함수: 종일/시간 토글
-        function toggleTimeControls(row) {
-            var timeControls = row.find('.time-controls');
-            if (row.find('.full-day').is(':checked')) {
-                timeControls.hide();
-            } else {
-                timeControls.show();
-            }
-        }
-
-        // 함수: datepicker 초기화
-        function initDatepicker(selector) {
-            $(selector).datepicker({
-                dateFormat: 'yy-mm-dd (D)',
-                dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-                dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
-                monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-                monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-                showMonthAfterYear: true,
-                yearSuffix: '년',
-                firstDay: 0
-            });
-        }
-
-        // 함수: 현재 날짜 반환
-        function getCurrentDate() {
-            var now = new Date();
-            var year = now.getFullYear();
-            var month = ('0' + (now.getMonth() + 1)).slice(-2);
-            var day = ('0' + now.getDate()).slice(-2);
-            var dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-            var dayOfWeek = dayNames[now.getDay()];
-
-            return year + '-' + month + '-' + day + ' (' + dayOfWeek + ')';
-        }
-
-        // 함수: hidden 필드 업데이트
-        function updateHiddenFields(row) {
-            var dateValue = row.find(".datepicker").val();
-
-            // 날짜 문자열에서 "(요일)" 부분 제거
-            var dateOnly = dateValue ? dateValue.split(" (")[0] : "";
-
-            // 종일/시간 선택에 따라 처리
-            if (row.find('.full-day').is(':checked')) {
-                // 종일 선택 시
-                row.find(".leave-start-date").val(dateOnly);
-                row.find(".leave-end-date").val(dateOnly);
-                row.find(".leave-type").val("연차");
-                row.find(".leave-hours").val("8");
-            } else {
-                // 시간 선택 시
-                var hour = row.find(".hour-select").val();
-                var minute = row.find(".minute-select").val();
-                var duration = row.find(".duration-select").val();
-                var hours = duration === "4시간" ? "4" : "8";
-
-                // 시작 시간 설정
-                var startDateTime = dateOnly + " " + hour + ":" + minute;
-                row.find(".leave-start-date").val(startDateTime);
-
-                // 종료 시간 계산 (단순화를 위해 동일 날짜 사용)
-                row.find(".leave-end-date").val(dateOnly + " 18:00");
-                row.find(".leave-type").val("반차");
-                row.find(".leave-hours").val(hours);
-            }
-        }
     });
 </script>
 </body>

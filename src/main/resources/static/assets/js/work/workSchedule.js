@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         events: function(fetchInfo, successCallback, failureCallback) {
             // 서버에서 근태 데이터를 가져오기
-            fetch('/attend/getWorkSchedule')
+            fetch('/works/getWorkSchedule')
                 .then(response => response.json())
                 .then(data => {
                     // 데이터를 FullCalendar에 맞게 변환하여 전달

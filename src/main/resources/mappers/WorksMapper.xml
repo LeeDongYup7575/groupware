@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.work.dao.WorkDAO">
+
+    <insert id="insertByEdsm" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO edsm_document
+        (edsm_form_id, title, content, retention_period, security_grade, drafter_id, draft_date, approval_date ,status)
+        VALUES
+        ('1005', '연장근무신청서', #{content},'3년','B등급', #{drafterId}, current_timestamp,null,'진행')
+
+        <selectKey order="AFTER" keyProperty="id" resultType="int">
+            select LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <insert id="insertByOverTime" parameterType="com.example.projectdemo.domain.work.dto.OverTimeDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO overtime_requests
+        (emp_id, edsm_document_id, work_date, start_time, end_time, status ,reason, created_at)
+        VALUES
+            (#{empId}, #{edsmDocId}, #{workDate}, #{startTime},#{endTime},'진행',#{reason},current_timestamp)
+    </insert>
+
+    <select id="selectByStatus" resultType="java.lang.String">
+        select status from edsm_document where edsm_form_id = '1005' and drafter_id = #{drafterId} and id = #{edsmDocId}
+    </select>
+
+    <select id="selectAllOverTimeRequests" resultType="com.example.projectdemo.domain.work.dto.OverTimeDTO">
+        SELECT
+            id,
+            emp_id AS empId,
+            edsm_document_id AS edsmDocId,
+            work_date AS workDate,
+            start_time AS startTime,
+            end_time AS endTime,
+            status,
+            reason,
+            created_at AS createdAt
+        FROM overtime_requests
+        WHERE emp_id = #{empId}
+    </select>
+
+    <select id="selectOverTimeRequestsByMonth" resultType="com.example.projectdemo.domain.work.dto.OverTimeDTO">
+        SELECT
+            id,
+            emp_id AS empId,
+            edsm_document_id AS edsmDocId,
+            work_date AS workDate,
+            start_time AS startTime,
+            end_time AS endTime,
+            status,
+            reason,
+            created_at AS createdAt
+        FROM overtime_requests
+        WHERE emp_id = #{empId}
+          AND work_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+
+</mapper>
