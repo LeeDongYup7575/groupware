@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/board")
@@ -31,7 +29,6 @@ public class BoardController {
     private BoardsService boardsService;
 
 
-//  추가 내용 :: s
     // 통합 게시판 - 모든 권한 있는 게시판의 게시글 보기
     @GetMapping("")
     public String integratedBoard(HttpServletRequest request, Model model) {
@@ -85,16 +82,6 @@ public class BoardController {
 
         return "board/view";
     }
-//  추가 내용 :: s
-
-
-
-    @GetMapping("/list")
-    public String getAllPosts(Model model) {
-        List<PostsDTO> posts = postsService.getAllPosts();
-        model.addAttribute("posts", posts);
-        return "board/list"; //게시글 목록 조회(전체 게시글 보기)
-    }
 
     @GetMapping("/view/{id}")
     public String viewPost(@PathVariable int id, Model model) {
@@ -112,26 +99,6 @@ public class BoardController {
     @GetMapping("/important")
     public String importantPosts() {
         return "board/important"; // 중요 게시물 페이지
-    }
-
-    @GetMapping("/notice")
-    public String notices() {
-        return "board/notice"; // 사내공지
-    }
-
-    @GetMapping("/free")
-    public String freeBoard() {
-        return "board/free"; // 자유게시판
-    }
-
-    @GetMapping("/football")
-    public String footballClub() {
-        return "board/football"; // 축구동호회
-    }
-
-    @GetMapping("/movies")
-    public String movieClub() {
-        return "board/movies"; // 영화동호회
     }
 
     @GetMapping("/create")
