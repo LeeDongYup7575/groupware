@@ -41,10 +41,10 @@
             </td>
             <td th:text="${post.author}">작성자</td>
             <td th:text="${post.boardName}">게시판명</td>
-            <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">날짜</td>
+            <td th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd') : '-'}">날짜</td>
             <td th:text="${post.views}">조회수</td>
         </tr>
-        <tr th:if="${#lists.isEmpty(posts)}">
+        <tr th:if="${posts == null || #lists.isEmpty(posts)}">
             <td colspan="6" class="text-center">게시글이 없습니다.</td>
         </tr>
         </tbody>

@@ -40,7 +40,7 @@
 <script th:src="@{/assets/js/fragments/sidebar-common.js}"></script>
 
 <!-- 페이지별 추가 스크립트 -->
-<th:block th:replace="${pageScripts}"></th:block>
+<th:block th:replace="${pageScripts ?: ''}"></th:block>
 
 </body>
 </html>
