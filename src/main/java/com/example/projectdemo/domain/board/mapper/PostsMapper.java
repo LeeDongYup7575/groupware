@@ -15,9 +15,6 @@ public interface PostsMapper {
      */
     void insertPost(PostsDTO postsDTO);
 
-    // 게시글 목록 조회
-    List<PostsDTO> getAllPosts();
-
     // 사용자가 접근 가능한 모든 게시판의 게시글 조회
     List<PostsDTO> getAccessiblePostsByEmpId(int empId);
 

@@ -18,9 +18,6 @@ import java.util.List;
 public class BoardController {
 
     @Autowired
-    private JwtTokenUtil jwtUtil;
-
-    @Autowired
     private PostsService postsService;
 
     @Autowired
