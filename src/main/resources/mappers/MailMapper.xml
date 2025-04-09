@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.mail.mapper.MailMapper">
+
+    <!-- 메일 계정 등록 -->
+    <insert id="insertMailAccount" parameterType="com.example.projectdemo.domain.mail.dto.MailAccountDTO">
+        <selectKey keyProperty="mailAccount.accountid" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO hmail.hm_accounts
+        VALUES (
+                   NULL,                          -- accountid (AUTO_INCREMENT)
+                   1,                             -- accountdomainid
+                   0,                             -- accountadminlevel
+                   #{mailAccount.accountaddress},              -- accountaddress
+                   #{mailAccount.accountpassword},            -- accountpassword
+                   1,                             -- accountactive
+                   0,                             -- accountisad
+                   '',                            -- accountaddomain
+                   '',                            -- accountadusername
+                   0,                             -- accountmaxsize
+                   0,                             -- accountvacationmessageon
+                   '',                            -- accountvacationmessage
+                   '',                            -- accountvacationsubject
+                   3,                             -- accountpwencryption (SHA256)
+                   0,                             -- accountforwardenabled
+                   '',                            -- accountforwardaddress
+                   0,                             -- accountforwardkeeporiginal
+                   0,                             -- accountenablesignature
+                   '',                            -- accountsignatureplaintext
+                   '',                            -- accountsignaturehtml
+                   NOW(),                         -- accountlastlogontime
+                   0,                             -- accountvacationexpires
+                   NOW(),                         -- accountvacationexpiredate
+                   '',                            -- accountpersonfirstname
+                   ''                             -- accountpersonlastname
+               )
+    </insert>
+
+    <!-- IMAP 폴더 생성 -->
+    <insert id="insertImapFolders">
+        INSERT INTO hmail.hm_imapfolders
+            VALUES
+              (NULL,
+               #{accountid},        -- 생성한 계정의 accountid
+               -1,                  -- 최상위 폴더
+               'INBOX',             -- 폴더 이름
+               1,                   -- 기본 구독 상태
+               NOW(),               -- 생성 시간
+               0),                  -- 현재 UID
+              (NULL, #{accountid}, -1, 'Trash', 1, NOW(), 0)
+    </insert>
+
+
+    <!-- 메일 비밀번호 업데이트 -->
+    <update id="updateMailPassword">
+        UPDATE
+            hmail.hm_accounts
+        SET
+            accountpassword = #{encodedPassword}
+        WHERE
+            accountaddress = #{internalEmail}
+    </update>
+
+
+    <!-- 메일 계정 조회 -->
+    <select id="existsByEmail" resultType="int">
+        SELECT COUNT(*)
+        FROM hmail.hm_accounts
+        WHERE accountaddress = #{accountaddress}
+    </select>
+
+</mapper>

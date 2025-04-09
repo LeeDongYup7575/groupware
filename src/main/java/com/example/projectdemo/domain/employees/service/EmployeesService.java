@@ -7,6 +7,7 @@ import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
+import com.example.projectdemo.domain.mail.service.MailService;
 import jakarta.validation.constraints.NotBlank;
 import net.crizin.KoreanCharacter;
 import net.crizin.KoreanRomanizer;
@@ -33,6 +34,9 @@ public class EmployeesService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MailService mailService;
 
     private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
     private static final String CHAR_UPPER = CHAR_LOWER.toUpperCase();
@@ -92,8 +96,11 @@ public class EmployeesService {
         String tempPassword = generateTempPassword();
         String encodedPassword = passwordEncoder.encode(tempPassword);
 
-        // 이메일 생성
+        // 사내 이메일 생성
         String internalEmail = generateInternalEmail(employee.getName());
+
+        // 사내 이메일 계정 등록
+        mailService.registerMailAccount(internalEmail, tempPassword);
 
         int updated = employeeMapper.updateRegistrationStatus(
                 empNum,
@@ -157,6 +164,9 @@ public class EmployeesService {
         if (updated <= 0) {
             throw new RuntimeException("비밀번호 업데이트에 실패했습니다.");
         }
+
+        // 메일 비밀번호 업데이트
+        mailService.updateMailPassword(employee.getInternalEmail(), newPassword);
     }
 
     /**
@@ -249,9 +259,10 @@ public class EmployeesService {
         String emailPrefix = firstName.charAt(0) + lastName; // 예: ykang
 
         // 이메일 중복 체크 (가정: emailExists는 DB에서 중복 체크하는 메서드)
-//        if (emailExists(emailPrefix + "@techx.kro.kr")) {
-//            emailPrefix = firstName + lastName; // 예: yunjinkang
-//        }
+
+        if (mailService.emailExists(emailPrefix + "@techx.kro.kr")) {
+            emailPrefix = firstName + lastName; // 예: yunjinkang
+        }
 
         return emailPrefix + "@techx.kro.kr";
     }
