@@ -333,8 +333,9 @@ select {
 
 .contents-label {
     display: block;
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 8px;
+    margin-left: 5px;
     color: #333;
     font-weight: 500;
 }
@@ -347,6 +348,10 @@ select {
     font-size: 14px;
 }
 
+.label-input:focus{
+    outline: none;
+}
+
 .label-textarea {
     width: 100%;
     padding: 10px;
@@ -355,6 +360,14 @@ select {
     min-height: 200px;
     resize: vertical;
     font-size: 14px;
+}
+.label-textarea:focus{
+    outline: none;
+}
+
+.approval-date{
+    font-size: 12px;
+    color: #777;
 }
 
 /* 첨부파일 영역 */

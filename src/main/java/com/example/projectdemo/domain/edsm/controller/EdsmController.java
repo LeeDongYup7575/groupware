@@ -60,17 +60,45 @@ public class EdsmController {
         List<EdsmDocumentDTO> allCashDocument = edsmService.selectByAllCashDocument(empNum);
         List<EdsmDocumentDTO> allLetterDocument = edsmService.selectByAllLetterDocument(empNum);
         List<EdsmDocumentDTO> allLeavesDocument = edsmService.selectByAllLeavesDocument(empNum);
-
+        List<EdsmDocumentDTO> allOvertimeDocument = edsmService.selectByAllOvertimeDocument(empNum);
 
         model.addAttribute("allBusinessDocument", allBusinessDocument);
         model.addAttribute("allCashDocument", allCashDocument);
         model.addAttribute("allLetterDocument", allLetterDocument);
         model.addAttribute("allLeavesDocument", allLeavesDocument);
         model.addAttribute("allDocumentList",allDocument);
+        model.addAttribute("allOvertimeDocument",allOvertimeDocument);
 
         return "edsm/main";
     }
 
+
+    //결재 상태 <대기>
+    @RequestMapping("/wait")
+    public String wait(Model model, HttpServletRequest request) {
+// JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String)request.getAttribute("empNum");
+
+        if (empNum == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("wait","대기");
+
+        List<EdsmDocumentDTO> waitDocument = edsmService.selectByAllApprovalFromIdWait(empNum);
+
+        model.addAttribute("waitDocumentList",waitDocument);
+
+        return "edsm/wait";
+    }
 
 
     //결재 상태 <예정>
@@ -93,7 +121,7 @@ public class EdsmController {
         model.addAttribute("employee", employee);
         model.addAttribute("expected","예정");
 
-        List<EdsmDocumentDTO> expectedDocument=edsmService.selectByAllApprovalFromId(empNum);
+        List<EdsmDocumentDTO> expectedDocument=edsmService.selectByAllApprovalFromIdExpected(empNum);
 
         model.addAttribute("expectedDocumentList",expectedDocument);
 
@@ -131,14 +159,7 @@ public class EdsmController {
 
         return "edsm/main";
     }
-    //결재 상태 <완료>
-    @RequestMapping("/complete")
-    public String complete(Model model) {
 
-        model.addAttribute("complete","완료");
-
-        return "edsm/complete";
-    }
 
 
 

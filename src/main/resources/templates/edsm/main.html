@@ -32,19 +32,18 @@
         <div class="menu-items">
             <div class="menu-item" id="main">
                 <i class="fas fa-folder"></i>
-                전체(결재권이 있는 모든 문서- 예정, 진행, 완료 모두)
+                전체
+                (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
+            </div>
+            <div class="menu-item" id="wait">
+                <i class="fas fa-spinner"></i>
+                대기
+                (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
             </div>
             <div class="menu-item" id="expected">
                 <i class="fas fa-spinner"></i>
-                예정(내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
-            </div>
-            <div class="menu-item" id="progress">
-                <i class="fas fa-spinner"></i>
-                진행(내가 승인한 문서가 아직 완료가 되지 않은 문서)
-            </div>
-            <div class="menu-item" id="complete">
-                <i class="fas fa-check-circle"></i>
-                완료(내가 결재권이 있는 문서중 승인 혹은 반려된 문서들)
+                예정
+                (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
             </div>
         </div>
     </div>
@@ -83,6 +82,7 @@
             <option value="지출결의서">지출결의서</option>
             <option value="품의서">품의서</option>
             <option value="휴가신청서">휴가신청서</option>
+            <option value="연장근무신청서">연장근무신청서</option>
         </select>
     </div>
 
@@ -103,13 +103,16 @@
             </tr>
             </thead>
             <tbody>
-        <tr th:each="doc : ${allBusinessDocument}" >
+            <tr th:if="${#lists.isEmpty(allBusinessDocument)}">
+                <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
+            </tr>
+        <tr th:each="doc : ${allBusinessDocument}" th:if="${doc.status == '진행'}">
             <td th:text="${doc.id}"></td>
             <td>
                 <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
             </td>
             <td th:text="${doc.drafterName}"></td>
-            <td th:text="${doc.drafterDate}"></td>
+            <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
             <td th:switch="${doc.edsmFormId}">
                 <p th:case="1001">업무연락</p>
                 <p th:case="1002">지출결의</p>
@@ -117,14 +120,13 @@
                 <p th:case="1004">휴가신청</p>
                 <p th:case="1005">연장근무</p>
             </td>
-            <td th:text="${doc.status}"
-                th:style="${(doc.status == '반려')
-                  ? 'color:red;'
-                  : ((doc.status == '진행')
-                        ? 'color:green;'
-                        : ((doc.status == '승인')
-                              ? 'color:blue;'
-                              : ''))}"></td>
+            <td th:text="${doc.approvalStatus}"
+
+                th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
+                : ((doc.approvalStatus == '승인') ? 'color:green;'
+                : ((doc.approvalStatus == '반려') ? 'color:red;'
+                : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                : '')))}"></td>
         </tr>
         </tbody>
 
@@ -150,13 +152,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="doc : ${allCashDocument}" >
+            <tr th:if="${#lists.isEmpty(allCashDocument)}">
+                <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
+            </tr>
+            <tr th:each="doc : ${allCashDocument}" th:if="${doc.status == '진행'}">
                 <td th:text="${doc.id}"></td>
                 <td>
-                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                    <a th:href="@{'/edsmDetail/cashDisbuVoucher/' + ${doc.id}}" th:text="${doc.title}"></a>
                 </td>
                 <td th:text="${doc.drafterName}"></td>
-                <td th:text="${doc.drafterDate}"></td>
+                <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
                 <td th:switch="${doc.edsmFormId}">
                     <p th:case="1001">업무연락</p>
                     <p th:case="1002">지출결의</p>
@@ -164,14 +169,13 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.status}"
-                    th:style="${(doc.status == '반려')
-                  ? 'color:red;'
-                  : ((doc.status == '진행')
-                        ? 'color:green;'
-                        : ((doc.status == '승인')
-                              ? 'color:blue;'
-                              : ''))}"></td>
+                <td th:text="${doc.approvalStatus}"
+
+                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
+                : ((doc.approvalStatus == '승인') ? 'color:green;'
+                : ((doc.approvalStatus == '반려') ? 'color:red;'
+                : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                : '')))}"></td>
             </tr>
             </tbody>
         </table>
@@ -193,13 +197,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="doc : ${allLetterDocument}" >
+            <tr th:if="${#lists.isEmpty(allLetterDocument)}">
+                <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
+            </tr>
+            <tr th:each="doc : ${allLetterDocument}" th:if="${doc.status == '진행'}">
                 <td th:text="${doc.id}"></td>
                 <td>
-                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                    <a th:href="@{'/edsmDetail/letterOfApproval/' + ${doc.id}}" th:text="${doc.title}"></a>
                 </td>
                 <td th:text="${doc.drafterName}"></td>
-                <td th:text="${doc.drafterDate}"></td>
+                <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
                 <td th:switch="${doc.edsmFormId}">
                     <p th:case="1001">업무연락</p>
                     <p th:case="1002">지출결의</p>
@@ -207,21 +214,20 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.status}"
-                    th:style="${(doc.status == '반려')
-                  ? 'color:red;'
-                  : ((doc.status == '진행')
-                        ? 'color:green;'
-                        : ((doc.status == '승인')
-                              ? 'color:blue;'
-                              : ''))}"></td>
+                <td th:text="${doc.approvalStatus}"
+
+                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
+                : ((doc.approvalStatus == '승인') ? 'color:green;'
+                : ((doc.approvalStatus == '반려') ? 'color:red;'
+                : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                : '')))}"></td>
             </tr>
             </tbody>
         </table>
     </div>
 
 
-    <!-- 품의서 결재 상황 -->
+    <!-- 휴가신청 결재 상황 -->
     <div class="doc-table-container" data-doc-type="휴가신청서">
         <h4>휴가신청 결재 상황</h4>
         <br>
@@ -237,13 +243,16 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="doc : ${allLeavesDocument}" >
+            <tr th:if="${#lists.isEmpty(allLeavesDocument)}">
+                <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
+            </tr>
+            <tr th:each="doc : ${allLeavesDocument}" th:if="${doc.status == '진행'}">
                 <td th:text="${doc.id}"></td>
                 <td>
-                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                    <a th:href="@{'/edsmDetail/#/' + ${doc.id}}" th:text="${doc.title}"></a>
                 </td>
                 <td th:text="${doc.drafterName}"></td>
-                <td th:text="${doc.drafterDate}"></td>
+                <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
                 <td th:switch="${doc.edsmFormId}">
                     <p th:case="1001">업무연락</p>
                     <p th:case="1002">지출결의</p>
@@ -251,19 +260,62 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.status}"
-                    th:style="${(doc.status == '반려')
-                  ? 'color:red;'
-                  : ((doc.status == '진행')
-                        ? 'color:green;'
-                        : ((doc.status == '승인')
-                              ? 'color:blue;'
-                              : ''))}"></td>
+                <td th:text="${doc.approvalStatus}"
+
+                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
+                : ((doc.approvalStatus == '승인') ? 'color:green;'
+                : ((doc.approvalStatus == '반려') ? 'color:red;'
+                : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                : '')))}"></td>
             </tr>
             </tbody>
         </table>
     </div>
 
+    <!-- 연장근무신청 결재 상황 -->
+    <div class="doc-table-container" data-doc-type="연장근무신청서">
+        <h4>연장근무신청 결재 상황</h4>
+        <br>
+        <table class="document-table">
+            <thead>
+            <tr>
+                <th>문서 번호</th>
+                <th>제목</th>
+                <th>기안자</th>
+                <th>기안일</th>
+                <th>구분</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(allOvertimeDocument)}">
+                <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
+            </tr>
+            <tr th:each="doc : ${allOvertimeDocument}" th:if="${doc.status == '진행'}">
+                <td th:text="${doc.id}"></td>
+                <td>
+                    <a th:href="@{'/edsmDetail/#/' + ${doc.id}}" th:text="${doc.title}"></a>
+                </td>
+                <td th:text="${doc.drafterName}"></td>
+                <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
+                <td th:switch="${doc.edsmFormId}">
+                    <p th:case="1001">업무연락</p>
+                    <p th:case="1002">지출결의</p>
+                    <p th:case="1003">품의</p>
+                    <p th:case="1004">휴가신청</p>
+                    <p th:case="1005">연장근무</p>
+                </td>
+                <td th:text="${doc.approvalStatus}"
+
+                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
+                : ((doc.approvalStatus == '승인') ? 'color:green;'
+                : ((doc.approvalStatus == '반려') ? 'color:red;'
+                : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                : '')))}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
 <script>
 
@@ -274,7 +326,9 @@
         location.href = "/edsm/expected";
     });
 
-
+    $("#wait").on("click", function () {
+        location.href = "/edsm/wait";
+    });
     $("#progress").on("click", function () {
         location.href = "/edsm/progress";
     });

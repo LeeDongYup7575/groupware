@@ -33,18 +33,17 @@
             <div class="menu-item" id="main">
                 <i class="fas fa-folder"></i>
                 전체
+                (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
+            </div>
+            <div class="menu-item" id="wait">
+                <i class="fas fa-spinner"></i>
+                대기
+                (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
             </div>
             <div class="menu-item" id="expected">
                 <i class="fas fa-spinner"></i>
                 예정
-            </div>
-            <div class="menu-item" id="progress">
-                <i class="fas fa-spinner"></i>
-                진행
-            </div>
-            <div class="menu-item" id="complete">
-                <i class="fas fa-check-circle"></i>
-                완료
+                (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
             </div>
         </div>
     </div>
@@ -52,24 +51,20 @@
     <div class="menu-section">
         <div class="menu-header">
             <i class="fas fa-chevron-down"></i>
-            문서함
+            나의 문서함
         </div>
         <div class="menu-items">
             <div class="menu-item">
-                <i class="fas fa-folder"></i>
-                전체
-            </div>
-            <div class="menu-item">
                 <i class="fas fa-pen"></i>
-                기안
+                기안(내가 기안한 모든 문서- 상태상관없음)
             </div>
             <div class="menu-item">
                 <i class="fas fa-file-signature"></i>
-                결재
+                승인(내가 기안한 문서 중 승인완료된 문서등)
             </div>
             <div class="menu-item">
                 <i class="fas fa-undo"></i>
-                반려
+                반려(내가 기안한 문서 중 반려된 문서들)
             </div>
         </div>
     </div>
@@ -101,7 +96,7 @@
                 <a th:case="1005" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
             </td>
             <td th:text="${exdoc.drafterName}"></td>
-            <td th:text="${exdoc.drafterDate}"></td>
+            <td th:text="${#dates.format(exdoc.drafterDate, 'yyyy-MM-dd')}"></td>
             <td th:switch="${exdoc.edsmFormId}">
                 <p th:case="1001">업무연락</p>
                 <p th:case="1002">지출결의</p>
@@ -109,10 +104,13 @@
                 <p th:case="1004">휴가신청</p>
                 <p th:case="1005">연장근무</p>
             </td>
-            <td th:switch="${exdoc.status}">
-                <p th:case="진행">예정</p>
-                <p th:case="반려">반려</p>
-                <p th:case="승인">승인</p>
+            <td th:text="${exdoc.approvalStatus}" th:style="${(exdoc.approvalStatus == '예정')
+                  ? 'color:black;'
+                  : ((exdoc.status == '진행')
+                        ? 'color:green;'
+                        : ((exdoc.status == '승인')
+                              ? 'color:blue;'
+                              : ''))}">
             </td>
         </tr>
         </tbody>
@@ -131,7 +129,9 @@
         location.href = "/edsm/expected";
     });
 
-
+    $("#wait").on("click", function () {
+        location.href = "/edsm/wait";
+    });
     $("#progress").on("click", function () {
         location.href = "/edsm/progress";
     });

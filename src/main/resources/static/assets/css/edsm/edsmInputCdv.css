@@ -333,6 +333,23 @@ select:hover, select:focus {
     outline: none;
 }
 
+.form-group input{
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 10px;
+    width: 200px;
+}
+
+.form-group input:focus{
+    border-color: #4a90e2;
+    outline: none;
+}
+
+.label-textarea:focus{
+    border-color: #4a90e2;
+    outline: none;
+}
 .bank-input {
     padding: 6px 10px;
     border: 1px solid #ddd;
