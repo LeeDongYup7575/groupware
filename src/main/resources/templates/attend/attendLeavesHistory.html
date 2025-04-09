@@ -100,7 +100,7 @@
                 <th>번호</th>
                 <th>신청자</th>
                 <th>휴가 종류</th>
-                <th>일수</th>
+                <th>휴가 일수</th>
                 <th>기간</th>
                 <th>상태</th>
                 <th>상세</th>
@@ -114,7 +114,7 @@
                 <td th:text="${leave.id}">1</td>
                 <td th:text="${employee.name}">신청자</td>
                 <td th:text="${leave.leaveType}">휴가 종류</td>
-                <td>1</td>
+                <td th:text="${leave.leaveType == '반차' ? 0.5 : (leave.leaveType == '연차' ? 1 : 0)}">휴가일수</td>
                 <td th:text="${leave.startDate} + ' ~ ' + ${leave.endDate}">기간</td>
                 <td th:text="${leave.status}">상태</td>
                 <td><button class="detail-button" th:attr="data-reason=${leave.reason}">상세</button></td>

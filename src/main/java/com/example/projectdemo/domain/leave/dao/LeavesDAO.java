@@ -65,5 +65,22 @@ public class LeavesDAO {
         return mybatis.delete("com.example.projectdemo.domain.leave.dao.LeavesDAO.deleteLeaveGrantsByEmpId",empId);
     }
 
+    public int updateLeaveStatus(int id, String status) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("status", status);
+        return mybatis.update("com.example.projectdemo.domain.leave.dao.LeavesDAO.updateLeaveStatus",params);
+    }
+
+    public List<LeavesDTO> selectLeavesByEmpId(int empId) {
+        return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.selectLeavesByEmpId", empId);
+    }
+
+    public List<Map<String, Object>> getMonthlyLeaveHours(int empId, int year) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("empId", empId);
+        params.put("year", year);
+        return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.getMonthlyLeaveHours", params);
+    }
 
 }

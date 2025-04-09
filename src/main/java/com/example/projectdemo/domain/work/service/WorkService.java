@@ -35,4 +35,16 @@ public class WorkService {
     public List<OverTimeDTO> getOverTimeRequestsByMonth(int empId,int year, int month){
         return workDAO.getOverTimeRequestsByMonth(empId,year,month);
     }
+
+    public int updateOverTimeRequestsStatus(int id, String status){
+        return workDAO.updateOverTimeRequestsStatus(id,status);
+    }
+
+    public List<OverTimeDTO> selectOverTimeListByEmpId(int empId){
+        return workDAO.selectOverTimeListByEmpId(empId);
+    }
+
+    public List<Map<String, Object>> getMonthlyOvertimeHours(int empId, int year){
+        return workDAO.getMonthlyOvertimeHours(empId,year);
+    }
 }
