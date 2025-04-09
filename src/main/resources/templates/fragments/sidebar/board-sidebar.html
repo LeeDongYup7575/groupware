@@ -34,29 +34,39 @@
             <li><a th:href="@{/board}"><span class="sidebar-icon">📋</span> 통합 게시판</a></li>
             <li><a th:href="@{/board/important}"><span class="sidebar-icon">⭐</span> 중요 게시물</a></li>
 
-            <!-- 전사 게시판 (토글) -->
+            <!-- 전사 게시판 그룹 (is_global = 1) -->
             <li class="toggle-menu">
-                <a href="">
+                <a href="" >
                     <span class="sidebar-icon">📢</span> 전사 게시판 &nbsp;
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <ul id="all-menu" class="submenu">
-                    <li><a th:href="@{/board/1}"><span class="sidebar-icon">📄</span> 사내공지</a></li>
-                    <li><a th:href="@{/board/2}"><span class="sidebar-icon">💬</span> 자유게시판</a></li>
+                    <li th:each="board : ${accessibleBoards}" th:if="${board.isActive && board.isGlobal}">
+                        <a th:href="@{/board/{id}(id=${board.id})}">
+                            <span class="sidebar-icon">📄</span>
+                            <span th:text="${board.name}">게시판명</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
 
-            <!-- 그룹 게시판 (토글) -->
-            <li class="toggle-menu">
+            <!-- 그룹 게시판 (is_global = 0) -->
+            <li class="toggle-menu" th:if="${!#lists.isEmpty(accessibleBoards.?[isActive and !isGlobal])}">
                 <a href="">
                     <span class="sidebar-icon">👥</span> 그룹 게시판 &nbsp;
                     <i class="fas fa-chevron-down"></i>
                 </a>
                 <ul id="group-menu" class="submenu">
-                    <li><a th:href="@{/board/3}"><span class="sidebar-icon">⚽</span> 축구동호회</a></li>
-                    <li><a th:href="@{/board/4}"><span class="sidebar-icon">🎥</span> 영화동호회</a></li>
+                    <li th:each="board : ${accessibleBoards}" th:if="${board.isActive && !board.isGlobal}">
+                        <a th:href="@{/board/{id}(id=${board.id})}">
+                            <span class="sidebar-icon">📁</span>
+                            <span th:text="${board.name}">게시판명</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
+
+
 
             <li><a th:href="@{/board/create}"><span class="sidebar-icon">➕</span> 게시판 만들기</a></li>
             <li><a th:href="@{/board/manage}"><span class="sidebar-icon">🛠 </span> 게시판 관리</a></li>
