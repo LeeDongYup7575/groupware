@@ -15,15 +15,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final AuthorizationInterceptor authorizationInterceptor;
     private final TempPasswordInterceptor tempPasswordInterceptor;
     private final LoginTrackerInterceptor loginTrackerInterceptor;
+    private final SidebarInterceptor sidebarInterceptor;
 
     @Autowired
     public WebMvcConfig(
             AuthorizationInterceptor authorizationInterceptor,
             TempPasswordInterceptor tempPasswordInterceptor,
-            LoginTrackerInterceptor loginTrackerInterceptor) {
+            LoginTrackerInterceptor loginTrackerInterceptor,
+            SidebarInterceptor sidebarInterceptor) {
         this.authorizationInterceptor = authorizationInterceptor;
         this.tempPasswordInterceptor = tempPasswordInterceptor;
         this.loginTrackerInterceptor = loginTrackerInterceptor;
+        this.sidebarInterceptor = sidebarInterceptor;
     }
 
     @Override
@@ -44,5 +47,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 권한 체크 인터셉터 등록 (관리자 권한 필요한 API)
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/api/admin/**");
+
+        // 사이드바 데이터 제공 인터셉터 등록 (게시판 관련 요청에만 적용)
+        registry.addInterceptor(sidebarInterceptor)
+                .addPathPatterns("/board/**");
     }
 }

@@ -103,4 +103,10 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 게시글 하드 삭제 쿼리 -->
+    <delete id="deletePost" parameterType="int">
+        DELETE FROM posts
+        WHERE id = #{id}
+    </delete>
+
 </mapper>
