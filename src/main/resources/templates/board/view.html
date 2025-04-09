@@ -36,18 +36,92 @@
 
             <div class="action-buttons">
                 <a th:href="@{/board/edit/{id}(id=${post.id})}" class="btn btn-primary">수정</a>
-                <button onclick="confirmDelete()">삭제</button>
+                <button onclick="confirmDelete()" class="btn btn-danger">삭제</button>
             </div>
         </div>
 
         <form id="deleteForm" th:action="@{/board/delete/{id}(id=${post.id})}" method="post" style="display:none;"></form>
 
-        <script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            // Thymeleaf를 통해 서버에서 값을 받아옴
+            const postId = /*[[${post.id}]]*/ null;
+            const postEmpId = /*[[${post.empId}]]*/ null;
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteButton = document.querySelector('.action-buttons button');
+                const editButton = document.querySelector('.action-buttons a');
+                const token = localStorage.getItem('accessToken');
+
+                if (!token) {
+                    // 로그인하지 않은 경우 수정/삭제 버튼 숨기기
+                    if (deleteButton) deleteButton.style.display = 'none';
+                    if (editButton) editButton.style.display = 'none';
+                    return;
+                }
+
+                // 현재 로그인한 사용자 정보 가져오기
+                fetch('/api/posts/current-user', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('사용자 정보를 가져올 수 없습니다.');
+                        }
+                        return response.json();
+                    })
+                    .then(user => {
+                        // 문자열로 변환하여 비교
+                        const userId = String(user.id);
+                        const authorId = String(postEmpId);
+
+                        // 작성자가 아닌 경우 버튼 숨기기
+                        if (userId !== authorId) {
+                            if (deleteButton) deleteButton.style.display = 'none';
+                            if (editButton) editButton.style.display = 'none';
+                        } else {
+                            // 작성자인 경우 버튼 표시 유지
+                            if (deleteButton) deleteButton.style.display = 'inline-block';
+                            if (editButton) editButton.style.display = 'inline-block';
+                        }
+                    })
+                    .catch(error => {
+                        // 오류 발생 시 버튼 숨기기
+                        if (deleteButton) deleteButton.style.display = 'none';
+                        if (editButton) editButton.style.display = 'none';
+                    });
+            });
+
             function confirmDelete() {
                 if (confirm("선택한 글을 삭제하시겠습니까?")) {
-                    document.getElementById('deleteForm').submit();
+                    const token = localStorage.getItem('accessToken');
+
+                    fetch(`/api/posts/${postId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.json().then(err => { throw new Error(err.message || '삭제 실패'); });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            alert('게시글이 성공적으로 삭제되었습니다.');
+                            window.location.href = '/board'; // 목록 페이지로 리다이렉트
+                        })
+                        .catch(error => {
+                            alert('게시글 삭제 중 오류가 발생했습니다: ' + error.message);
+                            console.error('Error:', error);
+                        });
                 }
             }
+            /*]]>*/
         </script>
     </div>
 </body>

@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class PostsService {
@@ -75,10 +73,10 @@ public class PostsService {
         return post != null && post.getEmpId() == empId;
     }
 
-    // 게시글 삭제 메서드
-    public int deletePost(int id) {
-        // 실제 삭제(하드 삭제)
-        return postsMapper.deletePost(id);
+    // 게시글 삭제
+    public boolean deletePost(int id) {
+        int result = postsMapper.deletePost(id);
+        return result > 0;
     }
 
 
