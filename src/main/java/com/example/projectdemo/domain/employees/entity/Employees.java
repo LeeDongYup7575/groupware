@@ -34,8 +34,8 @@ public class Employees {
     private LocalDateTime lastLogin;
     private boolean registered = false;
     private Integer temp_password;
-    private Integer totalLeave;
-    private Integer usedLeave;
+    private BigDecimal totalLeave;
+    private BigDecimal usedLeave;
 
     // Transient 대신 제외할 필드는 직접 선언하지 않음
     private transient Departments department;

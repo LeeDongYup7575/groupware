@@ -37,8 +37,8 @@ public class EmployeesDTO {
     private LocalDateTime lastLogin;
     private boolean registered;
     private Integer temp_password;
-    private Integer totalLeave;
-    private Integer usedLeave;
+    private BigDecimal totalLeave;
+    private BigDecimal usedLeave;
 
     // 추가 보안 관련 필드
     private boolean accountNonExpired;
