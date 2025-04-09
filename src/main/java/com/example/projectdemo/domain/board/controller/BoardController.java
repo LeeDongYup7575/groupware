@@ -47,7 +47,7 @@ public class BoardController {
 
         // 게시판 접근 권한 확인
         if (!boardsService.hasAccess(empId, boardId)) {
-            return "board/access-denied";
+            return "board/integrated-list";
         }
 
         BoardsDTO board = boardsService.getBoardById(boardId);
@@ -70,7 +70,7 @@ public class BoardController {
 
         // 게시판 접근 권한 확인
         if (!boardsService.hasAccess(empId, board.getId())) {
-            return "board/access-denied";
+            return "board/integrated-list";
         }
 
         model.addAttribute("post", post);
