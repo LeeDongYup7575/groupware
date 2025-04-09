@@ -77,8 +77,8 @@
 
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
-    <div class="tab-header"></div>
-    <span>업무연락</span>
+
+    <span>결재 예정 문서</span><br>
     <table class="document-table">
         <thead>
         <tr>
@@ -92,17 +92,32 @@
         </thead>
         <tbody>
         <tr th:each="exdoc : ${expectedDocumentList}">
-            <td th:text="'업무-'+${exdoc.id}"></td>
-            <td>
-                <a th:href="@{'/edsmDetail/businessContact/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+            <td th:text="${exdoc.id}"></td>
+            <td th:switch="${exdoc.edsmFormId}">
+                <a th:case="1001" th:href="@{'/edsmDetail/businessContact/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1002" th:href="@{'/edsmDetail/cashDisbuVoucher/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1003" th:href="@{'/edsmDetail/letterOfApproval/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1004" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1005" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
             </td>
             <td th:text="${exdoc.drafterName}"></td>
             <td th:text="${exdoc.drafterDate}"></td>
-            <td th:text="${exdoc.edsmFormId}"></td>
-            <td th:text="${exdoc.status}"></td>
+            <td th:switch="${exdoc.edsmFormId}">
+                <p th:case="1001">업무연락</p>
+                <p th:case="1002">지출결의</p>
+                <p th:case="1003">품의</p>
+                <p th:case="1004">휴가신청</p>
+                <p th:case="1005">연장근무</p>
+            </td>
+            <td th:switch="${exdoc.status}">
+                <p th:case="진행">예정</p>
+                <p th:case="반려">반려</p>
+                <p th:case="승인">승인</p>
+            </td>
         </tr>
         </tbody>
     </table>
+    <div class="pagination"></div>
 
 </div>
 
@@ -127,6 +142,79 @@
 
     $("#create-button").on("click", function () {
         location.href = "/edsmForm/input";
+    });
+
+    // 페이지 당 레코드 수 (NaviStatics.java에서 정의된 값과 동일)
+    const recordsPerPage = 5;
+
+    // 네비게이터에 표시할 페이지 번호 최대 개수 (예시로 NaviStatics.naviCountPerPage 값 사용)
+    const naviCountPerPage = 5;
+
+    $(".main-content").each(function(){
+        let $container = $(this);
+        let $table = $container.find("table.document-table");
+        let $rows = $table.find("tbody tr");
+        let totalRecords = $rows.length;
+        let totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+        let $pagination = $container.find(".pagination");
+        if($pagination.length === 0){
+            $pagination = $('<div class="pagination"></div>');
+            $container.append($pagination);
+        }
+
+        // 현재 페이지 번호를 저장
+        let currentPage = 1;
+
+        // 페이지 그룹을 렌더링하는 함수
+        function renderPagination(page) {
+            currentPage = page;
+            $pagination.empty();
+            // 현재 페이지가 포함되는 그룹 계산
+            let groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+            let startPage = groupIndex * naviCountPerPage + 1;
+            let endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+            // 이전 그룹 버튼 표시 (현재 그룹이 첫 그룹이 아닌 경우)
+            if(startPage > 1) {
+                $pagination.append('<a href="#" class="page-link prev-group" data-page="'+(startPage-1)+'"><</a>');
+            }
+
+            // 페이지 번호 버튼 생성
+            for(let i = startPage; i <= endPage; i++){
+                $pagination.append('<a href="#" class="page-link" data-page="'+i+'">'+i+'</a>');
+            }
+
+            // 다음 그룹 버튼 표시 (마지막 페이지가 아니라면)
+            if(endPage < totalPages) {
+                $pagination.append('<a href="#" class="page-link next-group" data-page="'+(endPage+1)+'">></a>');
+            }
+
+            // 현재 페이지 버튼에 active 클래스 추가
+            $pagination.find("a.page-link").removeClass("active");
+            $pagination.find('a.page-link[data-page="'+currentPage+'"]').addClass("active");
+        }
+
+        // 실제 행을 보여주는 함수
+        function showPage(page) {
+            let start = (page - 1) * recordsPerPage;
+            let end = start + recordsPerPage;
+            $rows.hide();
+            $rows.slice(start, end).show();
+        }
+
+        // 초기 렌더링: 첫 페이지 표시
+        renderPagination(1);
+        showPage(1);
+
+        // pagination 클릭 이벤트 처리 (동적 생성된 버튼이므로 on() 사용)
+        $pagination.on("click", "a.page-link", function(e){
+            e.preventDefault();
+            let targetPage = $(this).data("page");
+            // 페이지 숫자 혹은 그룹 이동 버튼을 클릭했을 경우
+            renderPagination(targetPage);
+            showPage(targetPage);
+        });
     });
 </script>
 </body>

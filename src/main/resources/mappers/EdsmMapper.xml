@@ -23,6 +23,44 @@
     </insert>
 
 
+    <!-- 업무연락 테이블 모두 조회 -->
+    <select id="SelectByAllBusinessDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT DISTINCT d.*, e.name AS drafterName, d.draft_date AS drafterDate
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum} and d.edsm_form_id = '1001'
+    </select>
+
+    <!-- 지출결의서 테이블 모두 조회 -->
+    <select id="SelectByAllCashDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT DISTINCT d.*, e.name AS drafterName, d.draft_date AS drafterDate
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum} and d.edsm_form_id = '1002'
+    </select>
+
+    <!-- 품의서 테이블 모두 조회 -->
+    <select id="SelectByAllLetterDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT DISTINCT d.*, e.name AS drafterName, d.draft_date AS drafterDate
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum} and d.edsm_form_id = '1003'
+    </select>
+
+    <!-- 휴가신청서 테이블 모두 조회 -->
+    <select id="SelectByAllLeavesDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT DISTINCT d.*, e.name AS drafterName, d.draft_date AS drafterDate
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum} and d.edsm_form_id = '1004'
+    </select>
+
+
+
     <!-- 나의 모든 문서 확인-->
     <select id="SelectByAllDocument" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
         SELECT
@@ -60,12 +98,25 @@
         )
     </select>
 
+    <!-- 로그인한 사원이 결재순번이 다가와서 결재를 해야하는 문서 출력 -->
+    <select id="selectByAllApprovalNowFromId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+
+    </select>
+
  <!-- 업무연락 테이블 정보 입력 -->
     <insert id="InsertByBc" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO">
         INSERT INTO groupware.business_contact
         (edsm_document_id, drafter_id, title, content)
         VALUES
             (#{edsmDocumentId}, #{drafterId}, #{title}, #{content})
+    </insert>
+
+    <!-- 지출결의서 테이블 정보 입력 -->
+    <insert id="InsertByCdv" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmCashDisbuVoucherDTO">
+        INSERT INTO groupware.cash_voucher
+            (edsm_document_id, drafter_id, title, content, accounting_date, spender_id, bank, bank_account)
+        VALUES
+            (#{edsmDocumentId}, #{drafterId}, #{title}, #{content}, #{accountingDate}, #{spenderId}, #{bank}, #{bankAccount})
     </insert>
 
     <!-- 품의서 테이블 정보 입력 -->
@@ -84,7 +135,7 @@
 
     </select>
 
-    <!-- 문서 번호를 통한 결재문서 정보 조회-->
+    <!-- 문서 번호를 통한 결재라인문서 정보 조회-->
     <select id="SelectByDocumentIdFromApprovalLine" resultType="com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO">
         SELECT
             al.document_id,

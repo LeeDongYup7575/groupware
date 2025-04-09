@@ -59,7 +59,8 @@ public class AttendController {
 
         List<Map<String, Object>> statisticsByYear = attendService.getAttendanceStatisticsThisYear(empId);
 
-        int canUseLeaves = employee.getTotalLeave()-employee.getUsedLeave();
+        BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
+
 
         BigDecimal totalWorkHours = attendService.getTotalWorkHoursThisYear(empId);
         int workDays = attendService.getWorkDaysThisYear(empId);

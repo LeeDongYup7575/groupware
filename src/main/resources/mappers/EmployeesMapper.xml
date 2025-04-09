@@ -95,7 +95,8 @@
             profile_img_url = #{profileImgUrl},
             phone = #{phone},
             gender = #{gender},
-            temp_password = #{tempPassword}
+            temp_password = #{tempPassword},
+            internal_email = #{internalEmail}
         WHERE
             emp_num = #{empNum}
     </update>
