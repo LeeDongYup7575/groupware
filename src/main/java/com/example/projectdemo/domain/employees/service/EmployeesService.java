@@ -8,6 +8,8 @@ import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
 import jakarta.validation.constraints.NotBlank;
+import net.crizin.KoreanCharacter;
+import net.crizin.KoreanRomanizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,6 +92,9 @@ public class EmployeesService {
         String tempPassword = generateTempPassword();
         String encodedPassword = passwordEncoder.encode(tempPassword);
 
+        // 이메일 생성
+        String internalEmail = generateInternalEmail(employee.getName());
+
         int updated = employeeMapper.updateRegistrationStatus(
                 empNum,
                 true, // registered
@@ -97,7 +102,8 @@ public class EmployeesService {
                 profileImgUrl,
                 phone,
                 gender,
-                true // tempPassword
+                true, // tempPassword
+                internalEmail
         );
 
         if (updated <= 0) {
@@ -230,4 +236,23 @@ public class EmployeesService {
         employeeMapper.updateEmpInfo(updatedEmp);
     }
 
+    /**
+     * 사내 이메일 생성
+     */
+    public String generateInternalEmail(String name) {
+        String romanized = KoreanRomanizer.romanize(name, KoreanCharacter.Type.NameTypical); // 예: "강윤진" → "Kang Yunjin"
+        String[] parts = romanized.split(" ");
+
+        String lastName = parts[0].toLowerCase(); // 예: kang
+        String firstName = parts[1].toLowerCase(); // 예: yunjin
+
+        String emailPrefix = firstName.charAt(0) + lastName; // 예: ykang
+
+        // 이메일 중복 체크 (가정: emailExists는 DB에서 중복 체크하는 메서드)
+//        if (emailExists(emailPrefix + "@techx.kro.kr")) {
+//            emailPrefix = firstName + lastName; // 예: yunjinkang
+//        }
+
+        return emailPrefix + "@techx.kro.kr";
+    }
 }

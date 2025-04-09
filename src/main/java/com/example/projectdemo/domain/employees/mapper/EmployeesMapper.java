@@ -39,7 +39,8 @@ public interface EmployeesMapper {
             @Param("profileImgUrl") String profileImgUrl,
             @Param("phone") String phone,
             @Param("gender") String gender,
-            @Param("tempPassword") boolean tempPassword);
+            @Param("tempPassword") boolean tempPassword,
+            @Param("internalEmail") String internalEmail);
 
     // 비밀번호 업데이트
     int updatePassword(
