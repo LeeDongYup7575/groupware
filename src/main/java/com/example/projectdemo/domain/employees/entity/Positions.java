@@ -13,4 +13,5 @@ public class Positions {
 
     private Integer id;
     private String title;
+    private Integer level;
 }

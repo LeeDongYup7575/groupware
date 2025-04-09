@@ -19,4 +19,6 @@ public class DepartmentsService {
     public List<DepartmentsDTO> getAllDepartments(){
         return departmentsMapper.findAll();
     }
+
+    public DepartmentsDTO getDepartmentById(Integer id){ return departmentsMapper.findById(id);}
 }

@@ -5,6 +5,7 @@
     <resultMap id="positionMap" type="com.example.projectdemo.domain.employees.entity.Positions">
         <id property="id" column="id" />
         <result property="title" column="title" />
+        <result property="level" column="level" />
     </resultMap>
 
     <select id="findAll" resultType="com.example.projectdemo.domain.employees.dto.PositionsDTO">
