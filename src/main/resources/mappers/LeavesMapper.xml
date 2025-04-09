@@ -41,18 +41,43 @@
     </select>
 
 
-    <update id="updateByLeaves">
-        UPDATE employees
-        SET total_leave = total_leave +
-        CASE
-            WHEN TIMESTAMPDIFF(MONTH, hire_date, CURDATE()) &lt; 12
-                 AND DAY(hire_date) = DAY(CURDATE()) THEN 1
+    <!-- 연차를 부여하지 않은 직원 조회 -->
+    <select id="selectEmployeesForLeaveGrant" resultType="EmployeesDTO">
+        SELECT *
+        FROM employees
+        WHERE (
+            -- 1년 미만이고 오늘이 입사일자 기준 매월 부여일인 경우
+            (TIMESTAMPDIFF(MONTH, hire_date, CURDATE()) &lt; 12 AND DAY(hire_date) = DAY(CURDATE()))
+           OR
+        -- 1년 이상이고 오늘이 입사일자 기준 매년 부여일인 경우
+            (TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &gt;= 1
+          AND MONTH(hire_date) = MONTH(CURDATE())
+          AND DAY(hire_date) = DAY(CURDATE()))
+            )
+          AND NOT EXISTS (
+        SELECT 1
+        FROM leave_grants
+        WHERE leave_grants.emp_id = employees.id
+          AND leave_grants.grant_date = CURDATE()
+            )
+    </select>
 
-            WHEN TIMESTAMPDIFF(YEAR, hire_date, CURDATE()) &gt;= 1
-                 AND MONTH(hire_date) = MONTH(CURDATE())
-                 AND DAY(hire_date) = DAY(CURDATE()) THEN 15
-            ELSE 0
-        END
+    <!-- leave_grants 에 기록 -->
+    <insert id="insertLeaveGrant">
+        INSERT INTO leave_grants (emp_id, grant_date, grant_type, leave_count)
+        VALUES (#{empId}, CURDATE(), #{grantType}, #{leaveCount})
+    </insert>
+
+    <!-- 연차 기록 삭제 -->
+    <delete id="deleteLeaveGrantsByEmpId">
+        DELETE FROM leave_grants WHERE emp_id = #{empId}
+    </delete>
+
+    <!-- total_leave 초기화 후 새로운 값으로 설정 -->
+    <update id="setEmployeeLeave">
+        UPDATE employees
+        SET total_leave = #{leaveCount}
+        WHERE id = #{empId}
     </update>
 
 </mapper>
