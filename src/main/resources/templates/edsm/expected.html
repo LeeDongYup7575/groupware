@@ -93,8 +93,12 @@
         <tbody>
         <tr th:each="exdoc : ${expectedDocumentList}">
             <td th:text="${exdoc.id}"></td>
-            <td>
-                <a th:href="@{'/edsmDetail/businessContact/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+            <td th:switch="${exdoc.edsmFormId}">
+                <a th:case="1001" th:href="@{'/edsmDetail/businessContact/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1002" th:href="@{'/edsmDetail/cashDisbuVoucher/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1003" th:href="@{'/edsmDetail/letterOfApproval/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1004" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1005" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
             </td>
             <td th:text="${exdoc.drafterName}"></td>
             <td th:text="${exdoc.drafterDate}"></td>
@@ -105,7 +109,11 @@
                 <p th:case="1004">휴가신청</p>
                 <p th:case="1005">연장근무</p>
             </td>
-            <td th:text="${exdoc.status}"></td>
+            <td th:switch="${exdoc.status}">
+                <p th:case="진행">예정</p>
+                <p th:case="반려">반려</p>
+                <p th:case="승인">승인</p>
+            </td>
         </tr>
         </tbody>
     </table>
