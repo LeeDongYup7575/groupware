@@ -27,5 +27,7 @@ public interface PostsMapper {
     // 게시글 수정 메서드 추가
     int updatePost(PostsDTO post);
 
+    // 하드 삭제 (실제 데이터베이스에서 삭제)
+    int deletePost(int id);
 
 }

@@ -55,11 +55,6 @@ public class PostsService {
         return post;
     }
 
-    // 게시글 상세 조회
-    public PostsDTO getPostById(Integer id) {
-        return postsMapper.getPostById(id);
-    }
-
     // 게시글 수정
     public boolean updatePost(PostsDTO post) {
         // 게시글 존재 여부 확인
@@ -78,6 +73,12 @@ public class PostsService {
         PostsDTO post = getPostById(postId);
         // 작성자만 수정 가능 또는 관리자 권한 확인
         return post != null && post.getEmpId() == empId;
+    }
+
+    // 게시글 삭제 메서드
+    public int deletePost(int id) {
+        // 실제 삭제(하드 삭제)
+        return postsMapper.deletePost(id);
     }
 
 

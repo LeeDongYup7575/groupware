@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -146,6 +147,23 @@ public class BoardController {
             return "redirect:/board/post/" + id + "?success=true";
         } else {
             return "redirect:/board/edit/" + id + "?error=failed";
+        }
+    }
+
+    //게시글 삭제
+    @PostMapping("/delete/{id}")
+    public String deletePost(@PathVariable int id, RedirectAttributes redirectAttributes) {
+        try {
+            int result = postsService.deletePost(id);
+            if (result > 0) {
+                redirectAttributes.addFlashAttribute("message", "게시글이 성공적으로 삭제되었습니다.");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "게시글을 찾을 수 없습니다.");
+            }
+            return "redirect:/board";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "게시글 삭제 중 오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/board/post/" + id;
         }
     }
 
