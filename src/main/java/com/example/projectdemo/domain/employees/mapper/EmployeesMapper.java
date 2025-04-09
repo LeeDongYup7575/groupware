@@ -12,6 +12,14 @@ import java.util.List;
 @Mapper
 public interface EmployeesMapper {
 
+    int updateEmployee(EmployeesDTO employee);
+
+    /**
+     * 직원 비활성화 (관리자용)
+     * enabled 필드를 false로 설정
+     */
+    int deactivateEmployee(@Param("id") Integer id);
+
     // 사원 전체 조회
     List<EmployeesDTO> selectEmpAll();
 

@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>메인 사이드바</title>
+
+
 </head>
 <body>
 <!-- 공통 사이드바 스타일 포함 -->
 <th:block th:fragment="sidebarAssets">
   <link rel="stylesheet" th:href="@{/css/fragments/sidebar-common.css}">
 </th:block>
+
 <script>
   function openChat() {
     const token = localStorage.getItem('accessToken');
@@ -26,6 +29,8 @@
     }
   }
 </script>
+
+
 <!-- 메인 사이드바 -->
 <div th:fragment="sidebar" id="sidebar" class="sidebar">
   <div class="sidebar-menu">
@@ -41,7 +46,14 @@
       <li><a th:href="@{/attend/main}"><span class="sidebar-icon">⏰</span> 근무/경비처리</a></li>
       <li><a th:href="@{/edsm/main}"><span class="sidebar-icon">📝</span> 전자결재</a></li>
       <li><a href="#"><span class="sidebar-icon">👥</span> 조직도</a></li>
-      <li><a href="#"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a></li>
+      <li>
+<!--        <a href="#" id="adminLink"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a>-->
+      </li>
+      <li th:if="${#request.getAttribute('role') == 'ROLE_ADMIN'}">
+        <a href="/admin/dashboard">
+          <span class="sidebar-icon">⚙️</span> 관리자 페이지
+        </a>
+      </li>
       <li><a th:href="@{/faq}"><span class="sidebar-icon">❓</span> FAQ</a></li>
     </ul>
   </div>
@@ -51,5 +63,65 @@
 <th:block th:fragment="sidebarScripts">
   <script th:src="@{/js/fragments/sidebar-common.js}"></script>
 </th:block>
+
+<script th:inline="javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    const adminLink = document.getElementById('adminLink');
+    console.log('Admin Link Element:', adminLink); // 요소 존재 확인
+
+    if (adminLink) {
+      adminLink.addEventListener('click', function(e) {
+        console.log('Admin Link Clicked'); // 클릭 이벤트 확인
+        e.preventDefault();
+
+        const token = localStorage.getItem('accessToken');
+        console.log('Access Token:', token); // 토큰 확인
+
+        if (!token) {
+          alert("로그인이 필요합니다");
+          return;
+        }
+
+        // 추가 디버깅 로그
+        console.log('Attempting to fetch admin check');
+
+        fetch('/api/admin/check', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+                .then(response => {
+                  console.log('Admin Check Response:', response);
+
+                  if (!response.ok) {
+                    console.error('Response not ok:', response.status, response.statusText);
+                    throw new Error('관리자 권한이 없습니다.');
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('Admin Check Data:', data);
+
+                  // 새 창 열기
+                  const url = `http://10.10.55.16:3000`;
+                  const newWindow = window.open(url, "_blank");
+
+                  if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
+                  }
+                })
+                .catch(error => {
+                  console.error('Full Admin Access Error:', error);
+                  alert(error.message || '관리자 페이지 접근 중 오류가 발생했습니다.');
+                });
+      });
+    } else {
+      console.error('Admin link element not found');
+    }
+  });
+
+</script>
 </body>
 </html>

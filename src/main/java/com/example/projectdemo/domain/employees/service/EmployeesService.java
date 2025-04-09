@@ -19,6 +19,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -265,5 +266,82 @@ public class EmployeesService {
         }
 
         return emailPrefix + "@techx.kro.kr";
+    }
+
+    /**
+     * 모든 직원 목록 조회
+     */
+    public List<EmployeesDTO> getAllEmployees() {
+        return employeeMapper.selectEmpAll();
+    }
+
+    /**
+     * ID로 직원 조회
+     */
+    public EmployeesDTO findById(Integer id) {
+        EmployeesDTO employee = employeeMapper.findById(id);
+
+        if (employee != null) {
+            // 부서 및 직급 정보 설정
+            String depName = departmentsMapper.findById(employee.getDepId()).getName();
+            employee.setDepartmentName(depName);
+
+            String posTitle = positionsMapper.findById(employee.getPosId()).getTitle();
+            employee.setPositionTitle(posTitle);
+        }
+
+        return employee;
+    }
+
+    /**
+     * 직원 정보 업데이트 (관리자용)
+     */
+    @Transactional
+    public EmployeesDTO updateEmployee(EmployeesDTO employee) {
+        // 기존 직원 정보 조회
+        EmployeesDTO existingEmployee = employeeMapper.findById(employee.getId());
+
+        if (existingEmployee == null) {
+            throw new RuntimeException("직원 정보를 찾을 수 없습니다.");
+        }
+
+        // 관리자가 변경 가능한 필드만 업데이트
+        // 여기서는 직원의 기본 정보만 업데이트 (비밀번호, 토큰 등 민감한 정보는 제외)
+        updateEmployeeInfo(employee);
+
+        // 업데이트된 직원 정보 반환
+        return findById(employee.getId());
+    }
+
+    /**
+     * 직원 정보 업데이트 실행 메서드
+     */
+    private void updateEmployeeInfo(EmployeesDTO employee) {
+        // 직원 정보 업데이트를 위한 MyBatis 매퍼 메서드 호출
+        // 실제 구현 시 관련 매퍼 메서드 구현 필요
+        int updated = employeeMapper.updateEmployee(employee);
+
+        if (updated <= 0) {
+            throw new RuntimeException("직원 정보 업데이트에 실패했습니다.");
+        }
+    }
+
+    /**
+     * 직원 비활성화 (관리자용)
+     */
+    @Transactional
+    public boolean deactivateEmployee(Integer id) {
+        // 직원 존재 확인
+        EmployeesDTO employee = employeeMapper.findById(id);
+
+        if (employee == null) {
+            throw new RuntimeException("직원 정보를 찾을 수 없습니다.");
+        }
+
+        // 직원 비활성화 처리
+        // 실제 구현 시 관련 매퍼 메서드 구현 필요
+        int updated = employeeMapper.deactivateEmployee(id);
+
+        return updated > 0;
     }
 }

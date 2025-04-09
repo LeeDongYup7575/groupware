@@ -48,8 +48,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/api/admin/**");
 
+
         // 사이드바 데이터 제공 인터셉터 등록 (게시판 관련 요청에만 적용)
         registry.addInterceptor(sidebarInterceptor)
                 .addPathPatterns("/board/**");
+
     }
 }

@@ -156,4 +156,25 @@
             emp_num = #{updatedEmp.empNum}
     </update>
 
+    <!-- 직원 정보 업데이트 (관리자용) -->
+    <update id="updateEmployee" parameterType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        UPDATE employees
+        SET
+            name = #{name},
+            email = #{email},
+            phone = #{phone},
+            dep_id = #{depId},
+            pos_id = #{posId},
+            role = #{role},
+            enabled = #{enabled}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 직원 비활성화 (관리자용) -->
+    <update id="deactivateEmployee">
+        UPDATE employees
+        SET enabled = false
+        WHERE id = #{id}
+    </update>
+
 </mapper>
