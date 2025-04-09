@@ -18,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +64,8 @@ public class LeaveController {
             return "redirect:/attend/main";
         }
 
-        int canUseLeaves = employee.getTotalLeave()-employee.getUsedLeave();
+        BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
+
 
         List<EmployeesDTO> empAllList = employeeMapper.selectEmpAll();
         List<EmployeesDTO> empList = new ArrayList<>();
@@ -98,7 +100,8 @@ public class LeaveController {
         EmployeesDTO employee = employeeMapper.findById(empId);
         if (employee == null) return "redirect:/auth/login";
 
-        int canUseLeaves = employee.getTotalLeave() - employee.getUsedLeave();
+        BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
+
 
         LocalDate now = LocalDate.now();
         int currentYear = (year != null) ? year : now.getYear();
