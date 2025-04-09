@@ -100,17 +100,7 @@
 
     <!-- 로그인한 사원이 결재순번이 다가와서 결재를 해야하는 문서 출력 -->
     <select id="selectByAllApprovalNowFromId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
-        SELECT d.*, e.name AS drafterName, d.draft_date AS drafterDate
-        FROM groupware.edsm_document d
-        JOIN groupware.approval_line a ON d.id = a.document_id
-        JOIN groupware.employees e ON d.drafter_id = e.emp_num
-        WHERE a.approver_id = #{empNum}
-        AND NOT EXISTS (
-        SELECT 1
-        FROM groupware.approval_line a2
-        WHERE a2.document_id = d.id
-        AND (a2.approval_no < a.approval_no)
-        AND (a2.status <> '승인'))
+
     </select>
 
  <!-- 업무연락 테이블 정보 입력 -->
