@@ -47,7 +47,7 @@ public class BoardController {
 
         // 게시판 접근 권한 확인
         if (!boardsService.hasAccess(empId, boardId)) {
-            return "board/access-denied";
+            return "board/integrated-list";
         }
 
         BoardsDTO board = boardsService.getBoardById(boardId);
@@ -70,7 +70,7 @@ public class BoardController {
 
         // 게시판 접근 권한 확인
         if (!boardsService.hasAccess(empId, board.getId())) {
-            return "board/access-denied";
+            return "board/integrated-list";
         }
 
         model.addAttribute("post", post);
@@ -154,8 +154,8 @@ public class BoardController {
     @PostMapping("/delete/{id}")
     public String deletePost(@PathVariable int id, RedirectAttributes redirectAttributes) {
         try {
-            int result = postsService.deletePost(id);
-            if (result > 0) {
+            boolean  result = postsService.deletePost(id);
+            if (result) {
                 redirectAttributes.addFlashAttribute("message", "게시글이 성공적으로 삭제되었습니다.");
             } else {
                 redirectAttributes.addFlashAttribute("error", "게시글을 찾을 수 없습니다.");
