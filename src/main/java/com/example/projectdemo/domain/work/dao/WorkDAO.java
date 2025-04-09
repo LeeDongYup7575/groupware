@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.work.dao;
 
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
+import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import com.example.projectdemo.domain.work.dto.OverTimeDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +48,23 @@ public class WorkDAO {
         paramMap.put("endDate", endDate);
 
         return mybatis.selectList("com.example.projectdemo.domain.work.dao.WorkDAO.selectOverTimeRequestsByMonth", paramMap);
+    }
+
+    public int updateOverTimeRequestsStatus(int id, String status) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("status", status);
+        return mybatis.update("com.example.projectdemo.domain.work.dao.WorkDAO.updateOverTimeRequestsStatus",params);
+    }
+
+    public List<OverTimeDTO> selectOverTimeListByEmpId(int empId) {
+        return mybatis.selectList("com.example.projectdemo.domain.work.dao.WorkDAO.selectOverTimeListByEmpId", empId);
+    }
+
+    public List<Map<String, Object>> getMonthlyOvertimeHours(int empId, int year) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("empId", empId);
+        params.put("year", year);
+        return mybatis.selectList("com.example.projectdemo.domain.work.dao.WorkDAO.getMonthlyOvertimeHours", params);
     }
 }

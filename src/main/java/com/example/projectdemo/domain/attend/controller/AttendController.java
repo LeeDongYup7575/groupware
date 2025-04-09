@@ -8,6 +8,7 @@ import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.leave.service.LeavesService;
+import com.example.projectdemo.domain.work.service.WorkService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,44 +41,58 @@ public class AttendController {
     @Autowired
     private LeavesService leavesService;
 
+    @Autowired
+    private WorkService workService;
+
+    private int parseTimeToMinutes(String timeStr) {
+        if (timeStr == null || timeStr.isEmpty()) {
+            return 0;
+        }
+
+        String[] parts = timeStr.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        return hours * 60 + minutes;
+    }
+
+    private String formatMinutesToTime(int minutes) {
+        int h = minutes / 60;
+        int m = minutes % 60;
+        return String.format("%02d:%02d", h, m);
+    }
+
     @RequestMapping("/main")
     public String list(Model model, HttpServletRequest request) {
+        int empId = (int) request.getAttribute("id");
 
-
-        int empId = (int)request.getAttribute("id");
-
-        if (empId == 0) { //예외처리
+        if (empId == 0) {
             return "redirect:/auth/login";
         }
 
         EmployeesDTO employee = employeeMapper.findById(empId);
-        if (employee == null) { //예외처리
+        if (employee == null) {
             return "redirect:/auth/login";
         }
 
-        List<AttendDTO>attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
-
+        List<AttendDTO> attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
         List<Map<String, Object>> statisticsByYear = attendService.getAttendanceStatisticsThisYear(empId);
-
         BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
-
 
         BigDecimal totalWorkHours = attendService.getTotalWorkHoursThisYear(empId);
         int workDays = attendService.getWorkDaysThisYear(empId);
         BigDecimal correctionAverage = workDays > 0 ? totalWorkHours.divide(new BigDecimal(workDays), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
-
 
         model.addAttribute("employee", employee);
         model.addAttribute("attendanceListByDate", attendanceListByDate);
         model.addAttribute("statisticsByYear", statisticsByYear);
         model.addAttribute("canUseLeaves", canUseLeaves);
         model.addAttribute("currentDate", new Date());
-        model.addAttribute("totalWorkHours", totalWorkHours); // 총 근무시간
-        model.addAttribute("workDays", workDays); // 근무일수
-        model.addAttribute("correctionAverage", correctionAverage); // 보정평균
+        model.addAttribute("totalWorkHours", totalWorkHours);
+        model.addAttribute("workDays", workDays);
+        model.addAttribute("correctionAverage", correctionAverage);
+
         return "/attend/attendMain";
     }
-
 
     @RequestMapping("/annualStatistics")
     public String annualStatistics(Model model, HttpServletRequest request,
@@ -98,6 +113,22 @@ public class AttendController {
         }
 
         List<Map<String, Object>> monthlyStats = attendService.getMonthlyAttendanceStatistics(empId, year);
+        List<Map<String, Object>> overtimeStats = workService.getMonthlyOvertimeHours(empId, year);
+        List<Map<String, Object>> leaveStats = leavesService.getMonthlyLeaveHours(empId, year);
+
+        Map<Integer, String> overtimeMap = new HashMap<>();
+        for (Map<String, Object> stat : overtimeStats) {
+            int month = ((Number) stat.get("month")).intValue();
+            String time = (String) stat.get("total_overtime");
+            overtimeMap.put(month, time);
+        }
+
+        Map<Integer, String> leaveMap = new HashMap<>();
+        for (Map<String, Object> stat : leaveStats) {
+            int month = ((Number) stat.get("month")).intValue();
+            String time = (String) stat.get("total_leave");
+            leaveMap.put(month, time);
+        }
 
         List<Map<String, Object>> completeMonthlyStats = new ArrayList<>();
         BigDecimal totalTardy = BigDecimal.ZERO;
@@ -110,16 +141,17 @@ public class AttendController {
         for (int month = 1; month <= 12; month++) {
             boolean found = false;
             for (Map<String, Object> stats : monthlyStats) {
-                if (stats.get("month").equals(Long.valueOf(month))) {
+                if (((Number) stats.get("month")).intValue() == month) {
+                    stats.put("totalOvertime", overtimeMap.getOrDefault(month, "00:00"));
+                    stats.put("totalLeave", leaveMap.getOrDefault(month, "00:00"));
                     completeMonthlyStats.add(stats);
 
-                    // 합계 계산
                     totalTardy = totalTardy.add((BigDecimal) stats.get("tardyCount"));
                     totalEarlyLeave = totalEarlyLeave.add((BigDecimal) stats.get("earlyLeaveCount"));
                     totalAbsenteeism = totalAbsenteeism.add((BigDecimal) stats.get("absenteeismCount"));
                     totalVacationCount = totalVacationCount.add((BigDecimal) stats.get("vacationCount"));
                     totalWorkHours = totalWorkHours.add((BigDecimal) stats.get("workHours"));
-                    totalWorkDays += (long) stats.get("workDays"); // long 타입 직접 연산
+                    totalWorkDays += (long) stats.get("workDays");
 
                     found = true;
                     break;
@@ -133,11 +165,36 @@ public class AttendController {
                 emptyStats.put("absenteeismCount", BigDecimal.ZERO);
                 emptyStats.put("vacationCount", BigDecimal.ZERO);
                 emptyStats.put("workHours", BigDecimal.ZERO);
-                emptyStats.put("workDays", 0L); // long 값으로 초기화
+                emptyStats.put("workDays", 0L);
+                emptyStats.put("totalOvertime", overtimeMap.getOrDefault(month, "00:00"));
+                emptyStats.put("totalLeave", leaveMap.getOrDefault(month, "00:00"));
                 completeMonthlyStats.add(emptyStats);
             }
         }
 
+        // ✅ 기준 시간 설정 및 보정 근무 시간 계산
+        String[] standardHours = {
+                "168:00", "152:00", "160:00", "176:00", "160:00", "160:00",
+                "184:00", "160:00", "160:00", "168:00", "168:00", "168:00"
+        };
+
+        List<String> correctedWorkTimeList = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            int standard = parseTimeToMinutes(standardHours[i]);
+            int leave = parseTimeToMinutes(leaveMap.getOrDefault(i + 1, "00:00"));
+            int overtime = parseTimeToMinutes(overtimeMap.getOrDefault(i + 1, "00:00"));
+            int corrected = standard - leave + overtime;
+            correctedWorkTimeList.add(formatMinutesToTime(corrected));
+        }
+
+        int totalMinutes = 0;
+        for (String timeStr : correctedWorkTimeList) {
+            totalMinutes += parseTimeToMinutes(timeStr);
+        }
+
+        String totalCorrectedWorkTime = formatMinutesToTime(totalMinutes);
+
+        model.addAttribute("totalCorrectedWorkTime", totalCorrectedWorkTime);
         model.addAttribute("year", year);
         model.addAttribute("monthlyStats", completeMonthlyStats);
         model.addAttribute("employee", employee);
@@ -147,8 +204,8 @@ public class AttendController {
         model.addAttribute("totalVacationCount", totalVacationCount);
         model.addAttribute("totalWorkHours", totalWorkHours);
         model.addAttribute("totalWorkDays", totalWorkDays);
+        model.addAttribute("correctedWorkTimeList", correctedWorkTimeList); // ✅ 추가
 
         return "/attend/attendAnnualStatistics";
     }
-
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -60,6 +61,15 @@ public class LeavesService {
         }
     }
 
+    public int updateLeaveStatus(int id, String status) {
+        return leavesDAO.updateLeaveStatus(id, status);
+    }
 
+    public List<LeavesDTO> selectLeavesByEmpId(int empId) {
+        return leavesDAO.selectLeavesByEmpId(empId);
+    }
 
+    public List<Map<String, Object>> getMonthlyLeaveHours(int empId, int year) {
+        return leavesDAO.getMonthlyLeaveHours(empId, year);
+    }
 }

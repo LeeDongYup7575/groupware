@@ -10,6 +10,8 @@ import com.example.projectdemo.domain.edsm.enums.ApprovalStatus;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.leave.dto.LeavesDTO;
+import com.example.projectdemo.domain.leave.service.LeavesService;
 import com.example.projectdemo.domain.work.dto.OverTimeDTO;
 import com.example.projectdemo.domain.work.service.WorkService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -51,6 +53,9 @@ public class WorkController {
 
     @Autowired
     private WorkService workService;
+
+    @Autowired
+    private LeavesService leavesService;
 
     @RequestMapping("/overTimeForm")
     public String overTimeForm(Model model, HttpServletRequest request) {
@@ -196,6 +201,7 @@ public class WorkController {
             int edsmDocId = overTime.getEdsmDocId();
             String status = workService.selectByStatus(drafterId, edsmDocId);
             overTime.setStatus(status);
+            workService.updateOverTimeRequestsStatus(overTime.getId(), status);
         }
 
         model.addAttribute("employee", employee);
@@ -223,6 +229,12 @@ public class WorkController {
 
         // 근태 기록을 DB에서 가져오기
         List<AttendDTO> attendList = attendService.selectByEmpId(empId);
+
+        //휴가 기록을 DB에서 가져오기
+        List<LeavesDTO> leavesList = leavesService.selectLeavesByEmpId(empId);
+
+        // 연장 근무 기록을 DB에서 가져오기
+        List<OverTimeDTO> overtimesList = workService.selectOverTimeListByEmpId(empId);
 
         // 근태 기록을 FullCalendar에 맞는 형식으로 변환
         List<Map<String, Object>> events = new ArrayList<>();
@@ -269,6 +281,48 @@ public class WorkController {
                 }
             }
         }
+
+        for (LeavesDTO leave : leavesList) {
+            Map<String, Object> leaveEvent = new HashMap<>();
+            leaveEvent.put("title", leave.getLeaveType() + " 휴가"); // 예: 연차 휴가, 반차 휴가
+            leaveEvent.put("start", leave.getStartDate()); // "2025-04-10"
+
+            // 반차는 end를 start와 동일하게, 전일휴가는 end 포함 다음날로 설정
+            if ("반차".equals(leave.getLeaveType())) {
+                leaveEvent.put("end", leave.getStartDate());
+            } else {
+                // endDate 다음 날로 설정 (FullCalendar는 end 당일 포함 안 함)
+                LocalDate endPlusOne = LocalDate.parse(leave.getEndDate()).plusDays(1);
+                leaveEvent.put("end", endPlusOne.toString());
+            }
+
+            leaveEvent.put("description", "사유: " + leave.getReason());
+            leaveEvent.put("color", "#0078d7");
+
+            events.add(leaveEvent);
+        }
+
+        for (OverTimeDTO overtime : overtimesList) {
+            Map<String, Object> workEvent = new HashMap<>();
+
+            workEvent.put("title", "연장 근무");
+            workEvent.put("type", "overtime");
+
+            // 날짜 및 시간 조합
+            String workDate = overtime.getWorkDate(); // 예: "2025-04-09"
+            String startTime = overtime.getStartTime(); // 예: "18:00"
+            String endTime = overtime.getEndTime(); // 예: "20:30"
+
+            workEvent.put("start", workDate + "T" + startTime);
+            workEvent.put("end", workDate + "T" + endTime);
+
+            workEvent.put("description", overtime.getReason());
+            workEvent.put("color", "#6f42c1");
+
+            events.add(workEvent);
+        }
+
+
 
         return events;  // JSON 형식으로 반환
     }

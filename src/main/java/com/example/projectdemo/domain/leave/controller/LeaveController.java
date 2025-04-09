@@ -161,6 +161,7 @@ public class LeaveController {
             int edsmDocId = leave.getEdsmDocId();
             String status = leavesService.selectByStatus(drafterId, edsmDocId);
             leave.setStatus(status); // 해당 leave 객체에 상태 설정
+            leavesService.updateLeaveStatus(leave.getId(), status);
         }
 
         model.addAttribute("leavesList", leavesList);

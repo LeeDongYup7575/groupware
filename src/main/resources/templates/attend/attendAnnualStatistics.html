@@ -110,19 +110,8 @@
                 </tr>
                 <tr>
                     <td>근무 계획</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>32:00</td>
-                    <td>176:00</td>
-                    <td>152:00</td>
-                    <td>160:00</td>
-                    <td>184:00</td>
-                    <td>160:00</td>
-                    <td>176:00</td>
-                    <td>144:00</td>
-                    <td>160:00</td>
-                    <td>176:00</td>
-                    <td>1,520:00</td>
+                    <td th:each="time : ${correctedWorkTimeList}" th:text="${time}"></td>
+                    <td th:text="${totalCorrectedWorkTime}"></td>
                 </tr>
                 <tr>
                     <td>실근무</td>
@@ -143,19 +132,17 @@
                 </tr>
                 <tr>
                     <td colspan="2">보정평균근무</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
-                    <td>00:00</td>
+                    <td th:each="stats : ${monthlyStats}"
+                        th:text="${stats.workDays > 0 ?
+                         (stats.workHours + (stats.vacationCount * 8)) /
+                         (stats.workDays + stats.vacationCount) :
+                         '00:00'}">
+                    </td>
+                    <td th:text="${totalWorkDays > 0 ?
+                        (totalWorkHours + (totalVacationCount * 8)) /
+                        (totalWorkDays + totalVacationCount) :
+                        '00:00'}">
+                    </td>
                 </tr>
                 </tbody>
             </table>

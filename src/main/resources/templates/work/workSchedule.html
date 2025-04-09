@@ -54,6 +54,24 @@
             <div id="calendar"></div>
         </div>
     </div>
+
+    <!-- 모달 백드롭 -->
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+
+    <!-- 향상된 모달 디자인 -->
+    <div id="eventModal" class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle"></h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modalTime" class="event-time"></div>
+            <div id="modalReason" class="event-reason"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-button" onclick="closeModal()">닫기</button>
+        </div>
+    </div>
 </div>
 
 <!-- Move JavaScript to the end of body for better loading -->
