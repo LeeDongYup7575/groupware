@@ -5,77 +5,76 @@ import com.example.projectdemo.domain.chat.dto.ChatUserDTO;
 import com.example.projectdemo.domain.chat.dto.MemberShipDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Service // ✅ 서비스 레이어 - 채팅방 멤버십(참여자) 관련 로직
 public class MembershipService {
-    @Autowired
-    private MembershipDAO membershipDAO;
-    @Autowired
-    private EmployeesMapper employeesMapper;
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
+    @Autowired
+    private MembershipDAO membershipDAO; // ✅ DB 접근 (멤버십 테이블)
+
+    @Autowired
+    private EmployeesMapper employeesMapper; // ✅ DB 접근 (직원 정보 테이블)
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate; // ✅ WebSocket 알림 발송용
+
+    @Autowired
+    private ChatMessageService chatMessageService; // ✅ MongoDB 채팅 메시지 관리 서비스
+
+    @Autowired
+    private ChatRoomService chatRoomService; // ✅ 채팅방 삭제 관리 서비스
+
+    // ✅ 채팅방 나가기 또는 채팅방 삭제 로직
     @Transactional
     public String deleteMembership(int roomid, int userid) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("roomid", roomid);
-        params.put("userid", userid);
-        System.out.println(userid + " : 삭제할려고 넘어온 아이디값");
-        boolean isAdmin = membershipDAO.isAdmin(params);
-        System.out.println(isAdmin + "관리자 확인여부에요");
-        System.out.println(isAdmin ? "일반인" : "관리자");
-        if (!isAdmin) {
-            int rs = membershipDAO.deleteChatRoom(roomid);
-            if (rs > 0) {
-                System.out.println("방삭제 완료");
-                Map<String,Object> payload = new HashMap<>();
-                payload.put("roomid", roomid);
-                messagingTemplate.convertAndSend("/topic/roomDeleted", payload);
-                return "success";
-            } else {
-                System.out.println("방 삭제 실패");
-                return "fail";
-            }
-        } else {
-            int rs = membershipDAO.deleteById(params);
-            System.out.println("방 나가기 완료");
-            return "ExitChatroom";
-        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("roomid", roomid); // 방 ID 설정
+        params.put("userid", userid); // 사용자 ID 설정
 
+        boolean isAdmin = membershipDAO.isAdmin(params); // ✅ 현재 유저가 일반 참여자인지, 관리자인지 판단
+
+        if (!isAdmin) { // 👉 일반 멤버인 경우: 방 삭제
+            int rs = membershipDAO.deleteChatRoom(roomid); // 방 통째로 삭제
+            if (rs > 0) { // 삭제 성공 시
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("roomid", roomid);
+                messagingTemplate.convertAndSend("/topic/roomDeleted", payload); // WebSocket으로 방 삭제 알림
+                chatMessageService.deleteByChatroomId(roomid); // MongoDB 메시지 삭제
+                chatRoomService.deleteByChatroomId(roomid); // 채팅방 DB 삭제
+                return "success"; // 성공 응답
+            } else {
+                return "fail"; // 삭제 실패 응답
+            }
+        } else { // 👉 관리자(본인이 방 생성자)인 경우: 그냥 "방 나가기"
+            membershipDAO.deleteById(params); // 자기 자신만 멤버 리스트에서 제거
+            return "ExitChatroom"; // 방은 유지
+        }
     }
 
+    // ✅ 채팅방 참여자 리스트 조회
     public List<ChatUserDTO> getUserList(int userid, int roomid) {
+        List<MemberShipDTO> list = membershipDAO.getUserList(roomid); // 해당 방의 모든 멤버 조회
+        if (list.isEmpty()) {
+            return List.of(); // 참여자가 없으면 빈 리스트 리턴
+        }
 
-        List<MemberShipDTO> list = membershipDAO.getUserList(roomid);
-
-        System.out.println(list.get(1).getId() + " : " + list.get(1).getEmpId());
         List<ChatUserDTO> memberList = new ArrayList<>();
-        for (MemberShipDTO dto : list) {
-            System.out.println(dto.getEmpId() + " : 직원고유번호");
+        for (MemberShipDTO dto : list) { // 멤버십 정보를 순회
             int id = dto.getEmpId();
-            EmployeesDTO emp = employeesMapper.findById(id);
-
-            if (emp != null) {
-                String name = emp.getName();
-                memberList.add(new ChatUserDTO(id, name));
-            } else {
-                System.out.println("❗ 직원 정보 없음: ID = " + id);
-                // 필요하다면 에러 응답 대신 continue 해서 무시
+            EmployeesDTO emp = employeesMapper.findById(id); // 직원 상세 정보 조회
+            if (emp != null) { // 직원이 존재하면
+                memberList.add(new ChatUserDTO(id, emp.getName())); // 사용자 정보 리스트에 추가
             }
         }
-        return memberList;
-
-
+        return memberList; // 최종 참여자 리스트 반환
     }
 }

@@ -21,4 +21,7 @@
     <select id="getUserList" resultType="com.example.projectdemo.domain.chat.dto.MemberShipDTO">
         select * from membership where chatroom_id=${roomid}
     </select>
+    <select id="getMemberIdsByRoomId" resultType="int">
+        select emp_id from membership where chatroom_id=${roomid}
+    </select>
 </mapper>

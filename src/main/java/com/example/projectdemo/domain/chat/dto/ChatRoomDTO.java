@@ -1,11 +1,16 @@
 package com.example.projectdemo.domain.chat.dto;
 
-import java.sql.Date;
+import lombok.Data;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+@Data
 public class ChatRoomDTO {
     private int id;
     private String name;
     private Date createdAt;
+    private String lastMessage;
+    private Timestamp lastMessageTime;
 
     public void setName(String name) {
         this.name = name;

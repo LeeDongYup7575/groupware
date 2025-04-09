@@ -22,5 +22,10 @@
           AND c.name LIKE concat('%', #{target}, '%')
 
     </select>
+    <delete id="deleteByChatroomId">
+        delete
+         from chatrooms where id =
+        ${roomid}
+    </delete>
 
 </mapper>
