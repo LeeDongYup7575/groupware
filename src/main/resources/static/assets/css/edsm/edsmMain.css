@@ -252,6 +252,31 @@ body {
     color: #999;
     font-style: italic;
 }
+.pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.page-link{
+    text-decoration-line: none;
+    margin-left: 10px;
+    color: #555;
+}
+.document-table th{
+    text-align: center;
+}
+
+.document-table tr td{
+
+    text-align: center;
+}
+.document-table tr td a{
+    text-decoration-line: none;
+    color: #555;
+}
+
 
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
@@ -283,3 +308,4 @@ body {
         font-size: 16px;
     }
 }
+

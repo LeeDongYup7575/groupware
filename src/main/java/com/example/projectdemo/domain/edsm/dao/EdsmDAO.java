@@ -1,10 +1,7 @@
 package com.example.projectdemo.domain.edsm.dao;
 
 
-import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmLetterOfApprovalDTO;
+import com.example.projectdemo.domain.edsm.dto.*;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -29,6 +26,11 @@ public class EdsmDAO {
         return mybatis.insert("Edsm.InsertByBc", edsmBusinessContactDTO);
     }
 
+    //지출결의서 정보 테이블 입력
+    public int insertByCashDisbuVoucher(EdsmCashDisbuVoucherDTO edsmCashDisbuVoucherDTO) {
+        return mybatis.insert("Edsm.InsertByCdv", edsmCashDisbuVoucherDTO);
+    }
+
     //품의서 정보 테이블 입력
     public int insertByLetterOfApproval(EdsmLetterOfApprovalDTO letterOfApprovalDTO) {
         return mybatis.insert("Edsm.InsertByLac", letterOfApprovalDTO);
@@ -44,6 +46,26 @@ public class EdsmDAO {
     public List<EdsmDocumentDTO> selectByAllDocument(String empNum) {
         return mybatis.selectList("Edsm.SelectByAllDocument", empNum);
 
+    }
+
+    //로그인한 자의 사번을 기준으로 결재권이 있는 업무연락 문서 출력
+    public List<EdsmDocumentDTO> SelectByAllBusinessDocument (String empNum) {
+        return mybatis.selectList("Edsm.SelectByAllBusinessDocument",empNum);
+    }
+
+    //로그인한 자의 사번을 기준으로 결재권이 있는 지출결의서 문서 출력
+    public List<EdsmDocumentDTO> SelectByAllCashDocument (String empNum) {
+        return mybatis.selectList("Edsm.SelectByAllCashDocument",empNum);
+    }
+
+    //로그인한 자의 사번을 기준으로 결재권이 있는 품의서 문서 출력
+    public List<EdsmDocumentDTO> SelectByAllLetterDocument (String empNum) {
+        return mybatis.selectList("Edsm.SelectByAllLetterDocument",empNum);
+    }
+
+    //로그인한 자의 사번을 기준으로 결재권이 있는 휴가신청서 문서 출력
+    public List<EdsmDocumentDTO> SelectByAllLeavesDocument (String empNum) {
+        return mybatis.selectList("Edsm.SelectByAllLeavesDocument",empNum);
     }
 
     // 로그인된 사번을 기준으로 로그인자가 결재권 있는 문서 리스트 출력

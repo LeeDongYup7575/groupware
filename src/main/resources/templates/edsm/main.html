@@ -52,20 +52,16 @@
     <div class="menu-section">
         <div class="menu-header">
             <i class="fas fa-chevron-down"></i>
-            문서함
+            나의 문서함
         </div>
         <div class="menu-items">
-            <div class="menu-item">
-                <i class="fas fa-folder"></i>
-                전체
-            </div>
             <div class="menu-item">
                 <i class="fas fa-pen"></i>
                 기안
             </div>
             <div class="menu-item">
                 <i class="fas fa-file-signature"></i>
-                결재
+                승인
             </div>
             <div class="menu-item">
                 <i class="fas fa-undo"></i>
@@ -77,81 +73,196 @@
 
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
-    <div class="tab-header" th:text="${main}"></div>
-    <span>업무연락</span>
-    <table class="document-table">
-        <thead>
-        <tr>
-            <th>문서 번호</th>
-            <th>제목</th>
-            <th>기안자</th>
-            <th>기안일</th>
-            <th>구분</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
+
+    <!-- 상단에 문서 유형 선택 셀렉트 박스 추가 -->
+    <div class="document-type-select" style="margin-bottom: 20px;">
+        <label for="docTypeSelect">문서 유형:</label>
+        <select id="docTypeSelect">
+            <option value="all">전체</option>
+            <option value="업무연락">업무연락</option>
+            <option value="지출결의서">지출결의서</option>
+            <option value="품의서">품의서</option>
+            <option value="휴가신청서">휴가신청서</option>
+        </select>
+    </div>
+
+
+    <!-- 업무연락 문서 목록 -->
+    <div class="doc-table-container" data-doc-type="업무연락">
+        <h4>업무연락 결재 상황</h4>
+        <br>
+        <table class="document-table">
+            <thead>
+            <tr>
+                <th>문서 번호</th>
+                <th>제목</th>
+                <th>기안자</th>
+                <th>기안일</th>
+                <th>구분</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+        <tr th:each="doc : ${allBusinessDocument}" >
+            <td th:text="${doc.id}"></td>
             <td>
                 <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
             </td>
             <td th:text="${doc.drafterName}"></td>
             <td th:text="${doc.drafterDate}"></td>
-            <td th:text="${doc.edsmFormId}"></td>
-            <td th:text="${doc.status}"></td>
+            <td th:switch="${doc.edsmFormId}">
+                <p th:case="1001">업무연락</p>
+                <p th:case="1002">지출결의</p>
+                <p th:case="1003">품의</p>
+                <p th:case="1004">휴가신청</p>
+                <p th:case="1005">연장근무</p>
+            </td>
+            <td th:text="${doc.status}"
+                th:style="${(doc.status == '반려')
+                  ? 'color:red;'
+                  : ((doc.status == '진행')
+                        ? 'color:green;'
+                        : ((doc.status == '승인')
+                              ? 'color:blue;'
+                              : ''))}"></td>
         </tr>
         </tbody>
-    </table>
 
-    <span>지출결의서</span>
-    <table class="document-table">
-        <thead>
-        <tr>
-            <th>문서 번호</th>
-            <th>제목</th>
-            <th>기안자</th>
-            <th>기안일</th>
-            <th>구분</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
-            <td th:text="${doc.title}"></td>
-            <td th:text="${doc.drafterName}"></td>
-            <td th:text="${doc.drafterDate}"></td>
-            <td th:text="${doc.edsmFormId}"></td>
-            <td th:text="${doc.status}"></td>
-        </tr>
-        </tbody>
     </table>
+        <!-- 게시판 이동 내비게이션 -->
+        <div class="pagination"></div>
+    </div>
 
-    <span>품의서</span>
-    <table class="document-table">
-        <thead>
-        <tr>
-            <th>문서 번호</th>
-            <th>제목</th>
-            <th>기안자</th>
-            <th>기안일</th>
-            <th>구분</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="doc : ${allDocumentList}">
-            <td th:text="'업무-'+${doc.id}"></td>
-            <td th:text="${doc.title}"></td>
-            <td th:text="${doc.drafterName}"></td>
-            <td th:text="${doc.drafterDate}"></td>
-            <td th:text="${doc.edsmFormId}"></td>
-            <td th:text="${doc.status}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+
+    <!-- 지출결의서 문서 목록 -->
+    <div class="doc-table-container" data-doc-type="지출결의서">
+        <h4>지출결의서 결재 상황</h4>
+        <br>
+        <table class="document-table">
+            <thead>
+            <tr>
+                <th>문서 번호</th>
+                <th>제목</th>
+                <th>기안자</th>
+                <th>기안일</th>
+                <th>구분</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="doc : ${allCashDocument}" >
+                <td th:text="${doc.id}"></td>
+                <td>
+                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                </td>
+                <td th:text="${doc.drafterName}"></td>
+                <td th:text="${doc.drafterDate}"></td>
+                <td th:switch="${doc.edsmFormId}">
+                    <p th:case="1001">업무연락</p>
+                    <p th:case="1002">지출결의</p>
+                    <p th:case="1003">품의</p>
+                    <p th:case="1004">휴가신청</p>
+                    <p th:case="1005">연장근무</p>
+                </td>
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '반려')
+                  ? 'color:red;'
+                  : ((doc.status == '진행')
+                        ? 'color:green;'
+                        : ((doc.status == '승인')
+                              ? 'color:blue;'
+                              : ''))}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- 품의서 결재 상황 -->
+    <div class="doc-table-container" data-doc-type="품의서">
+        <h4>품의서 결재 상황</h4>
+        <table class="document-table">
+            <thead>
+            <tr>
+                <th>문서 번호</th>
+                <th>제목</th>
+                <th>기안자</th>
+                <th>기안일</th>
+                <th>구분</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="doc : ${allLetterDocument}" >
+                <td th:text="${doc.id}"></td>
+                <td>
+                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                </td>
+                <td th:text="${doc.drafterName}"></td>
+                <td th:text="${doc.drafterDate}"></td>
+                <td th:switch="${doc.edsmFormId}">
+                    <p th:case="1001">업무연락</p>
+                    <p th:case="1002">지출결의</p>
+                    <p th:case="1003">품의</p>
+                    <p th:case="1004">휴가신청</p>
+                    <p th:case="1005">연장근무</p>
+                </td>
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '반려')
+                  ? 'color:red;'
+                  : ((doc.status == '진행')
+                        ? 'color:green;'
+                        : ((doc.status == '승인')
+                              ? 'color:blue;'
+                              : ''))}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- 품의서 결재 상황 -->
+    <div class="doc-table-container" data-doc-type="휴가신청서">
+        <h4>휴가신청 결재 상황</h4>
+        <br>
+        <table class="document-table">
+            <thead>
+            <tr>
+                <th>문서 번호</th>
+                <th>제목</th>
+                <th>기안자</th>
+                <th>기안일</th>
+                <th>구분</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="doc : ${allLeavesDocument}" >
+                <td th:text="${doc.id}"></td>
+                <td>
+                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                </td>
+                <td th:text="${doc.drafterName}"></td>
+                <td th:text="${doc.drafterDate}"></td>
+                <td th:switch="${doc.edsmFormId}">
+                    <p th:case="1001">업무연락</p>
+                    <p th:case="1002">지출결의</p>
+                    <p th:case="1003">품의</p>
+                    <p th:case="1004">휴가신청</p>
+                    <p th:case="1005">연장근무</p>
+                </td>
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '반려')
+                  ? 'color:red;'
+                  : ((doc.status == '진행')
+                        ? 'color:green;'
+                        : ((doc.status == '승인')
+                              ? 'color:blue;'
+                              : ''))}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
 
 <script>
@@ -175,6 +286,104 @@
     $("#create-button").on("click", function () {
         location.href = "/edsmForm/input";
     });
+
+
+    // 셀렉트 박스 변경 시 해당 문서 유형에 맞춰서 컨테이너 보이기/숨기기
+    $("#docTypeSelect").on("change", function() {
+        let selectedType = $(this).val();
+        if(selectedType === "all") {
+            $(".doc-table-container").show();
+        } else {
+            $(".doc-table-container").each(function() {
+                // 각 컨테이너의 data-doc-type 속성과 비교
+                let docType = $(this).data("doc-type");
+                if(docType === selectedType) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        }
+    });
+
+    // 페이지가 로드되면 '전체'를 선택한 상태로 설정
+    $("#docTypeSelect").val("all");
+    $(".doc-table-container").show();
+
+    // 페이지 당 레코드 수 (NaviStatics.java에서 정의된 값과 동일)
+    const recordsPerPage = 5;
+
+    // 네비게이터에 표시할 페이지 번호 최대 개수 (예시로 NaviStatics.naviCountPerPage 값 사용)
+    const naviCountPerPage = 5;
+
+    $(".doc-table-container").each(function(){
+        let $container = $(this);
+        let $table = $container.find("table.document-table");
+        let $rows = $table.find("tbody tr");
+        let totalRecords = $rows.length;
+        let totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+        let $pagination = $container.find(".pagination");
+        if($pagination.length === 0){
+            $pagination = $('<div class="pagination"></div>');
+            $container.append($pagination);
+        }
+
+        // 현재 페이지 번호를 저장
+        let currentPage = 1;
+
+        // 페이지 그룹을 렌더링하는 함수
+        function renderPagination(page) {
+            currentPage = page;
+            $pagination.empty();
+            // 현재 페이지가 포함되는 그룹 계산
+            let groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+            let startPage = groupIndex * naviCountPerPage + 1;
+            let endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+            // 이전 그룹 버튼 표시 (현재 그룹이 첫 그룹이 아닌 경우)
+            if(startPage > 1) {
+                $pagination.append('<a href="#" class="page-link prev-group" data-page="'+(startPage-1)+'"><</a>');
+            }
+
+            // 페이지 번호 버튼 생성
+            for(let i = startPage; i <= endPage; i++){
+                $pagination.append('<a href="#" class="page-link" data-page="'+i+'">'+i+'</a>');
+            }
+
+            // 다음 그룹 버튼 표시 (마지막 페이지가 아니라면)
+            if(endPage < totalPages) {
+                $pagination.append('<a href="#" class="page-link next-group" data-page="'+(endPage+1)+'">></a>');
+            }
+
+            // 현재 페이지 버튼에 active 클래스 추가
+            $pagination.find("a.page-link").removeClass("active");
+            $pagination.find('a.page-link[data-page="'+currentPage+'"]').addClass("active");
+        }
+
+        // 실제 행을 보여주는 함수
+        function showPage(page) {
+            let start = (page - 1) * recordsPerPage;
+            let end = start + recordsPerPage;
+            $rows.hide();
+            $rows.slice(start, end).show();
+        }
+
+        // 초기 렌더링: 첫 페이지 표시
+        renderPagination(1);
+        showPage(1);
+
+        // pagination 클릭 이벤트 처리 (동적 생성된 버튼이므로 on() 사용)
+        $pagination.on("click", "a.page-link", function(e){
+            e.preventDefault();
+            let targetPage = $(this).data("page");
+            // 페이지 숫자 혹은 그룹 이동 버튼을 클릭했을 경우
+            renderPagination(targetPage);
+            showPage(targetPage);
+        });
+    });
+
+
 </script>
 </body>
 </html>

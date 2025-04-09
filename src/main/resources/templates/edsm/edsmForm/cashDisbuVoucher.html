@@ -2,21 +2,18 @@
 <html lang="ko">
 <head>
     <meta charset="utf-8" />
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href= "/assets/css/edsm/edsmInputCdv.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+    <!-- 나머지 CSS 및 Font Awesome 등 -->
+    <link rel="stylesheet" href="/assets/css/edsm/edsmInputCdv.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>전자결재</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 아이콘 사용 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- jQuery UI CSS (예: Smoothness 테마) -->
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
-    <!-- jQuery UI 스크립트 -->
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-    <!-- jQuery UI 다국어 지원 스크립트 (한국어) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/jquery-ui-i18n.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 </head>
 <body>
 <!-- 헤더 -->
@@ -86,7 +83,7 @@
     <div class="main-container">
         <div class="total">
             <!-- 실제 폼 시작 -->
-            <form id="documentForm" action="/edsmForm/submit" method="post" enctype="multipart/form-data">
+            <form id="documentForm" action="/edsmForm/cash_submit" method="post" enctype="multipart/form-data">
 
                 <!-- 기본설정 영역 -->
                 <div class="form-section">
@@ -226,19 +223,19 @@
         <div class="form-group">
                 <div style="margin-bottom: 20px;">
                     <label for="accountingDate">회계 기준일</label>
-                    <input type="text" id="accountingDate" name="accountingDate" placeholder="날짜 선택" style="width: 300px;">
+                    <input type="text" id="accountingDate" name="accountingDate" placeholder="날짜 입력" style="width: 300px;">
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <span style="margin-right: 10px;">지출자</span>
                     <span class="spender-input"> 클릭 후 입력 </span>
                 </div>
-
+                <input type="hidden" id="spender" name="spender" value="" />
                 <div style="margin-bottom: 20px;">
                     <span>계좌은행</span>
                     <input type="text" class="bank-input" name="bank" placeholder="은행입력">
                     <span>계좌번호</span>
-                    <input type="text" class="bank-input" name="back-account" placeholder="계좌번호입력">
+                    <input type="text" class="bankAccount-input" name="bankAccount" placeholder="계좌번호입력">
                 </div>
             </div>
                 <div class="form-contents">
@@ -375,7 +372,7 @@
             location.href = "/edsmForm/input";
         });
 
-        $(function() {
+
             // 한국어 로케일 설정
             $.datepicker.setDefaults($.datepicker.regional['ko']);
             $("#accountingDate").datepicker({
@@ -385,7 +382,7 @@
                 changeYear: true,        // 연도 변경 드롭다운
                 yearRange: "2000:+10"    // 연도 범위 (2000년부터 현재 연도 + 10년까지)
             });
-        });
+
 
         //지출자 모달 열기
         $(".spender-input").on("click", function() {
@@ -427,6 +424,10 @@
             let $selected = $(selected[0]);
             let position = $selected.data("approverposition");
             let name = $selected.data("approvername");
+            let empId = $selected.data("approvernum");
+
+            // hidden input 필드에 단순 문자열(사원 ID) 저장
+            $("#spender").val(empId);
 
             // spender-input 영역에 선택한 직원의 직급과 이름 표시
             $(".spender-input").text(position + " " + name);
