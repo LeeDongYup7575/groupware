@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href= "/assets/css/edsm/edsmMain.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>전자결재</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 아이콘 사용 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<!-- 헤더 -->
+<div class="header">
+  <div class="logo">TECH X</div>
+  <div class="title">전자결재</div>
+</div>
+
+<!-- 좌측 사이드바 -->
+<div class="sidebar">
+  <button class="create-button" id="create-button">
+    <i class="fas fa-plus"></i>
+    작성하기
+  </button>
+
+  <div class="menu-section">
+    <div class="menu-header">
+      <i class="fas fa-chevron-down"></i>
+      결재 상태
+    </div>
+    <div class="menu-items">
+      <div class="menu-item" id="main">
+        <i class="fas fa-folder"></i>
+        전체
+        (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
+      </div>
+      <div class="menu-item" id="wait">
+        <i class="fas fa-spinner"></i>
+        대기
+        (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
+      </div>
+      <div class="menu-item" id="expected">
+        <i class="fas fa-spinner"></i>
+        예정
+        (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-header">
+      <i class="fas fa-chevron-down"></i>
+      나의 문서함
+    </div>
+    <div class="menu-items">
+      <div class="menu-item">
+        <i class="fas fa-pen"></i>
+        기안(내가 기안한 모든 문서- 상태상관없음)
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-file-signature"></i>
+        승인(내가 기안한 문서 중 승인완료된 문서등)
+      </div>
+      <div class="menu-item">
+        <i class="fas fa-undo"></i>
+        반려(내가 기안한 문서 중 반려된 문서들)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 콘텐츠 영역 -->
+<div class="main-content">
+
+  <span>결재 예정 문서</span><br>
+  <table class="document-table">
+    <thead>
+    <tr>
+      <th>문서 번호</th>
+      <th>제목</th>
+      <th>기안자</th>
+      <th>기안일</th>
+      <th>구분</th>
+      <th>상태</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="doc : ${waitDocumentList}">
+      <td th:text="${doc.id}"></td>
+      <td th:switch="${doc.edsmFormId}">
+        <a th:case="1001" th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+        <a th:case="1002" th:href="@{'/edsmDetail/cashDisbuVoucher/' + ${doc.id}}" th:text="${doc.title}"></a>
+        <a th:case="1003" th:href="@{'/edsmDetail/letterOfApproval/' + ${doc.id}}" th:text="${doc.title}"></a>
+        <a th:case="1004" th:href="@{'/edsmDetail/#/' + ${doc.id}}" th:text="${doc.title}"></a>
+        <a th:case="1005" th:href="@{'/edsmDetail/#/' + ${doc.id}}" th:text="${doc.title}"></a>
+      </td>
+      <td th:text="${doc.drafterName}"></td>
+      <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
+      <td th:switch="${doc.edsmFormId}">
+        <p th:case="1001">업무연락</p>
+        <p th:case="1002">지출결의</p>
+        <p th:case="1003">품의</p>
+        <p th:case="1004">휴가신청</p>
+        <p th:case="1005">연장근무</p>
+      </td>
+      <td th:text="${doc.approvalStatus}"
+          th:style="${(doc.approvalStatus == '대기')
+                  ? 'color:blue;'
+                  : ((doc.status == '진행')
+                        ? 'color:green;'
+                        : ((doc.status == '승인')
+                              ? 'color:blue;'
+                              : ''))}"></td>
+    </tr>
+    </tbody>
+  </table>
+  <div class="pagination"></div>
+
+</div>
+
+
+<script>
+
+  $("#main").on("click", function () {
+    location.href = "/edsm/main";
+  });
+  $("#expected").on("click", function () {
+    location.href = "/edsm/expected";
+  });
+
+  $("#wait").on("click", function () {
+    location.href = "/edsm/wait";
+  });
+  $("#progress").on("click", function () {
+    location.href = "/edsm/progress";
+  });
+
+  $("#complete").on("click", function () {
+    location.href = "/edsm/complete";
+  });
+
+  $("#create-button").on("click", function () {
+    location.href = "/edsmForm/input";
+  });
+
+  // 페이지 당 레코드 수 (NaviStatics.java에서 정의된 값과 동일)
+  const recordsPerPage = 5;
+
+  // 네비게이터에 표시할 페이지 번호 최대 개수 (예시로 NaviStatics.naviCountPerPage 값 사용)
+  const naviCountPerPage = 5;
+
+  $(".main-content").each(function(){
+    let $container = $(this);
+    let $table = $container.find("table.document-table");
+    let $rows = $table.find("tbody tr");
+    let totalRecords = $rows.length;
+    let totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    let $pagination = $container.find(".pagination");
+    if($pagination.length === 0){
+      $pagination = $('<div class="pagination"></div>');
+      $container.append($pagination);
+    }
+
+    // 현재 페이지 번호를 저장
+    let currentPage = 1;
+
+    // 페이지 그룹을 렌더링하는 함수
+    function renderPagination(page) {
+      currentPage = page;
+      $pagination.empty();
+      // 현재 페이지가 포함되는 그룹 계산
+      let groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+      let startPage = groupIndex * naviCountPerPage + 1;
+      let endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+      // 이전 그룹 버튼 표시 (현재 그룹이 첫 그룹이 아닌 경우)
+      if(startPage > 1) {
+        $pagination.append('<a href="#" class="page-link prev-group" data-page="'+(startPage-1)+'"><</a>');
+      }
+
+      // 페이지 번호 버튼 생성
+      for(let i = startPage; i <= endPage; i++){
+        $pagination.append('<a href="#" class="page-link" data-page="'+i+'">'+i+'</a>');
+      }
+
+      // 다음 그룹 버튼 표시 (마지막 페이지가 아니라면)
+      if(endPage < totalPages) {
+        $pagination.append('<a href="#" class="page-link next-group" data-page="'+(endPage+1)+'">></a>');
+      }
+
+      // 현재 페이지 버튼에 active 클래스 추가
+      $pagination.find("a.page-link").removeClass("active");
+      $pagination.find('a.page-link[data-page="'+currentPage+'"]').addClass("active");
+    }
+
+    // 실제 행을 보여주는 함수
+    function showPage(page) {
+      let start = (page - 1) * recordsPerPage;
+      let end = start + recordsPerPage;
+      $rows.hide();
+      $rows.slice(start, end).show();
+    }
+
+    // 초기 렌더링: 첫 페이지 표시
+    renderPagination(1);
+    showPage(1);
+
+    // pagination 클릭 이벤트 처리 (동적 생성된 버튼이므로 on() 사용)
+    $pagination.on("click", "a.page-link", function(e){
+      e.preventDefault();
+      let targetPage = $(this).data("page");
+      // 페이지 숫자 혹은 그룹 이동 버튼을 클릭했을 경우
+      renderPagination(targetPage);
+      showPage(targetPage);
+    });
+  });
+</script>
+</body>
+</html>

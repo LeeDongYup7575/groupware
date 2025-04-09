@@ -3,8 +3,7 @@ package com.example.projectdemo.domain.edsm.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
-import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO;
+import com.example.projectdemo.domain.edsm.dto.*;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
@@ -63,10 +62,12 @@ public class EdsmDetailController {
         model.addAttribute("employee", employee);
 
         List<EdsmDocumentDTO> edsmDocumentList = edao.selectByDocumentId(id);
+        List<EdsmBusinessContactDTO> edsmBusinessContactDTOList = edao.selectByBusinessContactFromDocId(id);
         List<ApprovalLineDTO> approvalLineList = edao.selectByDocumentIdFromApprovalLine(id);
         model.addAttribute("edsmDocumentList", edsmDocumentList);
         model.addAttribute("approvalLineList", approvalLineList);
-        return "businessContactDetail"; // 상세 페이지 템플릿 이름
+        model.addAttribute("edsmBusinessContactDTOList", edsmBusinessContactDTOList);
+        return "edsm/edsmDetail/businessContactDetail"; // 상세 페이지 템플릿 이름
     }
 
 
@@ -91,10 +92,12 @@ public class EdsmDetailController {
         model.addAttribute("employee", employee);
 
         List<EdsmDocumentDTO> edsmDocumentList = edao.selectByDocumentId(id);
+        List<EdsmCashDisbuVoucherDTO> edsmCashDisbuVoucherDTOList = edao.selectByCashDisbuVoucherFromDocId(id);
         List<ApprovalLineDTO> approvalLineList = edao.selectByDocumentIdFromApprovalLine(id);
         model.addAttribute("edsmDocumentList", edsmDocumentList);
         model.addAttribute("approvalLineList", approvalLineList);
-        return "cashDisbuVoucherDetail"; // 상세 페이지 템플릿 이름
+        model.addAttribute("edsmCashDisbuVoucherDTOList", edsmCashDisbuVoucherDTOList);
+        return "edsm/edsmDetail/cashDisbuVoucherDetail"; // 상세 페이지 템플릿 이름
     }
 
 
@@ -119,10 +122,14 @@ public class EdsmDetailController {
         model.addAttribute("employee", employee);
 
         List<EdsmDocumentDTO> edsmDocumentList = edao.selectByDocumentId(id);
+        List<EdsmLetterOfApprovalDTO> edsmLetterOfApprovalDTOList = edao.selectByLetterOfApprovalFromDocId(id);
         List<ApprovalLineDTO> approvalLineList = edao.selectByDocumentIdFromApprovalLine(id);
         model.addAttribute("edsmDocumentList", edsmDocumentList);
         model.addAttribute("approvalLineList", approvalLineList);
-        return "letterOfApproval"; // 상세 페이지 템플릿 이름
+        model.addAttribute("edsmLetterOfApprovalDTOList", edsmLetterOfApprovalDTOList);
+
+
+        return "edsm/edsmDetail/letterOfApprovalDetail"; // 상세 페이지 템플릿 이름
     }
 
 

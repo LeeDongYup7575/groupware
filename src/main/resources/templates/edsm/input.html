@@ -34,15 +34,17 @@
                 <div class="menu-item" id="main">
                     <i class="fas fa-folder"></i>
                     전체
+                    (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
                 </div>
-
-                <div class="menu-item" id="progress">
+                <div class="menu-item" id="wait">
                     <i class="fas fa-spinner"></i>
-                    진행
+                    대기
+                    (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
                 </div>
-                <div class="menu-item" id="complete">
-                    <i class="fas fa-check-circle"></i>
-                    완료
+                <div class="menu-item" id="expected">
+                    <i class="fas fa-spinner"></i>
+                    예정
+                    (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
                 </div>
             </div>
         </div>
@@ -50,24 +52,20 @@
         <div class="menu-section">
             <div class="menu-header">
                 <i class="fas fa-chevron-down"></i>
-                문서함
+                나의 문서함
             </div>
             <div class="menu-items">
                 <div class="menu-item">
-                    <i class="fas fa-folder"></i>
-                    전체
-                </div>
-                <div class="menu-item">
                     <i class="fas fa-pen"></i>
-                    기안
+                    기안(내가 기안한 모든 문서- 상태상관없음)
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-file-signature"></i>
-                    결재
+                    승인(내가 기안한 문서 중 승인완료된 문서등)
                 </div>
                 <div class="menu-item">
                     <i class="fas fa-undo"></i>
-                    반려
+                    반려(내가 기안한 문서 중 반려된 문서들)
                 </div>
             </div>
         </div>
@@ -138,7 +136,9 @@
         location.href = "/edsm/expected";
     });
 
-
+    $("#wait").on("click", function () {
+        location.href = "/edsm/wait";
+    });
     $("#progress").on("click", function () {
         location.href = "/edsm/progress";
     });

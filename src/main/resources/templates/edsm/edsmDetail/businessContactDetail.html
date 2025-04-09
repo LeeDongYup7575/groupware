@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="/assets/css/edsm/edsmInput.css" />
+  <link rel="stylesheet" href="/assets/css/edsm/edsmBusinessDetail.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <title>전자결재</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -39,38 +39,37 @@
         <div class="menu-item" id="main">
           <i class="fas fa-folder"></i>
           전체
+          (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
         </div>
-        <div class="menu-item" id="progress">
+        <div class="menu-item" id="wait">
           <i class="fas fa-spinner"></i>
-          진행
+          대기
+          (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
         </div>
-        <div class="menu-item" id="complete">
-          <i class="fas fa-check-circle"></i>
-          완료
+        <div class="menu-item" id="expected">
+          <i class="fas fa-spinner"></i>
+          예정
+          (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
         </div>
       </div>
     </div>
     <div class="menu-section">
       <div class="menu-header">
         <i class="fas fa-chevron-down"></i>
-        문서함
+        나의 문서함
       </div>
       <div class="menu-items">
         <div class="menu-item">
-          <i class="fas fa-folder"></i>
-          전체
-        </div>
-        <div class="menu-item">
           <i class="fas fa-pen"></i>
-          기안
+          기안(내가 기안한 모든 문서- 상태상관없음)
         </div>
         <div class="menu-item">
           <i class="fas fa-file-signature"></i>
-          결재
+          승인(내가 기안한 문서 중 승인완료된 문서등)
         </div>
         <div class="menu-item">
           <i class="fas fa-undo"></i>
-          반려
+          반려(내가 기안한 문서 중 반려된 문서들)
         </div>
       </div>
     </div>
@@ -190,7 +189,7 @@
 
                   <div class="drafter-name" style="margin: 5px 0;font-weight: bold;"
                        th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
-                  <div class="drafter-date" style="font-size: 12px;color: #777;" th:text="${currentTime}"></div>
+                  <div class="drafter-date" style="font-size: 12px;color: #777;" th:each="doc : ${edsmDocumentList}" th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></div>
                 </div>
 
               </div>
@@ -209,7 +208,7 @@
                 <div class="approval-body-cell approval-body-cell-2" th:each="appList : ${approvalLineList}">
                   <div class="approval-stamp" th:text="${appList.status}"></div>
                   <div class="approval-name" th:text="${appList.approverPosition}+${appList.approverName}"></div>
-                  <div class="approval-date" th:text="${appList.approvalAt}"></div>
+                  <div class="approval-date" th:text="${#dates.format(appList.approvalAt, 'yyyy-MM-dd')}"></div>
                   <!-- 버튼은 상태가 '대기'이고, 현재 로그인한 사원번호와 결재자 사원번호가 일치할 때만 나타남 -->
                   <div class="approval-btn" th:if="${appList.status == '대기' and appList.approverId == employee.empNum}">
                     <!-- data-document-id와 data-approval-no를 저장하여 후에 AJAX 요청 시 사용 -->
@@ -234,14 +233,14 @@
 
 
         <!-- 본문 입력 영역 -->
-        <div class="main2-contents" th:each="doc : ${edsmDocumentList}">
+        <div class="main2-contents" th:each="doc : ${edsmBusinessContactDTOList}">
           <div class="form-contents">
             <label class="contents-label" for="title">제목</label>
             <input type="text" id="title" name="title" class="label-input" th:value="${doc.title}" readonly="readonly"/>
           </div>
           <div class="form-contents">
             <label class="contents-label" for="content">본문</label>
-            <textarea id="content" name="content" class="label-textarea" th:value="${doc.content}" readonly="readonly"></textarea>
+            <textarea id="content" name="content" class="label-textarea" th:text="${doc.content}" readonly="readonly"></textarea>
           </div>
 
 
@@ -257,10 +256,6 @@
           </div>
         </div>
 
-        <!-- 폼 제출 버튼 -->
-        <div class="form-row">
-          <button type="submit" class="button">제출하기</button>
-        </div>
       </form>
     </div>
   </div>
@@ -328,7 +323,9 @@
       location.href = "/edsm/expected";
     });
 
-
+    $("#wait").on("click", function () {
+      location.href = "/edsm/wait";
+    });
     $("#progress").on("click", function () {
       location.href = "/edsm/progress";
     });

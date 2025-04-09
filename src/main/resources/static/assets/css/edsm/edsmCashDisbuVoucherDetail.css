@@ -159,43 +159,6 @@ body {
 }
 
 /* 양식 스타일 */
-.form-group input{
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    width: 200px;
-}
-
-
-.form-group input:focus{
-    border-color: #4a90e2;
-    outline: none;
-}
-.form-group label{
-    margin-bottom: 10px;
-}
-
-.label-textarea:focus{
-    border-color: #4a90e2;
-    outline: none;
-}
-.label-textarea{
-    margin-bottom: 20px;
-}
-
-.form-contents input{
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin: 0;
-    width: 200px;
-}
-.form-contents input:focus{
-    border-color: #4a90e2;
-    outline: none;
-}
-
 .form-section {
     margin-bottom: 20px;
     width: 100%;
@@ -362,18 +325,70 @@ select {
     background-color: #fff;
 }
 
+
+.bank-input {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 10px;
+    width: 200px;
+}
+.bankAccount-input{
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 10px;
+    width: 200px;
+}
+
+#accountingDate{
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 10px;
+    width: 200px;
+}
+
+#accountingDate:focus{
+    outline: none;
+}
+
+.bank-input:focus {
+
+    outline: none;
+}
+
+.bankAccount-input:focus{
+    outline: none;
+}
+
 /* 폼 스타일 */
 .form-contents {
     margin-bottom: 25px;
     width: 100%;
 }
 
+.form-group span{
+    font-size: 14px;
+}
+
+.form-group label{
+    font-size: 14px;
+}
+
+
+
 .contents-label {
     display: block;
     font-size: 14px;
     margin-bottom: 8px;
+    margin-left: 5px;
     color: #333;
     font-weight: 500;
+}
+.approval-date{
+    font-size: 12px;
+    color: #777;
 }
 
 .label-input {
@@ -392,6 +407,14 @@ select {
     min-height: 200px;
     resize: vertical;
     font-size: 14px;
+}
+
+.label-textarea:focus{
+    outline: none;
+}
+
+.label-input:focus{
+    outline: none;
 }
 
 /* 첨부파일 영역 */
@@ -508,23 +531,4 @@ select {
 
 .form-row button[type="submit"]:hover {
     background-color: #3a80d2;
-}
-
-/* 모달 내부의 두 영역 스타일 */
-#approvalModal .available-employees ul,
-#approvalModal .selected-employees ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-#approvalModal .selected-employees ul {
-    margin-top: 16px;
-}
-#approvalModal .available-employees li,
-#approvalModal .selected-employees li {
-    padding: 8px;
-    border: 0;
-    margin-bottom: 5px;
-    background: #f9f9f9;
-    cursor: pointer;
 }

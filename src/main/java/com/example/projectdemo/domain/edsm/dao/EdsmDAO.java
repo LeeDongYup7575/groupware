@@ -68,23 +68,49 @@ public class EdsmDAO {
         return mybatis.selectList("Edsm.SelectByAllLeavesDocument",empNum);
     }
 
-    // 로그인된 사번을 기준으로 로그인자가 결재권 있는 문서 리스트 출력
-    public List<EdsmDocumentDTO> selectByAllApprovalFromId(String empNum) {
-        return mybatis.selectList("Edsm.selectByAllApprovalFromId", empNum);
+    //로그인한 자의 사번을 기준으로 결재권 있는 업무연장 신청서 문서 출력
+    public List<EdsmDocumentDTO> SelectByAllOvertimeDocument(String empNum) {
+        return mybatis.selectList("Edsm.SelectByAllOvertimeDocument",empNum);
+    }
+
+    // 로그인된 사번을 기준으로 로그인자가 결재권이 대기인 문서 리스트 출력
+    public List<EdsmDocumentDTO> selectByAllApprovalFromIdWait(String empNum) {
+        return mybatis.selectList("Edsm.selectByAllApprovalFromId_wait", empNum);
+
+    }
+
+    // 로그인된 사번을 기준으로 로그인자가 결재권이 대기인 문서 리스트 출력
+    public List<EdsmDocumentDTO> selectByAllApprovalFromIdExpected(String empNum) {
+        return mybatis.selectList("Edsm.selectByAllApprovalFromId_expected", empNum);
 
     }
     
-    // 문서번호를 통한 Detail 출력
+    // 문서번호를 통한 기안 정보 출력
     public List<EdsmDocumentDTO> selectByDocumentId(int id) {
 
         return mybatis.selectList("Edsm.SelectByDocumentId", id);
+    }
+
+    // 문서번호를 통한 업무연락 Detail 정보 출력
+    public List<EdsmBusinessContactDTO> selectByBusinessContactFromDocId(int id) {
+        return mybatis.selectList("Edsm.SelectByBusinessContactFromDocId", id);
+    }
+
+    // 문서번호를 통한 지출결의서 Detail 정보 출력
+    public List<EdsmCashDisbuVoucherDTO> selectByCashDisbuVoucherFromDocId(int id) {
+        return mybatis.selectList("Edsm.SelectByCashDisbuVoucherFromDocId",id);
+    }
+
+    // 문서번호를 통한 품의서 Detail 정보 출력
+    public List<EdsmLetterOfApprovalDTO> selectByLetterOfApprovalFromDocId(int id) {
+        return mybatis.selectList("Edsm.SelectByLetterOfApprovalFromDocId",id);
     }
 
     // 문서번호를 통한 결재라인 출력
     public List<ApprovalLineDTO> selectByDocumentIdFromApprovalLine(int id) {
         return mybatis.selectList("Edsm.SelectByDocumentIdFromApprovalLine", id);
     }
-    
+
     //결재라인 상태 업데이트
     public int updateApprovalStatus(ApprovalLineDTO approvalLineDTO) {
         return mybatis.update("Edsm.UpdateApprovalStatus", approvalLineDTO);
