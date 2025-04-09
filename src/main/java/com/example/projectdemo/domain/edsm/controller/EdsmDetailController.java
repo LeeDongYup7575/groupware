@@ -24,11 +24,6 @@ import java.util.List;
 @RequestMapping("/edsmDetail")
 public class EdsmDetailController {
 
-    @Autowired
-    private HttpSession session;
-
-    @Autowired
-    private JwtTokenUtil jwt;
 
     @Autowired
     EdsmDAO edao;
