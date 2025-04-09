@@ -100,6 +100,7 @@ public class AuthController {
                     .empNum(employee.getEmpNum())
                     .name(employee.getName())
                     .email(employee.getEmail())
+                    .internalEmail(employee.getInternalEmail())
                     .role(employee.getRole())
                     .tempPassword(isTempPassword)
                     .departmentName(employee.getDepartmentName())

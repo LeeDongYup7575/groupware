@@ -22,6 +22,7 @@ public class JwtResponseDTO {
     private String empNum;
     private String name;
     private String email;
+    private String internalEmail;
     private String role;
 
     // 추가 정보
