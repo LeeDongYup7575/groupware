@@ -225,5 +225,18 @@
     </update>
 
 
+    <!-- 파일 첨부 -->
+    <insert id="FilesInsert" parameterType="com.example.projectdemo.domain.edsm.dto.EdsmFilesDTO">
+        INSERT INTO groupware.edsm_file_attachment
+            (edsm_document_id, document_type, ori_name, sys_name, path, size, upload_date)
+        VALUES
+            (#{edsmDocumentId}, #{documentType}, #{oriName}, #{sysName}, #{path}, #{size}, current_timestamp)
+    </insert>
+
+    <!-- 결재문서에 포함된 파일 리스트 출력 -->
+    <select id="FilesSelectFromDocId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmFilesDTO">
+        select * from groupware.edsm_file_attachment where edsm_document_id = #{edsmDocumentId}
+    </select>
+
 
 </mapper>

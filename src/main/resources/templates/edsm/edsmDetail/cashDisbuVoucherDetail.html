@@ -262,15 +262,27 @@
 
 
                     <!-- 파일첨부 영역 -->
-                    <!-- 파일첨부 영역 -->
                     <div class="attachment-section">
-                        <div class="attachment-links">
-                        </div>
-                        <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple />
+                        <span>첨부파일</span>
                         <div class="attachment-drop-area">
-                            첨부파일이 없습니다.
+                            <!-- 첨부파일이 있을 경우 목록을 출력 -->
+                            <ul>
+                                <!-- fileList에 포함된 파일들을 반복 처리 -->
+                                <li th:each="file : ${edsmFilesDTOList}">
+                                    <!-- 예를 들어, 서버에 저장된 파일 경로를 통해 파일 다운로드 또는 미리보기를 위한 링크 제공 -->
+                                    <a th:href="@{'/edsmFiles/download/' + ${file.sysName} + '/' + ${file.oriName}}" th:text="${file.oriName} +' ('+${file.size}+'kb)'"></a>
+                                    <!-- 필요하다면 파일 크기나 업로드 날짜 등 추가 정보 출력 가능 -->
+                                </li>
+                            </ul>
+                            <!-- 첨부파일 리스트가 비어 있을 경우 메시지 출력 -->
+                            <div th:if="${#lists.isEmpty(edsmFilesDTOList)}"
+                                 style="text-align: center; padding: 20px; color: #999; font-style: italic;">
+                                첨부파일이 없습니다.
+                            </div>
                         </div>
                     </div>
+
+
                 </div>
 
 

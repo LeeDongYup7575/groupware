@@ -154,7 +154,7 @@
 
     // form select 변경 이벤트
     $("#documentType").on("change", function() {
-        var selectedValue = $(this).val();
+        let selectedValue = $(this).val();
 
         console.log("선택된 값:", selectedValue);
         location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;

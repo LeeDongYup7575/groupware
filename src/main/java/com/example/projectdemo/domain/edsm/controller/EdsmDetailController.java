@@ -1,22 +1,19 @@
 package com.example.projectdemo.domain.edsm.controller;
 
 
-import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
 import com.example.projectdemo.domain.edsm.dto.*;
+import com.example.projectdemo.domain.edsm.services.EdsmDetailService;
+import com.example.projectdemo.domain.edsm.services.EdsmFilesService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -29,16 +26,10 @@ public class EdsmDetailController {
 
     @Autowired
     private EmployeesService employeeService;
-
     @Autowired
-    private EmployeesMapper employeesMapper;
-
-    public String getCurrentTime() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        return now.format(formatter);
-    }
-
+    private EdsmDetailService edsmDetailService;
+    @Autowired
+    private EdsmFilesService edsmFilesService;
 
 
     //업무연락 상세페이지
@@ -61,12 +52,17 @@ public class EdsmDetailController {
 
         model.addAttribute("employee", employee);
 
-        List<EdsmDocumentDTO> edsmDocumentList = edao.selectByDocumentId(id);
-        List<EdsmBusinessContactDTO> edsmBusinessContactDTOList = edao.selectByBusinessContactFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edao.selectByDocumentIdFromApprovalLine(id);
+        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
+        List<EdsmBusinessContactDTO> edsmBusinessContactDTOList = edsmDetailService.getEdsmBusinessContactListFromDocId(id);
+        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
+        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
         model.addAttribute("edsmDocumentList", edsmDocumentList);
         model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("edsmBusinessContactDTOList", edsmBusinessContactDTOList);
+        if(!edsmFilesDTOList.isEmpty()){
+            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
+        }
+
         return "edsm/edsmDetail/businessContactDetail"; // 상세 페이지 템플릿 이름
     }
 
@@ -91,12 +87,16 @@ public class EdsmDetailController {
 
         model.addAttribute("employee", employee);
 
-        List<EdsmDocumentDTO> edsmDocumentList = edao.selectByDocumentId(id);
-        List<EdsmCashDisbuVoucherDTO> edsmCashDisbuVoucherDTOList = edao.selectByCashDisbuVoucherFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edao.selectByDocumentIdFromApprovalLine(id);
+        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
+        List<EdsmCashDisbuVoucherDTO> edsmCashDisbuVoucherDTOList = edsmDetailService.getEdsmCashDisbuVoucherListFromDocId(id);
+        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
+        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
         model.addAttribute("edsmDocumentList", edsmDocumentList);
         model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("edsmCashDisbuVoucherDTOList", edsmCashDisbuVoucherDTOList);
+        if(!edsmFilesDTOList.isEmpty()){
+            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
+        }
         return "edsm/edsmDetail/cashDisbuVoucherDetail"; // 상세 페이지 템플릿 이름
     }
 
@@ -121,18 +121,24 @@ public class EdsmDetailController {
 
         model.addAttribute("employee", employee);
 
-        List<EdsmDocumentDTO> edsmDocumentList = edao.selectByDocumentId(id);
-        List<EdsmLetterOfApprovalDTO> edsmLetterOfApprovalDTOList = edao.selectByLetterOfApprovalFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edao.selectByDocumentIdFromApprovalLine(id);
+        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
+        List<EdsmLetterOfApprovalDTO> edsmLetterOfApprovalDTOList = edsmDetailService.getEdsmLetterOfApprovalListFromDocId(id);
+        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
+        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
         model.addAttribute("edsmDocumentList", edsmDocumentList);
         model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("edsmLetterOfApprovalDTOList", edsmLetterOfApprovalDTOList);
+        if(!edsmFilesDTOList.isEmpty()){
+            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
+        }
 
 
         return "edsm/edsmDetail/letterOfApprovalDetail"; // 상세 페이지 템플릿 이름
     }
 
 
+
+    // 결재권자의 결재 상태 업데이트
     @ResponseBody
     @PostMapping(value = "updateApprovalStatus", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String updateApprovalStatus(ApprovalLineDTO approvalLineDTO, HttpServletRequest request, Model model) {
@@ -149,8 +155,12 @@ public class EdsmDetailController {
         }
         model.addAttribute("employee", employee);
 
-        edao.updateApprovalStatus(approvalLineDTO);
-        return "success";
+       boolean result = edsmDetailService.updateApprovalStatus(approvalLineDTO);
+
+       if(result) {
+           return "success";
+       }
+        return "false";
     }
 
 }
