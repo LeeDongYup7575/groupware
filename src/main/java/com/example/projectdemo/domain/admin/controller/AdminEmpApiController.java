@@ -71,23 +71,47 @@ public class AdminEmpApiController {
     }
 
     @PutMapping("/details/{id}")
-    public ResponseEntity<EmployeesDTO> updateEmployee(
+    public ResponseEntity<?> updateEmployee(
             @PathVariable Integer id,
-            @RequestBody EmployeesDTO employeeDTO) {
+            @RequestBody EmployeesDTO employeeDTO,
+            HttpServletRequest request) {
 
-        employeeDTO.setId(id); // Ensure ID is set correctly
-        EmployeesDTO updatedEmployee = employeesService.updateEmployee(employeeDTO);
-        return ResponseEntity.ok(updatedEmployee);
+        // 권한 확인 (선택적)
+        String role = (String) request.getAttribute("role");
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "관리자 권한이 필요합니다.", "success", false));
+        }
+
+        try {
+            employeeDTO.setId(id); // ID 설정
+            EmployeesDTO updatedEmployee = employeesService.updateEmployee(employeeDTO);
+            return ResponseEntity.ok(updatedEmployee);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage(), "success", false));
+        }
     }
 
     @DeleteMapping("/details/{id}")
-    public ResponseEntity<Map<String, Object>> deactivateEmployee(@PathVariable Integer id) {
-        boolean result = employeesService.deactivateEmployee(id);
+    public ResponseEntity<?> deactivateEmployee(
+            @PathVariable Integer id,
+            HttpServletRequest request) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result);
+        // 권한 확인 (선택적)
+        String role = (String) request.getAttribute("role");
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "관리자 권한이 필요합니다.", "success", false));
+        }
 
-        return ResponseEntity.ok(response);
+        try {
+            boolean result = employeesService.deactivateEmployee(id);
+            return ResponseEntity.ok(Map.of("success", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage(), "success", false));
+        }
     }
 
     @GetMapping("/departments")
@@ -100,6 +124,27 @@ public class AdminEmpApiController {
     public ResponseEntity<List<PositionsDTO>> getAllPositions() {
         List<PositionsDTO> positions = positionsService.getAllPositions();
         return ResponseEntity.ok(positions);
+    }
+
+    @PutMapping("/activate/{id}")
+    public ResponseEntity<?> activateEmployee(
+            @PathVariable Integer id,
+            HttpServletRequest request) {
+
+        // 권한 확인 (선택적)
+        String role = (String) request.getAttribute("role");
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "관리자 권한이 필요합니다.", "success", false));
+        }
+
+        try {
+            boolean result = employeesService.activateEmployee(id);
+            return ResponseEntity.ok(Map.of("success", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage(), "success", false));
+        }
     }
 
 

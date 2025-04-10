@@ -75,4 +75,8 @@ public interface EmployeesMapper {
 
     // 직원 비활성화 (관리자용)
     int deactivateEmployee(@Param("id") Integer id);
+
+    // 직원 활성화 (관리자용)
+    int activateEmployee(@Param("id") Integer id);
+
 }

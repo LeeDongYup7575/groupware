@@ -22,14 +22,11 @@ public class CORSConfig implements WebMvcConfigurer {
                         "http://10.10.55.57:3000",
                         "http://172.30.1.74:3000",
                         "http://10.10.55.7:3000",
-                        "http://10.10.55.16:3000",
                         "http://localhost:3000"
                 )
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
                 .allowCredentials(true)
-                .maxAge(3600);
-
-        System.out.println("CORS mappings added");
+                .allowedHeaders("*")
+                .allowedMethods("*");
+        System.out.println("CORS mappings added with localhost");  // 로깅 메시지 변경
     }
 }

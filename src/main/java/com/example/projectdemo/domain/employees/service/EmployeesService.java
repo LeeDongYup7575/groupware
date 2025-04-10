@@ -7,12 +7,17 @@ import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import net.crizin.KoreanCharacter;
 import net.crizin.KoreanRomanizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -46,20 +51,6 @@ public class EmployeesService {
     private static final String SPECIAL_CHARS = "^$*.[]{}()?-\"!@#%&/\\,><':;|_~`+=";
     private static final String ALL_CHARS = CHAR_LOWER + CHAR_UPPER + NUMBER + SPECIAL_CHARS;
     private static final SecureRandom random = new SecureRandom();
-
-    /**
-     * 모든 직원 목록 조회
-     */
-//    public List<EmployeesDTO> getAllEmployees() {
-//        List<EmployeesDTO> employees = employeeMapper.selectEmpAll();
-//
-//        // Fetch additional data for each employee
-//        for (EmployeesDTO employee : employees) {
-//            enrichEmployeeData(employee);
-//        }
-//
-//        return employees;
-//    }
 
     /**
      * 모든 직원 목록 조회
@@ -359,15 +350,24 @@ public class EmployeesService {
             throw new RuntimeException("해당 직원을 찾을 수 없습니다.");
         }
 
-        // 주요 정보만 업데이트
-        int result = employeeMapper.updateEmployee(employeeDTO);
-
-        if (result <= 0) {
-            throw new RuntimeException("직원 정보 업데이트에 실패했습니다.");
+        // 필수 필드 검증
+        if (employeeDTO.getName() == null || employeeDTO.getName().trim().isEmpty()) {
+            throw new RuntimeException("이름은 필수 입력 항목입니다.");
         }
 
-        // 업데이트된 정보 반환
-        return findById(employeeDTO.getId());
+        try {
+            // 주요 정보만 업데이트
+            int result = employeeMapper.updateEmployee(employeeDTO);
+
+            if (result <= 0) {
+                throw new RuntimeException("직원 정보 업데이트에 실패했습니다.");
+            }
+
+            // 업데이트된 정보 반환
+            return findById(employeeDTO.getId());
+        } catch (Exception e) {
+            throw new RuntimeException("직원 정보 업데이트 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -375,7 +375,37 @@ public class EmployeesService {
      */
     @Transactional
     public boolean deactivateEmployee(Integer id) {
-        int result = employeeMapper.deactivateEmployee(id);
-        return result > 0;
+        // 직원 존재 여부 확인
+        EmployeesDTO employee = employeeMapper.findById(id);
+        if (employee == null) {
+            throw new RuntimeException("해당 직원을 찾을 수 없습니다.");
+        }
+
+        try {
+            int result = employeeMapper.deactivateEmployee(id);
+            return result > 0;
+        } catch (Exception e) {
+            throw new RuntimeException("직원 비활성화 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
+
+    /**
+     * 직원 활성화 (관리자용)
+     */
+    @Transactional
+    public boolean activateEmployee(Integer id) {
+        // 직원 존재 여부 확인
+        EmployeesDTO employee = employeeMapper.findById(id);
+        if (employee == null) {
+            throw new RuntimeException("해당 직원을 찾을 수 없습니다.");
+        }
+
+        try {
+            int result = employeeMapper.activateEmployee(id);
+            return result > 0;
+        } catch (Exception e) {
+            throw new RuntimeException("직원 활성화 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
 }

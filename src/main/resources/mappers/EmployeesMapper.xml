@@ -221,4 +221,11 @@
         </where>
     </select>
 
+    <!-- 직원 활성화 (관리자용) -->
+    <update id="activateEmployee">
+        UPDATE employees
+        SET enabled = true
+        WHERE id = #{id}
+    </update>
+
 </mapper>
