@@ -7,8 +7,11 @@ import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import com.example.projectdemo.domain.leave.service.LeavesService;
+import com.example.projectdemo.domain.work.dto.OverTimeDTO;
 import com.example.projectdemo.domain.work.service.WorkService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,7 +65,7 @@ public class AttendController {
     }
 
     @RequestMapping("/main")
-    public String list(Model model, HttpServletRequest request) {
+    public String list(Model model, HttpServletRequest request) throws Exception{
         int empId = (int) request.getAttribute("id");
 
         if (empId == 0) {
@@ -76,20 +79,39 @@ public class AttendController {
 
         List<AttendDTO> attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
         List<Map<String, Object>> statisticsByYear = attendService.getAttendanceStatisticsThisYear(empId);
+        List<Map<String, Object>> statisticsByMonth = attendService.getMonthlyAttendanceStatisticsThisMonth(empId);
+        List<Map<String, Object>> statisticsByWeek = attendService.getWeeklyAttendanceStatisticsThisWeek(empId);
+
         BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
 
         BigDecimal totalWorkHours = attendService.getTotalWorkHoursThisYear(empId);
         int workDays = attendService.getWorkDaysThisYear(empId);
         BigDecimal correctionAverage = workDays > 0 ? totalWorkHours.divide(new BigDecimal(workDays), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
 
+        // 근태 기록을 DB에서 가져오기
+        List<AttendDTO> attendList = attendService.selectByEmpId(empId);
+        ObjectMapper mapper = new ObjectMapper();
+        String attendListJson = mapper.writeValueAsString(attendList);
+
+        //휴가 기록을 DB에서 가져오기
+        List<LeavesDTO> leavesList = leavesService.selectLeavesByEmpId(empId);
+
+        // 연장 근무 기록을 DB에서 가져오기
+        List<OverTimeDTO> overtimesList = workService.selectOverTimeListByEmpId(empId);
+
         model.addAttribute("employee", employee);
         model.addAttribute("attendanceListByDate", attendanceListByDate);
         model.addAttribute("statisticsByYear", statisticsByYear);
+        model.addAttribute("statisticsByMonth", statisticsByMonth);
+        model.addAttribute("statisticsByWeek", statisticsByWeek);
         model.addAttribute("canUseLeaves", canUseLeaves);
         model.addAttribute("currentDate", new Date());
         model.addAttribute("totalWorkHours", totalWorkHours);
         model.addAttribute("workDays", workDays);
         model.addAttribute("correctionAverage", correctionAverage);
+        model.addAttribute("leavesList", leavesList);
+        model.addAttribute("attendListJson", attendListJson);
+        model.addAttribute("overtimesList", overtimesList);
 
         return "/attend/attendMain";
     }

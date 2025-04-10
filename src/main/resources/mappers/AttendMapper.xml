@@ -58,6 +58,42 @@
         ORDER BY month
     </select>
 
+    <select id="getMonthlyAttendanceStatisticsThisMonth" parameterType="map" resultMap="attendanceStatsResultMap">
+        SELECT
+            EXTRACT(MONTH FROM work_date) AS month,
+            SUM(CASE WHEN status = '지각' THEN 1 ELSE 0 END) AS tardyCount,
+            SUM(CASE WHEN status = '조퇴' THEN 1 ELSE 0 END) AS earlyLeaveCount,
+            SUM(CASE WHEN status = '결근' THEN 1 ELSE 0 END) AS absenteeismCount,
+            SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS vacationCount,
+            SUM(work_hours) AS workHours,
+            COUNT(DISTINCT CASE WHEN status != '결근' THEN work_date END) AS workDays
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND YEAR(work_date) = YEAR(CURDATE())
+          AND MONTH(work_date) = MONTH(CURDATE())
+        GROUP BY EXTRACT(MONTH FROM work_date)
+        ORDER BY month
+    </select>
+
+    <!-- 특정 직원의 주간 근태 통계 조회 -->
+    <select id="getWeeklyAttendanceStatisticsThisWeek" parameterType="map" resultMap="attendanceStatsResultMap">
+        SELECT
+            DATE_FORMAT(work_date, '%Y-%u') AS week,
+            SUM(CASE WHEN status = '지각' THEN 1 ELSE 0 END) AS tardyCount,
+            SUM(CASE WHEN status = '조퇴' THEN 1 ELSE 0 END) AS earlyLeaveCount,
+            SUM(CASE WHEN status = '결근' THEN 1 ELSE 0 END) AS absenteeismCount,
+            SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS vacationCount,
+            SUM(work_hours) AS totalWorkHours,
+            COUNT(DISTINCT CASE WHEN status != '결근' THEN work_date END) AS workDays
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND YEAR(work_date) = YEAR(CURDATE())
+          AND WEEK(work_date, 1) = WEEK(CURDATE(), 1) -- ISO 주차 사용
+        GROUP BY DATE_FORMAT(work_date, '%Y-%u')
+        ORDER BY week
+    </select>
+
+
     <select id="selectTotalWorkHoursThisYear" resultType="BigDecimal">
         SELECT SUM(work_hours)
         FROM attendance
@@ -72,11 +108,6 @@
                   AND YEAR(work_date) = YEAR(CURDATE())
     </select>
 
-    <select id="getWorkSchedules" resultType="map">
-        SELECT work_date, start_time, end_time, work_type
-        FROM work_schedules
-        WHERE emp_id = #{empId}
-    </select>
 
 
 </mapper>
