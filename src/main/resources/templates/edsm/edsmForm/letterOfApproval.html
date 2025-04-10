@@ -287,19 +287,19 @@
 
 
 </div>
-
+</div>
 
 <script th:inline="javascript">
 
   $(document).ready(function() {
     //작성자 정보 전역변수설정
     //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
-    var drafter = {
+    let drafter = {
       id: /*[[${employee.empNum}]]*/,
       position: /*[[${employee.positionTitle}]]*/,
       name: /*[[${employee.name}]]*/
     };
-    var storedValue = [[${documentFormId}]];
+    let storedValue = [[${documentFormId}]];
     if (storedValue) {
       $("#formSelect").val(storedValue);
     }

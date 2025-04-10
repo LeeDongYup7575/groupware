@@ -11,6 +11,7 @@ import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,9 @@ public class EdsmFormService {
 
     @Autowired
     private EmployeesService empService;
+
+    @Autowired
+    private EdsmFilesService edsmFilesService;
 
     //현재시간 가져오기
     public String getCurrentTime() {
@@ -53,7 +57,8 @@ public class EdsmFormService {
 
     }
     //업무연락 저장 서비스
-    public boolean insertByEdsmDocument(int edsmFormId, String draftId, String title, String content, String retentionPeriod, String securityGrade, String writerPosition, String writerName, String approvalLine, MultipartFile[] fileAttachment) {
+    @Transactional
+    public boolean insertByEdsmDocument(int edsmFormId, String draftId, String title, String content, String retentionPeriod, String securityGrade, String writerPosition, String writerName, String approvalLine, MultipartFile[] fileAttachment) throws Exception {
     //전자결재 테이블 저장
         // 문서 DTO 생성 및 값 설정
         EdsmDocumentDTO edsmDocumentDTO = new EdsmDocumentDTO();
@@ -68,6 +73,9 @@ public class EdsmFormService {
         // 문서 삽입 후 자동 생성된 id를 bcdto에 설정 (selectKey 사용)
         int result1 = edao.insertByedsm_document(edsmDocumentDTO);
         int edsmDocumentId = edsmDocumentDTO.getId();
+
+        //첨부파일 저장
+        edsmFilesService.getFilesInsert(edsmDocumentId,edsmFormId,fileAttachment);
 
         //업무연락 테이블에 정보 저장
         EdsmBusinessContactDTO edsmBusinessContactDTO = new EdsmBusinessContactDTO();
@@ -118,7 +126,8 @@ public class EdsmFormService {
     }
 
     //지출결의서 저장 서비스
-    public boolean insertByCash (int edsmFormId, String draftId, String title, String content, String retentionPeriod, String securityGrade, String writerPosition, String writerName,String accountingDate, String bank, String bankAccount, String spenderId, String approvalLine, MultipartFile[] fileAttachment){
+    @Transactional
+    public boolean insertByCash (int edsmFormId, String draftId, String title, String content, String retentionPeriod, String securityGrade, String writerPosition, String writerName,String accountingDate, String bank, String bankAccount, String spenderId, String approvalLine, MultipartFile[] fileAttachment) throws Exception {
         // 문서 DTO 생성 및 값 설정
         EdsmDocumentDTO edsmDocumentDTO = new EdsmDocumentDTO();
         edsmDocumentDTO.setEdsmFormId(edsmFormId);
@@ -132,6 +141,10 @@ public class EdsmFormService {
         // 문서 삽입 후 자동 생성된 id를 bcdto에 설정 (selectKey 사용)
         int result1 = edao.insertByedsm_document(edsmDocumentDTO);
         int edsmDocumentId = edsmDocumentDTO.getId();
+
+        //첨부파일 저장
+        edsmFilesService.getFilesInsert(edsmDocumentId,edsmFormId,fileAttachment);
+
 
         //지출결의서 테이블에 정보 저장
         EdsmCashDisbuVoucherDTO edsmCashDisbuVoucherDTO = new EdsmCashDisbuVoucherDTO();
@@ -189,7 +202,8 @@ public class EdsmFormService {
 
 
     //품의서 저장 서비스
-    public boolean insertLetterOfApproval(int edsmFormId, String drafterId, String title, String content, String retentionPeriod, String securityGrade, String writerPosition, String writerName, String expectedCost, String approvalLine, MultipartFile[] fileAttachment) {
+    @Transactional
+    public boolean insertLetterOfApproval(int edsmFormId, String drafterId, String title, String content, String retentionPeriod, String securityGrade, String writerPosition, String writerName, String expectedCost, String approvalLine, MultipartFile[] fileAttachment) throws Exception {
         // 문서 DTO 생성 및 값 설정
         EdsmDocumentDTO edsmDocumentDTO = new EdsmDocumentDTO();
         edsmDocumentDTO.setEdsmFormId(edsmFormId);
@@ -203,6 +217,10 @@ public class EdsmFormService {
         // 문서 삽입 후 자동 생성된 id를 bcdto에 설정 (selectKey 사용)
         int result1 = edao.insertByedsm_document(edsmDocumentDTO);
         int edsmDocumentId = edsmDocumentDTO.getId();
+
+        //첨부파일 저장
+        edsmFilesService.getFilesInsert(edsmDocumentId,edsmFormId,fileAttachment);
+
 
         //품의서 테이블에 정보 저장
         EdsmLetterOfApprovalDTO edsmLetterOfApprovalDTO = new EdsmLetterOfApprovalDTO();
