@@ -37,10 +37,6 @@ public class AttendDAO {
     public int getWorkDaysThisYear(int empId) {
         return mybatis.selectOne("com.example.projectdemo.domain.attend.dao.AttendDAO.selectWorkDaysThisYear", empId);
     }
-    // 근무 일정 조회
-    public List<Map<String, Object>> getWorkSchedules(int empId) {
-        return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getWorkSchedules", empId);
-    }
 
     public List<Map<String, Object>> getMonthlyAttendanceStatistics(int empId, int year) {
         Map<String, Object> params = new HashMap<>();
@@ -48,6 +44,14 @@ public class AttendDAO {
         params.put("year", year);
 
         return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getMonthlyAttendanceStatistics", params);
+    }
+
+    public List<Map<String, Object>> getMonthlyAttendanceStatisticsThisMonth(int empId) {
+        return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getMonthlyAttendanceStatisticsThisMonth", empId);
+    }
+
+    public List<Map<String, Object>> getWeeklyAttendanceStatisticsThisWeek(int empId) {
+        return mybatis.selectList("com.example.projectdemo.domain.attend.dao.AttendDAO.getWeeklyAttendanceStatisticsThisWeek", empId);
     }
 
 }

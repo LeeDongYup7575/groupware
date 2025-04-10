@@ -59,6 +59,12 @@ public class WorkController {
 
     @RequestMapping("/overTimeForm")
     public String overTimeForm(Model model, HttpServletRequest request) {
+        int empId = (int) request.getAttribute("id");
+
+        if (empId == 0) { //예외처리
+            return "redirect:/attend/main";
+        }
+
         String empNum = (String)request.getAttribute("empNum");
 
         if (empNum == null) { //예외처리
@@ -80,10 +86,38 @@ public class WorkController {
             empList.add(list_emp);
         }
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        int year = Year.now().getValue();
+        int currentMonth = LocalDate.now().getMonthValue();
+
+        // 연도 내 각 월별 연장/휴일근무시간 데이터를 가져온다.
+        List<Map<String, Object>> overtimeHoursList = workService.getMonthlyOvertimeHours(empId, year);
+
+        // 현재 월의 총합을 계산
+        double currentMonthTotalOvertime = 0;
+        for (Map<String, Object> data : overtimeHoursList) {
+            Integer month = (Integer) data.get("month");
+            if (month != null && month == currentMonth) {
+                Object totalHoursObj = data.get("totalHours");
+                double hours = 0;
+                if (totalHoursObj == null || totalHoursObj.toString().trim().isEmpty()) {
+                    hours = 0; // null 이거나 빈 문자열인 경우 0으로 처리
+                } else if (totalHoursObj instanceof Number) {
+                    hours = ((Number) totalHoursObj).doubleValue();
+                } else {
+                    try {
+                        hours = Double.parseDouble(totalHoursObj.toString());
+                    } catch (NumberFormatException e) {
+                        hours = 0; // 파싱 에러 발생 시 0으로 처리
+                    }
+                }
+                currentMonthTotalOvertime += hours;
+            }
+        }
 
         model.addAttribute("empList", empList);
         model.addAttribute("employee", employee);
         model.addAttribute("today", today);
+        model.addAttribute("currentMonthTotalOvertime", currentMonthTotalOvertime);
 
         return "/work/overTimeForm";
     }

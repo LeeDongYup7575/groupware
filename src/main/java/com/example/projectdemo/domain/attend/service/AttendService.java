@@ -41,6 +41,14 @@ public class AttendService {
         return thisYearStatistics;
     }
 
+    public List<Map<String, Object>> getMonthlyAttendanceStatisticsThisMonth(int empId) {
+        return dao.getMonthlyAttendanceStatisticsThisMonth(empId);
+    }
+
+    public List<Map<String, Object>> getWeeklyAttendanceStatisticsThisWeek(int empId) {
+        return dao.getWeeklyAttendanceStatisticsThisWeek(empId);
+    }
+
     public List<Map<String, Object>> getMonthlyAttendanceStatistics(int empId,int year) {
         return dao.getMonthlyAttendanceStatistics(empId, year);
     }
@@ -55,8 +63,6 @@ public class AttendService {
         return dao.getWorkDaysThisYear(empId);
     }
 
-    public List<Map<String, Object>> getWorkSchedules(int empId) {
-        return dao.getWorkSchedules(empId);
-    }
+
 
 }

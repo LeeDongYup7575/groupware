@@ -190,7 +190,7 @@
                     <tr class="estimation-row">
                         <td>신청 후 예상</td>
                         <td>136시간</td>
-                        <td><span class="overtime-hours expected">3시간</span></td>
+                        <td><span class="overtime-hours expected">${currentMonthTotalOvertime}시간</span></td>
                         <td>139시간</td>
                     </tr>
                     </tbody>
@@ -250,6 +250,52 @@
 </div>
 
 <script>
+    // 연장 근무시간(신청 후 예상) 갱신 함수
+    function recalcEstimation() {
+        // 기본 값 (서버나 다른 방식으로 받아올 수도 있음)
+        const baseRegular = 136;  // 정규 근무 시간 (현재 누적)
+        const baseOvertime = 1;   // 현재 누적 연장 근무 시간
+        const baseTotal = 137;    // 총 근무 시간 (정규+연장)
+
+        // 선택된 시작/종료 시간 값 읽기
+        let startHour = parseInt($("#startHour").val(), 10);
+        let startMinute = parseInt($("#startMinute").val(), 10);
+        let endHour = parseInt($("#endHour").val(), 10);
+        let endMinute = parseInt($("#endMinute").val(), 10);
+
+        // 시간을 분 단위로 변환
+        let startInMinutes = startHour * 60 + startMinute;
+        let endInMinutes = endHour * 60 + endMinute;
+
+        // 연장근무로 신청한 시간(분)
+        let newOvertimeMinutes = endInMinutes - startInMinutes;
+        if (newOvertimeMinutes < 0) {
+            newOvertimeMinutes = 0;  // 혹은 잘못된 경우 에러 처리를 추가 가능
+        }
+
+        // 분을 시간 단위로 변환 (소수점 포함)
+        let newOvertimeHours = newOvertimeMinutes / 60;
+
+        // 예상 연장 근무 시간 = 현재 누적 + 새로 신청한 연장 근무 시간
+        let estimatedOvertime = baseOvertime + newOvertimeHours;
+
+        // 예상 총 근무시간 = 정규 근무 + 예상 연장 근무
+        let estimatedTotal = baseRegular + estimatedOvertime;
+
+        // 표시를 위해 반올림 처리 (필요에 따라 Math.floor, Math.ceil 등 사용)
+        estimatedOvertime = Math.round(estimatedOvertime);
+        estimatedTotal = Math.round(estimatedTotal);
+
+        // 테이블의 "신청 후 예상" 부분 갱신
+        // 여기서는 td의 순서를 기준으로 [정규근무, 연장근무(스팬), 총 근무시간]으로 처리
+        let $estimationRow = $(".estimation-row");
+        $estimationRow.find("td").eq(1).text(baseRegular + "시간");
+        $estimationRow.find(".overtime-hours.expected").text(estimatedOvertime + "시간");
+        $estimationRow.find("td").eq(3).text(estimatedTotal + "시간");
+    }
+
+    // 선택한 연장근무 시간 변경시 계산 함수 실행 (drop-down 변경 이벤트에 바인딩)
+    $("#startHour, #startMinute, #endHour, #endMinute").on("change", recalcEstimation);
     $(document).ready(function() {
         // 드롭다운 메뉴
         $('.dropdown-header').click(function() {
@@ -345,6 +391,7 @@
             yearSuffix: '년',
             firstDay: 0
         });
+        recalcEstimation();
     });
 </script>
 </body>

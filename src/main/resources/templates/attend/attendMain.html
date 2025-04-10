@@ -6,6 +6,8 @@
     <title>TECH X - 근태 관리</title>
     <link rel="stylesheet" href="/assets/css/attend/attendMain.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 </head>
 <body>
 <header>
@@ -134,65 +136,178 @@
                                 <span th:text="${attendance.checkOut} + '  퇴근'"></span>
                             </li>
                         </ul>
-
-
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="section">
+            <h2>이번 주 근무 정보</h2>
+
+            <!-- 캘린더 형식으로 표시 -->
+            <div id="weekly-calendar" ></div>
+        </div>
+
+        <div class="section">
+            <h2>이번 달 근무 통계</h2>
+
+            <!-- 차트 형식으로 표시 -->
+            <canvas id="monthlyStatsChart" style="width: 100%;height: 400px;"></canvas>
+        </div>
+
+
     </div>
 </div>
 
-<script>
+<script id="attend-data" type="text/javascript" th:inline="javascript">
+    var attendList = JSON.parse(/*[[${attendListJson}]]*/ '[]');
+    var leavesList = /*[[${leavesList}]]*/ [];
+    var overtimesList = /*[[${overtimesList}]]*/ [];
+
+
+    // 월간 통계 데이터
+    var statisticsByMonth = /*[[${statisticsByMonth}]]*/ [];
+
+    // FullCalendar 이벤트 데이터 포맷으로 변환
+    var weeklyEvents = [];
+
+    for (var i = 0; i < attendList.length; i++) {
+        var record = attendList[i];
+
+        if (record.checkIn) {
+            const dateStr = new Date(record.workDate).toISOString().split('T')[0];
+            weeklyEvents.push({
+                title: '출근',
+                start: `${dateStr}T${record.checkIn}`,
+                end: record.checkOut ? `${dateStr}T${record.checkOut}` : null,
+                color: '#4CAF50'
+            });
+        }
+    }
+    for (var i = 0; i < leavesList.length; i++) {
+        var leave = leavesList[i];
+
+        if (leave.status === '승인') {
+            const dateStr = new Date(leave.startDate).toISOString().split('T')[0];
+            weeklyEvents.push({
+                title: '연차',
+                start: dateStr,
+                allDay: true,
+                color: '#FF9800'
+            });
+        }
+    }
+    for (var i = 0; i < overtimesList.length; i++) {
+        var overtime = overtimesList[i];
+
+        if (overtime.status === '승인') {
+            weeklyEvents.push({
+                title: '연장근무',
+                start: overtime.workDate,
+                allDay: true,
+                color: '#2196F3'
+            });
+        }
+    }
+
+    // 월간 통계 차트 데이터
+    var chartLabels = ['지각', '조퇴', '결근', '연차'];
+    var chartData = [
+        statisticsByMonth.reduce((sum, item) => sum + (item.tardyCount || 0), 0),
+        statisticsByMonth.reduce((sum, item) => sum + (item.earlyLeaveCount || 0), 0),
+        statisticsByMonth.reduce((sum, item) => sum + (item.absenteeismCount || 0), 0),
+        statisticsByMonth.reduce((sum, item) => sum + (item.vacationCount || 0), 0)
+    ];
+    /*]]>*/
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('weekly-calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridWeek',
+            locale: 'ko',
+            height: 'auto',
+            aspectRatio: 1.8,
+            headerToolbar: {
+                left: '',
+                center: 'title',
+                right: ''
+            },
+            events: weeklyEvents
+        });
+        calendar.render();
+
+        const ctx = document.getElementById('monthlyStatsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: '건수',
+                    data: chartData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(255, 205, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '횟수'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 드롭다운
+        const dropdownHeader = document.querySelector('.dropdown-header');
+        if (dropdownHeader) {
+            dropdownHeader.addEventListener('click', function () {
+                this.parentElement.classList.toggle('open');
+            });
+        }
+
+        // 시간 및 날짜
+        updateCalendarDate();
+    });
+
     document.querySelector(".request-btn").onclick = function() {
         location.href = "/works/overTimeForm";
     };
-
 
     document.querySelector(".add-button").onclick = function() {
         location.href = "/leaves/leavesForm";
     };
 
-    // 드롭다운 메뉴 기능
-    document.addEventListener('DOMContentLoaded', function() {
-        const dropdownHeader = document.querySelector('.dropdown-header');
-        dropdownHeader.addEventListener('click', function() {
-            this.parentElement.classList.toggle('open');
-        });
-    });
-
-
-    function updateTime(){
+    function updateTime() {
         var now = new Date();
-        // 브라우저의 지역 설정에 따라 시간 형식을 자동으로 변환
         document.getElementById("time").innerHTML = now.toLocaleTimeString();
     }
-
-    // 1초마다 업데이트
     setInterval(updateTime, 1000);
-
-    // 페이지 로드 시 바로 한 번 실행
     updateTime();
 
-    // 현재 날짜의 월, 일, 요일을 표시하는 함수
     function updateCalendarDate() {
         var now = new Date();
-
-        // 월, 일, 요일
-        var month = now.getMonth() + 1;  // 0~11 범위라서 1을 더해줍니다.
-        var day = now.getDate();
-        var weekday = now.toLocaleString('ko-KR', { weekday: 'long' });  // 요일을 한글로 표시
-
-        // 해당 요소에 값 삽입
-        document.getElementById("month").textContent = month + '월';
-        document.getElementById("day").textContent = day;
-        document.getElementById("weekday").textContent = weekday;
+        document.getElementById("month").textContent = (now.getMonth() + 1) + '월';
+        document.getElementById("day").textContent = now.getDate();
+        document.getElementById("weekday").textContent = now.toLocaleString('ko-KR', { weekday: 'long' });
     }
-
-    // 페이지 로드 시 날짜 업데이트
-    updateCalendarDate();
-
-
 </script>
+
+
 </body>
 </html>
