@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class personalContactDTO {
-    private int id;
-    private int empId;
+public class PersonalContactDTO {
+    private Integer id;
+    private Integer empId;
     private String name;
     private String email;
     private String phone;

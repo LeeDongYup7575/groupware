@@ -21,16 +21,76 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 주소 추가 취소 버튼
     document.querySelector('.contact-cancel-btn').addEventListener('click', function () {
+        resetContactForm()
+
         document.getElementById('contact-modal').classList.add('hidden');
     });
     // Esc 키 눌렀을 때 모달 닫기
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
+            resetContactForm()
+
             document.getElementById('contact-modal').classList.add('hidden');
         }
     });
 
+    //  개인 주소록 연락처 등록 메모 글자 수 업데이트
+    document.getElementById('memoInput').addEventListener('input', function () {
+        const currentLength = this.value.length;
+        document.getElementById('char-count').textContent = currentLength;
+    });
+
+
+    // 개인주소록 주소 저장
+    document.getElementById('saveContactBtn').addEventListener('click', function () {
+        console.log("버튼 클릭");
+        const name = document.getElementById('nameInput').value.trim();
+        const email = document.getElementById('emailInput').value;
+        const phone = document.getElementById('phoneInput').value;
+        const memo = document.getElementById('memoInput').value;
+
+        if(!name) {
+            alert('이름은 필수 입력 항목입니다.');
+            document.getElementById('nameInput').focus();
+            return;
+        }
+
+        const contactData = { name, email, phone, memo };
+
+        fetch('/api/contact/personal/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(contactData)
+        })
+            .then(response => {
+                resetContactForm()
+
+                if (response.status === 201) {
+                    alert('주소가 저장되었습니다.');
+                    // 여기서 모달 닫기나 리스트 새로고침 같은 후처리 추가 가능
+                    document.getElementById('contact-modal').classList.add('hidden');
+
+                    loadContacts('personal', 'all');
+                    updateActiveSidebarItem('personal', 'all');
+                } else {
+                    alert('저장에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('저장 중 오류 발생:', error);
+                alert('서버 오류로 저장에 실패했습니다.');
+            });
+    });
 });
+
+// 개인 주소록 연락처 추가 input 초기화
+function resetContactForm() {
+    document.getElementById('nameInput').value = '';
+    document.getElementById('emailInput').value = '';
+    document.getElementById('phoneInput').value = '';
+    document.getElementById('memoInput').value = '';
+    document.getElementById('char-count').textContent = '0';
+}
 
 // 부서 목록 불러오기
 function fetchDepartments() {
@@ -118,7 +178,7 @@ function renderContacts(data, tab) {
         tr.innerHTML = `
             <td class="cel"></td>
             <td class="name-col">${contact.name}</td>
-            <td>${contact.internalEmail}</td>
+            <td>${tab === 'shared' ? contact.internalEmail : contact.email || ''}</td>
             <td>${contact.phone}</td>
             <td class="info-col">${tab === 'shared' ? contact.depName : contact.memo || ''}</td>
         `;

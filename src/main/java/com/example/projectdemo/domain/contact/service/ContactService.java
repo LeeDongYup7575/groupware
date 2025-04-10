@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.contact.service;
 
 import com.example.projectdemo.domain.contact.dto.EmployeeContactDTO;
+import com.example.projectdemo.domain.contact.dto.PersonalContactDTO;
 import com.example.projectdemo.domain.contact.mapper.ContactMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,4 +26,21 @@ public class ContactService {
     public List<EmployeeContactDTO> getSharedContactsByDepartment(String depName){
         return contactMapper.findEmpContactsByDepartment(depName);
     }
+
+    /**
+     * 개인 주소록(사원 연락처) 조회
+     */
+    public List<PersonalContactDTO> getPersonalContactsByEmpId(Integer empId) {
+        return contactMapper.findPersonalContactsByEmpId(empId);
+    }
+
+    /**
+     * 개인 주소록에 주소 추가
+     */
+    public void addPersonalContact(Integer empId, PersonalContactDTO contact) {
+        contact.setEmpId(empId);
+        contactMapper.insertPersonalContact(contact);
+    }
+
+
 }
