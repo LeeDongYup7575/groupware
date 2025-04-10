@@ -28,7 +28,7 @@
         .container {
             width: 90%;
             max-width: 1200px;
-            margin: 2rem auto;
+            margin: 100px auto;
             display: grid;
             grid-template-columns: 1fr 350px;
             gap: 20px;
@@ -322,8 +322,13 @@
             }
         }
     </style>
+
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
 </head>
 <body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
 <div class="container">
     <div class="faq-section">
         <h2 class="section-title">자주 묻는 질문 (FAQ)</h2>
@@ -913,5 +918,9 @@
         });
     });
 </script>
+
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+
 </body>
 </html>
