@@ -177,4 +177,48 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 필터를 적용한 사원 조회 (페이지네이션 포함) -->
+    <select id="selectEmployeesWithFilters" parameterType="java.util.Map" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT
+        <include refid="employeeColumns" />
+        FROM
+        employees
+        <where>
+            <if test="searchTerm != null and searchTerm != ''">
+                (name LIKE CONCAT('%', #{searchTerm}, '%')
+                OR emp_num LIKE CONCAT('%', #{searchTerm}, '%')
+                OR email LIKE CONCAT('%', #{searchTerm}, '%'))
+            </if>
+            <if test="deptId != null">
+                AND dep_id = #{deptId}
+            </if>
+            <if test="posId != null">
+                AND pos_id = #{posId}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 필터를 적용한 사원 수 조회 -->
+    <select id="countEmployeesWithFilters" parameterType="java.util.Map" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        employees
+        <where>
+            <if test="searchTerm != null and searchTerm != ''">
+                (name LIKE CONCAT('%', #{searchTerm}, '%')
+                OR emp_num LIKE CONCAT('%', #{searchTerm}, '%')
+                OR email LIKE CONCAT('%', #{searchTerm}, '%'))
+            </if>
+            <if test="deptId != null">
+                AND dep_id = #{deptId}
+            </if>
+            <if test="posId != null">
+                AND pos_id = #{posId}
+            </if>
+        </where>
+    </select>
+
 </mapper>

@@ -46,14 +46,10 @@
       <li><a th:href="@{/attend/main}"><span class="sidebar-icon">⏰</span> 근무/경비처리</a></li>
       <li><a th:href="@{/edsm/main}"><span class="sidebar-icon">📝</span> 전자결재</a></li>
       <li><a href="#"><span class="sidebar-icon">👥</span> 조직도</a></li>
-      <li>
-        <a href="#" id="adminLink"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a>
+      <!-- 관리자 페이지 인터셉터로 권한 확인 후 연결됩니당 -->
+      <li th:if="${isAdmin}">
+        <a th:href="${adminUrl}" id="adminLink"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a>
       </li>
-<!--      <li th:if="${#request.getAttribute('role') == 'ROLE_ADMIN'}">-->
-<!--        <a href="/admin/dashboard">-->
-<!--          <span class="sidebar-icon">⚙️</span> 관리자 페이지-->
-<!--        </a>-->
-<!--      </li>-->
       <li><a th:href="@{/faq}"><span class="sidebar-icon">❓</span> FAQ</a></li>
     </ul>
   </div>
