@@ -7,21 +7,19 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Map;
 
 @Mapper
 public interface EmployeesMapper {
 
-    int updateEmployee(EmployeesDTO employee);
-
-    /**
-     * 직원 비활성화 (관리자용)
-     * enabled 필드를 false로 설정
-     */
-    int deactivateEmployee(@Param("id") Integer id);
-
     // 사원 전체 조회
     List<EmployeesDTO> selectEmpAll();
+
+    // 필터를 적용한 사원 조회 (페이지네이션 포함)
+    List<EmployeesDTO> selectEmployeesWithFilters(Map<String, Object> params);
+
+    // 필터를 적용한 사원 수 조회
+    int countEmployeesWithFilters(Map<String, Object> params);
 
     // 사원번호로 직원 조회
     EmployeesDTO findByEmpNum(@Param("empNum") String empNum);
@@ -72,4 +70,9 @@ public interface EmployeesMapper {
     // 마이페이지 회원정보(프로필이미지, 전화번호, 개인이메일) 수정
     int updateEmpInfo(@Param("updatedEmp") EmployeesInfoUpdateDTO updatedEmp);
 
+    // 직원 정보 업데이트 (관리자용)
+    int updateEmployee(EmployeesDTO employee);
+
+    // 직원 비활성화 (관리자용)
+    int deactivateEmployee(@Param("id") Integer id);
 }

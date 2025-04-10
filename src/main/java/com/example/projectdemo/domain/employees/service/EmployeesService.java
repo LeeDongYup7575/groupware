@@ -7,7 +7,6 @@ import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
-import com.example.projectdemo.domain.mail.service.MailService;
 import jakarta.validation.constraints.NotBlank;
 import net.crizin.KoreanCharacter;
 import net.crizin.KoreanRomanizer;
@@ -27,6 +26,7 @@ public class EmployeesService {
 
     @Autowired
     private EmployeesMapper employeeMapper;
+
     @Autowired
     private DepartmentsMapper departmentsMapper;
 
@@ -37,17 +37,63 @@ public class EmployeesService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private MailService mailService;
+    private PositionsMapper positionsMapper;
 
     private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
     private static final String CHAR_UPPER = CHAR_LOWER.toUpperCase();
     private static final String NUMBER = "0123456789";
     private static final String SPECIAL_CHARS = "^$*.[]{}()?-\"!@#%&/\\,><':;|_~`+=";
     private static final String ALL_CHARS = CHAR_LOWER + CHAR_UPPER + NUMBER + SPECIAL_CHARS;
-//private static final String ALL_CHARS = CHAR_LOWER + CHAR_UPPER + NUMBER;
     private static final SecureRandom random = new SecureRandom();
-    @Autowired
-    private PositionsMapper positionsMapper;
+
+    /**
+     * 모든 직원 목록 조회
+     */
+    public List<EmployeesDTO> getAllEmployees() {
+        List<EmployeesDTO> employees = employeeMapper.selectEmpAll();
+
+        // Fetch additional data for each employee
+        for (EmployeesDTO employee : employees) {
+            enrichEmployeeData(employee);
+        }
+
+        return employees;
+    }
+
+    /**
+     * 필터를 적용하여 직원 목록 조회
+     */
+    public List<EmployeesDTO> getEmployeesWithFilters(int page, int size, String searchTerm, Integer deptId, Integer posId) {
+        int offset = (page - 1) * size;
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("offset", offset);
+        params.put("limit", size);
+        params.put("searchTerm", searchTerm);
+        params.put("deptId", deptId);
+        params.put("posId", posId);
+
+        List<EmployeesDTO> employees = employeeMapper.selectEmployeesWithFilters(params);
+
+        // Fetch additional data for each employee
+        for (EmployeesDTO employee : employees) {
+            enrichEmployeeData(employee);
+        }
+
+        return employees;
+    }
+
+    /**
+     * 필터를 적용하여 직원 수 조회
+     */
+    public int countEmployeesWithFilters(String searchTerm, Integer deptId, Integer posId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("searchTerm", searchTerm);
+        params.put("deptId", deptId);
+        params.put("posId", posId);
+
+        return employeeMapper.countEmployeesWithFilters(params);
+    }
 
     /**
      * 이미 회원가입한 직원인지 확인
@@ -70,7 +116,27 @@ public class EmployeesService {
      */
     public EmployeesDTO findByEmpNum(String empNum) {
         EmployeesDTO employee = employeeMapper.findByEmpNum(empNum);
+        if (employee != null) {
+            enrichEmployeeData(employee);
+        }
+        return employee;
+    }
 
+    /**
+     * ID로 직원 찾기
+     */
+    public EmployeesDTO findById(Integer id) {
+        EmployeesDTO employee = employeeMapper.findById(id);
+        if (employee != null) {
+            enrichEmployeeData(employee);
+        }
+        return employee;
+    }
+
+    /**
+     * 직원 데이터 보강 (부서명, 직급명 등)
+     */
+    private void enrichEmployeeData(EmployeesDTO employee) {
         // 직원 dto 부서 이름 설정
         String depName = departmentsMapper.findById(employee.getDepId()).getName();
         employee.setDepartmentName(depName);
@@ -78,10 +144,7 @@ public class EmployeesService {
         // 직원 dto 직급 이름 설정
         String posTitle = positionsMapper.findById(employee.getPosId()).getTitle();
         employee.setPositionTitle(posTitle);
-
-        return employee;
     }
-
 
     /**
      * 회원가입 및 임시 비밀번호 생성
@@ -97,11 +160,8 @@ public class EmployeesService {
         String tempPassword = generateTempPassword();
         String encodedPassword = passwordEncoder.encode(tempPassword);
 
-        // 사내 이메일 생성
+        // 이메일 생성
         String internalEmail = generateInternalEmail(employee.getName());
-
-        // 사내 이메일 계정 등록
-        mailService.registerMailAccount(internalEmail, tempPassword);
 
         int updated = employeeMapper.updateRegistrationStatus(
                 empNum,
@@ -165,9 +225,6 @@ public class EmployeesService {
         if (updated <= 0) {
             throw new RuntimeException("비밀번호 업데이트에 실패했습니다.");
         }
-
-        // 메일 비밀번호 업데이트
-        mailService.updateMailPassword(employee.getInternalEmail(), newPassword);
     }
 
     /**
@@ -259,71 +316,29 @@ public class EmployeesService {
 
         String emailPrefix = firstName.charAt(0) + lastName; // 예: ykang
 
-        // 이메일 중복 체크 (가정: emailExists는 DB에서 중복 체크하는 메서드)
-
-        if (mailService.emailExists(emailPrefix + "@techx.kro.kr")) {
-            emailPrefix = firstName + lastName; // 예: yunjinkang
-        }
-
         return emailPrefix + "@techx.kro.kr";
-    }
-
-    /**
-     * 모든 직원 목록 조회
-     */
-    public List<EmployeesDTO> getAllEmployees() {
-        return employeeMapper.selectEmpAll();
-    }
-
-    /**
-     * ID로 직원 조회
-     */
-    public EmployeesDTO findById(Integer id) {
-        EmployeesDTO employee = employeeMapper.findById(id);
-
-        if (employee != null) {
-            // 부서 및 직급 정보 설정
-            String depName = departmentsMapper.findById(employee.getDepId()).getName();
-            employee.setDepartmentName(depName);
-
-            String posTitle = positionsMapper.findById(employee.getPosId()).getTitle();
-            employee.setPositionTitle(posTitle);
-        }
-
-        return employee;
     }
 
     /**
      * 직원 정보 업데이트 (관리자용)
      */
     @Transactional
-    public EmployeesDTO updateEmployee(EmployeesDTO employee) {
-        // 기존 직원 정보 조회
-        EmployeesDTO existingEmployee = employeeMapper.findById(employee.getId());
-
+    public EmployeesDTO updateEmployee(EmployeesDTO employeeDTO) {
+        // 업데이트 전 기존 데이터 조회
+        EmployeesDTO existingEmployee = employeeMapper.findById(employeeDTO.getId());
         if (existingEmployee == null) {
-            throw new RuntimeException("직원 정보를 찾을 수 없습니다.");
+            throw new RuntimeException("해당 직원을 찾을 수 없습니다.");
         }
 
-        // 관리자가 변경 가능한 필드만 업데이트
-        // 여기서는 직원의 기본 정보만 업데이트 (비밀번호, 토큰 등 민감한 정보는 제외)
-        updateEmployeeInfo(employee);
+        // 주요 정보만 업데이트
+        int result = employeeMapper.updateEmployee(employeeDTO);
 
-        // 업데이트된 직원 정보 반환
-        return findById(employee.getId());
-    }
-
-    /**
-     * 직원 정보 업데이트 실행 메서드
-     */
-    private void updateEmployeeInfo(EmployeesDTO employee) {
-        // 직원 정보 업데이트를 위한 MyBatis 매퍼 메서드 호출
-        // 실제 구현 시 관련 매퍼 메서드 구현 필요
-        int updated = employeeMapper.updateEmployee(employee);
-
-        if (updated <= 0) {
+        if (result <= 0) {
             throw new RuntimeException("직원 정보 업데이트에 실패했습니다.");
         }
+
+        // 업데이트된 정보 반환
+        return findById(employeeDTO.getId());
     }
 
     /**
@@ -331,17 +346,7 @@ public class EmployeesService {
      */
     @Transactional
     public boolean deactivateEmployee(Integer id) {
-        // 직원 존재 확인
-        EmployeesDTO employee = employeeMapper.findById(id);
-
-        if (employee == null) {
-            throw new RuntimeException("직원 정보를 찾을 수 없습니다.");
-        }
-
-        // 직원 비활성화 처리
-        // 실제 구현 시 관련 매퍼 메서드 구현 필요
-        int updated = employeeMapper.deactivateEmployee(id);
-
-        return updated > 0;
+        int result = employeeMapper.deactivateEmployee(id);
+        return result > 0;
     }
 }
