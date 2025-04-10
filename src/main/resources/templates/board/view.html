@@ -2,11 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{board/board-layout :: html(
         '게시글 상세',
-        ~{::style},
+        ~{::head/link},
         ~{::#contents},
         ~{::script}
       )}">
 <head>
+    <!-- summernote -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
     <title th:text="${post.title} + ' - 게시판'">게시글 제목 - 게시판</title>
     <style>
         /* 페이지별 추가 스타일 */
