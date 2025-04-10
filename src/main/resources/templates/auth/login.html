@@ -254,6 +254,9 @@
                 // 임시 비밀번호를 사용한 경우 비밀번호 변경 페이지로 이동
                 window.location.href = '/auth/change-password';
               } else {
+                // 메일 로그인
+                mailLogin(data.internalEmail, password);
+
                 // 메인 페이지로 이동
                 window.location.href = '/main';
               }
@@ -264,6 +267,22 @@
               errorMessageElement.style.display = 'block';
             });
   });
+
+  function mailLogin(user, pass) {
+    const url = `http://techx.kro.kr:8081/roundcube/?_autologin=1&_user=${encodeURIComponent(user)}&_pass=${encodeURIComponent(pass)}`;
+    const popup = window.open(
+            url,
+            'roundcubeLogin',
+            'width=1,height=1,top=99999,left=99999,resizable=no,scrollbars=no,status=no,toolbar=no,menubar=no'
+    );
+
+  }
+
+
+
+
+
+
 
   // 모든 AJAX 요청에 자동으로 인증 헤더 추가
   document.addEventListener('DOMContentLoaded', function() {
