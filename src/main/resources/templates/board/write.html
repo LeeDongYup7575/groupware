@@ -71,8 +71,42 @@
                 ['insert', ['link', 'picture']],
                 ['view', ['fullscreen', 'codeview']]
             ],
-            fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36']
+            fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36'],
+            callbacks: {
+                onImageUpload: function(files) {
+                    // 파일 업로드 처리
+                    for (let i = 0; i < files.length; i++) {
+                        uploadSummernoteImage(files[i], this);
+                    }
+                }
+            }
         });
+
+        // 이미지 업로드 함수
+        function uploadSummernoteImage(file, editor) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                url: '/api/posts/upload/image',  // 서버 이미지 업로드 엔드포인트
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')  // JWT 인증 추가
+                },
+                success: function(data) {
+                    // 서버에서 반환된 이미지 URL을 에디터에 삽입
+                    $(editor).summernote('insertImage', data.url);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus + ' : ' + errorThrown);
+                    alert('이미지 업로드에 실패했습니다.');
+                }
+            });
+        }
+
 
         // 폼 제출 이벤트 처리
         $('#postForm').on('submit', function(e) {

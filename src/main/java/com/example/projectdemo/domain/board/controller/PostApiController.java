@@ -6,12 +6,20 @@ import com.example.projectdemo.domain.board.service.PostsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -22,6 +30,9 @@ public class PostApiController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Value("${board.image.upload-dir}")
+    private String boardImageUploadDir;
 
     // === 게시글 관련 API ===
 
@@ -104,5 +115,53 @@ public class PostApiController {
                     .body(Map.of("success", false, "message", "사용자 정보 조회 중 오류가 발생했습니다."));
         }
     }
+
+    //Summernote 에디터에서 업로드한 이미지를 서버에 저장하고, 저장된 이미지의 URL을 클라이언트에 응답으로 보내주는 API
+    @PostMapping("/upload/image")
+    public ResponseEntity<?> uploadSummernoteImage(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("파일이 비어있습니다.");
+        }
+
+        try {
+            // 원본 파일명과 확장자 추출
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+
+            // 고유한 파일명 생성 (UUID 사용)
+            String newFilename = UUID.randomUUID().toString() + fileExtension;
+
+            // 년월일 폴더 구조 생성 (선택사항)
+            String datePath = new java.text.SimpleDateFormat("yyyy/MM/dd").format(new java.util.Date());
+            String savePath = boardImageUploadDir + "/" + datePath;
+
+            // 디렉토리 생성
+            File directory = new File(savePath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            // 파일 저장
+            Path targetPath = Paths.get(savePath, newFilename);
+            Files.copy(file.getInputStream(), targetPath);
+
+            // 클라이언트에서 접근 가능한 URL 생성
+            String fileUrl = "/uploaded-images/" + datePath + "/" + newFilename;
+
+            // 응답 데이터 구성
+            Map<String, String> response = new HashMap<>();
+            response.put("url", fileUrl);
+
+            return ResponseEntity.ok(response);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("파일 업로드 중 오류가 발생했습니다.");
+        }
+    }
+
 
 }
