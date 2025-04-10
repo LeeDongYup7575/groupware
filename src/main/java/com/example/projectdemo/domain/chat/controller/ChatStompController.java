@@ -2,6 +2,8 @@ package com.example.projectdemo.domain.chat.controller;
 
 import com.example.projectdemo.domain.chat.dao.MembershipDAO;
 import com.example.projectdemo.domain.chat.dto.ChatMessageDTO;
+import com.example.projectdemo.domain.chat.dto.UnreadMessage;
+import com.example.projectdemo.domain.chat.dto.UnreadNotificationDTO;
 import com.example.projectdemo.domain.chat.service.ChatMessageService;
 import com.example.projectdemo.domain.chat.service.UnreadMessageService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
@@ -63,7 +65,7 @@ public class ChatStompController {
             for (Integer memberId : memberIds) {
                 if (memberId != message.getSenderId()) {
                     unreadMessageService.saveUnreadMessage(memberId, roomId, message.getId());
-
+                    messagingTemplate.convertAndSend("/topic/chat/" + memberId, new UnreadNotificationDTO(roomId));
                 }
             }
         } catch (Exception e) {
@@ -76,7 +78,7 @@ public class ChatStompController {
     @GetMapping("/message/{roomId}")  // ✅ 채팅방의 과거 메시지 목록 조회 (GET /chat/message/{roomId})
     public List<ChatMessageDTO> getMessagesByRoom(@PathVariable int roomId) {
         List<ChatMessageDTO> list = chatMessageService.getMessagesByRoom(roomId);  // ✅ 채팅방 ID로 메시지 조회
-
+        System.out.println(list.get(0).getContent());
         if (!list.isEmpty()) {
             return list;  // ✅ 메시지가 있으면 리스트 반환
         } else {

@@ -3,18 +3,10 @@ package com.example.projectdemo.domain.edsm.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
-import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO;
-import com.example.projectdemo.domain.edsm.dto.EdsmLetterOfApprovalDTO;
-import com.example.projectdemo.domain.edsm.enums.ApprovalStatus;
-import com.example.projectdemo.domain.edsm.enums.EdsmStatus;
 import com.example.projectdemo.domain.edsm.services.EdsmFormService;
-import com.example.projectdemo.domain.edsm.services.EdsmService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -201,7 +190,7 @@ public class EdsmFormController {
                            @RequestParam("drafterName") String writerName,
                            @RequestParam("approvalLine") String approvalLine, // JSON 문자열 (추가 결재자들)
                            @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
-                           Model model, HttpServletRequest request) {
+                           Model model, HttpServletRequest request) throws Exception {
 
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String) request.getAttribute("empNum");
@@ -243,7 +232,7 @@ public class EdsmFormController {
                                @RequestParam("spender") String spenderId,
                                @RequestParam("approvalLine") String approvalLine, // JSON 문자열 (추가 결재자들)
                                @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
-                               Model model, HttpServletRequest request) {
+                               Model model, HttpServletRequest request) throws Exception {
 
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String) request.getAttribute("empNum");
@@ -283,7 +272,7 @@ public class EdsmFormController {
                                   @RequestParam("expectedCost") String expectedCost,
                                   @RequestParam("approvalLine") String approvalLine, // JSON 문자열 (추가 결재자들)
                                   @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
-                                  Model model, HttpServletRequest request) {
+                                  Model model, HttpServletRequest request) throws Exception {
 
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String) request.getAttribute("empNum");

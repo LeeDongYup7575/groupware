@@ -406,11 +406,23 @@ select {
     border: 1px dashed #ddd;
     border-radius: 4px;
     padding: 25px;
-    text-align: center;
+
     color: #888;
     font-size: 14px;
     background-color: #fafafa;
     margin-top: 10px;
+}
+
+.attachment-drop-area ul li a{
+    text-decoration-line: none;
+    color : #4a90e2;
+}
+
+.attachment-drop-area ul li{
+
+    list-style: none;
+    margin-bottom: 10px;
+
 }
 
 /* 모달 배경 */
