@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,17 +50,45 @@ public class EmployeesService {
     /**
      * 모든 직원 목록 조회
      */
+//    public List<EmployeesDTO> getAllEmployees() {
+//        List<EmployeesDTO> employees = employeeMapper.selectEmpAll();
+//
+//        // Fetch additional data for each employee
+//        for (EmployeesDTO employee : employees) {
+//            enrichEmployeeData(employee);
+//        }
+//
+//        return employees;
+//    }
+
+    /**
+     * 모든 직원 목록 조회
+     * @return 모든 직원 DTO 목록
+     */
     public List<EmployeesDTO> getAllEmployees() {
-        List<EmployeesDTO> employees = employeeMapper.selectEmpAll();
+        try {
+            List<EmployeesDTO> employees = employeeMapper.selectEmpAll();
 
-        // Fetch additional data for each employee
-        for (EmployeesDTO employee : employees) {
-            enrichEmployeeData(employee);
+            // 필요한 경우 부서와 직급 정보 추가적으로 설정
+            for (EmployeesDTO employee : employees) {
+                if (employee.getDepId() != null) {
+                    String depName = departmentsMapper.findById(employee.getDepId()).getName();
+                    employee.setDepartmentName(depName);
+                }
+
+                if (employee.getPosId() != null) {
+                    String posTitle = positionsMapper.findById(employee.getPosId()).getTitle();
+                    employee.setPositionTitle(posTitle);
+                }
+            }
+
+            return employees;
+        } catch (Exception e) {
+            System.out.println("직원 전체 목록 조회 중 오류: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-
-        return employees;
     }
-
     /**
      * 필터를 적용하여 직원 목록 조회
      */

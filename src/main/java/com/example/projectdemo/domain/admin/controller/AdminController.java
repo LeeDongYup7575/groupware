@@ -10,7 +10,7 @@ import org.springframework.web.servlet.view.RedirectView;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Value("${admin.frontend.url:http://localhost:3000}")
+    @Value("${admin.frontend.url:http://localhost:3000}") //개발환경이니까 일단 이렇게 해놓고 나중에 배포 예정
     private String adminFrontendUrl;
 
     @GetMapping
@@ -18,3 +18,4 @@ public class AdminController {
         return new RedirectView(adminFrontendUrl);
     }
 }
+

@@ -9,6 +9,7 @@ import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -423,5 +424,56 @@ public class AuthController {
                             "message", "만료되었거나 유효하지 않은 토큰입니다."
                     ));
         }
+    }
+
+    /**
+     * 현재 로그인한 사용자 정보 조회 API
+     */
+    @GetMapping("/current-user")
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String) request.getAttribute("empNum");
+
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "status", HttpStatus.UNAUTHORIZED.value(),
+                            "error", "Unauthorized",
+                            "message", "인증 정보가 없습니다."
+                    ));
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeMapper.findByEmpNum(empNum);
+
+        if (employee == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "status", HttpStatus.NOT_FOUND.value(),
+                            "error", "Not Found",
+                            "message", "사용자 정보를 찾을 수 없습니다."
+                    ));
+        }
+
+        // 기본 응답 생성
+        JwtResponseDTO userResponse = JwtResponseDTO.builder()
+                .id(employee.getId())
+                .empNum(employee.getEmpNum())
+                .name(employee.getName())
+                .email(employee.getEmail())
+                .internalEmail(employee.getInternalEmail())
+                .role(employee.getRole())
+                .departmentName(employee.getDepartmentName())
+                .positionTitle(employee.getPositionTitle())
+                .phone(employee.getPhone())
+                .profileImgUrl(employee.getProfileImgUrl())
+                .enabled(employee.isEnabled())
+                .lastLogin(employee.getLastLogin())
+                .gender(employee.getGender())
+                .hireDate(employee.getHireDate())
+                .attendStatus(employee.getAttendStatus())
+                .build();
+
+        return ResponseEntity.ok(userResponse);
     }
 }
