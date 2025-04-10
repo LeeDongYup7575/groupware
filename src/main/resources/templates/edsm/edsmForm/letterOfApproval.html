@@ -11,13 +11,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <!-- 메인 페이지 CSS -->
+  <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
+  <!-- 헤더 에셋 포함 -->
+  <th:block th:replace="fragments/header :: headerAssets"></th:block>
+  <!-- 사이드바 스타일 포함 -->
+  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 </head>
 <body>
 <!-- 헤더 -->
-<div class="header">
-  <div class="logo">TECH X</div>
-  <div class="title">전자결재</div>
-</div>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
 
 <div class="container">
   <!-- 좌측 사이드바 -->
@@ -227,9 +231,14 @@
 
         <!-- 파일첨부 영역 -->
         <div class="attachment-section">
-          <div class="attachment-links">
-          </div>
-          <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple />
+          <!-- 사용자 정의 버튼 -->
+          <label for="fileAttachment" class="file-upload-btn">
+            파일 선택
+          </label>
+          <!-- 실제 파일 입력 요소는 숨김 -->
+          <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple/>
+
+
           <div class="attachment-drop-area">
             첨부파일이 없습니다.
           </div>
@@ -411,8 +420,64 @@
       $("#approvalModal").fadeOut();
     });
 
+    // 전역 DataTransfer 객체 생성
+    let dt = new DataTransfer();
 
+    $("#fileAttachment").on("change", function() {
+      // 기존 DataTransfer 객체에 새 파일들을 추가
+      for(let i = 0; i < this.files.length; i++){
+        dt.items.add(this.files[i]);
+      }
+      // file input의 files 속성을 갱신
+      this.files = dt.files;
+      // UI 갱신
+      updateAttachmentArea();
+    });
+
+    function updateAttachmentArea(){
+      let html = "";
+      let files = dt.files;
+
+      if(files.length > 0){
+        html += "<ul>";
+        for(let i = 0; i < files.length; i++){
+          let file = files[i];
+          let fileSizeKB = Math.round(file.size / 1024);
+          html += "<li data-index='"+i+"'>"
+                  + file.name + " (" + fileSizeKB +"KB) "
+                  + "<button type='button' class='remove-file' data-index='"+i+"'>[X]</button>"
+                  + "</li>";
+        }
+        html += "</ul>";
+      } else {
+        html = "첨부파일이 없습니다.";
+      }
+
+      $(".attachment-drop-area").html(html);
+    }
+
+// 개별 파일 삭제 이벤트 처리
+    $(document).on("click", ".remove-file", function() {
+      let index = $(this).data("index");
+      // DataTransfer 객체에서 해당 인덱스의 파일 제거
+      // DataTransfer에는 직접 remove 메소드가 없으므로, 새 DataTransfer 객체를 생성하여 제외한 파일들을 추가합니다.
+      let newDt = new DataTransfer();
+      let files = dt.files;
+      for(let i = 0; i < files.length; i++){
+        if(i !== index){
+          newDt.items.add(files[i]);
+        }
+      }
+      dt = newDt;
+      // file input의 files 속성 갱신
+      $("#fileAttachment")[0].files = dt.files;
+      updateAttachmentArea();
+    });
   });
 </script>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+<!-- 공통 사이드바 스크립트 포함 -->
+<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
 </body>
 </html>
