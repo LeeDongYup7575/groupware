@@ -1,14 +1,13 @@
 package com.example.projectdemo.domain.contact.controller;
 
 import com.example.projectdemo.domain.contact.dto.EmployeeContactDTO;
+import com.example.projectdemo.domain.contact.dto.PersonalContactDTO;
 import com.example.projectdemo.domain.contact.service.ContactService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,5 +50,41 @@ public class ContactApiController {
     /**
      * 개인 주소록(사원 연락처) 조회
      */
-//    @GetMapping("/personal")
+    @GetMapping("/personal")
+    public ResponseEntity<List<PersonalContactDTO>> getPersonalContacts(HttpServletRequest request) {
+        try {
+            Integer empId = (Integer) request.getAttribute("id");
+            if (empId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            List<PersonalContactDTO> personalContacts = contactService.getPersonalContactsByEmpId(empId);
+
+            return ResponseEntity.ok(personalContacts);
+        } catch (Exception e) {
+            // 예외 발생 시 INTERNAL_SERVER_ERROR(500) 응답
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 개인 주소록에 주소 추가
+     */
+    @PostMapping("/personal/add")
+    public ResponseEntity<PersonalContactDTO> addPersonalContact(@RequestBody PersonalContactDTO contact,
+                                                                 HttpServletRequest request) {
+        try {
+            Integer empId = (Integer) request.getAttribute("id");
+            if (empId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            contactService.addPersonalContact(empId, contact);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
