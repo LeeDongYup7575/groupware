@@ -9,13 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 아이콘 사용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 메인 페이지 CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
+    <!-- 사이드바 스타일 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 </head>
 <body>
 <!-- 헤더 -->
-<div class="header">
-    <div class="logo">TECH X</div>
-    <div class="title">전자결재</div>
-</div>
+<!--<div class="header">-->
+<!--    <div class="logo">TECH X</div>-->
+<!--    <div class="title">전자결재</div>-->
+<!--</div>-->
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
 
 <!-- 좌측 사이드바 -->
 <div class="sidebar">
@@ -440,5 +448,9 @@
 
 
 </script>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+<!-- 공통 사이드바 스크립트 포함 -->
+<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
 </body>
 </html>

@@ -430,11 +430,37 @@ select {
     border: 1px dashed #ddd;
     border-radius: 4px;
     padding: 25px;
-    text-align: center;
+
     color: #888;
     font-size: 14px;
     background-color: #fafafa;
     margin-top: 10px;
+}
+.attachment-drop-area ul li{
+    list-style: none;
+}
+.file-upload-btn{
+    color: #4a90e2;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+
+    padding-right: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* 파일 입력 요소 자체는 숨김 */
+input[type="file"] {
+    display: none;
+}
+
+.remove-file{
+    background: none;
+    border: none;
+
+    cursor: pointer;
+    color: #888;
 }
 
 /* 모달 배경 */
@@ -527,4 +553,27 @@ select {
     margin-bottom: 5px;
     background: #f9f9f9;
     cursor: pointer;
+}
+
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .main-container {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .main-container {
+        margin-left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .main-container,
+    .sidebar.open ~ .main-container {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
+    }
 }

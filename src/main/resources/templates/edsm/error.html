@@ -2,9 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Error</title>
+    <!-- 메인 페이지 CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
+    <!-- 사이드바 스타일 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 </head>
 <body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
     <h1>개발자 모드 - 현재 DB 저장 에러입니다.</h1>
+    <!-- 헤더 관련 스크립트 포함 -->
+    <div th:replace="fragments/header :: headerScripts"></div>
+    <!-- 공통 사이드바 스크립트 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
 </body>
 </html>

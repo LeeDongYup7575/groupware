@@ -23,7 +23,7 @@ public class EdsmFilesController {
     @RequestMapping("/download/{sysName}/{oriName}")
     public void filesDownload(@PathVariable("sysName") String sysName, @PathVariable("oriName") String oriName) throws IOException {
 
-        String realPath = session.getServletContext().getRealPath("upload");
+        String realPath = session.getServletContext().getRealPath("edsmUpload");
         File target = new File(realPath + "/" + sysName);
         System.out.println(realPath);
         System.out.println(target);
