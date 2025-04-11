@@ -25,14 +25,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('contact-modal').classList.add('hidden');
     });
+
     // Esc 키 눌렀을 때 모달 닫기
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
-            resetContactForm()
+            const contactModal = document.getElementById('contact-modal');
+            const detailModal = document.getElementById('contact-detail-modal');
 
-            document.getElementById('contact-modal').classList.add('hidden');
+            if (!contactModal.classList.contains('hidden')) {
+                resetContactForm();
+                contactModal.classList.add('hidden');
+            }
+
+            if (!detailModal.classList.contains('hidden')) {
+                detailModal.classList.add('hidden');
+            }
         }
     });
+
 
     //  개인 주소록 연락처 등록 메모 글자 수 업데이트
     document.getElementById('memoInput').addEventListener('input', function () {
@@ -106,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
             })
                 .then(response => {
                     if (response.ok) {
-                        alert('삭제가 완료되었습니다.');
                         // 주소록 다시 불러오기
                         loadContacts('personal', 'all');
                         updateHeaderForSelection(); // 테이블 헤더 초기화
@@ -120,9 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
     });
-
-
-
 
 
     // 전체 선택 체크박스 이벤트
@@ -264,6 +270,13 @@ function renderContacts(data, tab) {
             <td class="info-col">${tab === 'shared' ? contact.depName : contact.memo || ''}</td>
         `;
 
+        // 연락처 행 클릭 감시 (상세 보기 모달 띄우기 위해)
+        tr.addEventListener('click', function (e) {
+            // 체크박스 누를 땐 무시
+            if (e.target.classList.contains('contact-checkbox')) return;
+            openDetailModal(contact, tab);
+        });
+
         tbody.appendChild(tr);
     });
 }
@@ -337,4 +350,49 @@ function updateHeaderForSelection() {
         thNameCol.textContent = '이름';
     }
 }
+
+// 연락처 상세 보기 모달 열기 닫기
+function openDetailModal(contact, tab) {
+    setFieldVisibility('detailName', contact.name);
+    setFieldVisibility('detailEmail', tab === 'shared' ? contact.internalEmail : contact.email);
+    setFieldVisibility('detailPhone', contact.phone);
+
+    if (tab === 'shared') {
+        document.getElementById('sharedOnly').style.display = '';
+        document.getElementById('personalOnly').style.display = 'none';
+
+        setFieldVisibility('detailDept', contact.depName);
+        setFieldVisibility('detailPosition', contact.posTitle);
+    } else {
+        document.getElementById('sharedOnly').style.display = 'none';
+        document.getElementById('personalOnly').style.display = '';
+
+        setFieldVisibility('detailMemo', contact.memo);
+    }
+
+    document.getElementById('contact-detail-modal').classList.remove('hidden');
+}
+
+// 연락처 상세 보기 모달 숨기기
+function closeDetailModal() {
+    document.getElementById('contact-detail-modal').classList.add('hidden');
+}
+
+// 값이 없으면 해당 form-group 숨기고, 값이 있으면 보여줌
+function setFieldVisibility(fieldId, value) {
+    const field = document.getElementById(fieldId);
+    const group = field?.closest('.form-group');
+
+    if (!field || !group) return;
+
+    if (value && value.trim() !== '') {
+        field.textContent = value;
+        group.style.display = '';
+    } else {
+        group.style.display = 'none';
+    }
+}
+
+
+
 

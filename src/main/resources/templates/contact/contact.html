@@ -95,5 +95,52 @@
   </div>
 </div>
 
+<!-- 연락처 상세 보기 모달 -->
+<div id="contact-detail-modal" class="modal-overlay hidden">
+  <div class="contact-form-container">
+    <div class="form-header">연락처 정보</div>
+
+    <div class="form-group">
+      <label>이름</label>
+      <div id="detailName"></div>
+    </div>
+
+    <div class="form-group">
+      <label>이메일</label>
+      <div id="detailEmail"></div>
+    </div>
+
+    <div class="form-group">
+      <label>전화</label>
+      <div id="detailPhone"></div>
+    </div>
+
+    <!-- 공유 주소록 전용 -->
+    <div id="sharedOnly">
+      <div class="form-group">
+        <label>부서</label>
+        <div id="detailDept"></div>
+      </div>
+      <div class="form-group">
+        <label>직급</label>
+        <div id="detailPosition"></div>
+      </div>
+    </div>
+
+    <!-- 개인 주소록 전용 -->
+    <div id="personalOnly">
+      <div class="form-group">
+        <label>메모</label>
+        <div id="detailMemo" style="white-space: pre-wrap;"></div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="contact-form-btn contact-cancel-btn" onclick="closeDetailModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
