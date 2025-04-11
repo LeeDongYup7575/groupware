@@ -606,6 +606,13 @@
                             document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                             document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
+                            // 메일 로그아웃
+                            window.open(
+                                "http://techx.kro.kr:8081/roundcube/?_task=login&_action=force-logout",
+                                "roundcubeLogout",
+                                "width=1,height=1,top=99999,left=99999,resizable=no,scrollbars=no,status=no,toolbar=no,menubar=no"
+                            );
+
                             // 인트로 페이지로 이동
                             window.location.href = '/';
                         })
