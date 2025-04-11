@@ -394,7 +394,7 @@ h3 i {
 }
 
 .fc .fc-view-harness {
-    height: auto !important;
+    height: 300px !important;
     position: relative;
     z-index: 1;
 }
