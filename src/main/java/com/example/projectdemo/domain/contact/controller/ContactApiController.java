@@ -68,7 +68,7 @@ public class ContactApiController {
     }
 
     /**
-     * 개인 주소록에 주소 추가
+     * 개인 주소록에 연락처 추가
      */
     @PostMapping("/personal/add")
     public ResponseEntity<PersonalContactDTO> addPersonalContact(@RequestBody PersonalContactDTO contact,
@@ -86,5 +86,24 @@ public class ContactApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+    /**
+     * 개인 주소록 연락처 삭제
+     */
+    @DeleteMapping("/personal/delete")
+    public ResponseEntity<Void> deletePersonalContacts(@RequestBody List<Integer> ids) {
+        try {
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.badRequest().build(); // 잘못된 요청
+            }
+
+            contactService.deletePersonalContacts(ids); // 서비스 호출
+            return ResponseEntity.ok().build(); // 성공
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 서버 오류
+        }
+    }
+
 
 }

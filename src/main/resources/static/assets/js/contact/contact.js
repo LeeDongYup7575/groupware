@@ -66,8 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 resetContactForm()
 
                 if (response.status === 201) {
-                    alert('주소가 저장되었습니다.');
-                    // 여기서 모달 닫기나 리스트 새로고침 같은 후처리 추가 가능
                     document.getElementById('contact-modal').classList.add('hidden');
 
                     loadContacts('personal', 'all');
@@ -81,6 +79,72 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('서버 오류로 저장에 실패했습니다.');
             });
     });
+
+    // 개인 주소록 삭제 이벤트
+    document.addEventListener('click', function (e) {
+        if (e.target.id === 'deleteContactsBtn') {
+            const checked = document.querySelectorAll('.contact-checkbox:checked');
+
+            if (checked.length === 0) {
+                alert('삭제할 항목을 선택해주세요.');
+                return;
+            }
+
+            if (!confirm(`${checked.length}개의 주소를 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            // 체크된 항목들의 부모 tr에서 data-id 수집
+            const ids = Array.from(checked).map(cb => Number(cb.closest('tr').dataset.id));
+
+            fetch('/api/contact/personal/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(ids)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('삭제가 완료되었습니다.');
+                        // 주소록 다시 불러오기
+                        loadContacts('personal', 'all');
+                        updateHeaderForSelection(); // 테이블 헤더 초기화
+                    } else {
+                        alert('삭제에 실패했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('삭제 중 오류 발생:', error);
+                    alert('서버 오류로 삭제에 실패했습니다.');
+                });
+        }
+    });
+
+
+
+
+
+    // 전체 선택 체크박스 이벤트
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('select-all-checkbox')) {
+            const isChecked = e.target.checked;
+            const checkboxes = document.querySelectorAll('.contact-checkbox');
+            checkboxes.forEach(cb => cb.checked = isChecked);
+        }
+    });
+
+
+    // 체크박스 변화 감지해서 헤더 동적으로 변경
+    document.addEventListener('change', function (e) {
+        // 개별 체크박스 or 전체 선택 체크박스일 때만 처리
+        if (e.target.classList.contains('contact-checkbox') || e.target.classList.contains('select-all-checkbox')) {
+            updateHeaderForSelection();
+            updateSelectAllCheckbox();
+        }
+    });
+
+
 });
 
 // 개인 주소록 연락처 추가 input 초기화
@@ -149,6 +213,7 @@ function loadContacts(tab, dept) {
         })
         .then(data => {
             renderContacts(data, tab);
+            updateHeaderForSelection(); // 테이블 헤더 초기화
         })
         .catch(error => {
             console.error(error);
@@ -162,8 +227,17 @@ function renderContacts(data, tab) {
     const tbody = document.getElementById('contactList');
     tbody.innerHTML = '';
 
-    // 테이블 헤더 텍스트 동적으로 변경
+    // info-col 헤더 변경
     document.querySelector('.contact-table thead .info-col').textContent = (tab === 'shared') ? '부서' : '메모';
+
+    // 헤더 체크박스 동적 처리
+    const headerCel = document.querySelector('.contact-table thead .cel');
+    if (tab === 'personal') {
+        headerCel.innerHTML = `<input type="checkbox" class="select-all-checkbox">`;
+    } else {
+        headerCel.innerHTML = ''; // 공유 탭이면 제거
+    }
+
 
     if (!data.length) {
         tbody.innerHTML = `<tr><td colspan="5">표시할 데이터가 없습니다.</td></tr>`;
@@ -175,8 +249,15 @@ function renderContacts(data, tab) {
 
         tr.setAttribute('data-team', contact.depName || '');
 
+        // 개인 연락처일 경우 data-id 속성 추가
+        if (tab === 'personal') {
+            tr.setAttribute('data-id', contact.id); // ✅ 추가
+        }
+
         tr.innerHTML = `
-            <td class="cel"></td>
+            <td class="cel">
+                ${tab === 'personal' ? `<input type="checkbox" class="contact-checkbox">` : ''}
+            </td>
             <td class="name-col">${contact.name}</td>
             <td>${tab === 'shared' ? contact.internalEmail : contact.email || ''}</td>
             <td>${contact.phone}</td>
@@ -214,3 +295,46 @@ window.addEventListener('popstate', function(event) {
     loadContacts(tab, dept);
     updateActiveSidebarItem(tab, dept);
 });
+
+
+// 체크 여부 판단
+function updateSelectAllCheckbox() {
+    const allCheckboxes = document.querySelectorAll('.contact-checkbox');
+    const checkedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+    const selectAll = document.querySelector('.select-all-checkbox');
+
+    if (!selectAll) return;
+
+    // 체크된 게 0개면 전체 선택 체크박스도 해제
+    if (checkedCheckboxes.length === 0) {
+        selectAll.checked = false;
+    }
+}
+
+
+// 개인주소록 연락처 체크박스 선택 시 버튼 처리
+function updateHeaderForSelection() {
+    const checkedCount = document.querySelectorAll('.contact-checkbox:checked').length;
+
+    const thNameCol = document.querySelector('.contact-table thead .name-col');
+    const thEmail = document.querySelector('.contact-table thead th:nth-child(3)');
+    const thPhone = document.querySelector('.contact-table thead th:nth-child(4)');
+    const thInfo = document.querySelector('.contact-table thead .info-col');
+
+    if (checkedCount > 0) {
+        // 나머지 헤더는 텍스트만 숨김
+        thEmail.textContent = '';
+        thPhone.textContent = '';
+        thInfo.textContent = '';
+
+        // 이름 컬럼은 삭제 버튼으로 대체
+        thNameCol.innerHTML = `<button id="deleteContactsBtn" class="delete-btn">삭제</button>`;
+    } else {
+        // 복원
+        thEmail.textContent = '이메일';
+        thPhone.textContent = '전화번호';
+        thInfo.textContent = '메모';
+        thNameCol.textContent = '이름';
+    }
+}
+

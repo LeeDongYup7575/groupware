@@ -128,6 +128,11 @@ main {
 .cel{
     width: 3%;
 }
+
+.contact-checkbox {
+    cursor: pointer;
+}
+
 .name-col{
     width: 22%;
 }
@@ -252,4 +257,12 @@ main {
 
 .add-contact-btn:focus {
     outline: none;
+}
+
+.delete-btn {
+    background-color: transparent;
+    color: #2196F3;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
 }
