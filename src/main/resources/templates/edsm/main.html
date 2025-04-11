@@ -17,11 +17,6 @@
 </head>
 <body>
 <!-- 헤더 -->
-<!--<div class="header">-->
-<!--    <div class="logo">TECH X</div>-->
-<!--    <div class="title">전자결재</div>-->
-<!--</div>-->
-<!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
 
 <!-- 좌측 사이드바 -->
@@ -37,20 +32,17 @@
             결재 상태
         </div>
         <div class="menu-items">
-            <div class="menu-item" id="main">
+            <div class="menu-item active" id="main">
                 <i class="fas fa-folder"></i>
                 전체
-                (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
             </div>
             <div class="menu-item" id="wait">
                 <i class="fas fa-spinner"></i>
                 대기
-                (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
             </div>
             <div class="menu-item" id="expected">
                 <i class="fas fa-spinner"></i>
                 예정
-                (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
             </div>
         </div>
     </div>
@@ -63,15 +55,15 @@
         <div class="menu-items">
             <div class="menu-item">
                 <i class="fas fa-pen"></i>
-                기안(내가 기안한 모든 문서- 상태상관없음)
+                기안
             </div>
             <div class="menu-item">
                 <i class="fas fa-file-signature"></i>
-                승인(내가 기안한 문서 중 승인완료된 문서등)
+                승인
             </div>
             <div class="menu-item">
                 <i class="fas fa-undo"></i>
-                반려(내가 기안한 문서 중 반려된 문서들)
+                반려
             </div>
         </div>
     </div>
@@ -79,12 +71,13 @@
 
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
-    <span>결재 상황 문서</span>
-    <!-- 상단에 문서 유형 선택 셀렉트 박스 추가 -->
-    <div class="document-type-select" style="margin-bottom: 20px;">
-        <label for="docTypeSelect">문서 유형:</label>
+    <span>나의 결재 상태</span>
+
+    <!-- 상단에 문서 유형 선택 셀렉트 박스 -->
+    <div class="document-type-select">
+        <label for="docTypeSelect"><i class="fas fa-filter"></i> 문서 유형 필터링:</label>
         <select id="docTypeSelect">
-            <option value="all">전체</option>
+            <option value="all">전체 문서 보기</option>
             <option value="업무연락">업무연락</option>
             <option value="지출결의서">지출결의서</option>
             <option value="품의서">품의서</option>
@@ -93,11 +86,9 @@
         </select>
     </div>
 
-
     <!-- 업무연락 문서 목록 -->
     <div class="doc-table-container" data-doc-type="업무연락">
-        <h4>업무연락 결재 상황</h4>
-        <br>
+        <h4>업무연락 결재 상태</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -113,40 +104,36 @@
             <tr th:if="${#lists.isEmpty(allBusinessDocument)}">
                 <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
             </tr>
-        <tr th:each="doc : ${allBusinessDocument}" th:if="${doc.status == '진행'}">
-            <td th:text="${doc.id}"></td>
-            <td>
-                <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
-            </td>
-            <td th:text="${doc.drafterName}"></td>
-            <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
-            <td th:switch="${doc.edsmFormId}">
-                <p th:case="1001">업무연락</p>
-                <p th:case="1002">지출결의</p>
-                <p th:case="1003">품의</p>
-                <p th:case="1004">휴가신청</p>
-                <p th:case="1005">연장근무</p>
-            </td>
-            <td th:text="${doc.approvalStatus}"
-
-                th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                : ((doc.approvalStatus == '승인') ? 'color:green;'
-                : ((doc.approvalStatus == '반려') ? 'color:red;'
-                : ((doc.approvalStatus == '대기') ? 'color:blue;'
-                : '')))}"></td>
-        </tr>
-        </tbody>
-
-    </table>
-        <!-- 게시판 이동 내비게이션 -->
+            <tr th:each="doc : ${allBusinessDocument}" th:if="${doc.status == '진행'}">
+                <td th:text="${doc.id}"></td>
+                <td>
+                    <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
+                </td>
+                <td th:text="${doc.drafterName}"></td>
+                <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
+                <td th:switch="${doc.edsmFormId}">
+                    <p th:case="1001">업무연락</p>
+                    <p th:case="1002">지출결의</p>
+                    <p th:case="1003">품의</p>
+                    <p th:case="1004">휴가신청</p>
+                    <p th:case="1005">연장근무</p>
+                </td>
+                <td th:text="${doc.approvalStatus}"
+                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
+                    : ((doc.approvalStatus == '승인') ? 'color:green;'
+                    : ((doc.approvalStatus == '반려') ? 'color:red;'
+                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                    : '')))}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <!-- 페이지네이션 -->
         <div class="pagination"></div>
     </div>
 
-
     <!-- 지출결의서 문서 목록 -->
     <div class="doc-table-container" data-doc-type="지출결의서">
-        <h4>지출결의서 결재 상황</h4>
-        <br>
+        <h4>지출결의서 결재 상태</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -177,21 +164,21 @@
                     <p th:case="1005">연장근무</p>
                 </td>
                 <td th:text="${doc.approvalStatus}"
-
                     th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                : ((doc.approvalStatus == '승인') ? 'color:green;'
-                : ((doc.approvalStatus == '반려') ? 'color:red;'
-                : ((doc.approvalStatus == '대기') ? 'color:blue;'
-                : '')))}"></td>
+                    : ((doc.approvalStatus == '승인') ? 'color:green;'
+                    : ((doc.approvalStatus == '반려') ? 'color:red;'
+                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                    : '')))}"></td>
             </tr>
             </tbody>
         </table>
+        <!-- 페이지네이션 -->
+        <div class="pagination"></div>
     </div>
-
 
     <!-- 품의서 결재 상황 -->
     <div class="doc-table-container" data-doc-type="품의서">
-        <h4>품의서 결재 상황</h4>
+        <h4>품의서 결재 상태</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -222,22 +209,21 @@
                     <p th:case="1005">연장근무</p>
                 </td>
                 <td th:text="${doc.approvalStatus}"
-
                     th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                : ((doc.approvalStatus == '승인') ? 'color:green;'
-                : ((doc.approvalStatus == '반려') ? 'color:red;'
-                : ((doc.approvalStatus == '대기') ? 'color:blue;'
-                : '')))}"></td>
+                    : ((doc.approvalStatus == '승인') ? 'color:green;'
+                    : ((doc.approvalStatus == '반려') ? 'color:red;'
+                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                    : '')))}"></td>
             </tr>
             </tbody>
         </table>
+        <!-- 페이지네이션 -->
+        <div class="pagination"></div>
     </div>
-
 
     <!-- 휴가신청 결재 상황 -->
     <div class="doc-table-container" data-doc-type="휴가신청서">
-        <h4>휴가신청 결재 상황</h4>
-        <br>
+        <h4>휴가신청 결재 상태</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -268,21 +254,21 @@
                     <p th:case="1005">연장근무</p>
                 </td>
                 <td th:text="${doc.approvalStatus}"
-
                     th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                : ((doc.approvalStatus == '승인') ? 'color:green;'
-                : ((doc.approvalStatus == '반려') ? 'color:red;'
-                : ((doc.approvalStatus == '대기') ? 'color:blue;'
-                : '')))}"></td>
+                    : ((doc.approvalStatus == '승인') ? 'color:green;'
+                    : ((doc.approvalStatus == '반려') ? 'color:red;'
+                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                    : '')))}"></td>
             </tr>
             </tbody>
         </table>
+        <!-- 페이지네이션 -->
+        <div class="pagination"></div>
     </div>
 
     <!-- 연장근무신청 결재 상황 -->
     <div class="doc-table-container" data-doc-type="연장근무신청서">
-        <h4>연장근무신청 결재 상황</h4>
-        <br>
+        <h4>연장근무신청 결재 상태</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -313,143 +299,215 @@
                     <p th:case="1005">연장근무</p>
                 </td>
                 <td th:text="${doc.approvalStatus}"
-
                     th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                : ((doc.approvalStatus == '승인') ? 'color:green;'
-                : ((doc.approvalStatus == '반려') ? 'color:red;'
-                : ((doc.approvalStatus == '대기') ? 'color:blue;'
-                : '')))}"></td>
+                    : ((doc.approvalStatus == '승인') ? 'color:green;'
+                    : ((doc.approvalStatus == '반려') ? 'color:red;'
+                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                    : '')))}"></td>
             </tr>
             </tbody>
         </table>
+        <!-- 페이지네이션 -->
+        <div class="pagination"></div>
     </div>
 </div>
 
-<script>
-
-    $("#main").on("click", function () {
-        location.href = "/edsm/main";
-    });
-    $("#expected").on("click", function () {
-        location.href = "/edsm/expected";
-    });
-
-    $("#wait").on("click", function () {
-        location.href = "/edsm/wait";
-    });
-    $("#progress").on("click", function () {
-        location.href = "/edsm/progress";
-    });
-
-    $("#complete").on("click", function () {
-        location.href = "/edsm/complete";
-    });
-
-    $("#create-button").on("click", function () {
-        location.href = "/edsmForm/input";
-    });
-
-
-    // 셀렉트 박스 변경 시 해당 문서 유형에 맞춰서 컨테이너 보이기/숨기기
-    $("#docTypeSelect").on("change", function() {
-        let selectedType = $(this).val();
-        if(selectedType === "all") {
-            $(".doc-table-container").show();
-        } else {
-            $(".doc-table-container").each(function() {
-                // 각 컨테이너의 data-doc-type 속성과 비교
-                let docType = $(this).data("doc-type");
-                if(docType === selectedType) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        }
-    });
-
-    // 페이지가 로드되면 '전체'를 선택한 상태로 설정
-    $("#docTypeSelect").val("all");
-    $(".doc-table-container").show();
-
-    // 페이지 당 레코드 수 (NaviStatics.java에서 정의된 값과 동일)
-    const recordsPerPage = 5;
-
-    // 네비게이터에 표시할 페이지 번호 최대 개수 (예시로 NaviStatics.naviCountPerPage 값 사용)
-    const naviCountPerPage = 5;
-
-    $(".doc-table-container").each(function(){
-        let $container = $(this);
-        let $table = $container.find("table.document-table");
-        let $rows = $table.find("tbody tr");
-        let totalRecords = $rows.length;
-        let totalPages = Math.ceil(totalRecords / recordsPerPage);
-
-        let $pagination = $container.find(".pagination");
-        if($pagination.length === 0){
-            $pagination = $('<div class="pagination"></div>');
-            $container.append($pagination);
-        }
-
-        // 현재 페이지 번호를 저장
-        let currentPage = 1;
-
-        // 페이지 그룹을 렌더링하는 함수
-        function renderPagination(page) {
-            currentPage = page;
-            $pagination.empty();
-            // 현재 페이지가 포함되는 그룹 계산
-            let groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
-            let startPage = groupIndex * naviCountPerPage + 1;
-            let endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
-
-            // 이전 그룹 버튼 표시 (현재 그룹이 첫 그룹이 아닌 경우)
-            if(startPage > 1) {
-                $pagination.append('<a href="#" class="page-link prev-group" data-page="'+(startPage-1)+'"><</a>');
-            }
-
-            // 페이지 번호 버튼 생성
-            for(let i = startPage; i <= endPage; i++){
-                $pagination.append('<a href="#" class="page-link" data-page="'+i+'">'+i+'</a>');
-            }
-
-            // 다음 그룹 버튼 표시 (마지막 페이지가 아니라면)
-            if(endPage < totalPages) {
-                $pagination.append('<a href="#" class="page-link next-group" data-page="'+(endPage+1)+'">></a>');
-            }
-
-            // 현재 페이지 버튼에 active 클래스 추가
-            $pagination.find("a.page-link").removeClass("active");
-            $pagination.find('a.page-link[data-page="'+currentPage+'"]').addClass("active");
-        }
-
-        // 실제 행을 보여주는 함수
-        function showPage(page) {
-            let start = (page - 1) * recordsPerPage;
-            let end = start + recordsPerPage;
-            $rows.hide();
-            $rows.slice(start, end).show();
-        }
-
-        // 초기 렌더링: 첫 페이지 표시
-        renderPagination(1);
-        showPage(1);
-
-        // pagination 클릭 이벤트 처리 (동적 생성된 버튼이므로 on() 사용)
-        $pagination.on("click", "a.page-link", function(e){
-            e.preventDefault();
-            let targetPage = $(this).data("page");
-            // 페이지 숫자 혹은 그룹 이동 버튼을 클릭했을 경우
-            renderPagination(targetPage);
-            showPage(targetPage);
-        });
-    });
-
-
-</script>
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
 <!-- 공통 사이드바 스크립트 포함 -->
-<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
+<script th:src="@{/assets/js/fragments/sidebar-common.js}"></script>
+
+<script>
+    $(document).ready(function() {
+        // 현재 페이지 메뉴 아이템에 active 클래스 추가
+        $("#main").addClass("active");
+
+        // 네비게이션 클릭 이벤트
+        $("#main").on("click", function () {
+            location.href = "/edsm/main";
+        });
+
+        $("#expected").on("click", function () {
+            location.href = "/edsm/expected";
+        });
+
+        $("#wait").on("click", function () {
+            location.href = "/edsm/wait";
+        });
+
+        $("#progress").on("click", function () {
+            location.href = "/edsm/progress";
+        });
+
+        $("#complete").on("click", function () {
+            location.href = "/edsm/complete";
+        });
+
+        $("#create-button").on("click", function () {
+            location.href = "/edsmForm/input";
+        });
+
+        // 셀렉트 박스 변경 시 애니메이션과 함께 문서 유형 필터링
+        $("#docTypeSelect").on("change", function() {
+            let selectedType = $(this).val();
+
+            if(selectedType === "all") {
+                $(".doc-table-container").each(function(index) {
+                    $(this).fadeIn(300 + (index * 100));
+                });
+            } else {
+                $(".doc-table-container").each(function() {
+                    let docType = $(this).data("doc-type");
+                    if(docType === selectedType) {
+                        $(this).fadeIn(300);
+                    } else {
+                        $(this).fadeOut(200);
+                    }
+                });
+            }
+        });
+
+        // 문서가 없는 테이블에 메시지 표시 함수
+        function showEmptyTableMessage() {
+            $(".doc-table-container").each(function() {
+                let $container = $(this);
+                let $table = $container.find("table.document-table");
+                let $tbody = $table.find("tbody");
+                let visibleRows = $tbody.find("tr:visible").not(".empty-message").length;
+
+                if (visibleRows === 0) {
+                    // 이미 메시지가 있는지 확인
+                    if ($tbody.find("tr.empty-message").length === 0) {
+                        $tbody.append('<tr class="empty-message"><td colspan="6">문서가 없습니다.</td></tr>');
+                    } else {
+                        $tbody.find("tr.empty-message").show();
+                    }
+                } else {
+                    // 데이터가 있으면 메시지 숨기기
+                    $tbody.find("tr.empty-message").hide();
+                }
+            });
+        }
+
+// 페이지 로드 시 실행
+        showEmptyTableMessage();
+
+// 필터링 시에도 메시지 갱신
+        $("#docTypeSelect").on("change", function() {
+            // 애니메이션 후 메시지 표시 (타이밍 조정)
+            setTimeout(showEmptyTableMessage, 350);
+        });
+
+// 페이지네이션 이벤트 후에도 메시지 확인
+        $(".pagination").on("click", "a.page-link", function() {
+            setTimeout(showEmptyTableMessage, 300);
+        });
+
+        // 페이지 로드 시 문서 컨테이너 순차적으로 표시
+        $(".doc-table-container").hide();
+        $(".doc-table-container").each(function(index) {
+            $(this).delay(index * 150).fadeIn(300);
+        });
+
+        // 초기 상태 설정
+        $("#docTypeSelect").val("all");
+
+        // 페이지네이션 설정
+        const recordsPerPage = 5;
+        const naviCountPerPage = 5;
+
+        $(".doc-table-container").each(function(){
+            let $container = $(this);
+            let $table = $container.find("table.document-table");
+            let $rows = $table.find("tbody tr");
+            let totalRecords = $rows.length;
+            let totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+            // 페이지네이션이 필요한 경우에만 표시
+            if(totalRecords > recordsPerPage) {
+                let $pagination = $container.find(".pagination");
+                if($pagination.length === 0){
+                    $pagination = $('<div class="pagination"></div>');
+                    $container.append($pagination);
+                }
+
+                // 현재 페이지 번호
+                let currentPage = 1;
+
+                // 페이지네이션 렌더링 함수
+                function renderPagination(page) {
+                    currentPage = page;
+                    $pagination.empty();
+
+                    // 현재 페이지가 포함되는 그룹 계산
+                    let groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+                    let startPage = groupIndex * naviCountPerPage + 1;
+                    let endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+                    // 이전 그룹 버튼
+                    if(startPage > 1) {
+                        $pagination.append('<a href="#" class="page-link prev-group" data-page="'+(startPage-1)+'"><i class="fas fa-angle-left"></i></a>');
+                    }
+
+                    // 페이지 번호 버튼
+                    for(let i = startPage; i <= endPage; i++){
+                        $pagination.append('<a href="#" class="page-link" data-page="'+i+'">'+i+'</a>');
+                    }
+
+                    // 다음 그룹 버튼
+                    if(endPage < totalPages) {
+                        $pagination.append('<a href="#" class="page-link next-group" data-page="'+(endPage+1)+'"><i class="fas fa-angle-right"></i></a>');
+                    }
+
+                    // 현재 페이지 버튼 활성화
+                    $pagination.find("a.page-link").removeClass("active");
+                    $pagination.find('a.page-link[data-page="'+currentPage+'"]').addClass("active");
+                }
+
+                // 페이지 표시 함수
+                function showPage(page) {
+                    let start = (page - 1) * recordsPerPage;
+                    let end = start + recordsPerPage;
+                    $rows.hide();
+                    $rows.slice(start, end).show();
+                }
+
+                // 초기 페이지 렌더링
+                renderPagination(1);
+                showPage(1);
+
+                // 페이지네이션 클릭 이벤트
+                $pagination.on("click", "a.page-link", function(e){
+                    e.preventDefault();
+                    let targetPage = $(this).data("page");
+                    renderPagination(targetPage);
+                    showPage(targetPage);
+
+                    // 해당 컨테이너로 부드럽게 스크롤
+                    $('html, body').animate({
+                        scrollTop: $container.offset().top - 100
+                    }, 300);
+                });
+            } else {
+                // 페이지네이션이 필요 없는 경우 (적은 레코드 수)
+                $rows.show();
+                $container.find(".pagination").hide();
+            }
+        });
+
+        // 테이블 행 클릭 이벤트 (제목 링크 외에도 행 전체 클릭 가능)
+        $(".document-table tbody tr").on("click", function(e) {
+            // 링크가 아닌 부분 클릭 시에만 작동
+            if (!$(e.target).is('a')) {
+                let link = $(this).find('a').attr('href');
+                if (link) {
+                    window.location.href = link;
+                }
+            }
+        });
+
+
+    });
+</script>
 </body>
 </html>

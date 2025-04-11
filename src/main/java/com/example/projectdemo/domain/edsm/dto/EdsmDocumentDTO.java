@@ -24,6 +24,15 @@ public class EdsmDocumentDTO {
     private Timestamp approvalDate;//null
     private String status;//enum
     private String approvalStatus;
+    private String drafterPosition;
+
+    public String getDrafterPosition() {
+        return drafterPosition;
+    }
+
+    public void setDrafterPosition(String drafterPosition) {
+        this.drafterPosition = drafterPosition;
+    }
 
     public String getApprovalStatus() {
         return approvalStatus;

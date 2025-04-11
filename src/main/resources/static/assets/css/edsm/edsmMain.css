@@ -8,6 +8,8 @@
 
 body {
     background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.5;
 }
 
 /* 헤더 */
@@ -17,12 +19,13 @@ body {
     padding: 10px 20px;
     border-bottom: 1px solid #e0e0e0;
     background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
     font-size: 24px;
     font-weight: bold;
-    color: #333;
+    color: #555;
     margin-right: 20px;
 }
 
@@ -40,24 +43,37 @@ body {
     padding: 20px 0;
     border-right: 1px solid #e5e5e5;
     float: left;
+    position: fixed;
+    overflow-y: auto;
+    z-index: 100;
 }
 
 .create-button {
-    background-color: #4a90e2;
+    background: linear-gradient(135deg, #4a90e2 0%, #2d70c3 100%);
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 8px;
+    padding: 12px;
     margin: 0 20px 20px 20px;
     width: calc(100% - 40px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
 }
 
-.create-button span {
-    margin-left: 5px;
+.create-button:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, #3a80d2 0%, #1e5fa8 100%);
+    box-shadow: 0 6px 15px rgba(74, 144, 226, 0.2);
+}
+
+.create-button i {
+    margin-right: 8px;
+    font-size: 14px;
 }
 
 .menu-section {
@@ -67,15 +83,20 @@ body {
 .menu-header {
     display: flex;
     align-items: center;
-    padding: 10px 15px;
-    color: #333;
-    font-weight: 500;
+    padding: 12px 15px;
+    color: #2c5282;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .menu-header i {
-    margin-right: 8px;
+    margin-right: 10px;
+    color: #4a90e2;
+}
+
+.menu-header:hover {
+    background-color: #e6f0fb;
 }
 
 .menu-items {
@@ -85,58 +106,143 @@ body {
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 8px 10px 8px 25px;
-    color: #333;
+    padding: 10px 10px 10px 25px;
+    color: #4a5568;
     font-size: 14px;
     cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
 }
 
 .menu-item:hover {
     background-color: #e6f0fb;
+    color: #2c5282;
+}
+
+.menu-item.active {
+    background-color: #ebf4ff;
+    color: #2c5282;
+    font-weight: 500;
+    border-left: 3px solid #4a90e2;
 }
 
 .menu-item i {
-    margin-right: 8px;
+    margin-right: 10px;
     width: 18px;
     text-align: center;
-    color: #666;
+    color: #4a90e2;
 }
-
-
 
 /* 메인 콘텐츠 영역 전체 스타일 */
 .main-content {
-    margin-top: 60px;
-    padding : 20px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    margin-left: 250px; /* 사이드바 너비에 맞춰 조정 */
-    min-height: calc(100vh - 60px); /* 헤더 높이를 고려한 전체 높이 */
+    margin-top: 100px; /* 헤더 높이에 맞춰 여백 조정 */
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    margin-left: 280px; /* 사이드바 너비 + 여백 */
+    margin-right: 30px;
+    min-height: calc(100vh - 80px - 30px); /* 헤더 높이와 패딩 고려 */
+    animation: fadeIn 0.6s ease;
 }
 
-/* 탭 헤더 스타일 */
-.tab-header {
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #3498db;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* 문서 유형 제목 스타일 */
 .main-content > span {
     display: block;
-    font-size: 18px;
-    font-weight: 500;
-    color: #2c3e50;
-    margin: 25px 0 12px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a3b66;
+    margin: 0 0 25px 0;
     position: relative;
-    padding-left: 15px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e6f0fb;
 }
 
-.main-content > span::before {
+/* 문서 유형 선택 스타일 */
+.document-type-select {
+    display: flex;
+    align-items: center;
+    background-color: #f9fafc;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    border: 1px solid #edf2f7;
+}
+
+.document-type-select label {
+    font-weight: 600;
+    color: #2c5282;
+    margin-right: 15px;
+    font-size: 15px;
+}
+
+#docTypeSelect {
+    padding: 10px 35px 10px 15px;
+    border: 2px solid #4a90e2;
+    border-radius: 8px;
+    background-color: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%234a90e2' stroke-width='2' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c5282;
+    min-width: 150px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+#docTypeSelect:hover {
+    border-color: #3a80d2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+#docTypeSelect:focus {
+    outline: none;
+    border-color: #3a80d2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* 문서 테이블 컨테이너 */
+.doc-table-container {
+    background-color: #fff;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+    border: 1px solid #edf2f7;
+    transition: all 0.3s ease;
+}
+
+.doc-table-container:hover {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    transform: translateY(-2px);
+}
+
+.doc-table-container h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a3b66;
+    margin-bottom: 20px;
+    position: relative;
+    padding-left: 18px;
+}
+
+.doc-table-container h4:before {
     content: '';
     position: absolute;
     left: 0;
@@ -144,7 +250,7 @@ body {
     transform: translateY(-50%);
     width: 6px;
     height: 18px;
-    background-color: #3498db;
+    background: linear-gradient(to bottom, #4a90e2, #2d70c3);
     border-radius: 3px;
 }
 
@@ -153,38 +259,81 @@ body {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     background-color: white;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 /* 테이블 헤더 스타일 */
 .document-table thead {
-    background-color: #3498db;
+    background: linear-gradient(135deg, #4a90e2 0%, #3a80d2 100%);
     color: white;
 }
 
 .document-table th {
-    padding: 14px 16px;
-    text-align: left;
-    font-weight: 500;
+    padding: 16px;
+    text-align: center;
+    font-weight: 600;
     font-size: 14px;
-    border-bottom: 1px solid #e0e0e0;
+    letter-spacing: 0.3px;
+    position: relative;
+}
+
+.document-table th:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* 테이블 본문 스타일 */
 .document-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #eeeeee;
+    padding: 14px 16px;
+    text-align: center;
     font-size: 14px;
-    color: #555;
+    color: #4a5568;
+    border-bottom: 1px solid #edf2f7;
+    transition: all 0.2s;
+}
+
+.document-table td a {
+    text-decoration: none;
+    color: #3182ce;
+    font-weight: 500;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.document-table td a:hover {
+    color: #2c5282;
+}
+
+.document-table td a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #2c5282;
+    transition: width 0.3s;
+}
+
+.document-table td a:hover::after {
+    width: 100%;
 }
 
 /* 테이블 행 hover 효과 */
+.document-table tbody tr {
+    transition: all 0.2s ease;
+}
+
 .document-table tbody tr:hover {
-    background-color: #f5f9ff;
+    background-color: #f3f9ff;
     cursor: pointer;
 }
 
@@ -193,24 +342,78 @@ body {
     border-bottom: none;
 }
 
-/* 문서 상태에 따른 배지(badge) 스타일 */
+/* 상태에 따른 스타일 */
 .document-table td:last-child {
-    font-weight: 500;
+    font-weight: 600;
+    border-radius: 4px;
 }
 
-/* 진행 중 상태 */
-.document-table td:last-child:contains("진행") {
-    color: #f39c12;
+/* 대기 상태 */
+.document-table td:last-child[style*="color:blue"] {
+    position: relative;
 }
 
-/* 완료 상태 */
-.document-table td:last-child:contains("완료") {
-    color: #27ae60;
+.document-table td:last-child[style*="color:blue"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(66, 153, 225, 0.08);
+    z-index: -1;
+    border-radius: 4px;
+}
+
+/* 승인 상태 */
+.document-table td:last-child[style*="color:green"] {
+    position: relative;
+}
+
+.document-table td:last-child[style*="color:green"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(72, 187, 120, 0.08);
+    z-index: -1;
+    border-radius: 4px;
 }
 
 /* 반려 상태 */
-.document-table td:last-child:contains("반려") {
-    color: #e74c3c;
+.document-table td:last-child[style*="color:red"] {
+    position: relative;
+}
+
+.document-table td:last-child[style*="color:red"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(245, 101, 101, 0.08);
+    z-index: -1;
+    border-radius: 4px;
+}
+
+/* 예정 상태 */
+.document-table td:last-child[style*="color:black"] {
+    position: relative;
+}
+
+.document-table td:last-child[style*="color:black"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(160, 174, 192, 0.08);
+    z-index: -1;
+    border-radius: 4px;
 }
 
 /* 각 열의 너비 조정 */
@@ -221,7 +424,8 @@ body {
 
 .document-table th:nth-child(2),
 .document-table td:nth-child(2) {
-    width: 40%;
+    width: 38%;
+    text-align: left;
 }
 
 .document-table th:nth-child(3),
@@ -236,79 +440,137 @@ body {
 
 .document-table th:nth-child(5),
 .document-table td:nth-child(5) {
-    width: 10%;
+    width: 12%;
 }
 
 .document-table th:nth-child(6),
 .document-table td:nth-child(6) {
-    width: 10%;
-    text-align: center;
+    width: 11%;
 }
 
 /* 테이블이 비어있을 때 메시지 */
-.document-table tbody:empty::after {
-    content: "문서가 없습니다.";
-    display: block;
-    padding: 20px;
+.document-table tbody tr td[colspan="6"] {
+    padding: 30px;
     text-align: center;
-    color: #999;
+    color: #a0aec0;
     font-style: italic;
+    background-color: #f9fafc;
 }
-.pagination{
+
+/* 페이지네이션 스타일 */
+.pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-
+    margin-top: 20px;
+    gap: 6px;
 }
 
-.page-link{
-    text-decoration-line: none;
-    margin-left: 10px;
-    color: #555;
-}
-.document-table th{
-    text-align: center;
-}
-
-.document-table tr td{
-
-    text-align: center;
-}
-.document-table tr td a{
-    text-decoration-line: none;
-    color: #555;
+.pagination a.page-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    margin: 0 2px;
 }
 
+.pagination a.page-link:hover {
+    background-color: #e6f0fb;
+    color: #3182ce;
+}
+
+.pagination a.page-link.active {
+    background-color: #4a90e2;
+    color: white;
+    box-shadow: 0 2px 6px rgba(74, 144, 226, 0.2);
+}
+
+.pagination a.page-link.prev-group,
+.pagination a.page-link.next-group {
+    font-weight: 700;
+    background-color: #f3f7fb;
+}
 
 /* 반응형 디자인 */
 @media (max-width: 1200px) {
     .main-content {
-        margin-left: 200px;
+        margin-left: 0;
+        padding: 20px;
+    }
 
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
     }
 }
 
 @media (max-width: 768px) {
     .main-content {
-        margin-left: 0;
         padding: 16px;
     }
 
-    .document-table {
-        font-size: 13px;
+    .document-type-select {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .document-type-select label {
+        margin-bottom: 8px;
+    }
+
+    #docTypeSelect {
+        width: 100%;
     }
 
     .document-table th,
     .document-table td {
-        padding: 10px 8px;
+        padding: 12px 10px;
+        font-size: 13px;
     }
 
-    .tab-header {
-        font-size: 20px;
+    .document-table th:nth-child(4),
+    .document-table td:nth-child(4),
+    .document-table th:nth-child(5),
+    .document-table td:nth-child(5) {
+        display: none;
     }
 
-    .main-content > span {
+    .document-table th:nth-child(1),
+    .document-table td:nth-child(1) {
+        width: 15%;
+    }
+
+    .document-table th:nth-child(2),
+    .document-table td:nth-child(2) {
+        width: 45%;
+    }
+
+    .document-table th:nth-child(3),
+    .document-table td:nth-child(3) {
+        width: 20%;
+    }
+
+    .document-table th:nth-child(6),
+    .document-table td:nth-child(6) {
+        width: 20%;
+    }
+
+    .doc-table-container {
+        padding: 15px;
+    }
+
+    .doc-table-container h4 {
         font-size: 16px;
     }
 }
-
