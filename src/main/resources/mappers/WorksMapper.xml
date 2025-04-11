@@ -67,23 +67,23 @@
     </update>
 
     <select id="getMonthlyOvertimeHours" resultType="map">
-        SELECT
-            MONTH(work_date) AS month,
-            CONCAT(
-            FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) / 3600), ':',
-            LPAD(FLOOR(MOD(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))), 3600) / 60), 2, '0')
-            ) AS total_overtime
-        FROM
-            overtime_requests
-        WHERE
-            status = '승인'
-          AND emp_id = #{empId}
-          AND YEAR(work_date) = #{year}
-        GROUP BY
-            MONTH(work_date)
-        ORDER BY
-            month
-    </select>
+    SELECT
+        MONTH(work_date) AS month,
+        CONCAT(
+        FLOOR(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))) / 3600), ':',
+        LPAD(FLOOR(MOD(SUM(TIME_TO_SEC(TIMEDIFF(end_time, start_time))), 3600) / 60), 2, '0')
+        ) AS total_overtime
+    FROM
+        overtime_requests
+    WHERE
+        status = '승인'
+      AND emp_id = #{empId}
+      AND YEAR(work_date) = #{year}
+    GROUP BY
+        MONTH(work_date)
+    ORDER BY
+        month
+</select>
 
     <!-- 문서 번호를 통한 연장근무신청서 Detail 가져오기 -->
     <select id="selectByOvertimesFromDocId" resultType="com.example.projectdemo.domain.work.dto.OverTimeDTO">

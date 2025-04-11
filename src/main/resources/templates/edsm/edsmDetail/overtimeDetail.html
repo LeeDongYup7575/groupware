@@ -227,7 +227,7 @@
             <div class="main2-contents" th:each="work : ${overtimesList}">
                 <div class="form-contents">
                     <label class="contents-label" for="title">제목</label>
-                    <input type="text" id="title" name="title" class="label-input" readonly="readonly"/>연장근무신청서
+                    <input type="text" id="title" name="title" class="label-input" value="연장근무신청서" readonly="readonly"/>
                 </div>
                 <div class="form-group">
                     <div style="margin-bottom: 20px;">
@@ -242,7 +242,7 @@
 
                 <div class="form-contents">
                     <label class="contents-label" for="content">사유</label>
-                    <textarea id="content" class="label-textarea" th:text="${leave.reason}" readonly="readonly"></textarea>
+                    <textarea id="content" class="label-textarea" th:text="${work.reason}" readonly="readonly"></textarea>
                 </div>
             </div>
 

@@ -14,12 +14,6 @@ body {
     background-color: #f5f6fa;
 }
 
-/* Header */
-header {
-    background-color: white;
-    padding: 15px 20px;
-    border-bottom: 1px solid #e0e0e0;
-}
 
 .logo {
     display: flex;
@@ -39,6 +33,7 @@ header {
 
 /* Layout */
 .container {
+    margin-top: 80px;
     display: flex;
     min-height: calc(100vh - 60px);
 }
@@ -62,6 +57,7 @@ header {
     display: block;
     cursor: pointer;
     font-size: 14px;
+    margin-top: 20px;
 }
 
 .add-button i {
@@ -316,5 +312,27 @@ header {
     .add-button {
         font-size: 12px;
         padding: 8px 12px;
+    }
+}
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .content {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .content {
+        margin-left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .content,
+    .sidebar.open ~ .content {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
     }
 }
