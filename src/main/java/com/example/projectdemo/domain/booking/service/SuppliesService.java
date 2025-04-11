@@ -42,12 +42,15 @@ public class SuppliesService {
                 .collect(Collectors.toList());
     }
 
-    // 특정 사원의 비품 예약 조회
+    // 특정 사원의 비품 예약 조회 (과거 시간 제외)
     public List<SuppliesBookingDTO> getBookingsByEmpNum(String empNum) {
+        LocalDateTime now = LocalDateTime.now();
         return suppliesMapper.findSuppliesBookingsByEmpNum(empNum).stream()
                 .map(this::convertToBookingDto)
+                .filter(dto -> dto.getStart() != null && dto.getStart().isAfter(now)) // 현재보다 이후 시작 시간만 필터링
                 .collect(Collectors.toList());
     }
+
 
     // 특정 비품의 예약 조회
     public List<SuppliesBookingDTO> getBookingsBySupplyId(Integer supplyId) {
@@ -218,4 +221,5 @@ public class SuppliesService {
 
         return dto;
     }
+
 }

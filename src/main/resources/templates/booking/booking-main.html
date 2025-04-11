@@ -306,7 +306,6 @@
 
 <div class="container">
   <div class="sidebar">
-    <button class="add-button"><i class="fas fa-plus"></i>예약 하기</button>
     <ul class="menu">
       <li class="active">
         <a th:href="@{/booking/main}"><i class="fas fa-calendar-alt"></i>전체 예약 현황</a></li>
@@ -441,17 +440,18 @@
             <tr th:if="${myMeetingRoomBookings.isEmpty()}">
               <td colspan="7" class="no-data">예약된 회의실이 없습니다.</td>
             </tr>
-            <tr th:each="booking : ${myMeetingRoomBookings}">
+            <tr th:each="booking : ${myMeetingRoomBookings}"
+                th:if="${booking.start > T(java.time.LocalDateTime).now()}">
               <td th:text="${booking.roomName}"></td>
               <td th:text="${booking.title}"></td>
               <td th:text="${#temporals.format(booking.start, 'yyyy-MM-dd')}"></td>
               <td th:text="${#temporals.format(booking.start, 'HH:mm')}"></td>
               <td th:text="${#temporals.format(booking.end, 'HH:mm')}"></td>
               <td>
-                  <span
-                          th:class="${booking.bookingStatus == 'CONFIRMED' ? 'booking-status status-confirmed' : 'booking-status status-cancelled'}"
-                          th:text="${booking.bookingStatus == 'CONFIRMED' ? '예약 완료' : '취소됨'}">
-                  </span>
+      <span
+              th:class="${booking.bookingStatus == 'CONFIRMED' ? 'booking-status status-confirmed' : 'booking-status status-cancelled'}"
+              th:text="${booking.bookingStatus == 'CONFIRMED' ? '예약 완료' : '취소됨'}">
+      </span>
               </td>
               <td>
                 <button
@@ -463,6 +463,7 @@
               </td>
             </tr>
             </tbody>
+
           </table>
         </div>
       </div>

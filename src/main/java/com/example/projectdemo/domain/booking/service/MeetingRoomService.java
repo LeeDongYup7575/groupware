@@ -46,8 +46,10 @@ public class MeetingRoomService {
 
     // 특정 사원의 회의실 예약 조회
     public List<MeetingRoomBookingDTO> getBookingsByEmpNum(String empNum) {
+        LocalDateTime now = LocalDateTime.now();
         return meetingRoomMapper.findMeetingRoomBookingsByEmpNum(empNum).stream()
                 .map(this::convertToBookingDto)
+                .filter(dto -> dto.getStart() != null && dto.getStart().isAfter(now))
                 .collect(Collectors.toList());
     }
 
