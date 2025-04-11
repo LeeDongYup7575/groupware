@@ -9,8 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 아이콘 사용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- 메인 페이지 CSS -->
-    <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
+
     <!-- 헤더 에셋 포함 -->
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
     <!-- 사이드바 스타일 포함 -->
@@ -80,7 +79,7 @@
 
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
-
+    <span>결재 상황 문서</span>
     <!-- 상단에 문서 유형 선택 셀렉트 박스 추가 -->
     <div class="document-type-select" style="margin-bottom: 20px;">
         <label for="docTypeSelect">문서 유형:</label>
@@ -257,7 +256,7 @@
             <tr th:each="doc : ${allLeavesDocument}" th:if="${doc.status == '진행'}">
                 <td th:text="${doc.id}"></td>
                 <td>
-                    <a th:href="@{'/edsmDetail/#/' + ${doc.id}}" th:text="${doc.title}"></a>
+                    <a th:href="@{'/edsmDetail/leavesDetail/' + ${doc.id}}" th:text="${doc.title}"></a>
                 </td>
                 <td th:text="${doc.drafterName}"></td>
                 <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>
@@ -302,7 +301,7 @@
             <tr th:each="doc : ${allOvertimeDocument}" th:if="${doc.status == '진행'}">
                 <td th:text="${doc.id}"></td>
                 <td>
-                    <a th:href="@{'/edsmDetail/#/' + ${doc.id}}" th:text="${doc.title}"></a>
+                    <a th:href="@{'/edsmDetail/overtimesDetail/' + ${doc.id}}" th:text="${doc.title}"></a>
                 </td>
                 <td th:text="${doc.drafterName}"></td>
                 <td th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></td>

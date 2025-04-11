@@ -9,8 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 아이콘 사용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- 메인 페이지 CSS -->
-    <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
+
     <!-- 헤더 에셋 포함 -->
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
     <!-- 사이드바 스타일 포함 -->
@@ -96,8 +95,8 @@
                 <a th:case="1001" th:href="@{'/edsmDetail/businessContact/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
                 <a th:case="1002" th:href="@{'/edsmDetail/cashDisbuVoucher/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
                 <a th:case="1003" th:href="@{'/edsmDetail/letterOfApproval/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
-                <a th:case="1004" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
-                <a th:case="1005" th:href="@{'/edsmDetail/#/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1004" th:href="@{'/edsmDetail/leavesDetail/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
+                <a th:case="1005" th:href="@{'/edsmDetail/overtimesDetail/' + ${exdoc.id}}" th:text="${exdoc.title}"></a>
             </td>
             <td th:text="${exdoc.drafterName}"></td>
             <td th:text="${#dates.format(exdoc.drafterDate, 'yyyy-MM-dd')}"></td>

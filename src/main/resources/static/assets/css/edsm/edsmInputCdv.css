@@ -12,11 +12,7 @@ body {
     line-height: 1.5;
 }
 
-.main-container{
-    margin: 20px;
-    width: 100%;
 
-}
 
 
 /* 헤더 */
@@ -36,10 +32,7 @@ body {
     margin-right: 20px;
 }
 
-.title {
-    font-size: 18px;
-    color: #333;
-}
+
 
 /* 전체 레이아웃 */
 .container {
@@ -58,6 +51,16 @@ body {
     flex-shrink: 0;
 }
 
+.total {
+    width: 100%;
+    max-width: 100%;
+    margin-top: 30px;
+
+}
+.title {
+    font-size: 18px;
+    color: #333;
+}
 .create-button {
     background-color: #4a90e2;
     color: white;
@@ -144,10 +147,11 @@ body {
 
 
 /* 메인 콘텐츠 영역 */
+
 .main-content {
-    flex: 1;
-    padding: 24px;
-    background-color: #fff;
+    width: calc(100% - 40px); /* 양쪽 마진 20px씩 고려 */
+    margin-top: 100px;
+    transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 /* 버튼 스타일 */
@@ -164,6 +168,11 @@ body {
     background-color: #3a80d2;
 }
 
+.main-container{
+    margin: 20px;
+    width: 100%;
+
+}
 .button.secondary {
     background-color: #fff;
     color: #4a90e2;
@@ -177,7 +186,10 @@ body {
 /* 양식 스타일 */
 .form-section {
 
-    border-bottom: 1px solid #f0f0f0;
+
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
 
 
 }
@@ -607,4 +619,27 @@ input[type="file"] {
     margin-bottom: 5px;
     background: #f9f9f9;
     cursor: pointer;
+}
+
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .main-container {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .main-container {
+        margin-left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .main-container,
+    .sidebar.open ~ .main-container {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
+    }
 }

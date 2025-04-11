@@ -8,6 +8,8 @@
 
 body {
     background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.5;
 }
 
 /* 헤더 */
@@ -36,6 +38,8 @@ body {
 .container {
     display: flex;
     min-height: calc(100vh - 60px);
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 /* 좌측 사이드바 */
@@ -49,6 +53,8 @@ body {
 
 .total {
     width: 100%;
+    max-width: 100%;
+    margin-top: 30px;
 
 
 }
@@ -132,10 +138,11 @@ body {
 }
 
 /* 메인 콘텐츠 영역 */
-.main-content {
-    flex: 1;
-    padding: 20px;
-    background-color: #fff;
+.main2-content {
+
+    width: calc(100% - 40px); /* 양쪽 마진 20px씩 고려 */
+    margin-top: 100px;
+    transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 /* 버튼 스타일 */
@@ -160,8 +167,9 @@ body {
 
 /* 양식 스타일 */
 .form-section {
-    margin-bottom: 20px;
     width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .form-header {
@@ -201,85 +209,7 @@ select {
     background-position: right 8px center;
 }
 
-/* 결재선 영역 */
-.approval-container {
-    width: 100%;
-    margin: 15px 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    padding: 20px;
-}
 
-.approval-line {
-    margin-bottom: 20px;
-}
-
-.approval-header {
-    background-color: #f1f3f5;
-    padding: 12px 15px;
-    font-weight: bold;
-    border: 1px solid #ddd;
-    text-align: center; /* 텍스트 가운데 정렬 */
-    margin-bottom: 10px;
-}
-
-.approval-header-cell {
-    text-align: center; /* 헤더 셀도 가운데 정렬 */
-}
-
-.approval-body {
-    display: flex;
-    margin: 20px;
-    justify-content: space-evenly;
-}
-
-.approval-body-cell {
-    flex: 1;
-    padding: 15px;
-    border: 1px solid #ddd;
-    text-align: center;
-    height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 0 5px;
-    min-width: 120px;
-}
-
-.approval-body-cell:first-child {
-    margin-left: 0;
-}
-
-.approval-body-cell:last-child {
-    margin-right: 0;
-}
-
-.approval-name {
-    margin: 5px 0;
-    font-weight: bold;
-}
-
-.approval-message {
-    font-size: 12px;
-    color: #777;
-}
-
-.approval-stamp {
-    width: 60px;
-    height: 60px;
-    border: 2px solid #5858FFFF;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #5858ff;
-    font-weight: bold;
-    transform: rotate(-15deg);
-}
 
 
 .drafter-name {
@@ -318,12 +248,7 @@ select {
     border-top: 1px solid #eee;
 }
 
-/* 메인 콘텐츠 영역 */
-.main2-contents {
-    width: 100%;
-    padding: 20px 0;
-    background-color: #fff;
-}
+
 
 /* 폼 스타일 */
 .form-contents {
@@ -357,105 +282,16 @@ select {
     font-size: 14px;
 }
 
-/* 첨부파일 영역 */
-.attachment-section {
-    margin-bottom: 20px;
-    width: 100%;
-}
 
-.attachment-label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #333;
-}
 
-.attachment-links {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
 
-.attachment-link {
-    color: #4a90e2;
-    font-size: 14px;
-    text-decoration: none;
-    display: inline-block;
-    border-right: 1px solid #ddd;
-    padding-right: 10px;
-}
-
-.attachment-link:last-child {
-    border-right: none;
-}
-
-.attachment-drop-area {
-    border: 1px dashed #ddd;
-    border-radius: 4px;
-    padding: 25px;
-    text-align: center;
-    color: #888;
-    font-size: 14px;
-    background-color: #fafafa;
-    margin-top: 10px;
-}
-
-/* 모달 배경 */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
-}
-/* 모달 컨텐츠 */
-.modal-content {
-    background-color: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 60%;
-    position: relative;
-    border-radius: 5px;
-}
-/* 닫기 버튼 */
-.close {
-    color: #aaa;
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-}
-.employee-list {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-}
-.employee-list li {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
-}
-.employee-list li:hover {
-    background-color: #f2f2f2;
-}
-.selected {
-    background-color: #e0f7fa;
-}
 
 /* 수정된 부분: 중첩된 컨테이너 문제 해결 */
 .container .container {
-    display: block;
-    width: 100%;
+    display: flex;
+    min-height: calc(100vh - 60px);
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 /* 폼 제출 버튼 영역 */
@@ -490,4 +326,29 @@ select {
     margin-bottom: 5px;
     background: #f9f9f9;
     cursor: pointer;
+}
+
+
+
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .main2-content {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .main2-content {
+        margin-left: 50px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .main2-content,
+    .sidebar.open ~ .main2-content {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
+    }
 }

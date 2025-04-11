@@ -49,7 +49,8 @@ body {
 
 .total {
     width: 100%;
-
+    max-width: 100%;
+    margin-top: 80px;
 
 }
 
@@ -496,4 +497,27 @@ select {
 
 .form-row button[type="submit"]:hover {
     background-color: #3a80d2;
+}
+
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .main-container {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .main-container {
+        margin-left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .main-container,
+    .sidebar.open ~ .main-container {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
+    }
 }
