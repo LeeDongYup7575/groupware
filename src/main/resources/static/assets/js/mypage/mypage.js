@@ -106,7 +106,7 @@ function generateContent(contentName, data) {
       <div class="info-container">
         <div class="info-row">
           <div class="info-label">입사일</div>
-          <div class="info-content" id="hireDate">${data.empNum}</div>
+          <div class="info-content" id="hireDate">${data.hireDate}</div>
         </div>
 
         <div class="info-row">
