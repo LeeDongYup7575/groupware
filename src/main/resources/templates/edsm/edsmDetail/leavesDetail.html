@@ -113,7 +113,8 @@
 
                     <div class="form-input">
                 <span id="drafterInfo"
-                      th:attr="data-drafterId=${employee.empNum}, data-drafterposition=${employee.positionTitle}, data-draftername=${employee.name}" th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                      th:each="doc : ${edsmDocumentList}"
+                      th:text="${doc.drafterPosition} + ' ' + ${doc.drafterName}">
                       <!--
                       <속성값 설명>
                       drafterId = 기안자 사번
