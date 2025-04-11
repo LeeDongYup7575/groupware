@@ -79,12 +79,27 @@ public class AttendController {
 
         List<AttendDTO> attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
         List<Map<String, Object>> statisticsByYear = attendService.getAttendanceStatisticsThisYear(empId);
+        if (statisticsByYear == null || statisticsByYear.isEmpty()) {
+            Map<String, Object> defaultStats = new HashMap<>();
+            defaultStats.put("tardyCount", 0);
+            defaultStats.put("earlyLeaveCount", 0);
+            defaultStats.put("absenteeismCount", 0);
+            statisticsByYear = List.of(defaultStats);
+        }
+
         List<Map<String, Object>> statisticsByMonth = attendService.getMonthlyAttendanceStatisticsThisMonth(empId);
         List<Map<String, Object>> statisticsByWeek = attendService.getWeeklyAttendanceStatisticsThisWeek(empId);
 
-        BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
+        BigDecimal totalLeave = employee.getTotalLeave() != null ? employee.getTotalLeave() : BigDecimal.ZERO;
+        BigDecimal usedLeave = employee.getUsedLeave() != null ? employee.getUsedLeave() : BigDecimal.ZERO;
+        BigDecimal canUseLeaves = totalLeave.subtract(usedLeave);
+
 
         BigDecimal totalWorkHours = attendService.getTotalWorkHoursThisYear(empId);
+        if (totalWorkHours == null) {
+            totalWorkHours = BigDecimal.ZERO;
+        }
+
         int workDays = attendService.getWorkDaysThisYear(empId);
         BigDecimal correctionAverage = workDays > 0 ? totalWorkHours.divide(new BigDecimal(workDays), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
 
