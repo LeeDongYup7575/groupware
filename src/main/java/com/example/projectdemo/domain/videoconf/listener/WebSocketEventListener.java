@@ -26,20 +26,34 @@ public class WebSocketEventListener {
         String empNum = (String) headerAccessor.getSessionAttributes().get("empNum");
         String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
 
-        if (username != null && empNum != null && roomId != null) {
-            log.info("User Disconnected: {} from room {}", username, roomId);
+        log.info("WebSocket 연결 종료 이벤트: username={}, empNum={}, roomId={}", username, empNum, roomId);
 
-            // DB에서 참가자 상태 업데이트
-            videoConfService.leaveRoom(roomId, empNum);
+        // 모든 필요한 정보가 있는지 확인
+        if (roomId != null && empNum != null) {
+            log.info("참가자 퇴장 처리: username={}, empNum={}, roomId={}", username, empNum, roomId);
 
-            // 다른 참가자들에게 퇴장 알림
-            WebRTCMessageDTO message = new WebRTCMessageDTO();
-            message.setType("leave");
-            message.setFrom(username);
-            message.setEmpNum(empNum);
-            message.setRoomId(roomId);
+            try {
+                // DB에서 참가자 상태 업데이트
+                videoConfService.leaveRoom(roomId, empNum);
 
-            messagingTemplate.convertAndSend("/topic/videochat", message);
+                // 다른 참가자들에게 퇴장 알림
+                // 사용자 이름이 없는 경우 "알 수 없는 사용자"로 표시
+                String displayName = username != null ? username : "알 수 없는 사용자";
+
+                WebRTCMessageDTO message = new WebRTCMessageDTO();
+                message.setType("leave");
+                message.setFrom(displayName);
+                message.setEmpNum(empNum);
+                message.setRoomId(roomId);
+
+                messagingTemplate.convertAndSend("/topic/videochat", message);
+                log.info("퇴장 메시지 발송 완료: from={}, empNum={}, roomId={}", displayName, empNum, roomId);
+            } catch (Exception e) {
+                log.error("WebSocket 연결 종료 처리 중 오류 발생: {}", e.getMessage(), e);
+            }
+        } else {
+            log.warn("세션 속성에서 필요한 정보를 찾을 수 없습니다: username={}, empNum={}, roomId={}",
+                    username, empNum, roomId);
         }
     }
 }

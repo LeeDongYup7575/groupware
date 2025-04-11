@@ -1145,6 +1145,7 @@
         // 채팅방 구독
         stompClient.subscribe('/topic/videochat', onMessageReceived);
 
+        startHeartbeat();
         // 서버에 방 참가 정보 전송
         fetch('/api/videoconf/join-room', {
             method: 'POST',
@@ -1889,6 +1890,9 @@
 
         state.isLeaving = true;
 
+        // 하트비트 중지
+        stopHeartbeat();
+
         // 서버에 방 나가기 API 호출
         fetch(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`, {
             method: 'POST'
@@ -1947,15 +1951,45 @@
 
     // 페이지 가시성 변경 이벤트 리스너 추가
     document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'hidden' && state.roomId && !state.isLeaving) {
-            // 백그라운드로 전환될 때 방 나가기 요청 전송
-            state.isLeaving = true;
-            navigator.sendBeacon(`/api/videoconf/leave-room?roomId=${state.roomId}&empNum=${state.empNum}`);
+        if (document.visibilityState === 'hidden') {
+            // 페이지가 백그라운드로 갔을 때 처리
+            console.log("페이지가 백그라운드로 전환되었습니다.");
+
+            // 하트비트 간격 늘리기 (선택 사항)
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL * 2); // 간격 2배로 늘림
+            }
+        } else if (document.visibilityState === 'visible' && state.roomId) {
+            // 페이지가 다시 활성화되었을 때 처리
+            console.log("페이지가 다시 활성화되었습니다.");
+
+            // 하트비트 정상 간격으로 복원
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
+            }
+
+            // 방 상태 확인
+            fetch(`/api/videoconf/check-room-validity?roomId=${state.roomId}`)
+                .then(response => response.json())
+                .then(isValid => {
+                    if (!isValid) {
+                        console.log("방이 더 이상 유효하지 않습니다.");
+                        alert("회의가 종료되었습니다.");
+                        leaveRoom();
+                    }
+                })
+                .catch(error => {
+                    console.error("방 상태 확인 중 오류 발생:", error);
+                });
         }
     });
 
     // 페이지 언로드 전 이벤트 리스너 (새로고침 또는 페이지 종료 시)
     window.addEventListener('beforeunload', () => {
+        stopHeartbeat();
+
         if (state.roomId && !state.isLeaving) {
             // 방 나가기 API 호출
             state.isLeaving = true;
@@ -1963,6 +1997,69 @@
         }
         clearResources();
     });
+
+    // 하트비트 관련 변수
+    let heartbeatInterval = null;
+    const HEARTBEAT_INTERVAL = 15000; // 15초마다 하트비트 전송
+
+    // 하트비트 시작 함수
+    function startHeartbeat() {
+        // 기존 하트비트가 있으면 중지
+        stopHeartbeat();
+
+        // 하트비트 시작
+        heartbeatInterval = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL);
+        console.log("하트비트 시작됨");
+    }
+
+    // 하트비트 중지 함수
+    function stopHeartbeat() {
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
+            console.log("하트비트 중지됨");
+        }
+    }
+
+    // 하트비트 전송 함수
+    function sendHeartbeat() {
+        if (!state.roomId || !state.empNum) {
+            console.log("방 ID 또는 사원 번호가 없어 하트비트를 보낼 수 없습니다.");
+            stopHeartbeat();
+            return;
+        }
+
+        // API 호출로 하트비트 전송
+        fetch('/api/videoconf/heartbeat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                roomId: state.roomId,
+                empNum: state.empNum
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.roomActive) {
+                    console.log("방이 더 이상 활성화되지 않았습니다. 연결을 종료합니다.");
+                    alert("회의가 종료되었습니다.");
+                    leaveRoom();
+                    return;
+                }
+
+                // 참가자 수 확인 (서버에서 제공된 경우)
+                if (data.participantCount !== undefined) {
+                    console.log(`현재 참가자 수: ${data.participantCount}`);
+                    // 필요한 경우 UI 업데이트
+                }
+            })
+            .catch(error => {
+                console.error("하트비트 전송 중 오류 발생:", error);
+                // 연속 실패 시 추가 처리 가능
+            });
+    }
 
 </script>
 <!-- 헤더 관련 스크립트 포함 -->
