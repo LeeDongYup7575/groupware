@@ -72,4 +72,7 @@ public class LeavesService {
     public List<Map<String, Object>> getMonthlyLeaveHours(int empId, int year) {
         return leavesDAO.getMonthlyLeaveHours(empId, year);
     }
+    public List<LeavesDTO> getLeavesDTOListByDocId(int id) {
+        return leavesDAO.getLeavesDTOListByDocId(id);
+    }
 }

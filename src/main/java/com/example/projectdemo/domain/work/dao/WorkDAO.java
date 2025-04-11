@@ -67,4 +67,8 @@ public class WorkDAO {
         params.put("year", year);
         return mybatis.selectList("com.example.projectdemo.domain.work.dao.WorkDAO.getMonthlyOvertimeHours", params);
     }
+
+    public List<OverTimeDTO> getOvertimeDTOListByDocId(int id) {
+        return mybatis.selectList("com.example.projectdemo.domain.work.dao.WorkDAO.selectByOvertimesFromDocId",id);
+    }
 }

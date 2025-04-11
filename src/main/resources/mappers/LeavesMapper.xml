@@ -108,6 +108,9 @@
             month
     </select>
 
-
+    <!-- 문서 번호를 통한 휴가신청서 Detail 가져오기 -->
+    <select id="selectByLeavesFromDocId" resultType="com.example.projectdemo.domain.leave.dto.LeavesDTO">
+        SELECT * FROM leaves where  edsm_document_id = #{id}
+    </select>
 
 </mapper>
