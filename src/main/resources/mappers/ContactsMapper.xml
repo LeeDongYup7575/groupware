@@ -69,5 +69,15 @@
         WHERE emp_id = #{empId}
     </select>
 
+    <!-- 개인주소록 연락처 삭제 -->
+    <delete id="deleteContactsByIds">
+        DELETE FROM
+            personal_contacts
+        WHERE id IN
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </delete>
+
 
 </mapper>

@@ -35,12 +35,20 @@ public class ContactService {
     }
 
     /**
-     * 개인 주소록에 주소 추가
+     * 개인 주소록에 연락처 추가
      */
     public void addPersonalContact(Integer empId, PersonalContactDTO contact) {
         contact.setEmpId(empId);
         contactMapper.insertPersonalContact(contact);
     }
+
+    /**
+     * 개인 주소록 연락처 삭제
+     */
+    public void deletePersonalContacts(List<Integer> ids) {
+        contactMapper.deleteContactsByIds(ids);
+    }
+
 
 
 }

@@ -18,6 +18,10 @@ public interface ContactMapper {
     // 개인 주소록(사원 연락처) 조회
     List<PersonalContactDTO> findPersonalContactsByEmpId(@Param("empId") Integer empId);
 
-    // 개인주소록에 주소 추가
+    // 개인주소록에 연락처 추가
     void insertPersonalContact(@Param("contact") PersonalContactDTO contact);
+
+    // 개인주소록 연락처 삭제
+    void deleteContactsByIds(@Param("ids") List<Integer> ids);
+
 }
