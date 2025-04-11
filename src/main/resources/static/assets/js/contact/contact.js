@@ -393,6 +393,10 @@ function updateHeaderForSelection() {
     const thPhone = document.querySelector('.contact-table thead th:nth-child(4)');
     const thInfo = document.querySelector('.contact-table thead .info-col');
 
+    // 현재 탭 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab') || 'shared';
+
     if (checkedCount > 0) {
         // 나머지 헤더는 텍스트만 숨김
         thEmail.textContent = '';
@@ -405,7 +409,7 @@ function updateHeaderForSelection() {
         // 복원
         thEmail.textContent = '이메일';
         thPhone.textContent = '전화번호';
-        thInfo.textContent = '메모';
+        thInfo.textContent = (tab === 'shared') ? '부서' : '메모';
         thNameCol.textContent = '이름';
     }
 }
