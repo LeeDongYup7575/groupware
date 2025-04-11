@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/videoconf")
 @RequiredArgsConstructor
-public class VideoConfRestController {
+public class VideoConfApiController {
 
     private final VideoConfService videoConfService;
 
