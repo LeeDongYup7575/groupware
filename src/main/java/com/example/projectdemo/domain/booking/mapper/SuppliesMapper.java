@@ -31,6 +31,10 @@ public interface SuppliesMapper {
 
     int cancelSuppliesBooking(Integer id);
 
+    /**
+     * 특정 시간대에 비품 예약 가능 여부 확인
+     * 해당 시간대에 이미 예약된 수량과 총 수량을 비교하여 결정
+     */
     boolean isSupplyAvailable(
             @Param("supplyId") Integer supplyId,
             @Param("quantity") Integer quantity,
@@ -38,7 +42,19 @@ public interface SuppliesMapper {
             @Param("endTime") LocalDateTime endTime,
             @Param("excludeBookingId") Integer excludeBookingId);
 
-    int updateSupplyAvailableQuantity(
+    /**
+     * 특정 시점에 예약된 비품 수량 조회
+     */
+    int getBookedQuantityAtTime(
             @Param("supplyId") Integer supplyId,
-            @Param("changeAmount") Integer changeAmount);
+            @Param("dateTime") LocalDateTime dateTime);
+
+    /**
+     * 특정 기간에 예약된 최대 비품 수량 조회
+     */
+    int getMaxBookedQuantityInPeriod(
+            @Param("supplyId") Integer supplyId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime,
+            @Param("excludeBookingId") Integer excludeBookingId);
 }

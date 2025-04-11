@@ -1,11 +1,11 @@
 package com.example.projectdemo.domain.booking.service;
 
+import com.example.projectdemo.domain.booking.dto.BookingRequestDTO;
 import com.example.projectdemo.domain.booking.dto.SuppliesDTO;
 import com.example.projectdemo.domain.booking.dto.SuppliesBookingDTO;
-import com.example.projectdemo.domain.booking.dto.BookingRequestDTO;
-import com.example.projectdemo.domain.booking.mapper.SuppliesMapper;
 import com.example.projectdemo.domain.booking.entity.Supplies;
 import com.example.projectdemo.domain.booking.entity.SuppliesBooking;
+import com.example.projectdemo.domain.booking.mapper.SuppliesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +26,14 @@ public class SuppliesService {
     // 모든 비품 조회
     public List<SuppliesDTO> getAllSupplies() {
         return suppliesMapper.findAllSupplies().stream()
-                .map(this::convertToDto)
+                .map(this::convertToDtoWithRealTimeAvailability)
                 .collect(Collectors.toList());
     }
 
     // 특정 비품 조회
     public SuppliesDTO getSuppliesById(Integer id) {
-        return convertToDto(suppliesMapper.findSuppliesById(id));
+        Supplies supply = suppliesMapper.findSuppliesById(id);
+        return convertToDtoWithRealTimeAvailability(supply);
     }
 
     // 모든 비품 예약 조회
@@ -42,15 +43,12 @@ public class SuppliesService {
                 .collect(Collectors.toList());
     }
 
-    // 특정 사원의 비품 예약 조회 (과거 시간 제외)
+    // 특정 사원의 비품 예약 조회
     public List<SuppliesBookingDTO> getBookingsByEmpNum(String empNum) {
-        LocalDateTime now = LocalDateTime.now();
         return suppliesMapper.findSuppliesBookingsByEmpNum(empNum).stream()
                 .map(this::convertToBookingDto)
-                .filter(dto -> dto.getStart() != null && dto.getStart().isAfter(now)) // 현재보다 이후 시작 시간만 필터링
                 .collect(Collectors.toList());
     }
-
 
     // 특정 비품의 예약 조회
     public List<SuppliesBookingDTO> getBookingsBySupplyId(Integer supplyId) {
@@ -92,12 +90,10 @@ public class SuppliesService {
         booking.setEnd(endDateTime);
         booking.setPurpose(requestDTO.getPurpose());
         booking.setBookingStatus("CONFIRMED");
+        booking.setCreatedAt(LocalDateTime.now());
 
         // 예약 등록
         suppliesMapper.insertSuppliesBooking(booking);
-
-        // 비품 가용 수량 업데이트
-        suppliesMapper.updateSupplyAvailableQuantity(requestDTO.getSupplyId(), -requestDTO.getQuantity());
 
         // 등록된 예약 반환
         return convertToBookingDto(booking);
@@ -126,12 +122,6 @@ public class SuppliesService {
                     startDateTime, endDateTime, id)) {
                 throw new RuntimeException("해당 시간에 비품을 예약할 수 없습니다.");
             }
-
-            // 수량 변경에 따른 가용 수량 업데이트
-            int quantityDifference = existingBooking.getQuantity() - requestDTO.getQuantity();
-            if (quantityDifference != 0) {
-                suppliesMapper.updateSupplyAvailableQuantity(requestDTO.getSupplyId(), quantityDifference);
-            }
         }
 
         // 예약 정보 업데이트
@@ -158,14 +148,7 @@ public class SuppliesService {
                 .orElseThrow(() -> new RuntimeException("예약 정보를 찾을 수 없습니다."));
 
         // 예약 취소
-        boolean result = suppliesMapper.cancelSuppliesBooking(id) > 0;
-
-        // 비품 가용 수량 업데이트
-        if (result) {
-            suppliesMapper.updateSupplyAvailableQuantity(existingBooking.getSupplyId(), existingBooking.getQuantity());
-        }
-
-        return result;
+        return suppliesMapper.cancelSuppliesBooking(id) > 0;
     }
 
     // 날짜 및 시간 문자열을 LocalDateTime으로 변환하는 유틸리티 메서드
@@ -179,16 +162,23 @@ public class SuppliesService {
         return LocalDateTime.of(date, time);
     }
 
-    // 엔티티를 DTO로 변환하는 유틸리티 메서드
-    private SuppliesDTO convertToDto(Supplies supplies) {
+    // 엔티티를 DTO로 변환하되 실시간 가용 수량 계산
+    private SuppliesDTO convertToDtoWithRealTimeAvailability(Supplies supplies) {
         if (supplies == null) return null;
+
+        // 현재 시점의 예약된 수량 계산
+        LocalDateTime now = LocalDateTime.now();
+        int bookedQuantity = suppliesMapper.getBookedQuantityAtTime(supplies.getId(), now);
+
+        // 실시간 가용 수량 계산
+        int realTimeAvailableQuantity = supplies.getTotalQuantity() - bookedQuantity;
 
         return new SuppliesDTO(
                 supplies.getId(),
                 supplies.getName(),
                 supplies.getCategory(),
                 supplies.getTotalQuantity(),
-                supplies.getAvailableQuantity(),
+                realTimeAvailableQuantity,
                 supplies.getDescription(),
                 supplies.getIsAvailable()
         );
@@ -221,5 +211,4 @@ public class SuppliesService {
 
         return dto;
     }
-
 }

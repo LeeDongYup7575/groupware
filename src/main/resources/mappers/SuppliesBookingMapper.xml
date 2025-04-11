@@ -100,27 +100,95 @@
         WHERE id = #{id}
     </update>
 
-    <select id="isSupplyAvailable" resultType="boolean">
-        SELECT CASE WHEN (
-        (SELECT available_quantity FROM supplies WHERE id = #{supplyId}) >=
-        (#{quantity} + COALESCE(
-        (SELECT SUM(b.quantity)
-        FROM supplies_booking b
-        WHERE b.supply_id = #{supplyId}
-        AND b.booking_status != 'CANCELLED'
-        AND (b.start <![CDATA[ < ]]> #{endTime} AND b.end <![CDATA[ > ]]> #{startTime})
-        <if test="excludeBookingId != null">
-            AND b.id != #{excludeBookingId}
-        </if>
-        ), 0)
-        )
-        ) THEN true ELSE false END
-    </select>
-
     <update id="updateSupplyAvailableQuantity">
         UPDATE supplies
         SET available_quantity = available_quantity + #{changeAmount}
         WHERE id = #{supplyId}
     </update>
+
+    <!-- 특정 시간대에 비품 예약 가능 여부 확인 -->
+    <select id="isSupplyAvailable" resultType="boolean">
+        SELECT
+            CASE
+                WHEN (
+                    (SELECT total_quantity FROM supplies WHERE id = #{supplyId})
+                        >=
+                    (#{quantity} +
+                     (SELECT COALESCE(MAX(booked_qty), 0) FROM (
+                                                                   SELECT
+                                                                       SUM(quantity) as booked_qty
+                                                                   FROM
+                                                                       supplies_booking
+                                                                   WHERE
+                                                                       supply_id = #{supplyId}
+                                                                     AND booking_status != 'CANCELLED'
+                            AND (id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
+                                                                     AND (
+                                                                       (start &lt;= #{endTime} AND end &gt;= #{startTime})
+                                                                       )
+                                                                   GROUP BY
+                                                                       supply_id
+                                                               ) as bookings_per_time))
+                    THEN TRUE
+                ELSE FALSE
+                END
+    </select>
+
+    <!-- 특정 시점에 예약된 비품 수량 조회 -->
+    <select id="getBookedQuantityAtTime" resultType="int">
+        SELECT COALESCE(SUM(quantity), 0)
+        FROM supplies_booking
+        WHERE supply_id = #{supplyId}
+          AND booking_status != 'CANCELLED'
+        AND start &lt;= #{dateTime}
+              AND end &gt;= #{dateTime}
+    </select>
+
+    <!-- 특정 기간에 예약된 최대 비품 수량 조회 -->
+    <select id="getMaxBookedQuantityInPeriod" resultType="int">
+        WITH time_slots AS (
+            SELECT
+                sb.start as time_point
+            FROM
+                supplies_booking sb
+            WHERE
+                sb.supply_id = #{supplyId}
+              AND sb.booking_status != 'CANCELLED'
+            AND (sb.id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
+            AND (sb.start BETWEEN #{startTime} AND #{endTime})
+
+        UNION
+
+        SELECT
+            sb.end as time_point
+        FROM
+            supplies_booking sb
+        WHERE
+            sb.supply_id = #{supplyId}
+          AND sb.booking_status != 'CANCELLED'
+                AND (sb.id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
+          AND (sb.end BETWEEN #{startTime} AND #{endTime})
+            ),
+            quantities_at_times AS (
+        SELECT
+            ts.time_point,
+            COALESCE(SUM(sb.quantity), 0) as total_booked
+        FROM
+            time_slots ts
+            LEFT JOIN
+            supplies_booking sb
+        ON
+            sb.supply_id = #{supplyId}
+            AND sb.booking_status != 'CANCELLED'
+            AND (sb.id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
+            AND ts.time_point BETWEEN sb.start AND sb.end
+        GROUP BY
+            ts.time_point
+            )
+        SELECT
+            COALESCE(MAX(total_booked), 0) as max_booked_quantity
+        FROM
+            quantities_at_times
+    </select>
 
 </mapper>
