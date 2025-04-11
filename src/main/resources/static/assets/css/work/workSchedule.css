@@ -13,43 +13,9 @@ a{
 body {
     background-color: #f5f6fa;
     overflow-x: hidden;
+    padding-top: 80px; /* 헤더의 높이만큼 여백 추가 */
 }
 
-/* Header */
-header {
-    background-color: white;
-    padding: 15px 20px;
-    border-bottom: 1px solid #e0e0e0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-}
-
-.logo h1 {
-    color: #333;
-    font-weight: bold;
-    margin-right: 15px;
-}
-
-.title {
-    color: #555;
-    font-size: 1.2rem;
-}
-
-.mobile-menu-toggle {
-    display: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #333;
-}
 
 /* Layout */
 .container {
@@ -64,9 +30,8 @@ header {
     padding: 20px 0;
     border-right: 1px solid #e0e0e0;
     transition: transform 0.3s ease, width 0.3s ease;
-    height: calc(100vh - 60px);
-    position: sticky;
-    top: 60px;
+    height: calc(100vh - 80px); /* 헤더 높이 반영 */
+    position: relative;
     overflow-y: auto;
 }
 
@@ -82,6 +47,7 @@ header {
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.2s;
+    margin-top: 20px;
 }
 
 .add-button:hover {
@@ -395,5 +361,27 @@ header {
     #eventModal {
         width: 90%;
         max-width: 350px;
+    }
+}
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .content {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .content {
+        margin-left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .content,
+    .sidebar.open ~ .content {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
     }
 }

@@ -167,7 +167,7 @@ public class WorkController {
 
         OverTimeDTO overTimeDTO = new OverTimeDTO();
 
-        overTimeDTO.setEmpId(drafterId);
+        overTimeDTO.setEmpId(empId);
         overTimeDTO.setStartTime(startTime);
         overTimeDTO.setEndTime(endTime);
         overTimeDTO.setWorkDate(formattedDate);
@@ -220,8 +220,11 @@ public class WorkController {
                                Model model, HttpServletRequest request) {
 
         String drafterId = (String) request.getAttribute("empNum");
+
         int empId = (int) request.getAttribute("id");
 
+        System.out.println("drafterId: " + drafterId);
+        System.out.println("empId: " + empId);
         if (empId == 0) {
             return "redirect:/auth/login";
         }
