@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>업무 관리</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/projects/work-management.css}">
+    <style>
+        .task-progress {
+            height: 10px;
+            margin-bottom: 10px;
+        }
+        .priority-high {
+            border-left: 4px solid #dc3545;
+        }
+        .priority-medium {
+            border-left: 4px solid #ffc107;
+        }
+        .priority-low {
+            border-left: 4px solid #0d6efd;
+        }
+        .tab-content {
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .project-card {
+            transition: transform 0.3s;
+            cursor: pointer;
+            height: 100%;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+        .todo-list-item {
+            cursor: pointer;
+        }
+        .todo-list-item.completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .todo-list-item:hover {
+            background-color: #f8f9fa;
+        }
+        .task-list-item {
+            border-left-width: 4px;
+            transition: background-color 0.2s;
+        }
+        .task-list-item:hover {
+            background-color: #f8f9fa;
+        }
+        .task-log-item {
+            border-left: 3px solid #6c757d;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<!-- Header fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar fragment -->
+        <div th:replace="~{fragments/sidebar/main-sidebar :: sidebar}"></div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">업무 관리</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <a th:href="@{/workmanagement}" class="btn btn-sm btn-outline-primary">업무</a>
+                        <a th:href="@{/workmanagement/register}" class="btn btn-sm btn-outline-secondary">등록</a>
+                        <a th:href="@{/workmanagement/schedule}" class="btn btn-sm btn-outline-info">일정</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="workTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="true">
+                        <i class="fas fa-project-diagram"></i> 프로젝트
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="my-tasks-tab" data-bs-toggle="tab" data-bs-target="#my-tasks" type="button" role="tab" aria-controls="my-tasks" aria-selected="false">
+                        <i class="fas fa-tasks"></i> 내 업무
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="todo-tab" data-bs-toggle="tab" data-bs-target="#todo" type="button" role="tab" aria-controls="todo" aria-selected="false">
+                        <i class="fas fa-clipboard-check"></i> To-Do
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="task-logs-tab" data-bs-toggle="tab" data-bs-target="#task-logs" type="button" role="tab" aria-controls="task-logs" aria-selected="false">
+                        <i class="fas fa-history"></i> 업무 로그
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="workTabsContent">
+                <!-- Projects Tab -->
+                <div class="tab-pane fade show active" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" id="project-search" class="form-control" placeholder="프로젝트 검색...">
+                                <button class="btn btn-outline-primary" type="button">검색</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="project-cards">
+                        <!-- Project cards will be rendered here -->
+                        <div class="col" th:each="project : ${projects}">
+                            <div class="card project-card" th:data-project-id="${project.id}">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span th:text="${project.name}">프로젝트명</span>
+                                    <span class="badge" th:classappend="${project.status == '진행중' ? 'bg-success' : project.status == '완료' ? 'bg-primary' : 'bg-warning'}" th:text="${project.status}">상태</span>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text" th:text="${project.description}">프로젝트 설명</p>
+                                    <div class="progress task-progress">
+                                        <div class="progress-bar" role="progressbar" th:style="'width: ' + ${project.progress} + '%'" th:attr="aria-valuenow=${project.progress}" aria-valuemin="0" aria-valuemax="100" th:text="${project.progress + '%'}">0%</div>
+                                    </div>
+                                    <small class="text-muted">
+                                        <span th:text="${project.taskCount}">0</span>개 업무 중 <span th:text="${project.completedTaskCount}">0</span>개 완료
+                                    </small>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted" th:text="${#temporals.format(project.startDate, 'yyyy-MM-dd')} + ' ~ ' + ${#temporals.format(project.endDate, 'yyyy-MM-dd')}">기간</small>
+                                        <small class="text-muted">
+                                            <span th:if="${not #lists.isEmpty(project.memberNames)}" th:text="${#strings.listJoin(project.memberNames, ', ')}">참여자</span>
+                                            <span th:if="${#lists.isEmpty(project.memberNames)}">참여자 없음</span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End of project cards -->
+                    </div>
+                </div>
+
+                <!-- My Tasks Tab -->
+                <div class="tab-pane fade" id="my-tasks" role="tabpanel" aria-labelledby="my-tasks-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <select id="task-filter" class="form-select">
+                                <option value="all">모든 업무</option>
+                                <option value="미시작">미시작</option>
+                                <option value="진행중">진행중</option>
+                                <option value="완료">완료</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="task-search" class="form-control" placeholder="업무 검색...">
+                                <button class="btn btn-outline-primary" type="button">검색</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="list-group" id="task-list">
+                        <!-- Task items will be rendered here -->
+                        <div th:each="task : ${assignedTasks}" class="list-group-item list-group-item-action task-list-item"
+                             th:classappend="${task.priority == '높음' ? 'priority-high' : task.priority == '중간' ? 'priority-medium' : 'priority-low'}"
+                             th:data-task-id="${task.id}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1" th:text="${task.title}">업무 제목</h5>
+                                <span class="badge" th:classappend="${task.status == '미시작' ? 'bg-secondary' : task.status == '진행중' ? 'bg-primary' : 'bg-success'}" th:text="${task.status}">상태</span>
+                            </div>
+                            <p class="mb-1" th:text="${task.description}">업무 설명</p>
+                            <div class="progress task-progress">
+                                <div class="progress-bar" role="progressbar" th:style="'width: ' + ${task.progress} + '%'" th:attr="aria-valuenow=${task.progress}" aria-valuemin="0" aria-valuemax="100" th:text="${task.progress + '%'}">0%</div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span th:text="${#temporals.format(task.startDate, 'yyyy-MM-dd')} + ' ~ ' + ${#temporals.format(task.dueDate, 'yyyy-MM-dd')}">기간</span>
+                                    <span th:if="${task.isOverdue}" class="text-danger"> (마감일 초과)</span>
+                                    <span th:unless="${task.isOverdue}"> (남은 일수: <span th:text="${task.remainingDays}">0</span>일)</span>
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-project-diagram"></i> <span th:text="${task.projectName}">프로젝트명</span>
+                                </small>
+                            </div>
+                        </div>
+                        <!-- End of task items -->
+                    </div>
+                </div>
+
+                <!-- Todo Tab -->
+                <div class="tab-pane fade" id="todo" role="tabpanel" aria-labelledby="todo-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <button id="add-todo-btn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#todoModal">
+                                <i class="fas fa-plus"></i> 새 할 일
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="todo-search" class="form-control" placeholder="할 일 검색...">
+                                <button class="btn btn-outline-primary" type="button">검색</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="list-group" id="todo-list">
+                        <!-- Todo items will be rendered here -->
+                        <div th:each="todo : ${todoList}" class="list-group-item list-group-item-action todo-list-item"
+                             th:classappend="${todo.completed ? 'completed' : ''}"
+                             th:data-todo-id="${todo.id}">
+                            <div class="d-flex align-items-center">
+                                <input class="form-check-input me-2 todo-checkbox" type="checkbox" th:checked="${todo.completed}">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1" th:text="${todo.title}">할 일 제목</h5>
+                                        <span class="badge" th:classappend="${todo.priority == '높음' ? 'bg-danger' : todo.priority == '중간' ? 'bg-warning' : 'bg-info'}" th:text="${todo.priority}">우선순위</span>
+                                    </div>
+                                    <p class="mb-1" th:text="${todo.content}">할 일 내용</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span th:text="${#temporals.format(todo.dueDate, 'yyyy-MM-dd')}">마감일</span>
+                                        <span th:if="${todo.isOverdue && !todo.completed}" class="text-danger"> (마감일 초과)</span>
+                                        <span th:if="${!todo.isOverdue && !todo.completed}"> (남은 일수: <span th:text="${todo.remainingDays}">0</span>일)</span>
+                                        <span th:if="${todo.completed}" class="text-success"> (완료됨)</span>
+                                    </small>
+                                </div>
+                                <div class="ms-2">
+                                    <button class="btn btn-sm btn-outline-primary edit-todo-btn" data-bs-toggle="modal" data-bs-target="#todoModal">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-todo-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End of todo items -->
+                    </div>
+                </div>
+
+                <!-- Task Logs Tab -->
+                <div class="tab-pane fade" id="task-logs" role="tabpanel" aria-labelledby="task-logs-tab">
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <input type="text" id="log-search" class="form-control" placeholder="로그 검색...">
+                                <button class="btn btn-outline-primary" type="button">검색</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="task-logs-container">
+                        <!-- Task logs will be loaded via AJAX -->
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">로딩 중...</span>
+                            </div>
+                            <p>업무 로그를 불러오는 중입니다...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Todo Modal -->
+<div class="modal fade" id="todoModal" tabindex="-1" aria-labelledby="todoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="todoModalLabel">새 할 일</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="todoForm">
+                    <input type="hidden" id="todo-id">
+                    <div class="mb-3">
+                        <label for="todo-title" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="todo-title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="todo-content" class="form-label">내용</label>
+                        <textarea class="form-control" id="todo-content" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="todo-due-date" class="form-label">마감일</label>
+                        <input type="date" class="form-control" id="todo-due-date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="todo-priority" class="form-label">우선순위</label>
+                        <select class="form-select" id="todo-priority" required>
+                            <option value="높음">높음</option>
+                            <option value="중간" selected>중간</option>
+                            <option value="낮음">낮음</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" id="save-todo-btn">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap and jQuery JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script th:inline="javascript">
+    $(document).ready(function() {
+        // Task logs Ajax loading
+        loadTaskLogs();
+
+        // Project card click
+        $('.project-card').on('click', function() {
+            const projectId = $(this).data('project-id');
+            window.location.href = `/workmanagement/project/${projectId}`;
+        });
+
+        // Todo checkbox click
+        $('.todo-checkbox').on('change', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            toggleTodoCompletion(todoId);
+        });
+
+        // Todo item click (excluding checkbox)
+        $('.todo-list-item').on('click', function(e) {
+            if (!$(e.target).hasClass('todo-checkbox') && !$(e.target).hasClass('edit-todo-btn') && !$(e.target).hasClass('delete-todo-btn')) {
+                const todoId = $(this).data('todo-id');
+                openTodoModal(todoId);
+            }
+        });
+
+        // Edit todo button click
+        $('.edit-todo-btn').on('click', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            openTodoModal(todoId);
+        });
+
+        // Delete todo button click
+        $('.delete-todo-btn').on('click', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            if (confirm('정말로 이 할 일을 삭제하시겠습니까?')) {
+                deleteTodo(todoId);
+            }
+        });
+
+        // Save todo button click
+        $('#save-todo-btn').on('click', function() {
+            saveTodo();
+        });
+
+        // Task filter change
+        $('#task-filter').on('change', function() {
+            const status = $(this).val();
+            filterTasks(status);
+        });
+
+        // Task search
+        $('#task-search').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            searchTasks(searchText);
+        });
+
+        // Todo search
+        $('#todo-search').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            searchTodos(searchText);
+        });
+
+        // Project search
+        $('#project-search').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            searchProjects(searchText);
+        });
+
+        // Log search
+        $('#log-search').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            searchLogs(searchText);
+        });
+    });
+
+    // Load task logs via AJAX
+    function loadTaskLogs() {
+        $.ajax({
+            url: '/api/tasks/logs/recent',
+            method: 'GET',
+            success: function(logs) {
+                renderTaskLogs(logs);
+            },
+            error: function(xhr, status, error) {
+                $('#task-logs-container').html('<div class="alert alert-danger">업무 로그를 불러오는데 실패했습니다.</div>');
+            }
+        });
+    }
+
+    // Render task logs
+    function renderTaskLogs(logs) {
+        if (logs.length === 0) {
+            $('#task-logs-container').html('<div class="alert alert-info">최근 업무 로그가 없습니다.</div>');
+            return;
+        }
+
+        let html = '';
+        logs.forEach(log => {
+            html += `
+                <div class="task-log-item">
+                    <div class="d-flex justify-content-between">
+                        <h6>${log.empName} (${log.logType})</h6>
+                        <small class="text-muted">${formatDateTime(log.createdAt)}</small>
+                    </div>
+                    <p class="mb-1">
+                        <strong>${log.taskTitle}</strong>
+                        ${log.oldValue ? `<span class="text-muted">${log.oldValue}</span> → ` : ''}
+                        <span class="text-primary">${log.newValue}</span>
+                    </p>
+                    ${log.comment ? `<p class="text-muted">${log.comment}</p>` : ''}
+                </div>
+                `;
+        });
+
+        $('#task-logs-container').html(html);
+    }
+
+    // Open todo modal for editing or creating
+    function openTodoModal(todoId) {
+        // Reset form
+        $('#todoForm')[0].reset();
+        $('#todo-id').val('');
+        $('#todoModalLabel').text('새 할 일');
+
+        // If todoId is provided, load todo data
+        if (todoId) {
+            $('#todoModalLabel').text('할 일 수정');
+
+            $.ajax({
+                url: `/api/todos/${todoId}`,
+                method: 'GET',
+                success: function(todo) {
+                    $('#todo-id').val(todo.id);
+                    $('#todo-title').val(todo.title);
+                    $('#todo-content').val(todo.content);
+                    $('#todo-due-date').val(formatDate(todo.dueDate));
+                    $('#todo-priority').val(todo.priority);
+                }
+            });
+        } else {
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            $('#todo-due-date').val(formatDate(tomorrow));
+        }
+
+        $('#todoModal').modal('show');
+    }
+
+    // Toggle todo completion
+    function toggleTodoCompletion(todoId) {
+        $.ajax({
+            url: `/api/todos/${todoId}/toggle`,
+            method: 'PATCH',
+            success: function(todo) {
+                const todoItem = $(`.todo-list-item[data-todo-id="${todoId}"]`);
+                if (todo.completed) {
+                    todoItem.addClass('completed');
+                    todoItem.find('.todo-checkbox').prop('checked', true);
+                } else {
+                    todoItem.removeClass('completed');
+                    todoItem.find('.todo-checkbox').prop('checked', false);
+                }
+            }
+        });
+    }
+
+    // Save todo (create or update)
+    function saveTodo() {
+        const todoId = $('#todo-id').val();
+        const todoData = {
+            title: $('#todo-title').val(),
+            content: $('#todo-content').val(),
+            dueDate: $('#todo-due-date').val(),
+            priority: $('#todo-priority').val()
+        };
+
+        // Validate form
+        if (!todoData.title || !todoData.dueDate) {
+            alert('제목과 마감일은 필수 입력 항목입니다.');
+            return;
+        }
+
+        const method = todoId ? 'PUT' : 'POST';
+        const url = todoId ? `/api/todos/${todoId}` : '/api/todos';
+
+        $.ajax({
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            data: JSON.stringify(todoData),
+            success: function() {
+                $('#todoModal').modal('hide');
+                // Refresh page to show updated todo list
+                window.location.reload();
+            },
+            error: function(xhr, status, error) {
+                alert('할 일 저장에 실패했습니다.');
+            }
+        });
+    }
+
+    // Delete todo
+    function deleteTodo(todoId) {
+        $.ajax({
+            url: `/api/todos/${todoId}`,
+            method: 'DELETE',
+            success: function() {
+                $(`.todo-list-item[data-todo-id="${todoId}"]`).remove();
+            },
+            error: function(xhr, status, error) {
+                alert('할 일 삭제에 실패했습니다.');
+            }
+        });
+    }
+
+    // Filter tasks by status
+    function filterTasks(status) {
+        if (status === 'all') {
+            $('.task-list-item').show();
+        } else {
+            $('.task-list-item').hide();
+            $(`.task-list-item .badge:contains("${status}")`).closest('.task-list-item').show();
+        }
+    }
+
+    // Search tasks
+    function searchTasks(searchText) {
+        $('.task-list-item').each(function() {
+            const title = $(this).find('h5').text().toLowerCase();
+            const description = $(this).find('p').text().toLowerCase();
+
+            if (title.includes(searchText) || description.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    // Search todos
+    function searchTodos(searchText) {
+        $('.todo-list-item').each(function() {
+            const title = $(this).find('h5').text().toLowerCase();
+            const content = $(this).find('p').text().toLowerCase();
+
+            if (title.includes(searchText) || content.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    // Search projects
+    function searchProjects(searchText) {
+        $('.project-card').each(function() {
+            const name = $(this).find('.card-header span:first-child').text().toLowerCase();
+            const description = $(this).find('.card-text').text().toLowerCase();
+
+            if (name.includes(searchText) || description.includes(searchText)) {
+                $(this).closest('.col').show();
+            } else {
+                $(this).closest('.col').hide();
+            }
+        });
+    }
+
+    // Search logs
+    function searchLogs(searchText) {
+        $('.task-log-item').each(function() {
+            const text = $(this).text().toLowerCase();
+
+            if (text.includes(searchText)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    // Format date (yyyy-MM-dd)
+    function formatDate(date) {
+        if (typeof date === 'string') {
+            date = new Date(date);
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // Format date and time (yyyy-MM-dd HH:mm)
+    function formatDateTime(datetime) {
+        if (typeof datetime === 'string') {
+            datetime = new Date(datetime);
+        }
+
+        const year = datetime.getFullYear();
+        const month = String(datetime.getMonth() + 1).padStart(2, '0');
+        const day = String(datetime.getDate()).padStart(2, '0');
+        const hours = String(datetime.getHours()).padStart(2, '0');
+        const minutes = String(datetime.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+</script>
+</body>
+</html>

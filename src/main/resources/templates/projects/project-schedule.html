@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프로젝트 일정</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/projects/project-schedule.css}">
+    <style>
+        #calendar {
+            margin-top: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .fc-event {
+            cursor: pointer;
+        }
+        .fc-day-today {
+            background-color: #f8f9fa !important;
+        }
+        .project-selector {
+            margin-bottom: 20px;
+        }
+        .participant-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .status-badge {
+            margin-left: 10px;
+        }
+        .fc-event-title {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<!-- Header fragment -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar fragment -->
+        <div th:replace="~{fragments/sidebar/main-sidebar :: sidebar}"></div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">프로젝트 일정</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <a th:href="@{/workmanagement}" class="btn btn-sm btn-outline-primary">업무</a>
+                        <a th:href="@{/workmanagement/register}" class="btn btn-sm btn-outline-secondary">등록</a>
+                        <a th:href="@{/workmanagement/schedule}" class="btn btn-sm btn-outline-info">일정</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">프로젝트 선택</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="project-selector">
+                                <select class="form-select" id="project-filter">
+                                    <option value="all">모든 프로젝트</option>
+                                    <option th:each="project : ${accessibleProjects}"
+                                            th:value="${project.id}"
+                                            th:text="${project.name}"
+                                            th:selected="${project.id == selectedProjectId}"></option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" id="add-schedule-btn" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                                    <i class="fas fa-plus"></i> 새 일정 등록
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">표시 옵션</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="show-tasks" checked>
+                                <label class="form-check-label" for="show-tasks">
+                                    업무 표시
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="show-schedules" checked>
+                                <label class="form-check-label" for="show-schedules">
+                                    일정 표시
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="show-my-tasks" checked>
+                                <label class="form-check-label" for="show-my-tasks">
+                                    내 담당 업무만 표시
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">다가오는 일정</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="upcoming-events">
+                                <div class="text-center">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p>일정을 불러오는 중...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-9">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedule Modal -->
+            <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="scheduleModalLabel">새 일정 등록</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="scheduleForm">
+                                <input type="hidden" id="schedule-id">
+                                <div class="row mb-3">
+                                    <div class="col-md-8">
+                                        <label for="schedule-title" class="form-label">일정 제목 <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="schedule-title" name="title" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="schedule-project" class="form-label">프로젝트</label>
+                                        <select class="form-select" id="schedule-project" name="projectId">
+                                            <option value="">선택...</option>
+                                            <option th:each="project : ${accessibleProjects}" th:value="${project.id}" th:text="${project.name}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="schedule-description" class="form-label">일정 설명</label>
+                                    <textarea class="form-control" id="schedule-description" name="description" rows="3"></textarea>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-5">
+                                        <label for="schedule-start-date" class="form-label">시작일시 <span class="text-danger">*</span></label>
+                                        <input type="datetime-local" class="form-control" id="schedule-start-date" name="startTime" required>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label for="schedule-end-date" class="form-label">종료일시 <span class="text-danger">*</span></label>
+                                        <input type="datetime-local" class="form-control" id="schedule-end-date" name="endTime" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="schedule-all-day" class="form-label">종일</label>
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="checkbox" id="schedule-all-day" name="isAllDay">
+                                            <label class="form-check-label" for="schedule-all-day">
+                                                종일 일정
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="schedule-location" class="form-label">장소</label>
+                                        <input type="text" class="form-control" id="schedule-location" name="location">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="schedule-color" class="form-label">색상</label>
+                                        <select class="form-select" id="schedule-color" name="color">
+                                            <option value="#3498db" style="background-color: #3498db; color: white;">파란색</option>
+                                            <option value="#2ecc71" style="background-color: #2ecc71; color: white;">녹색</option>
+                                            <option value="#e74c3c" style="background-color: #e74c3c; color: white;">빨간색</option>
+                                            <option value="#f39c12" style="background-color: #f39c12; color: white;">주황색</option>
+                                            <option value="#9b59b6" style="background-color: #9b59b6; color: white;">보라색</option>
+                                            <option value="#1abc9c" style="background-color: #1abc9c; color: white;">청록색</option>
+                                            <option value="#34495e" style="background-color: #34495e; color: white;">어두운 회색</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="schedule-repeat-type" class="form-label">반복 설정</label>
+                                    <select class="form-select" id="schedule-repeat-type" name="repeatType">
+                                        <option value="없음" selected>반복 없음</option>
+                                        <option value="매일">매일</option>
+                                        <option value="매주">매주</option>
+                                        <option value="매월">매월</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="repeat-end-date-container" style="display: none;">
+                                    <label for="schedule-repeat-end-date" class="form-label">반복 종료일</label>
+                                    <input type="date" class="form-control" id="schedule-repeat-end-date" name="repeatEndDate">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">참석자</label>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-8">
+                                                    <select class="form-select" id="participant-select">
+                                                        <option value="">선택...</option>
+                                                        <option th:each="emp : ${employees}" th:value="${emp.empNum}" th:text="${emp.name + ' (' + emp.empNum + ') - ' + emp.departmentName}"></option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <button type="button" class="btn btn-outline-primary" id="add-participant-btn">추가</button>
+                                                </div>
+                                            </div>
+
+                                            <div class="participant-list">
+                                                <table class="table table-sm" id="participants-table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>이름</th>
+                                                        <th>부서</th>
+                                                        <th>상태</th>
+                                                        <th></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <!-- 현재 사용자를 기본 참석자로 추가 -->
+                                                    <tr data-emp-num="${employee.empNum}">
+                                                        <td th:text="${employee.name + ' (' + employee.empNum + ')'}"></td>
+                                                        <td th:text="${employee.departmentName}"></td>
+                                                        <td><span class="badge bg-success">수락</span></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-danger" id="delete-schedule-btn" style="display: none;">삭제</button>
+                            <button type="button" class="btn btn-primary" id="save-schedule-btn">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Detail Modal -->
+            <div class="modal fade" id="eventDetailModal" tabindex="-1" aria-labelledby="eventDetailModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="eventDetailModalLabel">일정 상세 정보</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="event-detail-body">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p>일정 정보를 불러오는 중...</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            <button type="button" class="btn btn-primary" id="edit-event-btn">수정</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bootstrap and jQuery JavaScript -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- FullCalendar JavaScript -->
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/ko.js"></script>
+
+            <!-- Custom JavaScript -->
+            <script th:inline="javascript">
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the employee information
+                    const currentEmpNum = /*[[${employee.empNum}]]*/ '';
+
+                    // Initialize FullCalendar
+                    const calendarEl = document.getElementById('calendar');
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth',
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                        },
+                        locale: 'ko',
+                        buttonText: {
+                            today: '오늘',
+                            month: '월',
+                            week: '주',
+                            day: '일',
+                            list: '목록'
+                        },
+                        themeSystem: 'bootstrap5',
+                        eventTimeFormat: {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        },
+                        allDayText: '종일',
+                        navLinks: true,
+                        selectable: true,
+                        editable: true,
+                        dayMaxEvents: true,
+                        eventClick: function(info) {
+                            showEventDetails(info.event);
+                        },
+                        select: function(info) {
+                            openScheduleModal(null, info.startStr, info.endStr, info.allDay);
+                        },
+                        eventDrop: function(info) {
+                            updateEventDates(info.event);
+                        },
+                        eventResize: function(info) {
+                            updateEventDates(info.event);
+                        },
+                        events: function(fetchInfo, successCallback, failureCallback) {
+                            loadEvents(fetchInfo.start, fetchInfo.end, successCallback, failureCallback);
+                        }
+                    });
+
+                    calendar.render();
+
+                    // Load upcoming events
+                    loadUpcomingEvents();
+
+                    // Repeat type change
+                    $('#schedule-repeat-type').on('change', function() {
+                        if ($(this).val() === '없음') {
+                            $('#repeat-end-date-container').hide();
+                        } else {
+                            $('#repeat-end-date-container').show();
+                        }
+                    });
+
+                    // All day checkbox change
+                    $('#schedule-all-day').on('change', function() {
+                        if ($(this).is(':checked')) {
+                            $('#schedule-start-date').val($('#schedule-start-date').val().split('T')[0] + 'T00:00');
+                            $('#schedule-end-date').val($('#schedule-end-date').val().split('T')[0] + 'T23:59');
+                        }
+                    });
+
+                    // Add participant button
+                    $('#add-participant-btn').on('click', function() {
+                        const participantSelect = $('#participant-select');
+                        const empNum = participantSelect.val();
+
+                        if (empNum) {
+                            const empText = participantSelect.find('option:selected').text();
+                            const empName = empText.split(' - ')[0];
+                            const deptName = empText.split(' - ')[1];
+
+                            // Check if already added
+                            if ($(`#participants-table tbody tr[data-emp-num="${empNum}"]`).length === 0) {
+                                const row = `
+                                        <tr data-emp-num="${empNum}">
+                                            <td>${empName}</td>
+                                            <td>${deptName}</td>
+                                            <td><span class="badge bg-secondary">미응답</span></td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-danger remove-participant-btn">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+
+                                $('#participants-table tbody').append(row);
+                                participantSelect.val('');
+                            }
+                        }
+                    });
+
+                    // Remove participant button
+                    $(document).on('click', '.remove-participant-btn', function() {
+                        $(this).closest('tr').remove();
+                    });
+
+                    // Project filter change
+                    $('#project-filter').on('change', function() {
+                        calendar.refetchEvents();
+                    });
+
+                    // Show/hide options change
+                    $('#show-tasks, #show-schedules, #show-my-tasks').on('change', function() {
+                        calendar.refetchEvents();
+                    });
+
+                    // Save schedule button
+                    $('#save-schedule-btn').on('click', function() {
+                        saveSchedule();
+                    });
+
+                    // Delete schedule button
+                    $('#delete-schedule-btn').on('click', function() {
+                        deleteSchedule();
+                    });
+
+                    // Edit event button
+                    $('#edit-event-btn').on('click', function() {
+                        const eventId = $(this).data('event-id');
+                        const eventType = $(this).data('event-type');
+
+                        $('#eventDetailModal').modal('hide');
+
+                        if (eventType === 'schedule') {
+                            openScheduleModal(eventId);
+                        } else if (eventType === 'task') {
+                            // Redirect to task edit page
+                            window.location.href = `/workmanagement/task/${eventId}/edit`;
+                        }
+                    });
+
+                    // Load events function
+                    function loadEvents(start, end, successCallback, failureCallback) {
+                        const projectId = $('#project-filter').val();
+                        const showTasks = $('#show-tasks').is(':checked');
+                        const showSchedules = $('#show-schedules').is(':checked');
+                        const showMyTasks = $('#show-my-tasks').is(':checked');
+
+                        // Format dates for API
+                        const startStr = start.toISOString();
+                        const endStr = end.toISOString();
+
+                        // Prepare events array
+                        const events = [];
+
+                        // Promise array for all API calls
+                        const promises = [];
+
+                        // Load schedules if option is enabled
+                        if (showSchedules) {
+                            const schedulesPromise = new Promise((resolve, reject) => {
+                                let url = `/api/schedules/range?start=${startStr}&end=${endStr}`;
+
+                                if (projectId !== 'all') {
+                                    url = `/api/schedules/project/${projectId}`;
+                                }
+
+                                $.ajax({
+                                    url: url,
+                                    method: 'GET',
+                                    success: function(schedules) {
+                                        schedules.forEach(schedule => {
+                                            events.push({
+                                                id: `schedule_${schedule.id}`,
+                                                title: schedule.title,
+                                                start: schedule.startTime,
+                                                end: schedule.endTime,
+                                                allDay: schedule.isAllDay,
+                                                backgroundColor: schedule.color || '#3498db',
+                                                borderColor: schedule.color || '#3498db',
+                                                extendedProps: {
+                                                    type: 'schedule',
+                                                    description: schedule.description,
+                                                    location: schedule.location,
+                                                    projectId: schedule.projectId,
+                                                    projectName: schedule.projectName
+                                                }
+                                            });
+                                        });
+                                        resolve();
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Failed to load schedules:', error);
+                                        reject(error);
+                                    }
+                                });
+                            });
+
+                            promises.push(schedulesPromise);
+                        }
+
+                        // Load tasks if option is enabled
+                        if (showTasks) {
+                            const tasksPromise = new Promise((resolve, reject) => {
+                                let url = '';
+
+                                if (projectId !== 'all') {
+                                    url = `/api/tasks/project/${projectId}`;
+                                } else if (showMyTasks) {
+                                    url = `/api/tasks/assignee/${currentEmpNum}`;
+                                } else {
+                                    url = '/api/tasks';
+                                }
+
+                                $.ajax({
+                                    url: url,
+                                    method: 'GET',
+                                    success: function(tasks) {
+                                        tasks.forEach(task => {
+                                            // Skip completed tasks
+                                            if (task.status === '완료') {
+                                                return;
+                                            }
+
+                                            // Skip if not assigned to current user and showMyTasks is enabled
+                                            if (showMyTasks && task.assigneeEmpNum !== currentEmpNum) {
+                                                return;
+                                            }
+
+                                            // Set color based on priority
+                                            let color = '#3498db'; // Default blue
+                                            if (task.priority === '높음') {
+                                                color = '#e74c3c'; // Red
+                                            } else if (task.priority === '중간') {
+                                                color = '#f39c12'; // Orange
+                                            } else if (task.priority === '낮음') {
+                                                color = '#2ecc71'; // Green
+                                            }
+
+                                            events.push({
+                                                id: `task_${task.id}`,
+                                                title: `[업무] ${task.title}`,
+                                                start: task.startDate,
+                                                end: task.dueDate,
+                                                allDay: true,
+                                                backgroundColor: color,
+                                                borderColor: color,
+                                                textColor: '#ffffff',
+                                                extendedProps: {
+                                                    type: 'task',
+                                                    description: task.description,
+                                                    projectId: task.projectId,
+                                                    projectName: task.projectName,
+                                                    status: task.status,
+                                                    progress: task.progress,
+                                                    priority: task.priority,
+                                                    assigneeEmpNum: task.assigneeEmpNum,
+                                                    assigneeName: task.assigneeName
+                                                }
+                                            });
+                                        });
+                                        resolve();
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Failed to load tasks:', error);
+                                        reject(error);
+                                    }
+                                });
+                            });
+
+                            promises.push(tasksPromise);
+                        }
+
+                        // Wait for all promises to resolve
+                        Promise.all(promises)
+                            .then(() => {
+                                successCallback(events);
+                            })
+                            .catch(error => {
+                                failureCallback(error);
+                            });
+                    }
+
+                    // Load upcoming events
+                    function loadUpcomingEvents() {
+                        const today = new Date();
+                        const nextWeek = new Date(today);
+                        nextWeek.setDate(today.getDate() + 7);
+
+                        const startStr = today.toISOString();
+                        const endStr = nextWeek.toISOString();
+
+                        $.ajax({
+                            url: `/api/schedules/range?start=${startStr}&end=${endStr}`,
+                            method: 'GET',
+                            success: function(schedules) {
+                                renderUpcomingEvents(schedules);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Failed to load upcoming events:', error);
+                                $('#upcoming-events').html('<div class="alert alert-danger">일정을 불러오는데 실패했습니다.</div>');
+                            }
+                        });
+                    }
+
+                    // Render upcoming events
+                    function renderUpcomingEvents(schedules) {
+                        if (schedules.length === 0) {
+                            $('#upcoming-events').html('<div class="alert alert-info">다가오는 일정이 없습니다.</div>');
+                            return;
+                        }
+
+                        // Sort by start time
+                        schedules.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+
+                        // Take only the first 5
+                        const upcomingSchedules = schedules.slice(0, 5);
+
+                        let html = '<div class="list-group">';
+
+                        upcomingSchedules.forEach(schedule => {
+                            const startDate = new Date(schedule.startTime);
+                            const formattedDate = formatDateTime(startDate);
+
+                            html += `
+                                    <a href="#" class="list-group-item list-group-item-action upcoming-event-item" data-id="${schedule.id}">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">${schedule.title}</h6>
+                                            <small style="color: ${schedule.color || '#3498db'}">
+                                                <i class="fas fa-circle"></i>
+                                            </small>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar-alt"></i> ${formattedDate}
+                                        </small>
+                                        ${schedule.location ? `<small class="d-block text-muted"><i class="fas fa-map-marker-alt"></i> ${schedule.location}</small>` : ''}
+                                    </a>
+                                `;
+                        });
+
+                        html += '</div>';
+
+                        $('#upcoming-events').html(html);
+
+                        // Add click event for upcoming events
+                        $('.upcoming-event-item').on('click', function(e) {
+                            e.preventDefault();
+                            const scheduleId = $(this).data('id');
+                            openScheduleModal(scheduleId);
+                        });
+                    }
+
+                    // Show event details
+                    function showEventDetails(event) {
+                        const eventId = event.id;
+                        const eventType = event.extendedProps.type;
+
+                        // Set event ID and type to edit button
+                        $('#edit-event-btn').data('event-id', eventId.split('_')[1]);
+                        $('#edit-event-btn').data('event-type', eventType);
+
+                        let detailHtml = '';
+
+                        if (eventType === 'schedule') {
+                            // Format schedule detail
+                            detailHtml = `
+                                    <h4>${event.title}</h4>
+                                    <p class="text-muted">
+                                        <i class="fas fa-calendar-alt"></i> ${formatDateTime(event.start)} ${event.end ? '~ ' + formatDateTime(event.end) : ''}
+                                        ${event.allDay ? ' (종일)' : ''}
+                                    </p>
+
+                                    ${event.extendedProps.location ? `
+                                    <p class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> ${event.extendedProps.location}
+                                    </p>
+                                    ` : ''}
+
+                                    ${event.extendedProps.projectName ? `
+                                    <p class="text-muted">
+                                        <i class="fas fa-project-diagram"></i> ${event.extendedProps.projectName}
+                                    </p>
+                                    ` : ''}
+
+                                    ${event.extendedProps.description ? `
+                                    <hr>
+                                    <h5>설명</h5>
+                                    <p>${event.extendedProps.description}</p>
+                                    ` : ''}
+
+                                    <hr>
+                                    <h5>참석자</h5>
+                                    <div class="participant-list" id="event-participants">
+                                        <div class="text-center">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p>참석자 정보를 불러오는 중...</p>
+                                        </div>
+                                    </div>
+                                `;
+
+                            // Load participants
+                            const scheduleId = eventId.split('_')[1];
+                            $.ajax({
+                                url: `/api/schedules/${scheduleId}/participants`,
+                                method: 'GET',
+                                success: function(participants) {
+                                    renderParticipants(participants);
+                                },
+                                error: function(xhr, status, error) {
+                                    $('#event-participants').html('<div class="alert alert-danger">참석자 정보를 불러오는데 실패했습니다.</div>');
+                                }
+                            });
+                        } else if (eventType === 'task') {
+                            // Format task detail
+                            detailHtml = `
+                                    <h4>${event.title}</h4>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <span class="badge ${event.extendedProps.status === '미시작' ? 'bg-secondary' : event.extendedProps.status === '진행중' ? 'bg-primary' : 'bg-success'} me-2">
+                                            ${event.extendedProps.status}
+                                        </span>
+                                        <span class="badge ${event.extendedProps.priority === '높음' ? 'bg-danger' : event.extendedProps.priority === '중간' ? 'bg-warning' : 'bg-info'}">
+                                            우선순위: ${event.extendedProps.priority}
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted">
+                                        <i class="fas fa-calendar-alt"></i> ${formatDate(event.start)} ~ ${formatDate(event.end)}
+                                    </p>
+
+                                    <p class="text-muted">
+                                        <i class="fas fa-user"></i> 담당자: ${event.extendedProps.assigneeName}
+                                    </p>
+
+                                    ${event.extendedProps.projectName ? `
+                                    <p class="text-muted">
+                                        <i class="fas fa-project-diagram"></i> ${event.extendedProps.projectName}
+                                    </p>
+                                    ` : ''}
+
+                                    <div class="progress my-3">
+                                        <div class="progress-bar" role="progressbar" style="width: ${event.extendedProps.progress}%;" aria-valuenow="${event.extendedProps.progress}" aria-valuemin="0" aria-valuemax="100">
+                                            ${event.extendedProps.progress}%
+                                        </div>
+                                    </div>
+
+                                    ${event.extendedProps.description ? `
+                                    <hr>
+                                    <h5>업무 설명</h5>
+                                    <p>${event.extendedProps.description}</p>
+                                    ` : ''}
+                                `;
+                        }
+
+                        $('#event-detail-body').html(detailHtml);
+                        $('#eventDetailModal').modal('show');
+                    }
+
+                    // Render participants
+                    function renderParticipants(participants) {
+                        if (participants.length === 0) {
+                            $('#event-participants').html('<div class="alert alert-info">참석자가 없습니다.</div>');
+                            return;
+                        }
+
+                        let html = '<table class="table table-sm">';
+                        html += `
+                                <thead>
+                                    <tr>
+                                        <th>이름</th>
+                                        <th>부서</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            `;
+
+                        participants.forEach(participant => {
+                            const statusClass = participant.status === '수락' ? 'bg-success' : participant.status === '거절' ? 'bg-danger' : 'bg-secondary';
+
+                            html += `
+                                    <tr>
+                                        <td>${participant.empName}</td>
+                                        <td>${participant.deptName || '-'}</td>
+                                        <td><span class="badge ${statusClass}">${participant.status}</span></td>
+                                    </tr>
+                                `;
+                        });
+
+                        html += '</tbody></table>';
+
+                        $('#event-participants').html(html);
+                    }
+
+                    // Open schedule modal for creating or editing
+                    function openScheduleModal(scheduleId, startStr, endStr, allDay) {
+                        // Reset form
+                        $('#scheduleForm')[0].reset();
+                        $('#schedule-id').val('');
+                        $('#participants-table tbody tr:not(:first)').remove();
+                        $('#scheduleModalLabel').text('새 일정 등록');
+                        $('#delete-schedule-btn').hide();
+
+                        // Set default project if filter is active
+                        const projectId = $('#project-filter').val();
+                        if (projectId !== 'all') {
+                            $('#schedule-project').val(projectId);
+                        }
+
+                        // If scheduleId is provided, load schedule data
+                        if (scheduleId) {
+                            $('#scheduleModalLabel').text('일정 수정');
+                            $('#delete-schedule-btn').show();
+
+                            $.ajax({
+                                url: `/api/schedules/${scheduleId}`,
+                                method: 'GET',
+                                success: function(schedule) {
+                                    $('#schedule-id').val(schedule.id);
+                                    $('#schedule-title').val(schedule.title);
+                                    $('#schedule-description').val(schedule.description);
+                                    $('#schedule-location').val(schedule.location);
+                                    $('#schedule-color').val(schedule.color);
+                                    $('#schedule-project').val(schedule.projectId || '');
+                                    $('#schedule-all-day').prop('checked', schedule.isAllDay);
+                                    $('#schedule-repeat-type').val(schedule.repeatType || '없음');
+
+                                    if (schedule.repeatType && schedule.repeatType !== '없음') {
+                                        $('#repeat-end-date-container').show();
+                                        if (schedule.repeatEndDate) {
+                                            $('#schedule-repeat-end-date').val(formatDate(schedule.repeatEndDate));
+                                        }
+                                    } else {
+                                        $('#repeat-end-date-container').hide();
+                                    }
+
+                                    // Format date-time values
+                                    $('#schedule-start-date').val(formatDateTimeForInput(schedule.startTime));
+                                    $('#schedule-end-date').val(formatDateTimeForInput(schedule.endTime));
+
+                                    // Load participants
+                                    $.ajax({
+                                        url: `/api/schedules/${scheduleId}/participants`,
+                                        method: 'GET',
+                                        success: function(participants) {
+                                            // Clear existing participants except current user
+                                            $('#participants-table tbody tr:not(:first)').remove();
+
+                                            participants.forEach(participant => {
+                                                // Skip if it's the current user (already added)
+                                                if (participant.empNum === currentEmpNum) {
+                                                    return;
+                                                }
+
+                                                const statusClass = participant.status === '수락' ? 'bg-success' : participant.status === '거절' ? 'bg-danger' : 'bg-secondary';
+
+                                                const row = `
+                                                        <tr data-emp-num="${participant.empNum}">
+                                                            <td>${participant.empName}</td>
+                                                            <td>${participant.deptName || '-'}</td>
+                                                            <td><span class="badge ${statusClass}">${participant.status}</span></td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-sm btn-outline-danger remove-participant-btn">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    `;
+
+                                                $('#participants-table tbody').append(row);
+                                            });
+                                        }
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    alert('일정 정보를 불러오는데 실패했습니다.');
+                                }
+                            });
+                        } else if (startStr && endStr) {
+                            // Set date-time values from calendar selection
+                            $('#schedule-start-date').val(formatDateTimeForInput(startStr));
+                            $('#schedule-end-date').val(formatDateTimeForInput(endStr));
+                            $('#schedule-all-day').prop('checked', allDay);
+                        } else {
+                            // Set default values for new schedule
+                            const now = new Date();
+                            const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
+                            $('#schedule-start-date').val(formatDateTimeForInput(now));
+                            $('#schedule-end-date').val(formatDateTimeForInput(oneHourLater));
+                        }
+
+                        $('#scheduleModal').modal('show');
+                    }
+
+                    // Save schedule
+                    function saveSchedule() {
+                        // Validate form
+                        if (!validateScheduleForm()) {
+                            return;
+                        }
+
+                        // Get schedule ID
+                        const scheduleId = $('#schedule-id').val();
+
+                        // Collect form data
+                        const scheduleData = {
+                            title: $('#schedule-title').val(),
+                            description: $('#schedule-description').val(),
+                            projectId: $('#schedule-project').val() || null,
+                            startTime: $('#schedule-start-date').val(),
+                            endTime: $('#schedule-end-date').val(),
+                            location: $('#schedule-location').val(),
+                            isAllDay: $('#schedule-all-day').is(':checked'),
+                            repeatType: $('#schedule-repeat-type').val(),
+                            repeatEndDate: $('#schedule-repeat-end-date').val() || null,
+                            color: $('#schedule-color').val()
+                        };
+
+                        // Collect participants
+                        const participants = [];
+                        $('#participants-table tbody tr').each(function() {
+                            participants.push($(this).data('emp-num'));
+                        });
+
+                        // Add participants data
+                        scheduleData.participants = participants;
+
+                        // API url and method
+                        const url = scheduleId ? `/api/schedules/${scheduleId}` : '/api/schedules';
+                        const method = scheduleId ? 'PUT' : 'POST';
+
+                        // Save schedule via AJAX
+                        $.ajax({
+                            url: url,
+                            method: method,
+                            contentType: 'application/json',
+                            data: JSON.stringify(scheduleData),
+                            success: function(response) {
+                                $('#scheduleModal').modal('hide');
+                                calendar.refetchEvents();
+                                loadUpcomingEvents();
+                            },
+                            error: function(xhr, status, error) {
+                                alert('일정 저장에 실패했습니다: ' + xhr.responseText);
+                            }
+                        });
+                    }
+
+                    // Delete schedule
+                    function deleteSchedule() {
+                        const scheduleId = $('#schedule-id').val();
+
+                        if (!scheduleId) {
+                            return;
+                        }
+
+                        if (!confirm('정말로 이 일정을 삭제하시겠습니까?')) {
+                            return;
+                        }
+
+                        $.ajax({
+                            url: `/api/schedules/${scheduleId}`,
+                            method: 'DELETE',
+                            success: function() {
+                                $('#scheduleModal').modal('hide');
+                                calendar.refetchEvents();
+                                loadUpcomingEvents();
+                            },
+                            error: function(xhr, status, error) {
+                                alert('일정 삭제에 실패했습니다: ' + xhr.responseText);
+                            }
+                        });
+                    }
+
+                    // Update event dates after drag or resize
+                    function updateEventDates(event) {
+                        const eventId = event.id;
+                        const eventType = event.extendedProps.type;
+
+                        if (eventType === 'schedule') {
+                            const scheduleId = eventId.split('_')[1];
+
+                            const updateData = {
+                                startTime: event.start.toISOString(),
+                                endTime: event.end ? event.end.toISOString() : event.start.toISOString(),
+                                isAllDay: event.allDay
+                            };
+
+                            $.ajax({
+                                url: `/api/schedules/${scheduleId}/dates`,
+                                method: 'PATCH',
+                                contentType: 'application/json',
+                                data: JSON.stringify(updateData),
+                                success: function() {
+                                    calendar.refetchEvents();
+                                    loadUpcomingEvents();
+                                },
+                                error: function(xhr, status, error) {
+                                    alert('일정 날짜 업데이트에 실패했습니다.');
+                                    calendar.refetchEvents();
+                                }
+                            });
+                        } else if (eventType === 'task') {
+                            const taskId = eventId.split('_')[1];
+
+                            const updateData = {
+                                startDate: formatDate(event.start),
+                                dueDate: formatDate(event.end || event.start)
+                            };
+
+                            $.ajax({
+                                url: `/api/tasks/${taskId}/dates`,
+                                method: 'PATCH',
+                                contentType: 'application/json',
+                                data: JSON.stringify(updateData),
+                                success: function() {
+                                    calendar.refetchEvents();
+                                },
+                                error: function(xhr, status, error) {
+                                    alert('업무 날짜 업데이트에 실패했습니다.');
+                                    calendar.refetchEvents();
+                                }
+                            });
+                        }
+                    }
+
+                    // Validate schedule form
+                    function validateScheduleForm() {
+                        if (!$('#schedule-title').val().trim()) {
+                            alert('일정 제목을 입력해주세요.');
+                            $('#schedule-title').focus();
+                            return false;
+                        }
+
+                        if (!$('#schedule-start-date').val()) {
+                            alert('시작일시를 입력해주세요.');
+                            $('#schedule-start-date').focus();
+                            return false;
+                        }
+
+                        if (!$('#schedule-end-date').val()) {
+                            alert('종료일시를 입력해주세요.');
+                            $('#schedule-end-date').focus();
+                            return false;
+                        }
+
+                        const startDate = new Date($('#schedule-start-date').val());
+                        const endDate = new Date($('#schedule-end-date').val());
+
+                        if (startDate > endDate) {
+                            alert('종료일시는 시작일시보다 이후여야 합니다.');
+                            $('#schedule-end-date').focus();
+                            return false;
+                        }
+
+                        if ($('#schedule-repeat-type').val() !== '없음' && !$('#schedule-repeat-end-date').val()) {
+                            alert('반복 종료일을 입력해주세요.');
+                            $('#schedule-repeat-end-date').focus();
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    // Format date (yyyy-MM-dd)
+                    function formatDate(date) {
+                        if (typeof date === 'string') {
+                            date = new Date(date);
+                        }
+
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const day = String(date.getDate()).padStart(2, '0');
+
+                        return `${year}-${month}-${day}`;
+                    }
+
+                    // Format date and time (yyyy-MM-dd HH:mm)
+                    function formatDateTime(datetime) {
+                        if (typeof datetime === 'string') {
+                            datetime = new Date(datetime);
+                        }
+
+                        const year = datetime.getFullYear();
+                        const month = String(datetime.getMonth() + 1).padStart(2, '0');
+                        const day = String(datetime.getDate()).padStart(2, '0');
+                        const hours = String(datetime.getHours()).padStart(2, '0');
+                        const minutes = String(datetime.getMinutes()).padStart(2, '0');
+
+                        return `${year}-${month}-${day} ${hours}:${minutes}`;
+                    }
+
+                    // Format date and time for input (yyyy-MM-ddTHH:mm)
+                    function formatDateTimeForInput(datetime) {
+                        if (typeof datetime === 'string') {
+                            datetime = new Date(datetime);
+                        }
+
+                        const year = datetime.getFullYear();
+                        const month = String(datetime.getMonth() + 1).padStart(2, '0');
+                        const day = String(datetime.getDate()).padStart(2, '0');
+                        const hours = String(datetime.getHours()).padStart(2, '0');
+                        const minutes = String(datetime.getMinutes()).padStart(2, '0');
+
+                        return `${year}-${month}-${day}T${hours}:${minutes}`;
+                    }
+                });
+            </script>
+        </main>
+    </div>
+</div>
+</body>
+</html>
