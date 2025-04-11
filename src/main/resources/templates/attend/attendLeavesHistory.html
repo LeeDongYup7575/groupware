@@ -54,6 +54,7 @@
             휴가 생성 내역 2025-01-01 ~ 2025-12-31
         </div>
 
+
         <!-- 연차 생성 내역 테이블 -->
         <table class="data-table">
             <thead>
@@ -68,26 +69,36 @@
                 <th>최종</th>
             </tr>
             </thead>
+
             <tbody>
-            <tr th:each="entry : ${leaveGrantMap}">
-                <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>
-                <td th:text="${entry.value + '일'}"></td>
-                <td th:text="${entry.value + '일'}"></td>
-                <td>정기휴가</td>
-                <td th:text="|연차 (${entry.value}일 x 8시간 = ${entry.value * 8}시간)|"></td>
-            </tr>
-            <tr th:if="${leaveGrantMap.isEmpty()}">
+            <tr th:if="true">
                 <td colspan="5" class="no-data">생성된 연차가 없습니다.</td>
             </tr>
             </tbody>
 
+            <!--            <tbody>-->
+<!--            <tr th:each="entry : ${leaveGrantMap}">-->
+<!--                <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>-->
+<!--                <td th:text="${entry.value + '일'}"></td>-->
+<!--                <td th:text="${entry.value + '일'}"></td>-->
+<!--                <td>정기휴가</td>-->
+<!--                <td th:text="|연차 (${entry.value}일 x 8시간 = ${entry.value * 8}시간)|"></td>-->
+<!--            </tr>-->
+<!--            <tr th:if="${leaveGrantMap.isEmpty()}">-->
+<!--                <td colspan="5" class="no-data">생성된 연차가 없습니다.</td>-->
+<!--            </tr>-->
+<!--            </tbody>-->
+
+
+
         </table>
 
-        <!-- 요약 -->
+
         <div class="summary"
-             th:text="'휴가 현황  총 휴가: '+${employee.totalLeave}+'일 | 사용: '+ ${employee.usedLeave}+'일 | 잔여: '+ ${canUseLeaves}+'일'">
+             th:text="'휴가 현황  총 휴가: ' + (${employee.totalLeave} ?: 0) + '일 | 사용: ' + (${employee.usedLeave} ?: 0) + '일 | 잔여: ' + (${canUseLeaves} ?: 0) + '일'">
             휴가 현황 총 휴가: 20일 | 사용: 0일 | 잔여: 20일
         </div>
+
 
         <!-- 휴가 신청 내역 -->
         <div class="section-title">

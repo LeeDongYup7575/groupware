@@ -68,7 +68,11 @@ public class LeaveController {
             return "redirect:/attend/main";
         }
 
-        BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
+        BigDecimal totalLeave = employee.getTotalLeave() != null ? employee.getTotalLeave() : BigDecimal.ZERO;
+        BigDecimal usedLeave = employee.getUsedLeave() != null ? employee.getUsedLeave() : BigDecimal.ZERO;
+
+        BigDecimal canUseLeaves = totalLeave.subtract(usedLeave);
+
 
 
         List<EmployeesDTO> empAllList = employeeMapper.selectEmpAll();
@@ -104,7 +108,9 @@ public class LeaveController {
         EmployeesDTO employee = employeeMapper.findById(empId);
         if (employee == null) return "redirect:/auth/login";
 
-        BigDecimal canUseLeaves = employee.getTotalLeave().subtract(employee.getUsedLeave());
+        BigDecimal totalLeave = employee.getTotalLeave() != null ? employee.getTotalLeave() : BigDecimal.ZERO;
+        BigDecimal usedLeave = employee.getUsedLeave() != null ? employee.getUsedLeave() : BigDecimal.ZERO;
+        BigDecimal canUseLeaves = totalLeave.subtract(usedLeave);
 
 
         LocalDate now = LocalDate.now();
