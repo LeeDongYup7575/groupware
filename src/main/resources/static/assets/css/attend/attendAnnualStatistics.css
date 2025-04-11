@@ -6,8 +6,16 @@
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-a{
-    text-decoration-line: none;
+a {
+    color: inherit;
+    text-decoration: none;
+}
+a:visited {
+    color: inherit;
+}
+a:hover,
+a:active {
+    color: inherit;
 }
 
 body {
@@ -129,6 +137,7 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    color:#555;
 }
 
 .submenu li:hover {
