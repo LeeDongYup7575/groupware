@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,33 +71,64 @@ public class SuppliesService {
     }
 
     // 비품 예약 등록
-    @Transactional
-    public SuppliesBookingDTO createBooking(String empNum, BookingRequestDTO requestDTO) {
-        // 문자열 날짜/시간을 LocalDateTime으로 변환
-        LocalDateTime startDateTime = parseDateTime(requestDTO.getStartDate(), requestDTO.getStartTime());
-        LocalDateTime endDateTime = parseDateTime(requestDTO.getEndDate(), requestDTO.getEndTime());
+//    @Transactional
+//    public SuppliesBookingDTO createBooking(String empNum, BookingRequestDTO requestDTO) {
+//        // 문자열 날짜/시간을 LocalDateTime으로 변환
+//        LocalDateTime startDateTime = parseDateTime(requestDTO.getStartDate(), requestDTO.getStartTime());
+//        LocalDateTime endDateTime = parseDateTime(requestDTO.getEndDate(), requestDTO.getEndTime());
+//
+//        // 비품 예약 가능 여부 확인
+//        if (!isSupplyAvailable(requestDTO.getSupplyId(), requestDTO.getQuantity(), startDateTime, endDateTime)) {
+//            throw new RuntimeException("해당 시간에 비품을 예약할 수 없습니다.");
+//        }
+//
+//        // 예약 객체 생성
+//        SuppliesBooking booking = new SuppliesBooking();
+//        booking.setSupplyId(requestDTO.getSupplyId());
+//        booking.setEmpNum(empNum);
+//        booking.setQuantity(requestDTO.getQuantity());
+//        booking.setStart(startDateTime);
+//        booking.setEnd(endDateTime);
+//        booking.setPurpose(requestDTO.getPurpose());
+//        booking.setBookingStatus("CONFIRMED");
+//        booking.setCreatedAt(LocalDateTime.now());
+//
+//        // 예약 등록
+//        suppliesMapper.insertSuppliesBooking(booking);
+//
+//        // 등록된 예약 반환
+//        return convertToBookingDto(booking);
+//    }
 
-        // 비품 예약 가능 여부 확인
-        if (!isSupplyAvailable(requestDTO.getSupplyId(), requestDTO.getQuantity(), startDateTime, endDateTime)) {
-            throw new RuntimeException("해당 시간에 비품을 예약할 수 없습니다.");
+    @Transactional
+    public List<SuppliesBookingDTO> createMultipleBookings(String empNum, BookingRequestDTO requestDTO) {
+        List<SuppliesBookingDTO> bookings = new ArrayList<>();
+
+        for (BookingRequestDTO.SupplyItem item : requestDTO.getSupplies()) {
+            LocalDateTime startDateTime = parseDateTime(requestDTO.getStartDate(), requestDTO.getStartTime());
+            LocalDateTime endDateTime = parseDateTime(requestDTO.getEndDate(), requestDTO.getEndTime());
+
+            // 비품 예약 가능 여부 확인
+            if (!isSupplyAvailable(item.getId(), item.getQuantity(), startDateTime, endDateTime)) {
+                throw new RuntimeException("비품 " + item.getId() + " 예약 불가");
+            }
+
+            // 예약 생성
+            SuppliesBooking booking = new SuppliesBooking();
+            booking.setSupplyId(item.getId());
+            booking.setEmpNum(empNum);
+            booking.setQuantity(item.getQuantity());
+            booking.setStart(startDateTime);
+            booking.setEnd(endDateTime);
+            booking.setPurpose(requestDTO.getPurpose());
+            booking.setBookingStatus("CONFIRMED");
+            booking.setCreatedAt(LocalDateTime.now());
+
+            suppliesMapper.insertSuppliesBooking(booking);
+            bookings.add(convertToBookingDto(booking));
         }
 
-        // 예약 객체 생성
-        SuppliesBooking booking = new SuppliesBooking();
-        booking.setSupplyId(requestDTO.getSupplyId());
-        booking.setEmpNum(empNum);
-        booking.setQuantity(requestDTO.getQuantity());
-        booking.setStart(startDateTime);
-        booking.setEnd(endDateTime);
-        booking.setPurpose(requestDTO.getPurpose());
-        booking.setBookingStatus("CONFIRMED");
-        booking.setCreatedAt(LocalDateTime.now());
-
-        // 예약 등록
-        suppliesMapper.insertSuppliesBooking(booking);
-
-        // 등록된 예약 반환
-        return convertToBookingDto(booking);
+        return bookings;
     }
 
     // 비품 예약 수정

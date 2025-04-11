@@ -215,8 +215,9 @@ public class BookingApiController {
     }
 
     // 비품 예약 등록
+    // 비품 예약 등록
     @PostMapping("/supplies-bookings")
-    public ResponseEntity<SuppliesBookingDTO> createSuppliesBooking(
+    public ResponseEntity<List<SuppliesBookingDTO>> createSuppliesBookings(
             @RequestBody BookingRequestDTO requestDTO,
             HttpServletRequest request) {
 
@@ -234,43 +235,26 @@ public class BookingApiController {
             // 시간 유효성 검증
             validateTimeRange(startDateTime, endDateTime);
 
-            // 요청에 여러 비품 항목이 포함된 경우 처리
-            if (requestDTO.getSupplies() != null && !requestDTO.getSupplies().isEmpty()) {
-                // 모든 비품에 대해 예약 가능 여부 확인
-                boolean allAvailable = true;
-                for (BookingRequestDTO.SupplyItem item : requestDTO.getSupplies()) {
-                    boolean available = suppliesService.isSupplyAvailable(
-                            item.getId(), item.getQuantity(), startDateTime, endDateTime);
-                    if (!available) {
-                        allAvailable = false;
-                        break;
-                    }
-                }
+            // 요청에 포함된 비품 정보 확인
+            if (requestDTO.getSupplies() == null || requestDTO.getSupplies().isEmpty()) {
+                return ResponseEntity.badRequest().build(); // 비품 정보가 없으면 잘못된 요청 반환
+            }
 
-                if (!allAvailable) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT)
-                            .body(null); // 충돌 상태 반환
-                }
-
-                // 모든 비품이 가용 가능한 경우, 첫 번째 비품으로 예약 생성
-                // 실제로는 여러 비품을 한 번에 예약하는 로직을 구현해야 함
-                BookingRequestDTO.SupplyItem firstItem = requestDTO.getSupplies().get(0);
-                requestDTO.setSupplyId(firstItem.getId());
-                requestDTO.setQuantity(firstItem.getQuantity());
-            } else {
-                // 기존 방식대로 단일 비품 예약 가능 여부 확인
-                boolean isAvailable = suppliesService.isSupplyAvailable(
-                        requestDTO.getSupplyId(), requestDTO.getQuantity(), startDateTime, endDateTime);
-
-                if (!isAvailable) {
+            // 모든 비품 예약 가능 여부 확인
+            for (BookingRequestDTO.SupplyItem item : requestDTO.getSupplies()) {
+                boolean available = suppliesService.isSupplyAvailable(
+                        item.getId(), item.getQuantity(), startDateTime, endDateTime);
+                if (!available) {
                     return ResponseEntity.status(HttpStatus.CONFLICT)
                             .body(null); // 충돌 상태 반환
                 }
             }
 
-            // 예약 생성
-            SuppliesBookingDTO booking = suppliesService.createBooking(empNum, requestDTO);
-            return ResponseEntity.ok(booking);
+            // 모든 비품 예약 처리
+            List<SuppliesBookingDTO> bookings = suppliesService.createMultipleBookings(empNum, requestDTO);
+
+            // 예약 성공 응답 반환
+            return ResponseEntity.ok(bookings);
         } catch (IllegalArgumentException e) {
             // 유효성 검증 실패
             return ResponseEntity.badRequest().build();

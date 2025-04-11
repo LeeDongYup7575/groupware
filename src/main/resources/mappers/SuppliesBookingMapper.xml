@@ -111,27 +111,14 @@
         SELECT
             CASE
                 WHEN (
-                    (SELECT total_quantity FROM supplies WHERE id = #{supplyId})
-                        >=
-                    (#{quantity} +
-                     (SELECT COALESCE(MAX(booked_qty), 0) FROM (
-                                                                   SELECT
-                                                                       SUM(quantity) as booked_qty
-                                                                   FROM
-                                                                       supplies_booking
-                                                                   WHERE
-                                                                       supply_id = #{supplyId}
-                                                                     AND booking_status != 'CANCELLED'
-                            AND (id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
-                                                                     AND (
-                                                                       (start &lt;= #{endTime} AND end &gt;= #{startTime})
-                                                                       )
-                                                                   GROUP BY
-                                                                       supply_id
-                                                               ) as bookings_per_time))
-                    THEN TRUE
-                ELSE FALSE
-                END
+                    (SELECT total_quantity FROM supplies WHERE id = #{supplyId}) >=
+                    (#{quantity} + (SELECT COALESCE(SUM(quantity), 0)
+                                    FROM supplies_booking
+                                    WHERE supply_id = #{supplyId}
+                                      AND booking_status != 'CANCELLED'
+        AND (start &lt;= #{endTime} AND end &gt;= #{startTime})))
+        ) THEN TRUE
+        ELSE FALSE END
     </select>
 
     <!-- 특정 시점에 예약된 비품 수량 조회 -->
