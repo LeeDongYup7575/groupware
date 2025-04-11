@@ -384,6 +384,31 @@ select {
     margin-bottom: 20px;
 }
 
+.file-upload-btn{
+    color: #4a90e2;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+
+    padding-right: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+
+/* 파일 입력 요소 자체는 숨김 */
+input[type="file"] {
+    display: none;
+}
+
+.remove-file{
+    background: none;
+    border: none;
+
+    cursor: pointer;
+    color: #888;
+}
+
 .attachment-label {
     display: block;
     font-size: 14px;

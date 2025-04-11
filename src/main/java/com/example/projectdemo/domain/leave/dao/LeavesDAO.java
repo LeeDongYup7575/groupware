@@ -3,6 +3,7 @@ package com.example.projectdemo.domain.leave.dao;
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
+import com.example.projectdemo.domain.work.dto.OverTimeDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -81,6 +82,10 @@ public class LeavesDAO {
         params.put("empId", empId);
         params.put("year", year);
         return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.getMonthlyLeaveHours", params);
+    }
+
+    public List<LeavesDTO> getLeavesDTOListByDocId(int id) {
+        return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.selectByLeavesFromDocId",id);
     }
 
 }

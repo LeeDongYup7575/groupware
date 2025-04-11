@@ -85,5 +85,8 @@
             month
     </select>
 
-
+    <!-- 문서 번호를 통한 연장근무신청서 Detail 가져오기 -->
+    <select id="selectByOvertimesFromDocId" resultType="com.example.projectdemo.domain.work.dto.OverTimeDTO">
+        SELECT * FROM overtime_requests where  edsm_document_id = #{id}
+    </select>
 </mapper>

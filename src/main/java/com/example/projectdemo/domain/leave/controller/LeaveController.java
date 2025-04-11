@@ -5,6 +5,7 @@ import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
 import com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO;
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
 import com.example.projectdemo.domain.edsm.enums.ApprovalStatus;
+import com.example.projectdemo.domain.edsm.services.EdsmFilesService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
@@ -47,6 +48,9 @@ public class LeaveController {
 
     @Autowired
     private EmployeesService employeeService;
+
+    @Autowired
+    private EdsmFilesService edsmFilesService;
 
     @RequestMapping("/leavesForm")
     public String leavesForm(Model model, HttpServletRequest request) {
@@ -187,8 +191,9 @@ public class LeaveController {
             @RequestParam("leaveHours[]") List<String> leaveHours,
             @RequestParam("reason") String content,
             @RequestParam("approvalLine") String approvalLine,
+            @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
             HttpServletRequest request,
-            Model model) {
+            Model model)  throws Exception{
 
         EdsmBusinessContactDTO bcdto = new EdsmBusinessContactDTO();
 
@@ -211,7 +216,7 @@ public class LeaveController {
 
         int edsmDocId = leavesService.insertByEdsm(bcdto);
 
-
+        edsmFilesService.getFilesInsert(edsmDocId,1004,fileAttachment);
 
         for (int i = 0; i < leaveStartDates.size(); i++) {
             LeavesDTO leavesdto = new LeavesDTO();

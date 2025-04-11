@@ -47,4 +47,8 @@ public class WorkService {
     public List<Map<String, Object>> getMonthlyOvertimeHours(int empId, int year){
         return workDAO.getMonthlyOvertimeHours(empId,year);
     }
+
+    public List<OverTimeDTO> getOvertimeDTOListByDocId(int id) {
+        return workDAO.getOvertimeDTOListByDocId(id);
+    }
 }

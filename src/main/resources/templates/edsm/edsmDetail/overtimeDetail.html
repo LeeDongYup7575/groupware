@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/assets/css/edsm/edsmOvertimeDetail.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>전자결재</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 아이콘 사용 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+    <div class="logo">TECH X</div>
+    <div class="title">전자결재</div>
+</div>
+
+<div class="container">
+    <!-- 좌측 사이드바 -->
+    <div class="sidebar">
+        <button class="create-button" id="create-button">
+            <i class="fas fa-plus"></i>
+            작성하기
+        </button>
+        <div class="menu-section">
+            <div class="menu-header">
+                <i class="fas fa-chevron-down"></i>
+                결재 상태
+            </div>
+            <div class="menu-items">
+                <div class="menu-item" id="main">
+                    <i class="fas fa-folder"></i>
+                    전체
+                    (내가 결재권 있는 모든 문서의 나의 결재 선택 상태 확인)
+                </div>
+                <div class="menu-item" id="wait">
+                    <i class="fas fa-spinner"></i>
+                    대기
+                    (내 결재권이 승인 상태인 앞사람 보다 바로 뒤에 순번일경우)
+                </div>
+                <div class="menu-item" id="expected">
+                    <i class="fas fa-spinner"></i>
+                    예정
+                    (내 결재권이 대기 상태인 앞사람 보다 뒤에 순번일경우)
+                </div>
+            </div>
+        </div>
+        <div class="menu-section">
+            <div class="menu-header">
+                <i class="fas fa-chevron-down"></i>
+                나의 문서함
+            </div>
+            <div class="menu-items">
+                <div class="menu-item">
+                    <i class="fas fa-pen"></i>
+                    기안(내가 기안한 모든 문서- 상태상관없음)
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-file-signature"></i>
+                    승인(내가 기안한 문서 중 승인완료된 문서등)
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-undo"></i>
+                    반려(내가 기안한 문서 중 반려된 문서들)
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 결재 컨테이너 -->
+    <div class="main-container">
+        <div class="total">
+
+
+            <!-- 기본설정 영역 -->
+            <div class="form-section">
+                <h3 class="form-header">전자 결재 기안</h3>
+                <div class="form-row">
+
+                    <!-- 문서 양식 종류 -->
+                    <div class="form-label">문서 종류</div>
+
+                    <div class="form-input">
+                        <select id="documentType" name="documentType" th:each="doc : ${edsmDocumentList}" disabled>
+                            <option th:if="${doc.edsmFormId == 1001}" th:text="업무연락"></option>
+                            <option th:if="${doc.edsmFormId == 1002}" th:text="지출결의서"></option>
+                            <option th:if="${doc.edsmFormId == 1003}" th:text="품의서"></option>
+                            <option th:if="${doc.edsmFormId == 1004}" th:text="휴가신청서"></option>
+                            <option th:if="${doc.edsmFormId == 1005}" th:text="연장근무신청서"></option>
+                        </select>
+                    </div>
+                    <!-- 문서 양식 번호
+                    1001 = 업무연락
+                    1002 = 지출결의서
+                    1003 = 품의서
+                    1004 = 휴가신청서
+                    1005 = 연장근무신청서
+                    -->
+
+                    <!-- 작성자 (서버에서 세팅된 변수 사용- 타임리프문을 이용해서 가져옴) -->
+                    <div class="form-label" style="margin-left: 20px;">작성자</div> <!-- 작성자(기안자) = drafter -->
+
+                    <div class="form-input">
+                <span id="drafterInfo"
+                      th:attr="data-drafterId=${employee.empNum}, data-drafterposition=${employee.positionTitle}, data-draftername=${employee.name}" th:text="${employee.positionTitle} + ' ' + ${employee.name}">
+                      <!--
+                      <속성값 설명>
+                      drafterId = 기안자 사번
+                      drafterposition = 기안자 직급
+                      draftername = 기안자 이름
+                      -->
+                </span>
+                        <!-- 기안자 정보를 form으로 보내기위해 히든 입력창 생성 -->
+                        <input type="hidden" name="drafterId" th:value="${employee.empNum}" />
+                        <input type="hidden" name="drafterPosition" th:value="${employee.positionTitle}" />
+                        <input type="hidden" name="drafterName" th:value="${employee.name}" />
+                    </div>
+                </div>
+
+
+
+                <div class="form-row">
+                    <!-- 보존 연한 -->
+                    <div class="form-label">보존 연한</div>
+                    <div class="form-input">
+                        <select name="retentionPeriod" th:each="doc : ${edsmDocumentList}" disabled>
+                            <option th:text="${doc.retentionPeriod}"></option>
+                        </select>
+                    </div>
+
+
+
+                    <!-- 보안 등급 -->
+                    <div class="form-label" style="margin-left: 20px;">보안 등급</div>
+                    <div class="form-input">
+                        <select name="securityGrade" th:each="doc : ${edsmDocumentList}" disabled>
+                            <option th:if="${doc.securityGrade == 'S등급'}" th:text="S등급"></option>
+                            <option th:if="${doc.securityGrade == 'A등급'}" th:text="A등급"></option>
+                            <option th:if="${doc.securityGrade == 'B등급'}" th:text="B등급"></option>
+                            <option th:if="${doc.securityGrade == 'C등급'}" th:text="C등급"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- 결재선 영역 -->
+            <div class="form-section"  >
+                <div class="form-row" style="display:none">
+                    <div class="form-label">결재라인</div>
+
+
+                    <!-- 결재라인은 모달로 설정한 후, hidden 필드에 JSON 또는 구분자로 저장 -->
+                    <button type="button" class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
+                </div>
+
+                <!-- 신청 라인 (기안자 정보 사용) -->
+                <div class="approval-container">
+                    <div class="approval-line">
+                        <div class="approval-header">신청</div>
+                        <div class="approval-body">
+                            <div class="approval-body-cell">
+                                <div class="drafter-stamp" style="
+                      width: 60px;
+                      height: 60px;
+                      border: 2px solid green;
+                      border-radius: 50%;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      color: green;
+                      font-weight: bold;
+                      transform: rotate(-15deg);">신청</div>
+
+                                <div class="drafter-name" style="margin: 5px 0;font-weight: bold;"
+                                     th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
+                                <div class="drafter-date" style="font-size: 12px;color: #777;" th:each="doc : ${edsmDocumentList}" th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- 결재 라인 (모달에서 동적 추가) -->
+                    <div class="approval-line approval-line-2">
+                        <div class="approval-header approval-header-2">
+                            <div class="approval-header-cell approval-header-cell-2">결재 라인</div>
+
+                        </div>
+
+
+                        <div class="approval-body approval-body-2">
+                            <div class="approval-body-cell approval-body-cell-2" th:each="appList : ${approvalLineList}">
+                                <div class="approval-stamp" th:text="${appList.status}"></div>
+                                <div class="approval-name" th:text="${appList.approverPosition}+' '+${appList.approverName}"></div>
+                                <div class="approval-date" th:text="${#dates.format(appList.approvalAt, 'yyyy-MM-dd')}"></div>
+                                <!-- 버튼은 상태가 '대기'이고, 현재 로그인한 사원번호와 결재자 사원번호가 일치할 때만 나타남 -->
+                                <div class="approval-btn" th:if="${appList.status == '대기' and appList.approverId == employee.empNum}">
+                                    <!-- data-document-id와 data-approval-no를 저장하여 후에 AJAX 요청 시 사용 -->
+                                    <button type="button" class="approvalBtn"
+                                            th:attr="data-document-id=${appList.documentId}, data-approver-id=${appList.approverId}, data-approval-no=${appList.approvalNo}">
+                                        결재하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- 결재라인 정보를 hidden 필드로 폼에 포함
+                     스크립트에서 동적으로 추가 될거임.
+                 -->
+
+                <input type="hidden" name="approvalLine" id="approvalLine" value="" />
+            </div>
+
+
+            <!-- 본문 입력 영역 -->
+            <div class="main2-contents" th:each="work : ${overtimesList}">
+                <div class="form-contents">
+                    <label class="contents-label" for="title">제목</label>
+                    <input type="text" id="title" name="title" class="label-input" readonly="readonly"/>연장근무신청서
+                </div>
+                <div class="form-group">
+                    <div style="margin-bottom: 20px;">
+                        <label for="accountingDate">연장근무신청일</label>
+                        <input type="text" id="accountingDate" th:value="${work.workDate}" style="width: 200px;" readonly="readonly">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <span>연장근무시간</span>
+                        <input type="text" class="bank-input" name="bank" th:value="${work.startTime} + ' ~ ' + ${work.endTime}" readonly="readonly">
+                    </div>
+                </div>
+
+                <div class="form-contents">
+                    <label class="contents-label" for="content">사유</label>
+                    <textarea id="content" class="label-textarea" th:text="${leave.reason}" readonly="readonly"></textarea>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- 결재 선택 모달 (초기에는 숨김 처리) -->
+    <div id="approvalModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" style="cursor:pointer;">&times;</span>
+            <h3>결재 선택</h3>
+            <p>승인 또는 반려를 선택하세요.</p>
+            <button id="approveBtn" data-status="승인">승인</button>
+            <button id="rejectBtn" data-status="반려">반려</button>
+        </div>
+    </div>
+
+    <!-- 결재선 설정 모달 -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>결재라인 선택</h3><br/>
+            <!-- 부서 선택 요소 추가 -->
+            <div class="department-selection">
+                <label for="departmentSelect">부서 선택:</label>
+                <select id="departmentSelect">
+                    <option value="">전체 부서</option>
+                    <option value="1">개발팀</option>
+                    <option value="2">영업팀</option>
+                    <option value="3">인사팀</option>
+                </select>
+            </div>
+            <!-- 사원 리스트-->
+            <ul class="employee-list">
+                <li th:each="emp : ${list_emp}"
+                    th:attr="data-department=${emp.depId}, data-approvernum=${emp.empNum}, data-approverposition=${emp.positionTitle}, data-approvername=${emp.name}"
+                    th:text="${emp.positionTitle} + ' ' + ${emp.name}">
+                </li>
+            </ul>
+            <button id="saveApprovalLine" class="button">선택 완료</button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        //작성자 정보 전역변수설정
+        //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
+        let drafter = {
+            id: /*[[${employee.empNum}]]*/,
+            position: /*[[${employee.positionTitle}]]*/,
+            name: /*[[${employee.name}]]*/
+        };
+
+
+        // 초기화 및 이벤트 바인딩
+        let storedValue = [[${bc}]];
+        if (storedValue) {
+            $("#formSelect").val(storedValue);
+        }
+
+
+        $("#main").on("click", function () {
+            location.href = "/edsm/main";
+        });
+        $("#expected").on("click", function () {
+            location.href = "/edsm/expected";
+        });
+
+        $("#wait").on("click", function () {
+            location.href = "/edsm/wait";
+        });
+        $("#progress").on("click", function () {
+            location.href = "/edsm/progress";
+        });
+
+        $("#complete").on("click", function () {
+            location.href = "/edsm/complete";
+        });
+
+        $("#create-button").on("click", function () {
+            location.href = "/edsmForm/input";
+        });
+
+
+        // 결재하기 버튼 클릭 시 모달 열기
+        $('.approvalBtn').on('click', function() {
+            // 버튼에 저장된 문서ID와 결재번호를 모달에 data 속성으로 저장
+            let documentId = $(this).data('document-id');
+            let approverId = $(this).data('approver-id');
+            let approvalNo = $(this).data('approval-no');
+            $('#approvalModal').data('document-id', documentId);
+            $('#approvalModal').data('approver-id', approverId);
+            $('#approvalModal').data('approval-no', approvalNo);
+            // 모달 열기
+            $('#approvalModal').fadeIn();
+        });
+
+        // 모달 닫기 (닫기 버튼 클릭 시)
+        $('#approvalModal .close').on('click', function() {
+            $('#approvalModal').fadeOut();
+        });
+
+        // 승인, 반려 버튼 클릭 시 처리
+        $('#approveBtn, #rejectBtn').on('click', function() {
+            let newStatus = $(this).data('status'); // '승인' 또는 '반려'
+            let documentId = $('#approvalModal').data('document-id');
+            let approverId = $('#approvalModal').data('approver-id');
+            let approvalNo = $('#approvalModal').data('approval-no');
+            // AJAX 요청을 통해 서버의 상태 업데이트 API 호출 (예시 URL: /edsm/updateApprovalStatus)
+            $.ajax({
+                url: '/edsmDetail/updateApprovalStatus',
+                type: 'POST',
+                // contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // 기본값이므로 생략 가능
+                data: {
+                    documentId: documentId,
+                    approverId: approverId,
+                    approvalNo: approvalNo,
+                    status: newStatus
+                },
+                success: function(response) {
+                    // 서버에서 리다이렉트 대신 성공 메시지를 반환하도록 수정 필요
+                    alert('결재 상태가 "' + newStatus + '"로 변경되었습니다.');
+                    location.href = "/edsmDetail/cashDisbuVoucher/" + documentId;
+                },
+                error: function() {
+                    alert('결재 상태 업데이트에 실패했습니다.');
+                }
+            });
+        });
+
+        // form select 변경 이벤트
+        $("#documentType").on("change", function() {
+            let selectedValue = $(this).val();
+            console.log("선택된 값:", selectedValue);
+            location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
+        });
+
+        // 결재선 설정 버튼 클릭 시 모달 열기
+        $("#approvalSettingButton").on("click", function () {
+            $("#employeeModal").fadeIn();
+        });
+
+        // 모달 닫기 버튼 클릭
+        $(".close").on("click", function () {
+            $("#employeeModal").fadeOut();
+        });
+
+        // 사원 목록 클릭 시 선택 및 순서 재할당
+        $(".employee-list").on("click", "li", function () {
+            $(this).toggleClass("selected");
+            // 선택된 li들의 순서를 재할당 (1부터 시작)
+            $(".employee-list li.selected").each(function(index) {
+                $(this).attr("data-order", index + 1);
+
+            });
+        });
+
+
+        // 부서 선택 시 리스트 필터링
+        $("#departmentSelect").on("change", function() {
+            let selectedDept = $(this).val();
+            console.log(selectedDept);
+            if(selectedDept) {
+                $(".employee-list li").hide();
+                $(".employee-list li[data-department='" + selectedDept + "']").show();
+            } else {
+                $(".employee-list li").show();
+            }
+        });
+
+
+        $("#saveApprovalLine").on("click", function () {
+            let selectedEmployees = [];
+
+
+
+
+            // 모달에서 선택된 사원들의 정보를 1번 순서부터 추가
+            $(".employee-list li.selected").each(function(index) {
+                let order = index + 1;  // 작성자가 1번이므로 2부터 시작
+                let approverId = $(this).data("approvernum");
+                let approverPosition = $(this).data("approverposition");
+                let approverName = $(this).data("approvername");
+
+                selectedEmployees.push({
+                    approverId: approverId,
+                    approvalNo: order,
+                    position: approverPosition,
+                    name: approverName,
+                    status: '' // 기본 상태를 필요에 따라 지정 (예: 대기)
+                });
+            });
+
+            // 선택된 사원 정보를 hidden 필드에 JSON 문자열로 저장
+            $("#approvalLine").val(JSON.stringify(selectedEmployees));
+
+            // 결재라인 영역 업데이트 (작성자 포함)
+            let approvalBody = $(".approval-line-2 .approval-body-2");
+            approvalBody.empty();
+            selectedEmployees.forEach(function(emp) {
+                let cell = '<div class="approval-body-cell-2" data-order="'+ emp.approvalNo +'">' +
+                    '<div class="approval-stamp">' + (emp.status ? emp.status : "대기") + '</div>' +
+                    '<div class="approval-name">' + emp.position + ' ' + emp.name + '</div>' +
+                    '<div class="approval-date" style="font-size: 12px;color: #777;"></div>' +
+                    '</div>';
+                approvalBody.append(cell);
+            });
+
+            $("#employeeModal").fadeOut();
+        });
+    });
+</script>
+</body>
+</html>
