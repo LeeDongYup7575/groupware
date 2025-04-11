@@ -170,8 +170,15 @@
 
     <!-- 문서 번호를 통한 결재문서 정보 조회-->
     <select id="SelectByDocumentId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
-        SELECT *, draft_date AS drafterDate  FROM groupware.edsm_document where  id = #{id}
-
+        SELECT
+            d.*,
+            d.draft_date AS drafterDate,
+            e.name AS drafterName,
+            p.title AS drafterPosition
+        FROM groupware.edsm_document d
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+                 JOIN groupware.positions p ON e.pos_id = p.id
+        WHERE d.id = #{id}
     </select>
 
     <!-- 문서 번호를 통한 업무연락 문서Detail 가져오기 -->
