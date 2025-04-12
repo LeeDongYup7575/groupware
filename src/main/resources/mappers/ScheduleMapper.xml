@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.projects.mapper.ScheduleMapper">
+
+    <resultMap id="ScheduleResultMap" type="com.example.projectdemo.domain.projects.dto.ScheduleDTO">
+        <id property="id" column="id"/>
+        <result property="empNum" column="emp_num"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="location" column="location"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="allDay" column="all_day"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 전체 일정 조회 -->
+    <select id="findAllSchedules" resultMap="ScheduleResultMap">
+        SELECT * FROM schedules
+        ORDER BY start_time ASC
+    </select>
+
+    <!-- 사원 일정 조회 -->
+    <select id="findSchedulesByEmpNum" parameterType="String" resultMap="ScheduleResultMap">
+        SELECT * FROM schedules
+        WHERE emp_num = #{empNum}
+        ORDER BY start_time ASC
+    </select>
+
+    <!-- 일정 등록 -->
+    <insert id="insertSchedule" parameterType="com.example.projectdemo.domain.projects.dto.ScheduleDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO schedules (
+            emp_num, title, description, location,
+            start_time, end_time, all_day, created_at
+        ) VALUES (
+                     #{empNum}, #{title}, #{description}, #{location},
+                     #{startTime}, #{endTime}, #{allDay}, NOW()
+                 )
+    </insert>
+
+    <!-- 일정 수정 -->
+    <update id="updateSchedule" parameterType="com.example.projectdemo.domain.projects.dto.ScheduleDTO">
+        UPDATE schedules
+        SET title = #{title},
+            description = #{description},
+            location = #{location},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            all_day = #{allDay},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 일정 삭제 -->
+    <delete id="deleteSchedule" parameterType="Integer">
+        DELETE FROM schedules
+        WHERE id = #{id}
+    </delete>
+
+    <insert id="insertScheduleParticipant" parameterType="com.example.projectdemo.domain.projects.dto.ScheduleParticipantDTO">
+        INSERT INTO schedule_participants (schedule_id, emp_num, status, joined_at)
+        VALUES (#{scheduleId}, #{empNum}, #{status}, NOW())
+    </insert>
+
+    <update id="updateParticipantStatus">
+        UPDATE schedule_participants
+        SET status = #{status}
+        WHERE schedule_id = #{scheduleId} AND emp_num = #{empNum}
+    </update>
+
+    <select id="selectScheduleParticipant" resultType="com.example.projectdemo.domain.projects.dto.ScheduleParticipantDTO">
+        SELECT schedule_id, emp_num, status, joined_at
+        FROM schedule_participants
+        WHERE schedule_id = #{scheduleId} AND emp_num = #{empNum}
+    </select>
+
+
+</mapper>

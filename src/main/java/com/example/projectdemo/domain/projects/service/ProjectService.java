@@ -2,73 +2,100 @@ package com.example.projectdemo.domain.projects.service;
 
 import com.example.projectdemo.domain.projects.dto.ProjectDTO;
 import com.example.projectdemo.domain.projects.dto.ProjectMemberDTO;
+import com.example.projectdemo.domain.projects.mapper.ProjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-public interface ProjectService {
+@Service
+public class ProjectService {
 
-    /**
-     * 모든 프로젝트 목록 조회
-     */
-    List<ProjectDTO> getAllProjects();
+    @Autowired
+    private ProjectMapper projectMapper;
 
-    /**
-     * 특정 프로젝트 조회
-     */
-    ProjectDTO getProjectById(Integer id);
+    public List<ProjectDTO> getAllProjects(){
+        return projectMapper.findAllProjects();
+    }
 
-    /**
-     * 직원이 참여 중인 프로젝트 목록 조회
-     */
-    List<ProjectDTO> getProjectsByEmployee(String empNum);
+    public ProjectDTO getProjectById(Integer id){
+        return projectMapper.findProjectById(id);
+    }
 
-    /**
-     * 직원이 접근 가능한 프로젝트 목록 조회 (관찰자 포함)
-     */
-    List<ProjectDTO> getAccessibleProjects(String empNum);
+    public List<ProjectDTO> getProjectsByEmployee(String empNum){
+        return projectMapper.getProjectsByEmpNum(empNum);
+    }
 
-    /**
-     * 부서별 프로젝트 목록 조회
-     */
-    List<ProjectDTO> getProjectsByDepartment(Integer depId);
+    public List<ProjectDTO> getAccessibleProjects(String empNum){
+        return projectMapper.getPublicProjects();
+    }
 
-    /**
-     * 신규 프로젝트 등록
-     */
-    ProjectDTO createProject(ProjectDTO project);
+    public List<ProjectDTO> getProjectsByDepartment(Integer depId){
+        return projectMapper.getProjectsByDepartment(depId);
+    }
 
-    /**
-     * 프로젝트 정보 업데이트
-     */
-    ProjectDTO updateProject(ProjectDTO project);
+    @Transactional
+    public ProjectDTO createProject(ProjectDTO project){
+        if(projectMapper.insertProject(project) > 0){
+            return project;
+        }
+        throw new RuntimeException("프로젝트를 등록할 수 없습니다.");
+    }
 
-    /**
-     * 프로젝트 상태 업데이트
-     */
-    ProjectDTO updateProjectStatus(Integer id, String status);
+    @Transactional
+    public ProjectDTO updateProject(ProjectDTO project){
+        if(projectMapper.updateProject(project) > 0){
+            return project;
+        }
+        throw new RuntimeException("프로젝트를 수정할 수 없습니다.");
+    }
 
-    /**
-     * 프로젝트 종료 처리
-     */
-    ProjectDTO completeProject(Integer id);
+    @Transactional
+    public ProjectDTO updateProjectStatus(Integer id, String status){
+        if(projectMapper.updateProjectStatus(id, status) > 0){
+            return projectMapper.findProjectById(id);
+        }
+        throw new RuntimeException("프로젝트 상태 수정 실패");
+    }
 
-    /**
-     * 프로젝트에 멤버 추가
-     */
-    void addProjectMember(Integer projectId, String empNum, String role);
+    @Transactional
+    public ProjectDTO completeProject(Integer id){
+        if(projectMapper.updateProjectStatus(id, "complete") > 0){
+            return projectMapper.findProjectById(id);
+        }
+        throw new RuntimeException("프로젝트 완료 처리 실패");
+    }
 
-    /**
-     * 프로젝트 멤버 역할 변경
-     */
-    void updateProjectMemberRole(Integer projectId, String empNum, String role);
+    @Transactional
+    public void addProjectMember(Integer projectId, String empNum, String role){
+        ProjectMemberDTO member = new ProjectMemberDTO();
+        member.setProjectId(projectId);
+        member.setEmpNum(empNum);
+        member.setRole(role);
+        member.setJoinedAt(LocalDateTime.now()); // 필요 시 설정
 
-    /**
-     * 프로젝트에서 멤버 제거
-     */
-    void removeProjectMember(Integer projectId, String empNum);
+        if (projectMapper.insertProjectMember(member) <= 0){
+            throw new RuntimeException("프로젝트 멤버 추가 실패");
+        }
+    }
 
-    /**
-     * 프로젝트 멤버 목록 조회
-     */
-    List<ProjectMemberDTO> getProjectMembers(Integer projectId);
+    @Transactional
+    public void updateProjectMemberRole(Integer projectId, String empNum, String role){
+        if (projectMapper.updateProjectMemberRole(projectId, empNum, role) <= 0){
+            throw new RuntimeException("프로젝트 멤버 역할 수정 실패");
+        }
+    }
+
+    @Transactional
+    public void removeProjectMember(Integer projectId, String empNum){
+        if (projectMapper.deleteProjectMember(projectId, empNum) <= 0){
+            throw new RuntimeException("프로젝트 멤버 제거 실패");
+        }
+    }
+
+    public List<ProjectMemberDTO> getProjectMembers(Integer projectId){
+        return projectMapper.getProjectMembers(projectId);
+    }
 }

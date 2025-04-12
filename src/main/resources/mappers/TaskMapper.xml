@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.projects.mapper.TaskMapper">
+
+    <!-- 업무 기본 결과 매핑 -->
+    <resultMap id="TaskResultMap" type="com.example.projectdemo.domain.projects.dto.TaskDTO">
+        <id property="id" column="id" />
+        <result property="projectId" column="project_id" />
+        <result property="projectName" column="project_name" />
+        <result property="title" column="title" />
+        <result property="description" column="description" />
+        <result property="status" column="status" />
+        <result property="progress" column="progress" />
+        <result property="priority" column="priority" />
+        <result property="creatorEmpNum" column="creator_emp_num" />
+        <result property="creatorName" column="creator_name" />
+        <result property="assigneeEmpNum" column="assignee_emp_num" />
+        <result property="assigneeName" column="assignee_name" />
+        <result property="startDate" column="start_date" />
+        <result property="dueDate" column="due_date" />
+        <result property="estimatedHours" column="estimated_hours" />
+        <result property="actualHours" column="actual_hours" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="completedAt" column="completed_at" />
+    </resultMap>
+
+    <!-- 하위 업무 기본 결과 매핑 -->
+    <resultMap id="SubTaskResultMap" type="com.example.projectdemo.domain.projects.dto.SubTaskDTO">
+        <id property="id" column="id" />
+        <result property="taskId" column="task_id" />
+        <result property="title" column="title" />
+        <result property="description" column="description" />
+        <result property="completed" column="completed" />
+        <result property="assigneeEmpNum" column="assignee_emp_num" />
+        <result property="assigneeName" column="assignee_name" />
+        <result property="dueDate" column="due_date" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="completedAt" column="completed_at" />
+    </resultMap>
+
+    <!-- 모든 업무 조회 -->
+    <select id="findAllTasks" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        ORDER BY t.created_at DESC
+    </select>
+
+    <!-- 업무 ID로 업무 조회 -->
+    <select id="findTaskById" parameterType="Integer" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        WHERE t.id = #{id}
+    </select>
+
+    <!-- 프로젝트 ID로 업무 목록 조회 -->
+    <select id="getTasksByProject" parameterType="Integer" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        WHERE t.project_id = #{projectId}
+        ORDER BY t.due_date ASC, t.priority DESC
+    </select>
+
+    <!-- 특정 사원이 담당하는 업무 목록 조회 -->
+    <select id="getTasksByAssignee" parameterType="String" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        WHERE t.assignee_emp_num = #{empNum}
+        ORDER BY t.due_date ASC, t.priority DESC
+    </select>
+
+    <!-- 특정 사원이 생성한 업무 목록 조회 -->
+    <select id="getTasksByCreator" parameterType="String" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        WHERE t.creator_emp_num = #{empNum}
+        ORDER BY t.created_at DESC
+    </select>
+
+    <!-- 최근 생성된 업무 목록 조회 -->
+    <select id="getRecentTasks" parameterType="Integer" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        ORDER BY t.created_at DESC
+            LIMIT #{limit}
+    </select>
+
+    <!-- 특정 사원의 최근 업무 목록 조회 -->
+    <select id="getRecentTasksByEmpNum" resultMap="TaskResultMap">
+        SELECT t.*, p.name AS project_name,
+               creator.name AS creator_name,
+               assignee.name AS assignee_name
+        FROM tasks t
+                 INNER JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees creator ON t.creator_emp_num = creator.emp_num
+                 LEFT JOIN employees assignee ON t.assignee_emp_num = assignee.emp_num
+        WHERE t.assignee_emp_num = #{empNum} OR t.creator_emp_num = #{empNum}
+        ORDER BY t.created_at DESC
+            LIMIT #{limit}
+    </select>
+
+    <!-- 새 업무 등록 -->
+    <insert id="insertTask" parameterType="com.example.projectdemo.domain.projects.dto.TaskDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tasks (
+            project_id, title, description, status, progress, priority,
+            creator_emp_num, assignee_emp_num, start_date, due_date,
+            estimated_hours, actual_hours, created_at
+        ) VALUES (
+                     #{projectId}, #{title}, #{description}, #{status}, #{progress}, #{priority},
+                     #{creatorEmpNum}, #{assigneeEmpNum}, #{startDate}, #{dueDate},
+                     #{estimatedHours}, #{actualHours}, NOW()
+                 )
+    </insert>
+
+    <!-- 업무 정보 수정 -->
+    <update id="updateTask" parameterType="com.example.projectdemo.domain.projects.dto.TaskDTO">
+        UPDATE tasks
+        SET project_id = #{projectId},
+            title = #{title},
+            description = #{description},
+            status = #{status},
+            progress = #{progress},
+            priority = #{priority},
+            assignee_emp_num = #{assigneeEmpNum},
+            start_date = #{startDate},
+            due_date = #{dueDate},
+            estimated_hours = #{estimatedHours},
+            actual_hours = #{actualHours},
+            updated_at = NOW(),
+            completed_at = #{completedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 업무 상태 변경 -->
+    <update id="updateTaskStatus">
+        UPDATE tasks
+        SET status = #{status},
+            updated_at = NOW(),
+            completed_at = CASE
+                               WHEN #{status} = '완료' THEN NOW()
+                               ELSE completed_at
+                END
+        WHERE id = #{taskId}
+    </update>
+
+    <!-- 업무 진행률 업데이트 -->
+    <update id="updateTaskProgress">
+        UPDATE tasks
+        SET progress = #{progress},
+            updated_at = NOW(),
+            status = CASE
+                         WHEN #{progress} = 100 THEN '완료'
+                         WHEN #{progress} > 0 THEN '진행중'
+                         ELSE status
+                END,
+            completed_at = CASE
+                               WHEN #{progress} = 100 THEN NOW()
+                               ELSE completed_at
+                END
+        WHERE id = #{taskId}
+    </update>
+
+    <!-- 업무 삭제 -->
+    <delete id="deleteTask" parameterType="Integer">
+        DELETE FROM tasks
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 하위 업무 목록 조회 -->
+    <select id="getSubTasksByParent" parameterType="Integer" resultMap="SubTaskResultMap">
+        SELECT st.*, e.name AS assignee_name
+        FROM sub_tasks st
+                 LEFT JOIN employees e ON st.assignee_emp_num = e.emp_num
+        WHERE st.task_id = #{parentTaskId}
+        ORDER BY st.completed ASC, st.due_date ASC
+    </select>
+
+    <!-- 하위 업무 등록 -->
+    <insert id="insertSubTask" parameterType="com.example.projectdemo.domain.projects.dto.SubTaskDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sub_tasks (
+            task_id, title, description, completed, assignee_emp_num,
+            due_date, created_at
+        ) VALUES (
+                     #{taskId}, #{title}, #{description}, #{completed}, #{assigneeEmpNum},
+                     #{dueDate}, NOW()
+                 )
+    </insert>
+
+    <!-- 하위 업무 수정 -->
+    <update id="updateSubTask" parameterType="com.example.projectdemo.domain.projects.dto.SubTaskDTO">
+        UPDATE sub_tasks
+        SET title = #{title},
+            description = #{description},
+            completed = #{completed},
+            assignee_emp_num = #{assigneeEmpNum},
+            due_date = #{dueDate},
+            updated_at = NOW(),
+            completed_at = CASE
+                               WHEN #{completed} = true THEN NOW()
+                               ELSE completed_at
+                END
+        WHERE id = #{id}
+    </update>
+
+    <!-- 하위 업무 삭제 -->
+    <delete id="deleteSubTask" parameterType="Integer">
+        DELETE FROM sub_tasks
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 하위 업무 완료 상태 변경 -->
+    <update id="updateSubTaskCompletedStatus">
+        UPDATE sub_tasks
+        SET completed = #{completed},
+            updated_at = NOW(),
+            completed_at = CASE
+                               WHEN #{completed} = true THEN NOW()
+                               ELSE null
+                END
+        WHERE id = #{subTaskId}
+    </update>
+
+</mapper>

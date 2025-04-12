@@ -6,60 +6,74 @@ import com.example.projectdemo.domain.projects.dto.ScheduleParticipantDTO;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface ScheduleService {
+import com.example.projectdemo.domain.projects.mapper.ScheduleMapper;
+import com.example.projectdemo.domain.projects.service.ScheduleService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    /**
-     * 프로젝트별 일정 목록 조회
-     */
-    List<ScheduleDTO> getSchedulesByProject(Integer projectId);
+import java.time.LocalDateTime;
+import java.util.List;
 
-    /**
-     * 직원별 일정 목록 조회
-     */
-    List<ScheduleDTO> getSchedulesByEmployee(String empNum);
+@Service
+@RequiredArgsConstructor
+public class ScheduleService{
 
-    /**
-     * 특정 기간의 일정 목록 조회
-     */
-    List<ScheduleDTO> getSchedulesByDateRange(LocalDateTime startDate, LocalDateTime endDate);
+    @Autowired
+    private final ScheduleMapper scheduleMapper;
 
-    /**
-     * 일정 상세 조회
-     */
-    ScheduleDTO getScheduleById(Integer id);
+    public List<ScheduleDTO> getSchedulesByProject(Integer projectId) {
+        return scheduleMapper.selectSchedulesByProject(projectId);
+    }
 
-    /**
-     * 신규 일정 등록
-     */
-    ScheduleDTO createSchedule(ScheduleDTO schedule);
+    public List<ScheduleDTO> getSchedulesByEmployee(String empNum) {
+        return scheduleMapper.selectSchedulesByEmployee(empNum);
+    }
 
-    /**
-     * 일정 정보 업데이트
-     */
-    ScheduleDTO updateSchedule(ScheduleDTO schedule);
+    public List<ScheduleDTO> getSchedulesByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        return scheduleMapper.selectSchedulesByDateRange(startDate, endDate);
+    }
 
-    /**
-     * 일정 삭제
-     */
-    void deleteSchedule(Integer id);
+    public ScheduleDTO getScheduleById(Integer id) {
+        return scheduleMapper.selectScheduleById(id);
+    }
 
-    /**
-     * 일정 참석자 목록 조회
-     */
-    List<ScheduleParticipantDTO> getScheduleParticipants(Integer scheduleId);
+    public ScheduleDTO createSchedule(ScheduleDTO schedule) {
+        scheduleMapper.insertSchedule(schedule);
+        return schedule;
+    }
 
-    /**
-     * 일정 참석자 추가
-     */
-    ScheduleParticipantDTO addScheduleParticipant(Integer scheduleId, String empNum);
+    public ScheduleDTO updateSchedule(ScheduleDTO schedule) {
+        scheduleMapper.updateSchedule(schedule);
+        return schedule;
+    }
 
-    /**
-     * 일정 참석 상태 업데이트
-     */
-    ScheduleParticipantDTO updateParticipantStatus(Integer scheduleId, String empNum, String status);
+    public void deleteSchedule(Integer id) {
+        scheduleMapper.deleteSchedule(id);
+    }
 
-    /**
-     * 일정 참석자 제거
-     */
-    void removeScheduleParticipant(Integer scheduleId, String empNum);
+    public List<ScheduleParticipantDTO> getScheduleParticipants(Integer scheduleId) {
+        return scheduleMapper.selectScheduleParticipants(scheduleId);
+    }
+
+    public ScheduleParticipantDTO addScheduleParticipant(Integer scheduleId, String empNum) {
+        ScheduleParticipantDTO dto = ScheduleParticipantDTO.builder()
+                .scheduleId(scheduleId)
+                .empNum(empNum)
+                .status("대기") // 기본 상태
+                .build();
+
+        scheduleMapper.insertScheduleParticipant(dto);
+        return dto;
+    }
+
+    public ScheduleParticipantDTO updateParticipantStatus(Integer scheduleId, String empNum, String status) {
+        scheduleMapper.updateParticipantStatus(scheduleId, empNum, status);
+        return scheduleMapper.selectScheduleParticipant(scheduleId, empNum);
+    }
+
+
+    public void removeScheduleParticipant(Integer scheduleId, String empNum) {
+        scheduleMapper.deleteScheduleParticipant(scheduleId, empNum);
+    }
 }

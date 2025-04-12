@@ -17,7 +17,7 @@ public class TodoDTO {
     private String empNum;
     private String title;
     private String content;
-    private Boolean completed;
+    private boolean completed;
     private LocalDate dueDate;
     private String priority;
     private LocalDateTime createdAt;

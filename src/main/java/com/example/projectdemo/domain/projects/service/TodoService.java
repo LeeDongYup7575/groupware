@@ -1,48 +1,63 @@
 package com.example.projectdemo.domain.projects.service;
 
+import com.example.projectdemo.domain.projects.dto.TaskDTO;
 import com.example.projectdemo.domain.projects.dto.TodoDTO;
 
 import java.util.List;
 
-public interface TodoService {
+import com.example.projectdemo.domain.projects.mapper.TodoMapper;
+import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-    /**
-     * 직원별 할 일 목록 조회
-     */
-    List<TodoDTO> getTodoListByEmployee(String empNum);
+import java.time.LocalDate;
+import java.util.List;
 
-    /**
-     * 할 일 상세 조회
-     */
-    TodoDTO getTodoById(Integer id);
+@Service
+@RequiredArgsConstructor
+public class TodoService {
 
-    /**
-     * 신규 할 일 추가
-     */
-    TodoDTO createTodo(TodoDTO todo);
+    @Autowired
+    private final TodoMapper todoMapper;
 
-    /**
-     * 할 일 정보 업데이트
-     */
-    TodoDTO updateTodo(TodoDTO todo);
 
-    /**
-     * 할 일 완료 상태 토글
-     */
-    TodoDTO toggleTodoCompletion(Integer id);
 
-    /**
-     * 할 일 삭제
-     */
-    void deleteTodo(Integer id);
+    public List<TodoDTO> getTodoListByEmployee(String empNum) {
+        return todoMapper.selectTodosByEmployee(empNum);
+    }
 
-    /**
-     * 특정 날짜의 할 일 목록 조회
-     */
-    List<TodoDTO> getTodosByDate(String empNum, java.time.LocalDate date);
+    public TodoDTO getTodoById(Integer id) {
+        return todoMapper.selectTodoById(id);
+    }
 
-    /**
-     * 우선순위별 할 일 목록 조회
-     */
-    List<TodoDTO> getTodosByPriority(String empNum, String priority);
+    public TodoDTO createTodo(TodoDTO todo) {
+        todoMapper.insertTodo(todo);
+        return todo;
+    }
+
+    public TodoDTO updateTodo(TodoDTO todo) {
+        todoMapper.updateTodo(todo);
+        return todo;
+    }
+
+    public TodoDTO toggleTodoCompletion(Integer id) {
+        TodoDTO todo = todoMapper.selectTodoById(id);
+        boolean completed = !todo.isCompleted();
+        todoMapper.updateTodoCompletion(id, completed);
+        todo.setCompleted(completed);
+        return todo;
+    }
+
+    public void deleteTodo(Integer id) {
+        todoMapper.deleteTodo(id);
+    }
+
+    public List<TodoDTO> getTodosByDate(String empNum, LocalDate date) {
+        return todoMapper.selectTodosByDate(empNum, date);
+    }
+
+    public List<TodoDTO> getTodosByPriority(String empNum, String priority) {
+        return todoMapper.selectTodosByPriority(empNum, priority);
+    }
 }

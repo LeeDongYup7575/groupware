@@ -3,98 +3,99 @@ package com.example.projectdemo.domain.projects.service;
 import com.example.projectdemo.domain.projects.dto.SubTaskDTO;
 import com.example.projectdemo.domain.projects.dto.TaskDTO;
 import com.example.projectdemo.domain.projects.dto.TaskLogDTO;
+import com.example.projectdemo.domain.projects.mapper.TaskMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public interface TaskService {
+@Service
+@RequiredArgsConstructor
+public class TaskService {
 
-    /**
-     * 프로젝트별 업무 목록 조회
-     */
-    List<TaskDTO> getTasksByProject(Integer projectId);
+    @Autowired
+    private final TaskMapper taskMapper;
 
-    /**
-     * 담당자별 업무 목록 조회
-     */
-    List<TaskDTO> getTasksByAssignee(String empNum);
+    public List<TaskDTO> getTasksByProject(Integer projectId) {
+        return taskMapper.getTasksByProject(projectId);
+    }
 
-    /**
-     * 보고자별 업무 목록 조회
-     */
-    List<TaskDTO> getTasksByReporter(String empNum);
+    public List<TaskDTO> getTasksByAssignee(String empNum) {
+        return taskMapper.getTasksByAssignee(empNum);
+    }
 
-    /**
-     * 상태별 업무 목록 조회
-     */
-    List<TaskDTO> getTasksByStatus(Integer projectId, String status);
+    public List<TaskDTO> getTasksByReporter(String empNum) {
+        return taskMapper.getTasksByCreator(empNum);
+    }
 
-    /**
-     * 업무 상세 조회
-     */
-    TaskDTO getTaskById(Integer id);
+    public List<TaskDTO> getTasksByStatus(Integer projectId, String status) {
+        return taskMapper.getTasksByStatus(projectId, status);
+    }
 
-    /**
-     * 신규 업무 등록
-     */
-    TaskDTO createTask(TaskDTO task);
+    public TaskDTO getTaskById(Integer id) {
+        return taskMapper.getTaskById(id);
+    }
 
-    /**
-     * 업무 정보 업데이트
-     */
-    TaskDTO updateTask(TaskDTO task);
+    public TaskDTO createTask(TaskDTO task) {
+        taskMapper.insertTask(task);
+        return task;
+    }
 
-    /**
-     * 업무 상태 업데이트
-     */
-    TaskDTO updateTaskStatus(Integer id, String status);
+    public TaskDTO updateTask(TaskDTO task) {
+        taskMapper.updateTask(task);
+        return task;
+    }
 
-    /**
-     * 업무 진행률 업데이트
-     */
-    TaskDTO updateTaskProgress(Integer id, Integer progress);
+    public TaskDTO updateTaskStatus(Integer id, String status) {
+        taskMapper.updateTaskStatus(id, status);
+        return taskMapper.getTaskById(id);
+    }
 
-    /**
-     * 업무 완료 처리
-     */
-    TaskDTO completeTask(Integer id);
+    public TaskDTO updateTaskProgress(Integer id, Integer progress) {
+        taskMapper.updateTaskProgress(id, progress);
+        return taskMapper.getTaskById(id);
+    }
 
-    /**
-     * 업무 로그 조회
-     */
-    List<TaskLogDTO> getTaskLogs(Integer taskId);
+    public TaskDTO completeTask(Integer id) {
+        taskMapper.updateTaskStatus(id, "완료");
+        return taskMapper.getTaskById(id);
+    }
 
-    /**
-     * 업무 로그 추가
-     */
-    TaskLogDTO addTaskLog(TaskLogDTO log);
+    public List<TaskLogDTO> getTaskLogs(Integer taskId) {
+        return taskMapper.getTaskLogs(taskId);
+    }
 
-    /**
-     * 하위 업무 목록 조회
-     */
-    List<SubTaskDTO> getSubTasksByTask(Integer taskId);
+    public TaskLogDTO addTaskLog(TaskLogDTO log) {
+        taskMapper.insertTaskLog(log);
+        return log;
+    }
 
-    /**
-     * 하위 업무 상세 조회
-     */
-    SubTaskDTO getSubTaskById(Integer id);
+    public List<SubTaskDTO> getSubTasksByTask(Integer taskId) {
+        return taskMapper.getSubTasksByTask(taskId);
+    }
 
-    /**
-     * 하위 업무 추가
-     */
-    SubTaskDTO addSubTask(SubTaskDTO subTask);
+    public SubTaskDTO getSubTaskById(Integer id) {
+        return taskMapper.getSubTaskById(id);
+    }
 
-    /**
-     * 하위 업무 업데이트
-     */
-    SubTaskDTO updateSubTask(SubTaskDTO subTask);
+    public SubTaskDTO addSubTask(SubTaskDTO subTask) {
+        taskMapper.insertSubTask(subTask);
+        return subTask;
+    }
 
-    /**
-     * 하위 업무 상태 업데이트
-     */
-    SubTaskDTO updateSubTaskStatus(Integer id, String status);
+    public SubTaskDTO updateSubTask(SubTaskDTO subTask) {
+        taskMapper.updateSubTask(subTask);
+        return subTask;
+    }
 
-    /**
-     * 하위 업무 완료 처리
-     */
-    SubTaskDTO completeSubTask(Integer id);
+    public SubTaskDTO updateSubTaskStatus(Integer id, String status) {
+        taskMapper.updateSubTaskStatus(id, status);
+        return taskMapper.getSubTaskById(id);
+    }
+
+    public SubTaskDTO completeSubTask(Integer id) {
+        taskMapper.updateSubTaskStatus(id, "완료");
+        return taskMapper.getSubTaskById(id);
+    }
 }

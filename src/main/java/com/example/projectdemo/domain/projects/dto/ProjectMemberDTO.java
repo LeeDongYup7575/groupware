@@ -21,6 +21,6 @@ public class ProjectMemberDTO {
 
     // 추가 정보
     private String empName; // 매핑용
-    private String departmentName; // 매핑용
+    private String depName; // 매핑용
     private String positionTitle; // 매핑용
 }

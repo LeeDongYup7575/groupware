@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.projects.mapper.TodoMapper">
+
+    <!-- 전체 할 일 목록 (직원 기준) -->
+    <select id="selectTodosByEmployee" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+        SELECT *
+        FROM todos
+        WHERE emp_num = #{empNum}
+        ORDER BY due_date ASC
+    </select>
+
+    <!-- 개별 할 일 조회 -->
+    <select id="selectTodoById" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+        SELECT *
+        FROM todos
+        WHERE id = #{id}
+    </select>
+
+    <!-- 할 일 추가 -->
+    <insert id="insertTodo" parameterType="com.example.projectdemo.domain.projects.dto.TodoDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO todos (
+            title, content, emp_num, priority, due_date, completed,
+            created_at, updated_at, completed_at
+        )
+        VALUES (
+                   #{title}, #{content}, #{empNum}, #{priority}, #{dueDate}, #{completed},
+                   #{createdAt}, #{updatedAt}, #{completedAt}
+               )
+    </insert>
+
+
+    <!-- 할 일 수정 -->
+    <update id="updateTodo" parameterType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+        UPDATE todos
+        SET title = #{title},
+            content = #{content},
+            emp_num = #{empNum},
+            priority = #{priority},
+            due_date = #{dueDate},
+            completed = #{completed},
+            updated_at = #{updatedAt},
+            completed_at = #{completedAt}
+        WHERE id = #{id}
+    </update>
+
+
+    <!-- 할 일 완료 여부 업데이트 -->
+    <update id="updateTodoCompletion">
+        UPDATE todos
+        SET completed = #{completed}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 할 일 삭제 -->
+    <delete id="deleteTodo">
+        DELETE FROM todos
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 특정 날짜의 할 일 조회 -->
+    <select id="selectTodosByDate" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+        SELECT *
+        FROM todos
+        WHERE emp_num = #{empNum}
+          AND due_date = #{date}
+        ORDER BY due_date ASC
+    </select>
+
+    <!-- 우선순위에 따른 할 일 조회 -->
+    <select id="selectTodosByPriority" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+        SELECT *
+        FROM todos
+        WHERE emp_num = #{empNum}
+          AND priority = #{priority}
+        ORDER BY due_date ASC
+    </select>
+
+</mapper>

@@ -24,7 +24,7 @@ public class ProjectDTO {
     private LocalDate actualEndDate;
     private String status;
     private Integer depId;
-    private String departmentName; // 매핑용
+    private String depName; // 매핑용
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
