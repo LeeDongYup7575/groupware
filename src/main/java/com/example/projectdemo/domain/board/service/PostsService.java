@@ -15,6 +15,9 @@ public class PostsService {
     @Autowired
     private PostsMapper postsMapper;
 
+    @Autowired
+    private AttachmentsService attachmentsService;
+
     // 게시글 작성
     @Transactional
     public PostsDTO createPost(int empId, PostsDTO postsDTO) {
@@ -74,8 +77,11 @@ public class PostsService {
     }
 
     // 게시글 삭제
-    public boolean deletePost(int id) {
-        int result = postsMapper.deletePost(id);
+    public boolean deletePost(int postId) {
+        // 첨부파일 먼저 삭제
+        attachmentsService.deleteAttachmentsByPostId(postId);
+
+        int result = postsMapper.deletePost(postId);
         return result > 0;
     }
 

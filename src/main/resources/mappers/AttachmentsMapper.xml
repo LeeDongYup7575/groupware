@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.board.mapper.AttachmentsMapper">
+
+    <!-- 첨부 파일 결과 매핑 -->
+    <resultMap id="AttachmentResultMap" type="com.example.projectdemo.domain.board.dto.AttachmentsDTO">
+        <id property="id" column="id" />
+        <result property="postId" column="post_id" />
+        <result property="originName" column="origin_name" />
+        <result property="sysName" column="sys_name" />
+        <result property="uploadedAt" column="uploaded_at" />
+    </resultMap>
+
+    <!-- 첨부 파일 저장 -->
+    <insert id="insertAttachment" parameterType="com.example.projectdemo.domain.board.dto.AttachmentsDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO attachments (
+            post_id,
+            origin_name,
+            sys_name,
+            uploaded_at
+        ) VALUES (
+                     #{postId},
+                     #{originName},
+                     #{sysName},
+                     NOW()
+                 )
+    </insert>
+
+    <!-- 첨부파일 목록을 가져오기 -->
+    <select id="selectAttachmentsByPostId" resultMap="AttachmentResultMap">
+        SELECT
+            id, post_id, origin_name, sys_name, uploaded_at
+        FROM
+            attachments
+        WHERE
+            post_id = #{postId}
+        ORDER BY
+            id ASC
+    </select>
+
+    <!-- ID로 첨부 파일 조회 -->
+    <select id="findAttachmentById" resultMap="AttachmentResultMap">
+        SELECT
+            id,
+            post_id,
+            origin_name,
+            sys_name,
+            uploaded_at
+        FROM attachments
+        WHERE id = #{id}
+    </select>
+
+    <!-- 게시글 ID로 첨부 파일 삭제 -->
+    <delete id="deleteAttachmentsByPostId">
+        DELETE FROM attachments
+        WHERE post_id = #{postId}
+    </delete>
+
+    <!-- ID로 첨부 파일 삭제 -->
+    <delete id="deleteAttachment">
+        DELETE FROM attachments
+        WHERE id = #{id}
+    </delete>
+
+
+</mapper>

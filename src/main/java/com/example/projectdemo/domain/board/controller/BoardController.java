@@ -1,8 +1,10 @@
 package com.example.projectdemo.domain.board.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.board.dto.AttachmentsDTO;
 import com.example.projectdemo.domain.board.dto.BoardsDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.service.AttachmentsService;
 import com.example.projectdemo.domain.board.service.BoardsService;
 import com.example.projectdemo.domain.board.service.PostsService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,9 @@ public class BoardController {
 
     @Autowired
     private BoardsService boardsService;
+
+    @Autowired
+    private AttachmentsService attachmentsService;
 
 
     // 통합 게시판 - 모든 권한 있는 게시판의 게시글 보기
@@ -65,6 +70,7 @@ public class BoardController {
     public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model) {
         int empId = (int)request.getAttribute("id");
 
+        // 게시글 정보 가져오기
         PostsDTO post = postsService.getPostById(id);
         BoardsDTO board = boardsService.getBoardById(post.getBoardId());
 
@@ -73,8 +79,13 @@ public class BoardController {
             return "board/integrated-list";
         }
 
+        // 첨부파일 목록 가져오기
+        List<AttachmentsDTO> attachments = attachmentsService.selectAttachmentsByPostId(id);
+
+        // 모델에 데이터 추가
         model.addAttribute("post", post);
         model.addAttribute("board", board);
+        model.addAttribute("attachments", attachments);
 
         return "board/view";
     }
