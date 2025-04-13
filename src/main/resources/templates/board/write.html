@@ -40,6 +40,23 @@
                 <textarea id="summernote" type="text" th:class="form-control" name="content" rows="10" required></textarea>
             </div>
 
+            <!-- 파일 첨부 영역 추가 -->
+            <div class="form-group">
+                <label>파일 첨부</label>
+                <div class="file-upload-container" id="file-drop-area">
+                    <input type="file" id="file-upload-input" class="file-upload-input" multiple>
+                    <div class="file-upload-prompt">
+                        <div class="file-upload-icon">📎</div>
+                        <p class="file-upload-text">파일을 끌어다 놓거나 클릭하여 업로드</p>
+                        <p class="file-upload-hint">최대 10개 파일, 각 파일 10MB 이하</p>
+                    </div>
+                </div>
+
+                <ul class="file-list" id="file-list">
+                    <!-- 파일 항목들이 여기에 동적으로 추가됩니다 -->
+                </ul>
+            </div>
+
             <div class="form-actions">
                 <button type="reset" class="btn">취소</button>
                 <button type="submit" class="btn btn-primary">등록하기</button>
@@ -107,44 +124,212 @@
             });
         }
 
+        // 파일 업로드 핸들링
+        const fileUploadInput = document.getElementById('file-upload-input');
+        const fileDropArea = document.getElementById('file-drop-area');
+        const fileList = document.getElementById('file-list');
+        const MAX_FILE_COUNT = 10;
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        let fileData = []; // 업로드할 파일들을 저장할 배열
+
+        // 파일 드롭 이벤트 처리
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileDropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            // 파일을 끌고 올 때 영역에 강조 스타일 적용
+            fileDropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            // 파일을 놓거나 영역을 벗어나면 원래 스타일로 복귀
+            fileDropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            fileDropArea.style.borderColor = '#2563eb';
+            fileDropArea.style.backgroundColor = '#dbeafe';
+        }
+
+        function unhighlight() {
+            fileDropArea.style.borderColor = '#d1d5db';
+            fileDropArea.style.backgroundColor = '#f3f4f6';
+        }
+
+        // 사용자가 파일을 끌어서 이 영역에 놓았을 때 handleDrop 함수 실행
+        fileDropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer; // 드롭된 데이터에서 정보들을 가져옴
+            const files = dt.files; // 그 중 파일 리스트만 추출
+            handleFiles(files); // 파일을 처리하는 함수에 전달
+        }
+
+        fileUploadInput.addEventListener('change', function() {
+            // 파일 선택 창에서 파일을 고르면 처리하는 함수에 전달함
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (fileData.length + files.length > MAX_FILE_COUNT) {
+                alert(`최대 ${MAX_FILE_COUNT}개의 파일만 업로드할 수 있습니다.`);
+                return;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                // 파일 크기 검사
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`파일 '${file.name}'이(가) 10MB 제한을 초과합니다.`);
+                    continue;
+                }
+
+                // 파일 데이터 저장
+                const fileId = Date.now() + '-' + i;
+                fileData.push({
+                    id: fileId,
+                    file: file
+                });
+
+                // 파일 항목 UI 추가
+                addFileItem(file, fileId);
+            }
+
+            // 입력 필드 초기화
+            fileUploadInput.value = '';
+        }
+
+        function addFileItem(file, fileId) {
+            const fileItem = document.createElement('li');
+            fileItem.className = 'file-item';
+            fileItem.dataset.fileId = fileId;
+
+            const fileSize = formatFileSize(file.size);
+            const fileType = getFileType(file.name); // 파일 이름에서 확장자를 추출하여 파일 유형을 판단함
+
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <span class="file-icon">${getFileIconByType(fileType)}</span>
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${fileSize}</span>
+                </div>
+                <button type="button" class="file-remove" data-file-id="${fileId}">×</button>
+            `;
+
+            // 생성한 파일 항목을 파일 목록에 추가함
+            fileList.appendChild(fileItem);
+
+            // 파일 삭제 버튼 이벤트 설정
+            const removeBtn = fileItem.querySelector('.file-remove');
+            removeBtn.addEventListener('click', function() {
+                const fileId = this.dataset.fileId;
+                removeFile(fileId);
+            });
+        }
+
+        function removeFile(fileId) {
+            // 배열에서 파일 데이터 제거
+            fileData = fileData.filter(item => item.id !== fileId);
+
+            // UI에서 파일 항목 제거
+            const fileItem = fileList.querySelector(`li[data-file-id="${fileId}"]`);
+            if (fileItem) {
+                fileItem.remove();
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                return 'image';
+            } else if (['doc', 'docx', 'rtf', 'txt'].includes(ext)) {
+                return 'document';
+            } else if (['xls', 'xlsx', 'csv'].includes(ext)) {
+                return 'spreadsheet';
+            } else if (['ppt', 'pptx'].includes(ext)) {
+                return 'presentation';
+            } else if (['pdf'].includes(ext)) {
+                return 'pdf';
+            } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+                return 'archive';
+            } else {
+                return 'other';
+            }
+        }
+
+        function getFileIconByType(fileType) {
+            switch (fileType) {
+                case 'image': return '🖼️';
+                case 'document': return '📄';
+                case 'spreadsheet': return '📊';
+                case 'presentation': return '📑';
+                case 'pdf': return '📕';
+                case 'archive': return '📦';
+                default: return '📎';
+            }
+        }
+
 
         // 폼 제출 이벤트 처리
         $('#postForm').on('submit', function(e) {
             e.preventDefault();
 
-            // 폼 데이터 수집
-            const formData = {
-                title: $('#title').val(),
-                content: $('#summernote').summernote('code'), // 여기서 summernote 내용 가져오기
-                boardId: parseInt($('#boardId').val()),
-                views: 0
-            };
+            // FormData 객체 생성
+            const formData = new FormData();
+
+            // 게시글 기본 정보 추가
+            formData.append('title', $('#title').val());
+            formData.append('content', $('#summernote').summernote('code'));
+            formData.append('boardId', $('#boardId').val());
+
+            // 파일 첨부 추가 - fileData 배열의 파일을 사용
+            if (fileData.length > 0) {
+                fileData.forEach(fileItem => {
+                    formData.append('files', fileItem.file);
+                });
+            }
+
             // API 호출
-            fetch('/api/posts', {
-                method: 'POST',
+            $.ajax({
+                url: '/api/posts',  // 파일 첨부 포함 게시글 저장 API
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')  // JWT 인증 추가
                 },
-                body: JSON.stringify(formData)
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('게시글 저장 실패');
-                    }
-                    return response.json();
-                })
-                .then(data => {
+                success: function(data) {
                     // 성공 처리
                     alert('게시글이 성공적으로 저장되었습니다.');
                     window.location.href = '/board'; // 게시글 목록 페이지로 이동
-                })
-                .catch(error => {
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
                     // 오류 처리
-                    alert('게시글 저장 중 오류가 발생했습니다: ' + error.message);
-                    console.error('Error:', error);
-                });
+                    alert('게시글 저장 중 오류가 발생했습니다: ' + (jqXHR.responseJSON?.message || errorThrown));
+                    console.error('Error:', jqXHR.responseJSON || errorThrown);
+                }
+            });
         });
+
     });
 </script>
 </body>

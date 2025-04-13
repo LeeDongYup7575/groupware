@@ -1,7 +1,9 @@
 package com.example.projectdemo.domain.board.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.board.dto.AttachmentsDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.service.AttachmentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,28 +32,75 @@ public class PostApiController {
     private PostsService postsService;
 
     @Autowired
+    private AttachmentsService attachmentsService;
+
+    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Value("${board.image.upload-dir}")
     private String boardImageUploadDir;
 
+
+
     // === 게시글 관련 API ===
 
-    // 게시글 작성, 저장 API
+    //  게시글 작성 API - 파일 첨부 포함/미포함 모두 처리
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostsDTO postsDTO, HttpSession session, HttpServletRequest request) {
-        //HTTP 요청의 속성 값(id)을 Integer 타입으로 캐스팅
+    public ResponseEntity<?> createPost(
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("boardId") Integer boardId,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            HttpServletRequest request) {
+
+        // 로그 추가
+        System.out.println("Title: " + title);
+        System.out.println("BoardId: " + boardId);
+        System.out.println("Files received: " + (files != null ? files.size() : "null"));
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                System.out.println("File name: " + file.getOriginalFilename() + ", Size: " + file.getSize());
+            }
+        }
+
+        // 인증된 사용자 ID 확인
         Integer empId = (Integer) request.getAttribute("id");
 
         if (empId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
         }
 
-        // 서비스를 통해 게시글 작성
-        PostsDTO savedPost = postsService.createPost(empId, postsDTO);
+        try {
+            // 게시글 정보 설정
+            PostsDTO postsDTO = new PostsDTO();
+            postsDTO.setTitle(title);
+            postsDTO.setContent(content);
+            postsDTO.setBoardId(boardId);
+            postsDTO.setEmpId(empId);
 
-        // 성공 응답 반환
-        return ResponseEntity.ok(savedPost);
+            // 게시글 저장
+            PostsDTO savedPost = postsService.createPost(empId, postsDTO);
+
+            // 첨부 파일 저장
+            if (files != null && !files.isEmpty()) {
+                List<AttachmentsDTO> attachments = attachmentsService.uploadFiles(files, savedPost.getId());
+
+                // 응답 데이터에 첨부 파일 정보 추가
+                Map<String, Object> response = new HashMap<>();
+                response.put("post", savedPost);
+                response.put("attachments", attachments);
+
+                return ResponseEntity.ok(response);
+            }
+
+            // 첨부 파일이 없는 경우
+            return ResponseEntity.ok(savedPost);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("게시글 저장 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     // 게시글 삭제

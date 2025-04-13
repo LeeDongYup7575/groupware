@@ -37,6 +37,18 @@
                 게시글 내용입니다.
             </div>
 
+            <!-- 첨부 파일 목록 -->
+            <div class="attachments-container" th:if="${!#lists.isEmpty(attachments)}">
+                <h3 class="attachments-title">
+                    <i class="fas fa-paperclip"></i> 첨부파일
+                </h3>
+                <ul class="attachments-list">
+                    <li class="attachment-item" th:each="attachment : ${attachments}">
+                        <a class="attachment-download" th:href="@{/api/attachments/download/{id}(id=${attachment.id})}" th:text="${attachment.originName}" download>파일명</a>
+                    </li>
+                </ul>
+            </div>
+
             <div class="action-buttons">
                 <a th:href="@{/board/edit/{id}(id=${post.id})}" class="btn btn-primary">수정</a>
                 <button onclick="confirmDelete()" class="btn btn-danger">삭제</button>
@@ -48,8 +60,13 @@
         <script th:inline="javascript">
             /*<![CDATA[*/
             // Thymeleaf를 통해 서버에서 값을 받아옴
-            const postId = /*[[${post.id}]]*/ null;
-            const postEmpId = /*[[${post.empId}]]*/ null;
+            if (typeof postId === 'undefined') {
+                var postId = /*[[${post.id}]]*/ null;
+            }
+            if (typeof postEmpId === 'undefined') {
+                var postEmpId = /*[[${post.empId}]]*/ null;
+            }
+
 
             document.addEventListener('DOMContentLoaded', function() {
                 const deleteButton = document.querySelector('.action-buttons button');
