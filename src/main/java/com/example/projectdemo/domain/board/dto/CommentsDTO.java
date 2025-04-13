@@ -22,4 +22,11 @@ public class CommentsDTO {
     private LocalDateTime updatedAt;
     private Boolean isDeleted;
 
+    // 추가 필드 - 화면 표시용
+    private String empName;
+    private String profileImgUrl; // 프로필 이미지 URL
+
+    public Boolean getDeleted() {
+        return this.isDeleted;
+    }
 }

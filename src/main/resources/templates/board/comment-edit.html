@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>댓글 수정</title>
+</head>
+<body>
+<div class="container">
+    <h2>댓글 수정</h2>
+
+    <form action="/board/comments/update" method="post">
+        <input type="hidden" name="id" th:value="${comment.id}" />
+        <input type="hidden" name="postId" th:value="${comment.postId}" />
+
+        <div class="form-group">
+            <textarea name="content" th:text="${comment.content}" required></textarea>
+        </div>
+
+        <div class="form-actions">
+            <a th:href="@{/board/posts/{id}(id=${comment.postId})}" class="btn btn-secondary">취소</a>
+            <button type="submit" class="btn btn-primary">저장</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>
