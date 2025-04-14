@@ -1,0 +1,690 @@
+/* 기본 스타일 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+a:visited {
+    color: inherit;
+}
+a:hover,
+a:active {
+    color: inherit;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #555;
+    margin-right: 20px;
+}
+
+.title {
+    font-size: 18px;
+    color: #333;
+}
+
+.total {
+    width: 100%;
+}
+
+/* 전체 레이아웃 */
+.container {
+    margin-top: 80px;
+    display: flex;
+    min-height: calc(100vh - 60px);
+}
+
+/* 좌측 사이드바 */
+.sidebar {
+    width: 250px;
+    background-color: white;
+    padding: 20px 0;
+    border-right: 1px solid #e0e0e0;
+}
+
+.add-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    width: 90%;
+    margin: 20px auto 0 auto;
+    display: block;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-button i {
+    margin-right: 5px;
+}
+
+.menu {
+    list-style: none;
+}
+
+.menu > li {
+    cursor: pointer;
+    color: #555;
+}
+
+.menu > li > i,
+.dropdown-header > i:first-child {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.menu > li:not(.dropdown) {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* 드롭다운 메뉴 스타일 */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-header {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown.active .dropdown-header {
+    background-color: #e1ebf5; /* Updated to match the blue in the screenshot */
+    color: #555; /* Updated to white text for better contrast */
+    border-left: 3px solid #0078d4; /* Darker blue for the border */
+}
+
+.dropdown-icon {
+    transition: transform 0.3s ease;
+    margin-right: 8px !important;
+}
+
+.dropdown.open .dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    list-style: none;
+    background-color: #f5f5f5;
+}
+
+.dropdown.open .submenu {
+    max-height: 200px;
+}
+
+.submenu li {
+    padding: 10px 20px 10px 45px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.submenu li:hover {
+    background-color: #e8e8e8;
+}
+
+.submenu li i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+    color: #666;
+}
+
+.submenu a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* 메인 콘텐츠 영역 */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+}
+
+/* 버튼 스타일 */
+.button {
+    padding: 6px 12px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.button:hover {
+    background-color: #f5f5f5;
+}
+
+.small-button {
+    padding: 3px 8px;
+    font-size: 12px;
+}
+
+/* 양식 스타일 */
+.form-section {
+    margin-bottom: 20px;
+}
+
+.form-header {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.form-row {
+    display: flex;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.form-label {
+    width: 100px;
+    color: #555;
+    font-size: 14px;
+}
+
+.form-input {
+    flex: 1;
+    padding: 5px 10px;
+}
+
+/* 날짜 선택 영역 */
+.date-selection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.date-input {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 150px;
+}
+
+.date-select, .time-select {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.radio-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 3px;
+}
+
+.remove-button {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.remove-button:hover {
+    color: #f44336;
+}
+
+/* 사유 영역 */
+.reason-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+/* 셀렉트 박스 스타일 */
+select {
+    padding: 5px 25px 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23333' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
+
+/* 결재선 영역 */
+.approval-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 20px;
+}
+
+.approval-line {
+    margin-bottom: 20px;
+}
+
+.approval-header {
+    background-color: #f1f3f5;
+    padding: 12px 15px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.approval-header-cell {
+    text-align: center;
+}
+
+.approval-body {
+    display: flex;
+    margin: 20px;
+    justify-content: space-evenly;
+}
+
+.approval-body-cell {
+    flex: 1;
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+}
+
+.approval-body-cell:first-child {
+    margin-left: 0;
+}
+
+.approval-body-cell:last-child {
+    margin-right: 0;
+}
+
+.approval-name {
+    margin: 5px 0;
+    font-weight: bold;
+}
+
+.approval-date {
+    font-size: 12px;
+    color: #777;
+}
+
+.approval-stamp {
+    width: 60px;
+    height: 60px;
+    border: 2px solid #5858FF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5858ff;
+    font-weight: bold;
+    transform: rotate(-15deg);
+}
+
+/* 입력 필드 스타일 */
+.text-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+::placeholder {
+    color: #aaa;
+    font-size: 13px;
+}
+
+/* 푸터 버튼 영역 */
+.form-actions {
+    text-align: right;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+/* 첨부파일 영역 */
+.main2-contents {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+}
+
+.attachment-section {
+    margin-bottom: 20px;
+}
+
+.file-upload-btn{
+    color: #4a90e2;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+
+    padding-right: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+
+/* 파일 입력 요소 자체는 숨김 */
+input[type="file"] {
+    display: none;
+}
+
+.remove-file{
+    background: none;
+    border: none;
+
+    cursor: pointer;
+    color: #888;
+}
+
+.attachment-label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.attachment-links {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.attachment-link {
+    color: #4a90e2;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    border-right: 1px solid #ddd;
+    padding-right: 10px;
+}
+
+.attachment-link:last-child {
+    border-right: none;
+}
+
+.attachment-drop-area {
+    border: 1px dashed #ddd;
+    border-radius: 4px;
+    padding: 25px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    background-color: #fafafa;
+    margin-top: 10px;
+}
+
+/* 모달 배경 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* 모달 컨텐츠 */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 60%;
+    position: relative;
+    border-radius: 5px;
+}
+
+/* 닫기 버튼 */
+.close {
+    color: #aaa;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.employee-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+}
+
+.employee-list li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.employee-list li:hover {
+    background-color: #f2f2f2;
+}
+
+.selected {
+    background-color: #e0f7fa;
+}
+
+.date-selection {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* 필요시 줄바꿈 허용 */
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* 라디오 버튼 그룹 스타일 조정 */
+.radio-group {
+    min-width: 100px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.radio-group input[type="radio"] {
+    margin-right: 5px;
+}
+
+.radio-group label {
+    margin-right: 15px;
+}
+
+/* 시간 컨트롤 영역 스타일 수정 */
+.time-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 요소 간 간격 */
+    flex-wrap: wrap; /* 필요시 줄바꿈 */
+    margin-right: 20px;
+}
+
+/* select 박스와 텍스트 간격 조정 */
+.time-select {
+    margin-right: 5px;
+    min-width: 60px; /* 최소 너비 설정 */
+}
+
+/* 텍스트 요소 간격 조정 */
+.time-controls span {
+    margin: 0 5px;
+    white-space: nowrap;
+}
+
+/* 날짜 입력 필드 스타일 */
+.date-input {
+    cursor: pointer;
+    background-color: #fff;
+    min-width: 150px;
+    margin-right: 10px;
+}
+
+/* 삭제 버튼 위치 조정 */
+.remove-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+
+/* 달력 스타일 조정 */
+.ui-datepicker {
+    font-size: 12px;
+    width: 250px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    z-index: 1000 !important;
+}
+
+.ui-datepicker-header {
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+    border-radius: 4px 4px 0 0;
+    padding: 8px;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    font-weight: bold;
+    margin: 0 30px;
+}
+
+.ui-datepicker-prev, .ui-datepicker-next {
+    position: absolute;
+    top: 8px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.ui-datepicker-prev {
+    left: 8px;
+}
+
+.ui-datepicker-next {
+    right: 8px;
+}
+
+.ui-datepicker-calendar {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ui-datepicker-calendar th {
+    padding: 5px;
+    text-align: center;
+    font-weight: normal;
+    border: none;
+}
+
+.ui-datepicker-calendar td {
+    padding: 2px;
+    text-align: center;
+}
+
+.ui-datepicker-calendar a {
+    display: block;
+    padding: 5px;
+    text-decoration: none;
+    text-align: center;
+    border-radius: 4px;
+    color: #333;
+}
+
+.ui-datepicker-calendar .ui-state-default {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+}
+
+.ui-datepicker-calendar .ui-state-active {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.ui-datepicker-calendar .ui-state-hover {
+    background-color: #e9f2ff;
+    border: 1px solid #4a90e2;
+}
+
+/* 모달 내부의 두 영역 스타일 */
+#approvalModal .available-employees ul,
+#approvalModal .selected-employees ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#approvalModal .selected-employees ul {
+    margin-top: 16px;
+}
+#approvalModal .available-employees li,
+#approvalModal .selected-employees li {
+    padding: 8px;
+    border: 0;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+    cursor: pointer;
+}
+/* 사이드바가 열려있을 때 */
+@media (min-width: 1201px) {
+    .total {
+        margin-left: calc(var(--sidebar-width) + 20px); /* 사이드바 너비 + 여백 */
+        width: calc(100% - var(--sidebar-width) - 40px); /* 전체 너비 - 사이드바 너비 - 양쪽 마진 */
+    }
+}
+
+/* 반응형: 사이드바가 토글될 때 */
+@media (max-width: 1200px) {
+    .total {
+        margin-left: 20px;
+        width: calc(100% - 40px);
+    }
+
+    /* 사이드바가 열려있을 때 */
+    .sidebar.open + .total,
+    .sidebar.open ~ .total {
+        margin-left: calc(var(--sidebar-width) + 20px);
+        width: calc(100% - var(--sidebar-width) - 40px);
+    }
+}

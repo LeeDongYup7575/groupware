@@ -1,0 +1,175 @@
+/* 기본 스타일 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+/* 헤더 */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: white;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 20px;
+}
+
+.title {
+    font-size: 18px;
+    color: #333;
+}
+
+/* 좌측 사이드바 */
+.sidebar {
+    width: 250px;
+    background-color: #f3f7fb;
+    height: calc(100vh - 60px);
+    padding: 20px 0;
+    border-right: 1px solid #e5e5e5;
+    float: left;
+}
+
+.create-button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 0 20px 20px 20px;
+    width: calc(100% - 40px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.create-button span {
+    margin-left: 5px;
+}
+
+.menu-section {
+    margin-bottom: 20px;
+}
+
+.menu-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.menu-header i {
+    margin-right: 8px;
+}
+
+.menu-items {
+    padding-left: 15px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px 8px 25px;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #e6f0fb;
+}
+
+.menu-item i {
+    margin-right: 8px;
+    width: 18px;
+    text-align: center;
+    color: #666;
+}
+
+/* 메인 콘텐츠 영역 */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+.tab-header {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #4a90e2;
+    font-size: 18px;
+    padding-bottom: 10px;
+}
+
+/* 테이블 스타일 */
+.document-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.document-table th {
+    background-color: #f5f5f5;
+    padding: 10px;
+    text-align: center;
+    font-weight: normal;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.document-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.document-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* 상태 표시 */
+.status {
+    padding: 5px 10px;
+    border-radius: 3px;
+    background-color: #f0f0f0;
+    display: inline-block;
+}
+
+.status.waiting {
+    background-color: #fef3e6;
+    color: #f5a623;
+}
+
+.status.approved {
+    background-color: #e6f7e6;
+    color: #7ed321;
+}
+
+.status.rejected {
+    background-color: #fee6e6;
+    color: #d0021b;
+}
+
+/* 문서 번호 스타일 */
+.doc-number {
+    color: #888;
+    font-size: 0.9em;
+}
+
+/* 아이콘 스타일 */
+.icon {
+    margin-right: 5px;
+}

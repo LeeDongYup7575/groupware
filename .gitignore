@@ -75,3 +75,5 @@ target/
 mvnw
 mvnw.cmd
 .gitattributes
+
+src/main/resources/static/static/
