@@ -44,6 +44,15 @@
         WHERE c.id = #{id}
     </select>
 
+    <!-- 부모 댓글의 모든 대댓글 조회 -->
+    <select id="findByParentId" resultMap="commentWithUserInfo">
+        SELECT c.*, e.name AS emp_name, e.profile_img_url
+        FROM comments c
+                 LEFT JOIN employees e ON c.emp_id = e.id
+        WHERE c.parent_id = #{parentId}
+        ORDER BY c.created_at ASC
+    </select>
+
     <!-- 댓글 수정 -->
     <update id="updateComments" parameterType="com.example.projectdemo.domain.board.entity.Comments">
         UPDATE comments

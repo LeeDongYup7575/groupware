@@ -1,18 +1,15 @@
 package com.example.projectdemo.domain.board.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.example.projectdemo.domain.board.dto.CommentsDTO;
+import com.example.projectdemo.domain.board.entity.Comments;
+import com.example.projectdemo.domain.board.service.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.projectdemo.domain.board.dto.CommentsDTO;
-import com.example.projectdemo.domain.board.entity.Comments;
-import com.example.projectdemo.domain.board.service.CommentsService;
-
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // 댓글 관련 API를 처리하는 컨트롤러
 @RestController
@@ -51,6 +48,13 @@ public class CommentsApiController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(comment);
+    }
+
+    // 게시글의 모든 댓글 조회 (계층 구조로)
+    @GetMapping("/post/{postId}/hierarchical")
+    public ResponseEntity<List<Comments>> getHierarchicalCommentsByPostId(@PathVariable int postId) {
+        List<Comments> hierarchicalComments = commentsService.getHierarchicalCommentsByPostId(postId);
+        return ResponseEntity.ok(hierarchicalComments);
     }
 
     // 댓글 수정

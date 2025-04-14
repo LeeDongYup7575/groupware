@@ -3,6 +3,7 @@
       th:replace="~{board/board-layout :: html(
         '게시글 상세',
         ~{::head/link},
+        ~{::head/style},
         ~{::#contents},
         ~{::script}
       )}">
@@ -13,26 +14,53 @@
     <title th:text="${post.title} + ' - 게시판'">게시글 제목 - 게시판</title>
     <style>
         /* 페이지별 추가 스타일 */
-        /* CSS 스타일 */
-        .comment-edit-container {
-            margin-top: 10px;
+        /* 답글 관련 스타일 */
+        .reply-actions {
+            margin-top: 8px;
         }
 
-        .comment-edit-textarea {
+        .btn-reply {
+            background: none;
+            border: none;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-right: 10px;
+        }
+
+        .btn-reply:hover {
+            text-decoration: underline;
+        }
+
+        .reply-form-container {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .reply-form {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .reply-textarea {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             resize: vertical;
+            min-height: 60px;
         }
 
-        .comment-edit-actions {
+        .reply-form-actions {
             display: flex;
             justify-content: flex-end;
             margin-top: 8px;
         }
 
-        .comment-edit-cancel-btn, .comment-edit-save-btn {
+        .reply-cancel-btn, .reply-submit-btn {
             padding: 5px 12px;
             margin-left: 8px;
             border: none;
@@ -40,14 +68,78 @@
             cursor: pointer;
         }
 
-        .comment-edit-cancel-btn {
+        .reply-cancel-btn {
             background-color: #f2f2f2;
             color: #333;
         }
 
-        .comment-edit-save-btn {
+        .reply-submit-btn {
             background-color: #2563eb;
             color: white;
+        }
+
+        /* 대댓글 목록 스타일 */
+        .replies-container {
+            margin-top: 15px;
+            margin-left: 25px;
+            border-left: 2px solid #e5e7eb;
+            padding-left: 15px;
+        }
+
+        .reply {
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .reply-author-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .reply-author-info img {
+            margin-right: 8px;
+        }
+
+        .reply-date {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-left: 10px;
+        }
+
+        .reply-body {
+            padding-left: 32px;
+        }
+
+        .reply-content {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .reply-actions {
+            display: flex;
+        }
+
+        .reply-actions button {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-right: 10px;
+        }
+
+        .reply-actions button:hover {
+            color: #2563eb;
         }
 
         /* 페이지별 추가 스타일 */
@@ -103,7 +195,7 @@
                     <textarea id="comment-content" name="content" placeholder="댓글을 작성해주세요." required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="submitComment()">댓글 작성</button>
+                    <button type="button" onclick="submitComment(null)">댓글 작성</button>
                 </div>
             </div>
 
@@ -160,7 +252,85 @@
                                     </button>
                                 </div>
                             </div>
+
+                            <!-- 답글 버튼 추가 -->
+                            <div class="reply-actions">
+                                <button type="button" class="btn-reply"
+                                        th:onclick="'showReplyForm(' + ${comment.id} + ')'">
+                                    답글
+                                </button>
+                            </div>
+
+                            <!-- 답글 작성 폼 (기본적으로 숨김) -->
+                            <div class="reply-form-container" th:id="'reply-form-container-' + ${comment.id}"
+                                 style="display: none;">
+                                <div class="reply-form">
+                            <textarea class="reply-textarea" th:id="'reply-textarea-' + ${comment.id}"
+                                      placeholder="답글을 입력하세요..."></textarea>
+                                    <div class="reply-form-actions">
+                                        <button type="button" class="reply-cancel-btn"
+                                                th:onclick="'cancelReply(' + ${comment.id} + ')'">취소
+                                        </button>
+                                        <button type="button" class="reply-submit-btn"
+                                                th:onclick="'submitReply(' + ${comment.id} + ')'">등록
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 대댓글 목록 -->
+                            <div class="replies-container" th:if="${comment.replies != null && !comment.replies.empty}">
+                                <div class="reply" th:each="reply : ${comment.replies}" th:if="${!reply.isDeleted}">
+                                    <div class="reply-header">
+                                        <!-- 대댓글 작성자 정보 -->
+                                        <div class="reply-author-info">
+                                            <img th:src="${reply.profileImgUrl != null ? reply.profileImgUrl : '/assets/images/default-profile.png'}"
+                                                 alt="프로필" width="24" height="24" class="rounded-circle">
+                                            <div class="author-details">
+                                                <span class="author-name" th:text="${reply.empName}">작성자</span>
+                                                <span class="reply-date"
+                                                      th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- 본인 대댓글인 경우에만 수정/삭제 버튼 표시 -->
+                                        <div class="reply-actions" th:if="${reply.empId == empId}">
+                                            <button type="button" class="btn-edit" th:data-comment-id="${reply.id}"
+                                                    onclick="showEditForm(this.getAttribute('data-comment-id'))">수정
+                                            </button>
+                                            <button type="button" class="btn-delete" th:data-comment-id="${reply.id}"
+                                                    onclick="deleteComment(this.getAttribute('data-comment-id'))">삭제
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- 대댓글 본문 -->
+                                    <div class="reply-body">
+                                        <div class="reply-content" th:id="'comment-content-' + ${reply.id}"
+                                             th:text="${reply.content}">대댓글 내용
+                                        </div>
+
+                                        <!-- 대댓글 수정 폼 (기본적으로 숨김) -->
+                                        <div class="comment-edit-container"
+                                             th:id="'comment-edit-container-' + ${reply.id}"
+                                             style="display: none;">
+                                    <textarea class="comment-edit-textarea"
+                                              th:id="'comment-edit-textarea-' + ${reply.id}"
+                                              rows="2" th:text="${reply.content}"></textarea>
+                                            <div class="comment-edit-actions">
+                                                <button type="button" class="comment-edit-cancel-btn"
+                                                        th:onclick="'cancelEdit(' + ${reply.id} + ')'">취소
+                                                </button>
+                                                <button type="button" class="comment-edit-save-btn"
+                                                        th:onclick="'updateComment(' + ${reply.id} + ')'">저장
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
 
                     </div>
                 </th:block>

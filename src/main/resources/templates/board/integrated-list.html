@@ -2,11 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{board/board-layout :: html(
         '통합게시판 목록',
-        ~{::style},
+        ~{::head/link},
+        ~{::head/style},
         ~{::#contents},
         ~{::script}
       )}">
 <head>
+    <link th:remove="all"></link>
     <style>
         /* 페이지별 추가 스타일 */
         th, td{border: 1px solid;}

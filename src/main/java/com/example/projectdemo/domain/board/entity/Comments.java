@@ -3,12 +3,14 @@ package com.example.projectdemo.domain.board.entity;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Comments {
 
     private Integer id;
@@ -24,8 +26,7 @@ public class Comments {
     private String profileImgUrl;
     private String empName;
 
-    public Boolean getDeleted() {
-        return this.isDeleted;
-    }
-
+    // 대댓글 목록 (계층 구조용)
+    @Builder.Default
+    private List<Comments> replies = new ArrayList<>();
 }
