@@ -62,25 +62,24 @@ public class LeavesService {
         }
     }
 
-    public void initializeEmployeeLeave(int empId) {
-        EmployeesDTO emp = leavesDAO.getEmployeesByEmpId(empId);
+    public void initializeEmployeeLeave(String empNum) {
+        EmployeesDTO emp = leavesDAO.getEmployeesByEmpNum(empNum); // empNum으로 조회
+        int empId = emp.getId(); // empId 꺼냄
         LocalDate hireDate = emp.getHireDate();
         LocalDate now = LocalDate.now();
 
-        // 근무 개월 수 계산
         long months = ChronoUnit.MONTHS.between(hireDate, now);
 
         if (months >= 12) {
-            // 1년 이상 근무: 연간 연차 15일 부여
             leavesDAO.setEmployeeLeave(empId, 15);
             leavesDAO.insertLeaveGrant(empId, "annual", 15);
         } else {
-            // 1년 미만 근무: 월별 연차 계산 (최대 11개월 = 11일)
             int leaveCount = (int) months;
             leavesDAO.setEmployeeLeave(empId, leaveCount);
             leavesDAO.insertLeaveGrant(empId, "accumulated_monthly", leaveCount);
         }
     }
+
 
     public int updateLeaveStatus(int id, String status) {
         return leavesDAO.updateLeaveStatus(id, status);

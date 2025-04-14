@@ -446,7 +446,7 @@
             const dateValue = $("#workDate").val();
             const day = dateValue.split(" (")[1].replace(")", "");
 
-            if (day === "토" || day === "일") {
+            if (day === "Sat" || day === "Sun") {
                 if (!confirm("주말에 연장근무를 신청하시겠습니까?")) {
                     return false;
                 }
