@@ -40,11 +40,11 @@
         <div class="profile-card">
           <div class="profile-header">
             <div class="profile-image">
-              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="프로필 이미지">
+              <img th:src="${employee.profileImgUrl}" alt="프로필 이미지">
             </div>
             <div class="profile-name">
-              <h3>이미르 대리</h3>
-              <p>개발팀</p>
+              <h3 th:text="${employee.name + ' ' + employee.positionTitle}"></h3>
+              <p th:text="${employee.departmentName}"></p>
             </div>
           </div>
 
