@@ -8,6 +8,7 @@ import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.leave.service.LeavesService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,6 +41,7 @@ public class AuthController {
     private final EmailService emailService;
     private final ProfileUploadService profileUploadService;
     private final LogoutService logoutService;
+    private final LeavesService leavesService;
 
     @Autowired
     public AuthController(JwtTokenUtil jwtTokenUtil,
@@ -48,7 +50,8 @@ public class AuthController {
                           EmployeesService employeeService,
                           EmailService emailService,
                           ProfileUploadService profileUploadService,
-                          LogoutService logoutService) {
+                          LogoutService logoutService,
+                          LeavesService leavesService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeeMapper = employeeMapper;
         this.passwordEncoder = passwordEncoder;
@@ -56,6 +59,7 @@ public class AuthController {
         this.emailService = emailService;
         this.profileUploadService = profileUploadService;
         this.logoutService = logoutService;
+        this.leavesService = leavesService;
     }
 
     @PostMapping("/login")
@@ -259,7 +263,8 @@ public class AuthController {
     @PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> register(
             @RequestPart("userData") @Valid SignupDTO userData,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            HttpServletRequest request) {
 
         try {
             // 필수 파라미터 검증
@@ -297,6 +302,9 @@ public class AuthController {
                     userData.getPhone(),
                     userData.getGender()
             );
+
+            System.out.println(userData.getEmpNum());
+            leavesService.initializeEmployeeLeave(userData.getEmpNum());
 
             return ResponseEntity.ok(Map.of(
                     "message", "회원가입이 완료되었습니다. 임시 비밀번호가 이메일로 발송되었습니다."

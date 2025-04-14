@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.board.mapper.AdminMapper">
+    <select id="getDepList" resultType="com.example.projectdemo.domain.admin.dto.DepartmentListDTO">
+        select d.id, d.name, count(e.dep_id) as count
+        from departments d left join employees e
+        on d.id = e.dep_id
+        group by d.id, d.name;
+    </select>
+
+    <select id="getAttendanceRanking" resultType="com.example.projectdemo.domain.admin.dto.AttendanceRankingDTO">
+        SELECT  e.name, sum(a.work_hours) as work_hours
+        FROM attendance a
+        left join employees e on a.emp_id = e.emp_num
+        WHERE work_date >= DATE_FORMAT(NOW(), '%Y-%m-01')
+        AND work_date &lt; DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')
+        group by e.name
+        order by work_hours desc;
+    </select>
+    <select id="getEmployeeStatus" resultType="com.example.projectdemo.domain.admin.dto.EmployeeStatusDTO">
+        select COUNT(pos_id) as count, title
+        from employees e
+            left join positions p
+        on e.pos_id = p.id
+        group by pos_id;
+    </select>
+    <select id="getTodayAbsences" resultType="com.example.projectdemo.domain.admin.dto.TodayAbsencesDTO">
+        select count(status), status, emp_id, e.name, d.name
+        from attendance a
+                 left join employees e on a.emp_id = e.emp_num
+                 left join departments d on e.dep_id = d.id
+        where status = '결근'
+          and work_date = curdate()
+        group by status, emp_id;
+    </select>
+    <select id="getTotalEmployees" resultType="int">
+        select count(*) as count from employees;
+    </select>
+    <select id="getTodayMeetingRoomBookings" resultType="int">
+        select count(*) as count
+        from meeting_room_booking
+        where Date (start) = curdate()
+          and booking_status = 'confirmed';
+    </select>
+    <select id="getTodaySuppliesBookings" resultType="int">
+        select count(*) as count
+        from supplies_booking
+        where DAte(start) = curdate()
+          and booking_status = 'confirmed';</select>
+    <select id="getRecentLogins" resultType="com.example.projectdemo.domain.admin.dto.RecentLoginDTO">
+        select e.emp_num, e.name, e.last_login, d.name as departmentName, p.title as positionTitle
+        from employees e
+                 left join departments d on e.dep_id = d.id
+                 left join positions p on e.pos_id = p.id
+        where Date (last_login) = curDate()
+        order by last_login;
+    </select>
+</mapper>

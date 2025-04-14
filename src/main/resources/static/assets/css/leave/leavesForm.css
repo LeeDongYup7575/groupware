@@ -5,8 +5,16 @@
     box-sizing: border-box;
     font-family: 'Noto Sans KR', sans-serif;
 }
-a{
-    text-decoration-line: none;
+a {
+    color: inherit;
+    text-decoration: none;
+}
+a:visited {
+    color: inherit;
+}
+a:hover,
+a:active {
+    color: inherit;
 }
 
 body {
@@ -95,9 +103,9 @@ body {
 }
 
 .dropdown.active .dropdown-header {
-    background-color: #e6f7ee;
-    color: #009688;
-    border-left: 3px solid #009688;
+    background-color: #e1ebf5; /* Updated to match the blue in the screenshot */
+    color: #555; /* Updated to white text for better contrast */
+    border-left: 3px solid #0078d4; /* Darker blue for the border */
 }
 
 .dropdown-icon {

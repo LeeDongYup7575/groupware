@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/assets/css/attend/attendMain.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://unpkg.com/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.8/index.global.min.js"></script>
     <!-- 헤더 에셋 포함 -->
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
     <!-- 사이드바 스타일 포함 -->
@@ -224,6 +225,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('weekly-calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
+            googleCalendarApiKey: 'AIzaSyAmxOp9PrC83LxO6JmGFH3_rfhvpzOXiy8',
             initialView: 'dayGridWeek',
             locale: 'ko',
             height: '200px',
@@ -233,6 +235,12 @@
                 center: 'title',
                 right: ''
             },
+            eventSources: [{
+                googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
+                className: 'korean-holiday', // CSS에서 스타일링 가능
+                color: '#ff9f89',           // 기본 배경색
+                textColor: '#fff'
+            }],
             events: weeklyEvents
         });
         calendar.render();

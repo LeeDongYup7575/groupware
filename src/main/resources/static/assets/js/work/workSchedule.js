@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const calendar = new FullCalendar.Calendar(calendarEl, {
+        googleCalendarApiKey: 'AIzaSyAmxOp9PrC83LxO6JmGFH3_rfhvpzOXiy8',
         locale: 'ko',
         initialView: 'dayGridMonth',
         headerToolbar: {
@@ -34,56 +35,69 @@ document.addEventListener('DOMContentLoaded', function () {
             minute: '2-digit',
             hour12: false
         },
-        events: function (fetchInfo, successCallback, failureCallback) {
-            fetch('/works/getWorkSchedule')
-                .then(response => response.json())
-                .then(data => {
-                    const events = data.map(item => {
-                        const event = {
-                            title: item.title,
-                            start: item.start,
-                            end: item.end,
-                            description: item.description,
-                            allDay: item.end && !item.start.includes('T'),
-                            extendedProps: {
-                                type: item.type || 'normal',
-                                description: item.description
-                            }
-                        };
+        eventSources: [
+            // ✅ 1. 내 일정
+            {
+                events: function (fetchInfo, successCallback, failureCallback) {
+                    fetch('/works/getWorkSchedule')
+                        .then(response => response.json())
+                        .then(data => {
+                            const events = data.map(item => {
+                                const event = {
+                                    title: item.title,
+                                    start: item.start,
+                                    end: item.end,
+                                    description: item.description,
+                                    allDay: item.end && !item.start.includes('T'),
+                                    extendedProps: {
+                                        type: item.type || 'normal',
+                                        description: item.description
+                                    }
+                                };
 
-                        // 스타일 조건
-                        if (item.title.includes('휴가')) {
-                            event.title = '🌴 ' + item.title;
-                            event.backgroundColor = item.color || '#edd67a';
-                            event.textColor = '#fff';
-                            event.extendedProps.type = 'leave';
-                        } else if (item.type === 'overtime' || item.title.includes('연장 근무')) {
-                            event.title = '⏱️ ' + item.title;
-                            event.backgroundColor = item.color || '#6f42c1';
-                            event.textColor = '#fff';
-                            event.extendedProps.type = 'overtime';
-                        } else {
-                            if (item.title.includes('출근')) {
-                                event.backgroundColor = '#28a745'; // 초록
-                                event.title = '🏢 ' + item.title;
-                            } else if (item.title.includes('퇴근')) {
-                                event.backgroundColor = '#007bff'; // 파랑
-                                event.title = '🚶 ' + item.title;
-                            } else if (item.title.includes('지각')) {
-                                event.backgroundColor = '#dc3545'; // 빨강
-                                event.title = '⚠️ ' + item.title;
-                            }
-                        }
+                                // 스타일 지정
+                                if (item.title.includes('휴가')) {
+                                    event.title = '🌴 ' + item.title;
+                                    event.backgroundColor = item.color || '#edd67a';
+                                    event.textColor = '#fff';
+                                    event.extendedProps.type = 'leave';
+                                } else if (item.type === 'overtime' || item.title.includes('연장 근무')) {
+                                    event.title = '⏱️ ' + item.title;
+                                    event.backgroundColor = item.color || '#6f42c1';
+                                    event.textColor = '#fff';
+                                    event.extendedProps.type = 'overtime';
+                                } else {
+                                    if (item.title.includes('출근')) {
+                                        event.backgroundColor = '#28a745';
+                                        event.title = '🏢 ' + item.title;
+                                    } else if (item.title.includes('퇴근')) {
+                                        event.backgroundColor = '#007bff';
+                                        event.title = '🚶 ' + item.title;
+                                    } else if (item.title.includes('지각')) {
+                                        event.backgroundColor = '#dc3545';
+                                        event.title = '⚠️ ' + item.title;
+                                    }
+                                }
 
-                        return event;
-                    });
-                    successCallback(events);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    failureCallback(error);
-                });
-        },
+                                return event;
+                            });
+                            successCallback(events);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            failureCallback(error);
+                        });
+                }
+            },
+            // ✅ 2. 한국 공휴일
+            {
+                googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
+                className: 'korean-holiday', // CSS에서 스타일링 가능
+                color: '#ff9f89',           // 기본 배경색
+                textColor: '#fff'           // 글자색
+            }
+        ],
+
         eventClick: function (info) {
             const { title, extendedProps, start, end } = info.event;
             const modalTitle = document.getElementById('modalTitle');

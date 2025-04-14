@@ -4,6 +4,7 @@ package com.example.projectdemo.domain.leave.service;
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.leave.dao.LeavesDAO;
+import com.example.projectdemo.domain.leave.dto.LeaveGrantsDTO;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,25 @@ public class LeavesService {
         }
     }
 
+    public void initializeEmployeeLeave(String empNum) {
+        EmployeesDTO emp = leavesDAO.getEmployeesByEmpNum(empNum); // empNum으로 조회
+        int empId = emp.getId(); // empId 꺼냄
+        LocalDate hireDate = emp.getHireDate();
+        LocalDate now = LocalDate.now();
+
+        long months = ChronoUnit.MONTHS.between(hireDate, now);
+
+        if (months >= 12) {
+            leavesDAO.setEmployeeLeave(empId, 15);
+            leavesDAO.insertLeaveGrant(empId, "annual", 15);
+        } else {
+            int leaveCount = (int) months;
+            leavesDAO.setEmployeeLeave(empId, leaveCount);
+            leavesDAO.insertLeaveGrant(empId, "accumulated_monthly", leaveCount);
+        }
+    }
+
+
     public int updateLeaveStatus(int id, String status) {
         return leavesDAO.updateLeaveStatus(id, status);
     }
@@ -74,5 +94,8 @@ public class LeavesService {
     }
     public List<LeavesDTO> getLeavesDTOListByDocId(int id) {
         return leavesDAO.getLeavesDTOListByDocId(id);
+    }
+    public List<LeaveGrantsDTO>getLeaveGrantsByYear(int empId, int year) {
+        return leavesDAO.getLeaveGrantsByYear(empId, year);
     }
 }

@@ -9,6 +9,7 @@ import com.example.projectdemo.domain.edsm.services.EdsmFilesService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.leave.dto.LeaveGrantsDTO;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import com.example.projectdemo.domain.leave.service.LeavesService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,7 +100,6 @@ public class LeaveController {
                                 Model model, HttpServletRequest request) {
 
 
-
         int empId = (int) request.getAttribute("id");
         String drafterId = (String) request.getAttribute("empNum");
 
@@ -116,44 +116,8 @@ public class LeaveController {
         LocalDate now = LocalDate.now();
         int currentYear = (year != null) ? year : now.getYear();
 
-        LocalDate hireDate = employee.getHireDate();
-        Map<LocalDate, Integer> leaveGrantMap = new LinkedHashMap<>();
-
-        int hireDay = hireDate.getDayOfMonth();
-        LocalDate oneYearAfterHire = hireDate.plusYears(1);
-
-        if (now.isBefore(oneYearAfterHire)) {
-            // ✅ 입사 1년 미만
-            LocalDate grantCursor = hireDate.plusMonths(1);
-            while (!grantCursor.isAfter(now)) {
-                if (grantCursor.getYear() == currentYear) {
-                    int day = Math.min(hireDay, grantCursor.lengthOfMonth());
-                    leaveGrantMap.put(grantCursor.withDayOfMonth(day), 1);
-                }
-                grantCursor = grantCursor.plusMonths(1);
-            }
-        } else {
-            // ✅ 입사 1년 이상
-            LocalDate grantCursor = hireDate.plusMonths(1);
-            LocalDate endOfMonthlyGrants = oneYearAfterHire.minusDays(1);
-
-            while (!grantCursor.isAfter(endOfMonthlyGrants)) {
-                if (grantCursor.getYear() == currentYear) {
-                    int day = Math.min(hireDay, grantCursor.lengthOfMonth());
-                    leaveGrantMap.put(grantCursor.withDayOfMonth(day), 1);
-                }
-                grantCursor = grantCursor.plusMonths(1);
-            }
-
-            grantCursor = oneYearAfterHire;
-            while (!grantCursor.isAfter(now)) {
-                if (grantCursor.getYear() == currentYear) {
-                    int day = Math.min(hireDay, grantCursor.lengthOfMonth());
-                    leaveGrantMap.put(grantCursor.withDayOfMonth(day), 15);
-                }
-                grantCursor = grantCursor.plusYears(1);
-            }
-        }
+        // 연차 생성 내역 조회
+        List<LeaveGrantsDTO> allLeavesGrantList = leavesService.getLeaveGrantsByYear(empId,currentYear);
 
         // ✅ 연차 내역 전체 조회
         List<LeavesDTO> allLeavesList = leavesService.selectAllLeaves(empId);
@@ -174,10 +138,10 @@ public class LeaveController {
             leavesService.updateLeaveStatus(leave.getId(), status);
         }
 
+        model.addAttribute("allLeavesGrantList", allLeavesGrantList);
         model.addAttribute("leavesList", leavesList);
         model.addAttribute("employee", employee);
         model.addAttribute("canUseLeaves", canUseLeaves);
-        model.addAttribute("leaveGrantMap", leaveGrantMap);
         model.addAttribute("selectedYear", currentYear);
 
         return "/attend/attendLeavesHistory";

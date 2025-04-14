@@ -1,18 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
-
-    if (!urlParams.has('tab')) {
-        urlParams.set('tab', 'shared');
-        urlParams.set('dept', 'all');
-        history.replaceState(null, '', window.location.pathname + '?' + urlParams.toString());
-    }
-
-    const tab = urlParams.get('tab');
+    const search = urlParams.get('search');
+    const tab = urlParams.get('tab') || 'shared';
     const dept = urlParams.get('dept') || 'all';
 
-    fetchDepartments();  // 부서 목록 로드
-    loadContacts(tab, dept);  // 초기 연락처 로드
-    updateActiveSidebarItem(tab, dept);  // active 클래스 초기화
+    fetchDepartments().then(() => {
+        if (search && search.trim() !== "") {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = search;
+
+            document.querySelectorAll('.contact-sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            searchContacts(search);
+        } else {
+            loadContacts(tab, dept);
+            updateActiveSidebarItem(tab, dept); // 반드시 부서 DOM이 존재한 뒤에 호출
+        }
+    });
+
 
     // 주소 추가 버튼
     document.querySelector('.add-contact-btn').addEventListener('click', function () {
@@ -207,6 +214,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // 검색 입력 이벤트 리스너 추가
+    document.getElementById('searchInput').addEventListener('input', debounce(function(e) {
+        const query = e.target.value.trim();
+
+        document.querySelectorAll('.contact-sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // 검색어가 있으면 새로운 URLParams 객체를 만들어 search 파라미터만 설정
+        const params = new URLSearchParams();
+        params.set("search", query);
+        history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+
+        // 검색 API 호출 (검색 결과 렌더링)
+        searchContacts(query);
+
+    }, 300));
+
+    document.getElementById('searchInputDelBtn').addEventListener('click', function () {
+        const input = document.getElementById('searchInput');
+        input.value = '';
+
+        // input 이벤트 강제 발생시켜서 기존 검색 로직 그대로 작동하도록 함
+        input.dispatchEvent(new Event('input'));
+    });
 
 });
 
@@ -223,7 +255,7 @@ function resetContactForm() {
 
 // 부서 목록 불러오기
 function fetchDepartments() {
-    fetch('/api/departments')
+    return fetch('/api/departments') // Promise 반환
         .then(response => {
             if (!response.ok) {
                 throw new Error('부서 목록을 불러오는 데 실패했습니다.');
@@ -232,6 +264,18 @@ function fetchDepartments() {
         })
         .then(departments => {
             const container = document.getElementById('shared-tab-container');
+            container.innerHTML = "";
+
+            // ✅ "전체" 항목 먼저 추가
+            const allDiv = document.createElement('div');
+            allDiv.className = 'contact-sidebar-item';
+            allDiv.textContent = '전체';
+            allDiv.setAttribute('data-tab', 'shared');
+            allDiv.setAttribute('data-dept', 'all');
+            allDiv.setAttribute('onclick', `handleSidebarClick('shared', 'all')`);
+            container.appendChild(allDiv);
+
+            // ✅ 부서들 추가
             departments.forEach(dept => {
                 const div = document.createElement('div');
                 div.className = 'contact-sidebar-item';
@@ -249,18 +293,39 @@ function fetchDepartments() {
 
 // 사이드바 클릭 함수
 function handleSidebarClick(tab, dept = 'all') {
-    const urlParams = new URLSearchParams();
-    urlParams.set('tab', tab);
+    // 검색 input 비우기
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = "";
+    }
 
-    // shared일 때만 dept 붙이기
+    // URL 파라미터에서 search 파라미터 제거
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.delete('search');
+    urlParams.set('tab', tab);
     if (tab === 'shared') {
         urlParams.set('dept', dept);
     }
-
     history.pushState({}, '', window.location.pathname + '?' + urlParams.toString());
+
+    // 검색 결과 컨테이너 숨김
+    const searchContainer = document.getElementById("searchResultsContainer");
+    if (searchContainer) {
+        searchContainer.style.display = "none";
+    }
+
+    // 메인 테이블 복원
+    const mainTable = document.getElementById("mainContactTable");
+    if (mainTable) {
+        mainTable.style.display = "";
+    }
+
+    // 일반 연락처 데이터 로드
     loadContacts(tab, dept);
     updateActiveSidebarItem(tab, dept);
 }
+
+
 
 // 공유 or 개인 주소록 연락처 불러오기
 function loadContacts(tab, dept) {
@@ -356,17 +421,52 @@ function updateActiveSidebarItem(tab, dept) {
 // 브라우저 뒤로가기/앞으로가기 대응
 window.addEventListener('popstate', function(event) {
     const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get('search');
+
+    // 검색 상태라면 검색 처리
+    if (search && search.trim() !== "") {
+        // input 값도 업데이트해주기
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = search;
+        }
+
+        // 사이드바 active 제거
+        document.querySelectorAll('.contact-sidebar-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        searchContacts(search);
+        return;
+    }
+
+    // 검색이 아니면 기본 주소록 로드
     const tab = urlParams.get('tab') || 'shared';
     let dept = urlParams.get('dept') || 'all';
-
-    // personal이면 dept 무시
     if (tab === 'personal') {
         dept = 'all';
+    }
+
+    // 검색 input 초기화
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
+    // 검색결과 영역 숨기고 메인 테이블 표시
+    const searchContainer = document.getElementById("searchResultsContainer");
+    if (searchContainer) {
+        searchContainer.style.display = "none";
+    }
+    const mainTable = document.getElementById("mainContactTable");
+    if (mainTable) {
+        mainTable.style.display = "";
     }
 
     loadContacts(tab, dept);
     updateActiveSidebarItem(tab, dept);
 });
+
 
 
 // 체크 여부 판단
@@ -386,33 +486,38 @@ function updateSelectAllCheckbox() {
 
 // 개인주소록 연락처 체크박스 선택 시 버튼 처리
 function updateHeaderForSelection() {
-    const checkedCount = document.querySelectorAll('.contact-checkbox:checked').length;
+    // 모든 contact-table 요소를 가져와서, 현재 보이는 테이블만 업데이트
+    const tables = document.querySelectorAll('.contact-table');
+    tables.forEach(table => {
+        // getComputedStyle으로 현재 display 상태 확인 (숨겨지지 않은 테이블만 처리)
+        if (getComputedStyle(table).display === 'none') return;
 
-    const thNameCol = document.querySelector('.contact-table thead .name-col');
-    const thEmail = document.querySelector('.contact-table thead th:nth-child(3)');
-    const thPhone = document.querySelector('.contact-table thead th:nth-child(4)');
-    const thInfo = document.querySelector('.contact-table thead .info-col');
+        const thNameCol = table.querySelector('thead .name-col');
+        const thEmail = table.querySelector('thead th:nth-child(3)');
+        const thPhone = table.querySelector('thead th:nth-child(4)');
+        const thInfo = table.querySelector('thead .info-col');
 
-    // 현재 탭 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab') || 'shared';
+        // 각 테이블 내에서 선택된 체크박스 개수 계산 (개인 주소록 테이블에 해당)
+        const checkedCount = table.querySelectorAll('.contact-checkbox:checked').length;
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab') || 'shared';
 
-    if (checkedCount > 0) {
-        // 나머지 헤더는 텍스트만 숨김
-        thEmail.textContent = '';
-        thPhone.textContent = '';
-        thInfo.textContent = '';
-
-        // 이름 컬럼은 삭제 버튼으로 대체
-        thNameCol.innerHTML = `<button id="deleteContactsBtn" class="delete-btn">삭제</button>`;
-    } else {
-        // 복원
-        thEmail.textContent = '이메일';
-        thPhone.textContent = '전화번호';
-        thInfo.textContent = (tab === 'shared') ? '부서' : '메모';
-        thNameCol.textContent = '이름';
-    }
+        if (checkedCount > 0) {
+            // 선택된 항목이 있으면 헤더의 나머지 열 텍스트 숨기고, 이름 열은 삭제 버튼으로 대체
+            thEmail.textContent = '';
+            thPhone.textContent = '';
+            thInfo.textContent = '';
+            thNameCol.innerHTML = `<button id="deleteContactsBtn" class="delete-btn">삭제</button>`;
+        } else {
+            // 선택된 항목이 없으면 원래 텍스트 복원
+            thEmail.textContent = '이메일';
+            thPhone.textContent = '전화번호';
+            thInfo.textContent = (tab === 'shared') ? '부서' : '메모';
+            thNameCol.textContent = '이름';
+        }
+    });
 }
+
 
 // 연락처 상세 보기 모달 열기 닫기
 function openDetailModal(contact, tab) {
@@ -466,6 +571,193 @@ function setFieldVisibility(fieldId, value) {
     }
 }
 
+// 헬퍼 함수: 디바운스(debounce) – 입력 이벤트 과다 호출 방지
+function debounce(func, delay) {
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, delay);
+    }
+}
+
+// 검색 API 호출 함수 (서버는 입력된 값에 대해 공유/개인 결과 모두 반환)
+function searchContacts(query) {
+    fetch(`/api/contact/search?query=${query}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("검색 결과를 불러오는 데 실패했습니다.");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("검색 API 응답:", data);
+            renderSearchResults(data);
+        })
+        .catch(error => {
+            console.error(error);
+            // 오류시 사용자에게 알림 처리 가능
+        });
+}
+
+// 검색 결과 렌더링: 공유와 개인 각각 드롭다운 섹션으로 출력
+function renderSearchResults(data) {
+    // 기존 테이블 숨기기
+    document.querySelector(".contact-table").style.display = "none";
+
+    // 검색 결과 컨테이너가 없으면 생성
+    let container = document.getElementById("searchResultsContainer");
+    if (!container) {
+        container = document.createElement("div");
+        container.id = "searchResultsContainer";
+        document.querySelector(".contact-main").appendChild(container);
+    }
+    container.style.display = "";
+    container.innerHTML = "";  // 이전 검색 결과 초기화
+
+    // 공유 주소록 검색 결과 섹션
+    const sharedSection = createSearchSection("공유 주소록 검색 결과", data.shared, "shared");
+    container.appendChild(sharedSection);
+
+    // 개인 주소록 검색 결과 섹션
+    const personalSection = createSearchSection("개인 주소록 검색 결과", data.personal, "personal");
+    container.appendChild(personalSection);
+}
+
+// 드롭다운 섹션 생성 (각 섹션의 제목, 결과 개수, 테이블)
+function createSearchSection(title, results, tab) {
+    const section = document.createElement("div");
+    section.className = "search-section";
+
+    // 헤더 (드롭다운 토글)
+    const header = document.createElement("div");
+    header.className = "search-section-header";
+
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = `${title} (${results.length}건)`;
+    header.appendChild(titleSpan);
+
+    // (개인 탭에서는 삭제 버튼을 미리 넣지 않고, 체크박스 선택 시 updateHeaderForSelection 함수가 삭제 버튼을 대신 넣음)
+    const arrow = document.createElement("span");
+    arrow.textContent = "▼";
+    header.appendChild(arrow);
+
+    // 테이블 생성 : 기존 contact-table 마크업 재사용
+    const table = document.createElement("table");
+    table.className = "contact-table";
+    // personal 결과인 경우 추가 클래스 부여 (필요 시 updateHeaderForSelection에서 여러 테이블에 대해 적용할 수 있도록)
+    if (tab === "personal") {
+        table.classList.add("personal");
+    }
+
+    // 테이블 헤더 생성 (전체 선택 체크박스 및 각 열 제목 유지)
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+
+    // 첫번째 열 : 개인일 경우 전체 선택 체크박스, 공유이면 빈 셀
+    const thCel = document.createElement("th");
+    thCel.className = "cel";
+    if (tab === "personal") {
+        thCel.innerHTML = `<input type="checkbox" class="select-all-checkbox">`;
+    }
+    trHead.appendChild(thCel);
+
+    // 이름 열 (초기에는 단순 텍스트 "이름"을 표시)
+    const thName = document.createElement("th");
+    thName.className = "name-col";
+    thName.textContent = "이름";
+    trHead.appendChild(thName);
+
+    // 이메일 열
+    const thEmail = document.createElement("th");
+    thEmail.className = "email-col";
+    thEmail.textContent = "이메일";
+    trHead.appendChild(thEmail);
+
+    // 전화번호 열
+    const thPhone = document.createElement("th");
+    thPhone.className = "phone-col";
+    thPhone.textContent = "전화번호";
+    trHead.appendChild(thPhone);
+
+    // 부서 또는 메모 열
+    const thInfo = document.createElement("th");
+    thInfo.className = "info-col";
+    thInfo.textContent = (tab === "shared") ? "부서" : "메모";
+    trHead.appendChild(thInfo);
+
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    // 테이블 바디 생성
+    const tbody = document.createElement("tbody");
+    if (results.length === 0) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = "5";
+        td.textContent = "표시할 데이터가 없습니다.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    } else {
+        results.forEach(contact => {
+            const tr = document.createElement("tr");
+            if (tab === "personal") {
+                tr.setAttribute("data-id", contact.id);
+            }
+            // 첫 번째 셀
+            const tdCel = document.createElement("td");
+            tdCel.className = "cel";
+            if (tab === "personal") {
+                tdCel.innerHTML = `<input type="checkbox" class="contact-checkbox">`;
+            }
+            tr.appendChild(tdCel);
+
+            // 이름
+            const tdName = document.createElement("td");
+            tdName.className = "name-col";
+            tdName.textContent = contact.name;
+            tr.appendChild(tdName);
+
+            // 이메일
+            const tdEmail = document.createElement("td");
+            tdEmail.textContent = (tab === "shared") ? contact.internalEmail : (contact.email || '');
+            tr.appendChild(tdEmail);
+
+            // 전화번호
+            const tdPhone = document.createElement("td");
+            tdPhone.textContent = contact.phone;
+            tr.appendChild(tdPhone);
+
+            // 부서 or 메모
+            const tdInfo = document.createElement("td");
+            tdInfo.className = "info-col";
+            tdInfo.textContent = (tab === "shared") ? contact.depName : (contact.memo || '');
+            tr.appendChild(tdInfo);
+
+            // 행 클릭 시 모달 열기 (체크박스 클릭은 제외)
+            tr.addEventListener("click", function(e) {
+                if (e.target.classList.contains("contact-checkbox")) return;
+                openDetailModal(contact, tab);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+    table.appendChild(tbody);
+
+    // 드롭다운 토글 기능은 그대로 유지
+    header.addEventListener("click", function() {
+        if (table.style.display === "none") {
+            table.style.display = "";
+            arrow.textContent = "▼";
+        } else {
+            table.style.display = "none";
+            arrow.textContent = "▲";
+        }
+    });
+
+    section.appendChild(header);
+    section.appendChild(table);
+    return section;
+}
 
 
 

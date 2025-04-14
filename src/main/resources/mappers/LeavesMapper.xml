@@ -113,4 +113,19 @@
         SELECT * FROM leaves where  edsm_document_id = #{id}
     </select>
 
+    <select id="getLeaveGrantsByYear" resultType="com.example.projectdemo.domain.leave.dto.LeaveGrantsDTO">
+        SELECT grant_date AS grantDate,
+               leave_count AS leaveCount
+        FROM leave_grants
+        WHERE emp_id = #{empId}
+                  AND YEAR(grant_date) = #{year}
+        ORDER BY grant_date
+    </select>
+
+
+    <select id="getEmployeeByEmpNum" parameterType="string" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT * FROM employees WHERE emp_num = #{empNum}
+    </select>
+
+
 </mapper>
