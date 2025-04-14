@@ -71,23 +71,17 @@
             </thead>
 
             <tbody>
-            <tr th:if="true">
-                <td colspan="5" class="no-data">생성된 연차가 없습니다.</td>
-            </tr>
+                <tr th:each="entry : ${allLeavesGrantList}">
+                    <td th:text="${#dates.format(entry.grantDate, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${entry.leaveCount + '일'}"></td>
+                    <td th:text="${entry.leaveCount + '일'}"></td>
+                    <td>정기휴가</td>
+                    <td th:text="|연차 (${entry.leaveCount}일 x 8시간 = ${entry.leaveCount * 8}시간)|"></td>
+                </tr>
+                <tr th:if="${allLeavesGrantList.isEmpty()}">
+                    <td colspan="5" class="no-data">생성된 연차가 없습니다.</td>
+                </tr>
             </tbody>
-
-            <!--            <tbody>-->
-<!--            <tr th:each="entry : ${leaveGrantMap}">-->
-<!--                <td th:text="${#temporals.format(entry.key, 'yyyy-MM-dd')}"></td>-->
-<!--                <td th:text="${entry.value + '일'}"></td>-->
-<!--                <td th:text="${entry.value + '일'}"></td>-->
-<!--                <td>정기휴가</td>-->
-<!--                <td th:text="|연차 (${entry.value}일 x 8시간 = ${entry.value * 8}시간)|"></td>-->
-<!--            </tr>-->
-<!--            <tr th:if="${leaveGrantMap.isEmpty()}">-->
-<!--                <td colspan="5" class="no-data">생성된 연차가 없습니다.</td>-->
-<!--            </tr>-->
-<!--            </tbody>-->
 
 
 

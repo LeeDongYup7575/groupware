@@ -58,7 +58,7 @@ a:active {
     padding: 10px 15px;
     border-radius: 4px;
     width: 90%;
-    margin: 0 auto 20px auto;
+    margin: 20px auto 0 auto;
     display: block;
     cursor: pointer;
     font-size: 14px;
@@ -102,9 +102,9 @@ a:active {
 }
 
 .dropdown.active .dropdown-header {
-    background-color: #e6f7ee;
-    color: #009688;
-    border-left: 3px solid #009688;
+    background-color: #e1ebf5; /* Updated to match the blue in the screenshot */
+    color: #555; /* Updated to white text for better contrast */
+    border-left: 3px solid #0078d4; /* Darker blue for the border */
 }
 
 .dropdown-icon {

@@ -68,7 +68,6 @@ body {
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.2s;
-    margin-top: 20px;
 }
 
 .add-button i {
@@ -109,9 +108,9 @@ body {
 }
 
 .dropdown.active .dropdown-header {
-    background-color: #e6f7ee;
-    color: #009688;
-    border-left: 3px solid #009688;
+    background-color: #e1ebf5; /* Updated to match the blue in the screenshot */
+    color: #555; /* Updated to white text for better contrast */
+    border-left: 3px solid #0078d4; /* Darker blue for the border */
 }
 
 .dropdown-icon {
@@ -156,6 +155,12 @@ body {
 .submenu a {
     text-decoration: none;
     color: inherit;
+}
+
+/* Active submenu item */
+.submenu li.active {
+    background-color: #c0d6f0; /* Highlight for active submenu item */
+    color: #0056b3;
 }
 
 /* Content */
