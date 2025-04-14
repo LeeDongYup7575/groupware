@@ -25,18 +25,6 @@
     </insert>
 
     <!-- 게시글의 모든 댓글 조회 -->
-<!--    <select id="findByPostId" resultType="com.example.projectdemo.domain.board.entity.Comments">-->
-<!--        SELECT c.*,-->
-<!--               e.name as empName-->
-<!--        FROM comments c-->
-<!--                 LEFT JOIN employees e ON c.emp_id = e.id-->
-<!--        WHERE c.post_id = #{postId}-->
-<!--        ORDER BY-->
-<!--            CASE WHEN c.parent_id IS NULL THEN c.id ELSE c.parent_id END ASC,-->
-<!--            c.parent_id IS NOT NULL ASC,-->
-<!--            c.created_at ASC-->
-<!--    </select>-->
-
     <select id="findByPostId" resultMap="commentWithUserInfo">
         SELECT c.*, e.name AS emp_name, e.profile_img_url
         FROM comments c
@@ -57,7 +45,7 @@
     </select>
 
     <!-- 댓글 수정 -->
-    <update id="updateComment" parameterType="com.example.projectdemo.domain.board.entity.Comments">
+    <update id="updateComments" parameterType="com.example.projectdemo.domain.board.entity.Comments">
         UPDATE comments
         SET content = #{content}, updated_at = NOW()
         WHERE id = #{id}
