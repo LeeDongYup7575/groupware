@@ -250,14 +250,39 @@ groupware-demo
    │  │  │        │  │  └─ model
    │  │  │        │  │     └─ Notice.java
    │  │  │        │  ├─ projects
-   │  │  │        │  │  └─ entity
-   │  │  │        │  │     ├─ ProjectMembers.java
-   │  │  │        │  │     ├─ Projects.java
-   │  │  │        │  │     ├─ Schedules.java
-   │  │  │        │  │     ├─ SubTasks.java
-   │  │  │        │  │     ├─ TaskLogs.java
-   │  │  │        │  │     ├─ Tasks.java
-   │  │  │        │  │     └─ TodoList.java
+   │  │  │        │  │  ├─ controller
+   │  │  │        │  │  │  ├─ ProjectApiController.java
+   │  │  │        │  │  │  ├─ ScheduleApiController.java
+   │  │  │        │  │  │  ├─ TaskApiController.java
+   │  │  │        │  │  │  ├─ TodoApiController.java
+   │  │  │        │  │  │  └─ WorkManagementController.java
+   │  │  │        │  │  ├─ dto
+   │  │  │        │  │  │  ├─ ProjectDTO.java
+   │  │  │        │  │  │  ├─ ProjectMemberDTO.java
+   │  │  │        │  │  │  ├─ ScheduleDTO.java
+   │  │  │        │  │  │  ├─ ScheduleParticipantDTO.java
+   │  │  │        │  │  │  ├─ SubTaskDTO.java
+   │  │  │        │  │  │  ├─ TaskDTO.java
+   │  │  │        │  │  │  ├─ TaskLogDTO.java
+   │  │  │        │  │  │  └─ TodoDTO.java
+   │  │  │        │  │  ├─ entity
+   │  │  │        │  │  │  ├─ ProjectMembers.java
+   │  │  │        │  │  │  ├─ Projects.java
+   │  │  │        │  │  │  ├─ Schedules.java
+   │  │  │        │  │  │  ├─ SubTasks.java
+   │  │  │        │  │  │  ├─ TaskLogs.java
+   │  │  │        │  │  │  ├─ Tasks.java
+   │  │  │        │  │  │  └─ TodoList.java
+   │  │  │        │  │  ├─ mapper
+   │  │  │        │  │  │  ├─ ProjectMapper.java
+   │  │  │        │  │  │  ├─ ScheduleMapper.java
+   │  │  │        │  │  │  ├─ TaskMapper.java
+   │  │  │        │  │  │  └─ TodoMapper.java
+   │  │  │        │  │  └─ service
+   │  │  │        │  │     ├─ ProjectService.java
+   │  │  │        │  │     ├─ ScheduleService.java
+   │  │  │        │  │     ├─ TaskService.java
+   │  │  │        │  │     └─ TodoService.java
    │  │  │        │  ├─ videoconf
    │  │  │        │  │  ├─ controller
    │  │  │        │  │  │  ├─ VideoConfApiController.java
@@ -326,7 +351,11 @@ groupware-demo
    │     │  ├─ MembershipMapper.xml
    │     │  ├─ PositionsMapper.xml
    │     │  ├─ PostsMapper.xml
+   │     │  ├─ ProjectMapper.xml
+   │     │  ├─ ScheduleMapper.xml
    │     │  ├─ SuppliesBookingMapper.xml
+   │     │  ├─ TaskMapper.xml
+   │     │  ├─ TodoMapper.xml
    │     │  ├─ VideoRoomMapper.xml
    │     │  ├─ VideoRoomParticipantMapper.xml
    │     │  └─ WorksMapper.xml
@@ -365,6 +394,10 @@ groupware-demo
    │     │     │  ├─ main-page.css
    │     │     │  ├─ mypage
    │     │     │  │  └─ mypage.css
+   │     │     │  ├─ projects
+   │     │     │  │  ├─ project-schedule.css
+   │     │     │  │  ├─ task-register.css
+   │     │     │  │  └─ work-management.css
    │     │     │  └─ work
    │     │     │     ├─ overTimeForm.css
    │     │     │     ├─ workDetails.css
@@ -452,6 +485,10 @@ groupware-demo
    │        ├─ main.html
    │        ├─ mypage
    │        │  └─ mypage.html
+   │        ├─ projects
+   │        │  ├─ project-schedule.html
+   │        │  ├─ task-register.html
+   │        │  └─ work-management.html
    │        ├─ videochat
    │        │  └─ videochat.html
    │        └─ work

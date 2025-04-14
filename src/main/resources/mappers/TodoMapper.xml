@@ -8,7 +8,7 @@
     <!-- 전체 할 일 목록 (직원 기준) -->
     <select id="selectTodosByEmployee" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
         SELECT *
-        FROM todos
+        FROM todo_list
         WHERE emp_num = #{empNum}
         ORDER BY due_date ASC
     </select>
@@ -16,13 +16,13 @@
     <!-- 개별 할 일 조회 -->
     <select id="selectTodoById" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
         SELECT *
-        FROM todos
+        FROM todo_list
         WHERE id = #{id}
     </select>
 
     <!-- 할 일 추가 -->
     <insert id="insertTodo" parameterType="com.example.projectdemo.domain.projects.dto.TodoDTO" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO todos (
+        INSERT INTO todo_list (
             title, content, emp_num, priority, due_date, completed,
             created_at, updated_at, completed_at
         )
@@ -35,7 +35,7 @@
 
     <!-- 할 일 수정 -->
     <update id="updateTodo" parameterType="com.example.projectdemo.domain.projects.dto.TodoDTO">
-        UPDATE todos
+        UPDATE todo_list
         SET title = #{title},
             content = #{content},
             emp_num = #{empNum},
@@ -50,21 +50,21 @@
 
     <!-- 할 일 완료 여부 업데이트 -->
     <update id="updateTodoCompletion">
-        UPDATE todos
+        UPDATE todo_list
         SET completed = #{completed}
         WHERE id = #{id}
     </update>
 
     <!-- 할 일 삭제 -->
     <delete id="deleteTodo">
-        DELETE FROM todos
+        DELETE FROM todo_list
         WHERE id = #{id}
     </delete>
 
     <!-- 특정 날짜의 할 일 조회 -->
     <select id="selectTodosByDate" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
         SELECT *
-        FROM todos
+        FROM todo_list
         WHERE emp_num = #{empNum}
           AND due_date = #{date}
         ORDER BY due_date ASC
@@ -73,7 +73,7 @@
     <!-- 우선순위에 따른 할 일 조회 -->
     <select id="selectTodosByPriority" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
         SELECT *
-        FROM todos
+        FROM todo_list
         WHERE emp_num = #{empNum}
           AND priority = #{priority}
         ORDER BY due_date ASC

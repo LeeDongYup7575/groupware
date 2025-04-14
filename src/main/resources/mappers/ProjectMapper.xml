@@ -96,9 +96,9 @@
     <select id="getPublicProjects" resultMap="ProjectResultMap">
         SELECT p.*, d.name AS dep_name, e.name AS manager_name
         FROM projects p
-                 LEFT JOIN departments d ON p.dep_id = d.id
-                 LEFT JOIN employees e ON p.manager_emp_num = e.emp_num
-        WHERE p.is_public = 1
+        LEFT JOIN departments d ON p.dep_id = d.id
+        LEFT JOIN employees e ON p.manager_emp_num = e.emp_num
+        WHERE p.status != '완료'  <!-- is_public = 1 대신 상태로 필터링 -->
         ORDER BY p.created_at DESC
     </select>
 
@@ -106,10 +106,10 @@
     <insert id="insertProject" parameterType="com.example.projectdemo.domain.projects.dto.ProjectDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO projects (
             name, description, status, start_date, end_date, dep_id,
-            manager_emp_num, progress, is_public, created_at
+            manager_emp_num, progress, created_at
         ) VALUES (
                      #{name}, #{description}, #{status}, #{startDate}, #{endDate}, #{depId},
-                     #{managerEmpNum}, #{progress}, #{isPublic}, NOW()
+                     #{managerEmpNum}, #{progress}, NOW()
                  )
     </insert>
 

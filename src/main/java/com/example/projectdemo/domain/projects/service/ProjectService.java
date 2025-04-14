@@ -37,8 +37,18 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectDTO createProject(ProjectDTO project){
-        if(projectMapper.insertProject(project) > 0){
+    public ProjectDTO createProject(ProjectDTO project) {
+        // 프로젝트 등록
+        if(projectMapper.insertProject(project) > 0) {
+            // 현재 사용자(매니저)를 프로젝트 멤버로 자동 추가
+            ProjectMemberDTO member = new ProjectMemberDTO();
+            member.setProjectId(project.getId());
+            member.setEmpNum(project.getManagerEmpNum());
+            member.setRole("매니저");
+            member.setJoinedAt(LocalDateTime.now());
+
+            projectMapper.insertProjectMember(member);
+
             return project;
         }
         throw new RuntimeException("프로젝트를 등록할 수 없습니다.");

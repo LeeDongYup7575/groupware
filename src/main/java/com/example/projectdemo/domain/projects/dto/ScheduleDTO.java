@@ -1,3 +1,4 @@
+// ScheduleDTO.java
 package com.example.projectdemo.domain.projects.dto;
 
 import lombok.AllArgsConstructor;
@@ -6,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -14,24 +14,21 @@ import java.util.List;
 @AllArgsConstructor
 public class ScheduleDTO {
     private Integer id;
+    private String empNum; // 일정 소유자
+    private String creatorEmpNum; // 일정 생성자
+    private String creatorName;
     private String title;
     private String description;
-    private Integer projectId;
-    private String projectName; // 매핑용
-    private String creatorEmpNum;
-    private String creatorName; // 매핑용
+    private String location;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private String location;
-    private Boolean isAllDay;
-    private String repeatType;
-    private LocalDateTime repeatEndDate;
-    private String color;
-    private String notificationType;
-    private Integer notificationMinutes;
+    private Boolean allDay;
+    private Integer projectId;
+    private String projectName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // 추가 정보
-    private List<ScheduleParticipantDTO> participants;
+    // 화면 표시용 추가 필드
+    private Integer participantCount;
+    private String statusColor; // 일정 상태에 따른 색상
 }

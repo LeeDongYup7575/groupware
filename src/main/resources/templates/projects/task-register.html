@@ -3,26 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>업무 등록</title>
+  <title>프로젝트 등록</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
-  <link rel="stylesheet" th:href="@{/assets/css/projects/task-register.css}">
+
+<!--  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">-->
+  <link rel="stylesheet" th:href="@{/assets/css/projects/project-register.css}">
   <style>
-    .card {
-      margin-bottom: 20px;
-    }
-    .nav-tabs {
-      margin-bottom: 20px;
+    .required-mark {
+      color: #dc3545;
+      margin-left: 3px;
     }
     .form-container {
       max-width: 900px;
       margin: 0 auto;
     }
+    .member-selection {
+      min-height: 150px;
+    }
   </style>
+  <!-- 헤더 에셋 포함 -->
+  <th:block th:replace="fragments/header :: headerAssets"></th:block>
 </head>
 <body>
 <!-- Header fragment -->
@@ -31,235 +35,146 @@
 <div class="container-fluid">
   <div class="row">
     <!-- Sidebar fragment -->
-    <div th:replace="~{fragments/sidebar/main-sidebar :: sidebar}"></div>
+    <!-- 새로운 업무 사이드바 -->
+    <div class="col-md-2 work-sidebar">
+      <div class="nav flex-column">
+        <a th:href="@{/workmanagement}" class="nav-link active">
+          <i class="fas fa-tasks"></i> 업무
+        </a>
+        <a th:href="@{/workmanagement/register}" class="nav-link">
+          <i class="fas fa-plus-circle"></i> 등록
+        </a>
+        <!--                <a th:href="@{/workmanagement/schedule}" class="nav-link">-->
+        <!--                    <i class="fas fa-calendar-alt"></i> 일정-->
+        <!--                </a>-->
+        <a th:href="@{/workmanagement/schedule}" class="nav-link">
+          <i class="fas fa-calendar-alt"></i> 일정
+        </a>
+      </div>
+    </div>
 
     <!-- Main content -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">업무 등록</h1>
+        <h1 class="h2">프로젝트 등록</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
           <div class="btn-group me-2">
-            <a th:href="@{/workmanagement}" class="btn btn-sm btn-outline-primary">업무</a>
-            <a th:href="@{/workmanagement/register}" class="btn btn-sm btn-outline-secondary">등록</a>
+            <a th:href="@{/workmanagement}" class="btn btn-sm btn-outline-primary">업무 관리</a>
             <a th:href="@{/workmanagement/schedule}" class="btn btn-sm btn-outline-info">일정</a>
           </div>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <ul class="nav nav-tabs" id="registerTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="project-tab" data-bs-toggle="tab" data-bs-target="#project" type="button" role="tab" aria-controls="project" aria-selected="true">
-            <i class="fas fa-project-diagram"></i> 프로젝트 등록
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" id="task-tab" data-bs-toggle="tab" data-bs-target="#task" type="button" role="tab" aria-controls="task" aria-selected="false">
-            <i class="fas fa-tasks"></i> 업무 등록
-          </button>
-        </li>
-      </ul>
+      <div class="form-container">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">새 프로젝트 등록</h5>
+          </div>
+          <div class="card-body">
+            <form id="projectForm">
+              <!-- 현재 사용자 정보 (hidden) -->
+              <input type="hidden" id="current-user-emp-num" th:value="${employee.empNum}">
 
-      <!-- Tab Content -->
-      <div class="tab-content" id="registerTabsContent">
-        <!-- Project Registration Tab -->
-        <div class="tab-pane fade show active" id="project" role="tabpanel" aria-labelledby="project-tab">
-          <div class="form-container">
-            <div class="card">
-              <div class="card-header">
-                <h5 class="card-title mb-0">새 프로젝트 등록</h5>
+              <div class="row mb-3">
+                <div class="col-md-8">
+                  <label for="project-name" class="form-label">프로젝트명 <span class="required-mark">*</span></label>
+                  <input type="text" class="form-control" id="project-name" name="name" required>
+                </div>
+                <div class="col-md-4">
+                  <label for="project-status" class="form-label">상태 <span class="required-mark">*</span></label>
+                  <select class="form-select" id="project-status" name="status" required>
+                    <option value="준비중">준비중</option>
+                    <option value="진행중">진행중</option>
+                    <option value="완료">완료</option>
+                    <option value="보류">보류</option>
+                  </select>
+                </div>
               </div>
-              <div class="card-body">
-                <form id="projectForm">
-                  <div class="row mb-3">
-                    <div class="col-md-8">
-                      <label for="project-name" class="form-label">프로젝트명 <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="project-name" name="name" required>
+
+              <div class="mb-3">
+                <label for="project-description" class="form-label">프로젝트 설명 <span class="required-mark">*</span></label>
+                <textarea class="form-control" id="project-description" name="description" rows="4" required></textarea>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="project-start-date" class="form-label">시작일 <span class="required-mark">*</span></label>
+                  <input type="date" class="form-control" id="project-start-date" name="startDate" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="project-end-date" class="form-label">종료 예정일 <span class="required-mark">*</span></label>
+                  <input type="date" class="form-control" id="project-end-date" name="endDate" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="project-department" class="form-label">담당 부서</label>
+                <select class="form-select" id="project-department" name="depId">
+                  <option value="">선택...</option>
+                  <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">프로젝트 멤버</label>
+                <div class="card">
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label for="project-members-search" class="form-label">직원 검색</label>
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="project-members-search" placeholder="이름, 사번, 부서명으로 검색...">
+                        <button class="btn btn-outline-primary" type="button" id="search-members-btn">
+                          <i class="fas fa-search"></i> 검색
+                        </button>
+                      </div>
                     </div>
-                    <div class="col-md-4">
-                      <label for="project-status" class="form-label">상태 <span class="text-danger">*</span></label>
-                      <select class="form-select" id="project-status" name="status" required>
-                        <option value="준비중">준비중</option>
-                        <option value="진행중">진행중</option>
-                        <option value="완료">완료</option>
-                        <option value="보류">보류</option>
-                      </select>
-                    </div>
-                  </div>
 
-                  <div class="mb-3">
-                    <label for="project-description" class="form-label">프로젝트 설명 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="project-description" name="description" rows="4" required></textarea>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label for="project-start-date" class="form-label">시작일 <span class="text-danger">*</span></label>
-                      <input type="date" class="form-control" id="project-start-date" name="startDate" required>
-                    </div>
-                    <div class="col-md-6">
-                      <label for="project-end-date" class="form-label">종료 예정일 <span class="text-danger">*</span></label>
-                      <input type="date" class="form-control" id="project-end-date" name="endDate" required>
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="project-department" class="form-label">담당 부서</label>
-                    <select class="form-select" id="project-department" name="depId">
-                      <option value="">선택...</option>
-                      <option th:each="dept : ${departments}" th:value="${dept.id}" th:text="${dept.name}"></option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">프로젝트 멤버 지정</label>
-                    <div class="card">
-                      <div class="card-body">
-                        <div class="mb-3">
-                          <label for="project-members-search" class="form-label">직원 검색</label>
-                          <div class="input-group">
-                            <input type="text" class="form-control" id="project-members-search" placeholder="이름 또는 사번으로 검색...">
-                            <button class="btn btn-outline-primary" type="button" id="search-members-btn">검색</button>
-                          </div>
-                        </div>
-
-                        <div class="row">
-                          <div class="col-md-6">
-                            <h6>사원 목록</h6>
-                            <select class="form-select" id="available-members" size="8" multiple>
-                              <option th:each="emp : ${employees}" th:value="${emp.empNum}" th:text="${emp.name + ' (' + emp.empNum + ') - ' + emp.departmentName}"></option>
-                            </select>
-                          </div>
-                          <div class="col-md-6">
-                            <h6>프로젝트 멤버</h6>
-                            <select class="form-select" id="selected-members" size="8" multiple>
-                              <option th:value="${employee.empNum}" th:text="${employee.name + ' (' + employee.empNum + ') - ' + employee.departmentName + ' [매니저]'}" selected></option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <div class="text-center mt-3">
-                          <button type="button" class="btn btn-primary btn-sm" id="add-member-btn">
+                    <div class="row">
+                      <div class="col-md-5">
+                        <h6>사원 목록</h6>
+                        <select class="form-select member-selection" id="available-members" size="10" multiple>
+                          <option th:each="emp : ${employees}"
+                                  th:if="${emp.empNum != employee.empNum}"
+                                  th:value="${emp.empNum}"
+                                  th:text="${emp.name + ' (' + emp.empNum + ') - ' + (emp.departmentName != null ? emp.departmentName : '부서 없음')}">
+                          </option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 d-flex align-items-center justify-content-center">
+                        <div class="btn-group-vertical">
+                          <button type="button" class="btn btn-outline-primary" id="add-member-btn" title="멤버 추가">
                             <i class="fas fa-chevron-right"></i>
                           </button>
-                          <button type="button" class="btn btn-secondary btn-sm" id="remove-member-btn">
+                          <button type="button" class="btn btn-outline-secondary" id="remove-member-btn" title="멤버 제거">
                             <i class="fas fa-chevron-left"></i>
                           </button>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div class="text-center">
-                    <button type="button" class="btn btn-secondary" id="cancel-project-btn">취소</button>
-                    <button type="button" class="btn btn-primary" id="save-project-btn">저장</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Task Registration Tab -->
-        <div class="tab-pane fade" id="task" role="tabpanel" aria-labelledby="task-tab">
-          <div class="form-container">
-            <div class="card">
-              <div class="card-header">
-                <h5 class="card-title mb-0">새 업무 등록</h5>
-              </div>
-              <div class="card-body">
-                <form id="taskForm">
-                  <div class="mb-3">
-                    <label for="task-project" class="form-label">프로젝트 <span class="text-danger">*</span></label>
-                    <select class="form-select" id="task-project" name="projectId" required>
-                      <option value="">선택...</option>
-                      <option th:each="project : ${accessibleProjects}" th:value="${project.id}" th:text="${project.name}"></option>
-                    </select>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-8">
-                      <label for="task-title" class="form-label">업무명 <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="task-title" name="title" required>
-                    </div>
-                    <div class="col-md-4">
-                      <label for="task-status" class="form-label">상태 <span class="text-danger">*</span></label>
-                      <select class="form-select" id="task-status" name="status" required>
-                        <option value="미시작" selected>미시작</option>
-                        <option value="진행중">진행중</option>
-                        <option value="완료">완료</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="task-description" class="form-label">업무 설명 <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="task-description" name="description" rows="4" required></textarea>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label for="task-assignee" class="form-label">담당자 <span class="text-danger">*</span></label>
-                      <select class="form-select" id="task-assignee" name="assigneeEmpNum" required>
-                        <option value="">선택...</option>
-                        <option th:each="emp : ${employees}" th:value="${emp.empNum}" th:text="${emp.name + ' (' + emp.empNum + ') - ' + emp.departmentName}"></option>
-                      </select>
-                    </div>
-                    <div class="col-md-6">
-                      <label for="task-priority" class="form-label">우선순위 <span class="text-danger">*</span></label>
-                      <select class="form-select" id="task-priority" name="priority" required>
-                        <option value="높음">높음</option>
-                        <option value="중간" selected>중간</option>
-                        <option value="낮음">낮음</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-4">
-                      <label for="task-start-date" class="form-label">시작일 <span class="text-danger">*</span></label>
-                      <input type="date" class="form-control" id="task-start-date" name="startDate" required>
-                    </div>
-                    <div class="col-md-4">
-                      <label for="task-due-date" class="form-label">마감일 <span class="text-danger">*</span></label>
-                      <input type="date" class="form-control" id="task-due-date" name="dueDate" required>
-                    </div>
-                    <div class="col-md-4">
-                      <label for="task-estimated-hours" class="form-label">예상 소요 시간 (시간)</label>
-                      <input type="number" class="form-control" id="task-estimated-hours" name="estimatedHours" min="0">
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="task-progress" class="form-label">진행률 (%)</label>
-                    <div class="input-group">
-                      <input type="range" class="form-range" id="task-progress-range" min="0" max="100" step="5" value="0">
-                      <input type="number" class="form-control" id="task-progress" name="progress" min="0" max="100" value="0">
-                      <span class="input-group-text">%</span>
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">하위 업무</label>
-                    <div class="card">
-                      <div class="card-body">
-                        <div id="subtasks-container">
-                          <!-- 하위 업무 항목들이 여기에 동적으로 추가됩니다 -->
-                        </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-subtask-btn">
-                          <i class="fas fa-plus"></i> 하위 업무 추가
-                        </button>
+                      <div class="col-md-5">
+                        <h6>프로젝트 멤버</h6>
+                        <select class="form-select member-selection" id="selected-members" size="10" multiple>
+                          <!-- 현재 로그인한 사용자를 기본 매니저로 추가 -->
+                          <option th:value="${employee.empNum}"
+                                  th:text="${employee.name + ' (' + employee.empNum + ') - ' + (employee.departmentName != null ? employee.departmentName : '부서 없음') + ' [매니저]'}"
+                                  selected>
+                          </option>
+                        </select>
                       </div>
                     </div>
+                    <div class="alert alert-info mt-3">
+                      <i class="fas fa-info-circle"></i> 프로젝트 매니저는 기본적으로 현재 로그인한 사용자로 설정되며, 제거할 수 없습니다.
+                    </div>
                   </div>
-
-                  <div class="text-center">
-                    <button type="button" class="btn btn-secondary" id="cancel-task-btn">취소</button>
-                    <button type="button" class="btn btn-primary" id="save-task-btn">저장</button>
-                  </div>
-                </form>
+                </div>
               </div>
-            </div>
+
+              <div class="text-center">
+                <button type="button" class="btn btn-secondary" id="cancel-project-btn">취소</button>
+                <button type="button" class="btn btn-primary" id="save-project-btn">
+                  <i class="fas fa-save"></i> 프로젝트 등록
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -272,248 +187,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Custom JavaScript -->
-<script th:inline="javascript">
-  $(document).ready(function() {
-    // Initialize date fields with current date
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const nextMonth = new Date(today);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-
-    $('#project-start-date').val(formatDate(today));
-    $('#project-end-date').val(formatDate(nextMonth));
-
-    $('#task-start-date').val(formatDate(today));
-    $('#task-due-date').val(formatDate(tomorrow));
-
-    // Progress range input synchronization
-    $('#task-progress-range').on('input', function() {
-      $('#task-progress').val($(this).val());
-    });
-
-    $('#task-progress').on('input', function() {
-      $('#task-progress-range').val($(this).val());
-    });
-
-    // Project members selection
-    $('#add-member-btn').on('click', function() {
-      $('#available-members option:selected').each(function() {
-        // Don't add duplicates
-        if ($('#selected-members option[value="' + $(this).val() + '"]').length === 0) {
-          const newOption = $(this).clone().removeAttr('selected');
-          $('#selected-members').append(newOption);
-        }
-      });
-    });
-
-    $('#remove-member-btn').on('click', function() {
-      $('#selected-members option:selected').each(function() {
-        // Don't remove the manager (current user)
-        if (!$(this).text().includes('[매니저]')) {
-          $(this).remove();
-        }
-      });
-    });
-
-    // Search members
-    $('#search-members-btn').on('click', function() {
-      const searchText = $('#project-members-search').val().toLowerCase();
-
-      if (searchText.trim() === '') {
-        $('#available-members option').show();
-      } else {
-        $('#available-members option').each(function() {
-          if ($(this).text().toLowerCase().includes(searchText)) {
-            $(this).show();
-          } else {
-            $(this).hide();
-          }
-        });
-      }
-    });
-
-    // Add subtask
-    let subtaskIndex = 0;
-
-    $('#add-subtask-btn').on('click', function() {
-      const subtaskHtml = `
-                    <div class="subtask-item mb-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="subTasks[${subtaskIndex}].title" placeholder="하위 업무 제목" required>
-                            <button type="button" class="btn btn-outline-danger remove-subtask-btn">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <textarea class="form-control mt-2" name="subTasks[${subtaskIndex}].description" rows="2" placeholder="하위 업무 설명"></textarea>
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <select class="form-control" name="subTasks[${subtaskIndex}].assigneeEmpNum">
-                                    <option value="">담당자 선택...</option>
-                                    ${$('#task-assignee').html()}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <input type="date" class="form-control" name="subTasks[${subtaskIndex}].dueDate" placeholder="마감일">
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-      $('#subtasks-container').append(subtaskHtml);
-      subtaskIndex++;
-    });
-
-    // Remove subtask
-    $(document).on('click', '.remove-subtask-btn', function() {
-      $(this).closest('.subtask-item').remove();
-    });
-
-    // Save project
-    $('#save-project-btn').on('click', function() {
-      // Validate form
-      if (!validateForm('#projectForm')) {
-        return;
-      }
-
-      // Collect form data
-      const projectData = {
-        name: $('#project-name').val(),
-        description: $('#project-description').val(),
-        status: $('#project-status').val(),
-        startDate: $('#project-start-date').val(),
-        endDate: $('#project-end-date').val(),
-        depId: $('#project-department').val() || null
-      };
-
-      // Collect project members
-      const members = [];
-      $('#selected-members option').each(function() {
-        const empNum = $(this).val();
-        const isManager = $(this).text().includes('[매니저]');
-        members.push({
-          empNum: empNum,
-          role: isManager ? '매니저' : '팀원'
-        });
-      });
-
-      // Add members data
-      projectData.members = members;
-
-      // Save project via AJAX
-      $.ajax({
-        url: '/api/projects',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(projectData),
-        success: function(response) {
-          alert('프로젝트가 성공적으로 등록되었습니다.');
-          window.location.href = '/workmanagement';
-        },
-        error: function(xhr, status, error) {
-          alert('프로젝트 등록에 실패했습니다: ' + xhr.responseText);
-        }
-      });
-    });
-
-    // Save task
-    $('#save-task-btn').on('click', function() {
-      // Validate form
-      if (!validateForm('#taskForm')) {
-        return;
-      }
-
-      // Collect form data
-      const taskData = {
-        projectId: $('#task-project').val(),
-        title: $('#task-title').val(),
-        description: $('#task-description').val(),
-        status: $('#task-status').val(),
-        assigneeEmpNum: $('#task-assignee').val(),
-        priority: $('#task-priority').val(),
-        startDate: $('#task-start-date').val(),
-        dueDate: $('#task-due-date').val(),
-        estimatedHours: $('#task-estimated-hours').val() || null,
-        progress: $('#task-progress').val()
-      };
-
-      // Collect subtasks
-      const subTasks = [];
-      $('.subtask-item').each(function(index) {
-        const title = $(this).find('input[name^="subTasks"][name$=".title"]').val();
-        if (title) {
-          subTasks.push({
-            title: title,
-            description: $(this).find('textarea[name^="subTasks"][name$=".description"]').val(),
-            assigneeEmpNum: $(this).find('select[name^="subTasks"][name$=".assigneeEmpNum"]').val(),
-            dueDate: $(this).find('input[name^="subTasks"][name$=".dueDate"]').val()
-          });
-        }
-      });
-
-      // Add subtasks data
-      taskData.subTasks = subTasks;
-
-      // Save task via AJAX
-      $.ajax({
-        url: '/api/tasks',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(taskData),
-        success: function(response) {
-          alert('업무가 성공적으로 등록되었습니다.');
-          window.location.href = '/workmanagement';
-        },
-        error: function(xhr, status, error) {
-          alert('업무 등록에 실패했습니다: ' + xhr.responseText);
-        }
-      });
-    });
-
-    // Cancel buttons
-    $('#cancel-project-btn').on('click', function() {
-      if (confirm('작성 중인 내용이 저장되지 않습니다. 취소하시겠습니까?')) {
-        window.location.href = '/workmanagement';
-      }
-    });
-
-    $('#cancel-task-btn').on('click', function() {
-      if (confirm('작성 중인 내용이 저장되지 않습니다. 취소하시겠습니까?')) {
-        window.location.href = '/workmanagement';
-      }
-    });
-  });
-
-  // Validate form
-  function validateForm(formSelector) {
-    const form = $(formSelector)[0];
-    if (!form.checkValidity()) {
-      // Create the error message
-      $('<div class="invalid-feedback">이 필드는 필수입니다.</div>')
-              .insertAfter($(formSelector + ' :invalid'))
-              .show();
-
-      // Highlight invalid fields
-      $(formSelector + ' :invalid').addClass('is-invalid');
-
-      // Focus the first invalid field
-      $(formSelector + ' :invalid').first().focus();
-
-      return false;
-    }
-
-    return true;
-  }
-
-  // Format date (yyyy-MM-dd)
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  }
-</script>
+<script th:src="@{/assets/js/projects/project-register.js}"></script>
+<div th:replace="fragments/header :: headerScripts"></div>
 </body>
 </html>

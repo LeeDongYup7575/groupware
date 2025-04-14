@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -21,37 +22,11 @@ public class TaskApiController {
     private TaskService taskService;
 
     /**
-     * 프로젝트별 업무 목록 조회
+     * 모든 업무 목록 조회
      */
-    @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<TaskDTO>> getTasksByProject(@PathVariable Integer projectId) {
-        return ResponseEntity.ok(taskService.getTasksByProject(projectId));
-    }
-
-    /**
-     * 담당자별 업무 목록 조회
-     */
-    @GetMapping("/assignee/{empNum}")
-    public ResponseEntity<List<TaskDTO>> getTasksByAssignee(@PathVariable String empNum) {
-        return ResponseEntity.ok(taskService.getTasksByAssignee(empNum));
-    }
-
-    /**
-     * 보고자별 업무 목록 조회
-     */
-    @GetMapping("/reporter/{empNum}")
-    public ResponseEntity<List<TaskDTO>> getTasksByReporter(@PathVariable String empNum) {
-        return ResponseEntity.ok(taskService.getTasksByReporter(empNum));
-    }
-
-    /**
-     * 상태별 업무 목록 조회
-     */
-    @GetMapping("/project/{projectId}/status/{status}")
-    public ResponseEntity<List<TaskDTO>> getTasksByStatus(
-            @PathVariable Integer projectId,
-            @PathVariable String status) {
-        return ResponseEntity.ok(taskService.getTasksByStatus(projectId, status));
+    @GetMapping
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
+        return ResponseEntity.ok(taskService.getAllTasks());
     }
 
     /**
@@ -67,6 +42,38 @@ public class TaskApiController {
     }
 
     /**
+     * 특정 사원이 담당하는 업무 목록 조회
+     */
+    @GetMapping("/assignee")
+    public ResponseEntity<List<TaskDTO>> getTasksByAssignee(HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(taskService.getTasksByAssignee(empNum));
+    }
+
+    /**
+     * 특정 사원이 생성한 업무 목록 조회
+     */
+    @GetMapping("/created")
+    public ResponseEntity<List<TaskDTO>> getTasksByCreator(HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.ok(taskService.getTasksByCreator(empNum));
+    }
+
+    /**
+     * 프로젝트별 업무 목록 조회
+     */
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<TaskDTO>> getTasksByProject(@PathVariable Integer projectId) {
+        return ResponseEntity.ok(taskService.getTasksByProject(projectId));
+    }
+
+    /**
      * 신규 업무 등록
      */
     @PostMapping
@@ -76,8 +83,9 @@ public class TaskApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // 현재 사용자를 업무 등록자로 설정
+        // 현재 사용자를 업무 작성자로 설정
         task.setReporterEmpNum(empNum);
+        task.setCreatedAt(LocalDateTime.now());
 
         TaskDTO createdTask = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
@@ -87,7 +95,13 @@ public class TaskApiController {
      * 업무 정보 업데이트
      */
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable Integer id, @RequestBody TaskDTO task) {
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable Integer id, @RequestBody TaskDTO task,
+                                              HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         task.setId(id);
         TaskDTO updatedTask = taskService.updateTask(task);
         return ResponseEntity.ok(updatedTask);
@@ -97,13 +111,20 @@ public class TaskApiController {
      * 업무 상태 업데이트
      */
     @PatchMapping("/{id}/status")
-    public ResponseEntity<TaskDTO> updateTaskStatus(@PathVariable Integer id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<TaskDTO> updateTaskStatus(@PathVariable Integer id,
+                                                    @RequestBody Map<String, String> body,
+                                                    HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         String status = body.get("status");
         if (status == null || status.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        TaskDTO updatedTask = taskService.updateTaskStatus(id, status);
+        TaskDTO updatedTask = taskService.updateTaskStatus(id, status, empNum);
         return ResponseEntity.ok(updatedTask);
     }
 
@@ -111,107 +132,131 @@ public class TaskApiController {
      * 업무 진행률 업데이트
      */
     @PatchMapping("/{id}/progress")
-    public ResponseEntity<TaskDTO> updateTaskProgress(@PathVariable Integer id, @RequestBody Map<String, Integer> body) {
-        Integer progress = body.get("progress");
-        if (progress == null || progress < 0 || progress > 100) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        TaskDTO updatedTask = taskService.updateTaskProgress(id, progress);
-        return ResponseEntity.ok(updatedTask);
-    }
-
-    /**
-     * 업무 완료 처리
-     */
-    @PatchMapping("/{id}/complete")
-    public ResponseEntity<TaskDTO> completeTask(@PathVariable Integer id) {
-        TaskDTO completedTask = taskService.completeTask(id);
-        return ResponseEntity.ok(completedTask);
-    }
-
-    /**
-     * 업무 로그 조회
-     */
-    @GetMapping("/{id}/logs")
-    public ResponseEntity<List<TaskLogDTO>> getTaskLogs(@PathVariable Integer id) {
-        return ResponseEntity.ok(taskService.getTaskLogs(id));
-    }
-
-    /**
-     * 업무 로그 추가
-     */
-    @PostMapping("/{id}/logs")
-    public ResponseEntity<TaskLogDTO> addTaskLog(
-            @PathVariable Integer id,
-            @RequestBody TaskLogDTO log,
-            HttpServletRequest request) {
+    public ResponseEntity<TaskDTO> updateTaskProgress(@PathVariable Integer id,
+                                                      @RequestBody Map<String, Integer> body,
+                                                      HttpServletRequest request) {
         String empNum = (String) request.getAttribute("empNum");
         if (empNum == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        log.setTaskId(id);
-        log.setEmpNum(empNum);
+        Integer progress = body.get("progress");
+        if (progress == null || progress < 0 || progress > 100) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        TaskLogDTO addedLog = taskService.addTaskLog(log);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedLog);
+        TaskDTO updatedTask = taskService.updateTaskProgress(id, progress, empNum);
+        return ResponseEntity.ok(updatedTask);
     }
 
     /**
-     * 하위 업무 목록 조회
+     * 업무 삭제
      */
-    @GetMapping("/{id}/subtasks")
-    public ResponseEntity<List<SubTaskDTO>> getSubTasksByTask(@PathVariable Integer id) {
-        return ResponseEntity.ok(taskService.getSubTasksByTask(id));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable Integer id, HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            taskService.deleteTask(id, empNum);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**
      * 하위 업무 추가
      */
-    @PostMapping("/{id}/subtasks")
-    public ResponseEntity<SubTaskDTO> addSubTask(
-            @PathVariable Integer id,
-            @RequestBody SubTaskDTO subTask) {
-        subTask.setTaskId(id);
-        SubTaskDTO addedSubTask = taskService.addSubTask(subTask);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedSubTask);
+    @PostMapping("/{taskId}/subtasks")
+    public ResponseEntity<SubTaskDTO> addSubTask(@PathVariable Integer taskId,
+                                                 @RequestBody SubTaskDTO subTask,
+                                                 HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        subTask.setTaskId(taskId);
+        SubTaskDTO createdSubTask = taskService.createSubTask(subTask);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubTask);
     }
 
     /**
-     * 하위 업무 업데이트
+     * 하위 업무 수정
      */
-    @PutMapping("/subtasks/{id}")
-    public ResponseEntity<SubTaskDTO> updateSubTask(
-            @PathVariable Integer id,
-            @RequestBody SubTaskDTO subTask) {
-        subTask.setId(id);
+    @PutMapping("/{taskId}/subtasks/{subTaskId}")
+    public ResponseEntity<SubTaskDTO> updateSubTask(@PathVariable Integer taskId,
+                                                    @PathVariable Integer subTaskId,
+                                                    @RequestBody SubTaskDTO subTask,
+                                                    HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        subTask.setId(subTaskId);
+        subTask.setTaskId(taskId);
         SubTaskDTO updatedSubTask = taskService.updateSubTask(subTask);
         return ResponseEntity.ok(updatedSubTask);
     }
 
     /**
-     * 하위 업무 상태 업데이트
+     * 하위 업무 삭제
      */
-    @PatchMapping("/subtasks/{id}/status")
-    public ResponseEntity<SubTaskDTO> updateSubTaskStatus(
-            @PathVariable Integer id,
-            @RequestBody Map<String, String> body) {
-        String status = body.get("status");
-        if (status == null || status.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+    @DeleteMapping("/{taskId}/subtasks/{subTaskId}")
+    public ResponseEntity<?> deleteSubTask(@PathVariable Integer taskId,
+                                           @PathVariable Integer subTaskId,
+                                           HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        SubTaskDTO updatedSubTask = taskService.updateSubTaskStatus(id, status);
-        return ResponseEntity.ok(updatedSubTask);
+        try {
+            taskService.deleteSubTask(subTaskId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**
-     * 하위 업무 완료 처리
+     * 하위 업무 완료 상태 변경
      */
-    @PatchMapping("/subtasks/{id}/complete")
-    public ResponseEntity<SubTaskDTO> completeSubTask(@PathVariable Integer id) {
-        SubTaskDTO completedSubTask = taskService.completeSubTask(id);
-        return ResponseEntity.ok(completedSubTask);
+    @PatchMapping("/{taskId}/subtasks/{subTaskId}/completion")
+    public ResponseEntity<?> updateSubTaskCompletion(@PathVariable Integer taskId,
+                                                     @PathVariable Integer subTaskId,
+                                                     @RequestBody Map<String, Boolean> body,
+                                                     HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Boolean completed = body.get("completed");
+        if (completed == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            taskService.updateSubTaskCompletion(subTaskId, completed);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * 특정 업무의 로그 조회
+     */
+    @GetMapping("/{taskId}/logs")
+    public ResponseEntity<List<TaskLogDTO>> getTaskLogs(@PathVariable Integer taskId) {
+        return ResponseEntity.ok(taskService.getTaskLogs(taskId));
     }
 }

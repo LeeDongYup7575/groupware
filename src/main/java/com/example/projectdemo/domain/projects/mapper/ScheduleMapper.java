@@ -11,39 +11,32 @@ import java.util.List;
 @Mapper
 public interface ScheduleMapper {
 
-    List<ScheduleDTO> selectSchedulesByProject(@Param("projectId") Integer projectId);
-
-    List<ScheduleDTO> selectSchedulesByEmployee(@Param("empNum") String empNum);
-
-    List<ScheduleDTO> selectSchedulesByDateRange(@Param("startDate") LocalDateTime startDate,
-                                                 @Param("endDate") LocalDateTime endDate);
-
+    // 일정 조회 관련 메서드
+    List<ScheduleDTO> findAllSchedules();
+    List<ScheduleDTO> findSchedulesByEmpNum(@Param("empNum") String empNum);
     ScheduleDTO selectScheduleById(@Param("id") Integer id);
+    List<ScheduleDTO> selectSchedulesByProject(@Param("projectId") Integer projectId);
+    List<ScheduleDTO> selectSchedulesByEmployee(@Param("empNum") String empNum);
+    List<ScheduleDTO> selectSchedulesByDateRange(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
-    void insertSchedule(ScheduleDTO schedule);
+    // 일정 관리 관련 메서드
+    int insertSchedule(ScheduleDTO schedule);
+    int updateSchedule(ScheduleDTO schedule);
+    int deleteSchedule(@Param("id") Integer id);
 
-    void updateSchedule(ScheduleDTO schedule);
-
-    void deleteSchedule(@Param("id") Integer id);
-
+    // 일정 참여자 관련 메서드
     List<ScheduleParticipantDTO> selectScheduleParticipants(@Param("scheduleId") Integer scheduleId);
-
-//    void insertScheduleParticipant(@Param("scheduleId") Integer scheduleId,
-//                                   @Param("empNum") String empNum);
-//
-//    void updateParticipantStatus(@Param("scheduleId") Integer scheduleId,
-//                                 @Param("empNum") String empNum,
-//                                 @Param("status") String status);
-
-    void insertScheduleParticipant(ScheduleParticipantDTO dto);
-
-    void updateParticipantStatus(@Param("scheduleId") Integer scheduleId,
-                                 @Param("empNum") String empNum,
-                                 @Param("status") String status);
-
-    void deleteScheduleParticipant(@Param("scheduleId") Integer scheduleId,
-                                   @Param("empNum") String empNum);
-
-    ScheduleParticipantDTO selectScheduleParticipant(@Param("scheduleId") Integer scheduleId,
-                                                     @Param("empNum") String empNum);
+    ScheduleParticipantDTO selectScheduleParticipant(
+            @Param("scheduleId") Integer scheduleId,
+            @Param("empNum") String empNum);
+    int insertScheduleParticipant(ScheduleParticipantDTO participant);
+    int updateParticipantStatus(
+            @Param("scheduleId") Integer scheduleId,
+            @Param("empNum") String empNum,
+            @Param("status") String status);
+    int deleteScheduleParticipant(
+            @Param("scheduleId") Integer scheduleId,
+            @Param("empNum") String empNum);
 }

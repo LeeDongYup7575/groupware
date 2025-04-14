@@ -2,7 +2,9 @@ package com.example.projectdemo.domain.projects.controller;
 
 import com.example.projectdemo.domain.projects.dto.ProjectDTO;
 import com.example.projectdemo.domain.projects.dto.ProjectMemberDTO;
+import com.example.projectdemo.domain.projects.dto.TaskDTO;
 import com.example.projectdemo.domain.projects.service.ProjectService;
+import com.example.projectdemo.domain.projects.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,9 @@ public class ProjectApiController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private TaskService taskService;
 
     /**
      * 프로젝트 목록 조회
@@ -157,5 +162,15 @@ public class ProjectApiController {
     public ResponseEntity<?> removeProjectMember(@PathVariable Integer id, @PathVariable String empNum) {
         projectService.removeProjectMember(id, empNum);
         return ResponseEntity.ok().build();
+    }
+
+
+    /**
+     * 프로젝트별 업무 목록 조회
+     */
+    @GetMapping("/{projectId}/tasks")
+    public ResponseEntity<List<TaskDTO>> getProjectTasks(@PathVariable Integer projectId) {
+        List<TaskDTO> tasks = taskService.getTasksByProject(projectId);
+        return ResponseEntity.ok(tasks);
     }
 }

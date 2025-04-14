@@ -1,7 +1,6 @@
 package com.example.projectdemo.domain.projects.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubTaskDTO {
@@ -17,12 +15,11 @@ public class SubTaskDTO {
     private Integer taskId;
     private String title;
     private String description;
+    private boolean completed;
     private String assigneeEmpNum;
-    private String assigneeName; // 매핑용
-    private String status;
+    private String assigneeName;  // JOIN 결과 (실제 DB 컬럼에는 없음)
     private LocalDate dueDate;
-    private Integer progress;
-    private LocalDateTime completedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime completedAt;
 }

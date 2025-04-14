@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.projects.mapper.TaskLogMapper">
+
+    <!-- 업무 로그 기본 결과 매핑 -->
+    <resultMap id="TaskLogResultMap" type="com.example.projectdemo.domain.projects.dto.TaskLogDTO">
+        <id property="id" column="id" />
+        <result property="taskId" column="task_id" />
+        <result property="taskTitle" column="task_title" />
+        <result property="projectId" column="project_id" />
+        <result property="projectName" column="project_name" />
+        <result property="empNum" column="emp_num" />
+        <result property="empName" column="emp_name" />
+        <result property="logType" column="log_type" />
+        <result property="oldValue" column="old_value" />
+        <result property="newValue" column="new_value" />
+        <result property="comment" column="comment" />
+        <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <!-- 최근 업무 로그 조회 -->
+    <select id="getRecentTaskLogs" resultMap="TaskLogResultMap">
+        SELECT tl.*, t.title AS task_title, p.id AS project_id, p.name AS project_name, e.name AS emp_name
+        FROM task_logs tl
+                 INNER JOIN tasks t ON tl.task_id = t.id
+                 LEFT JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees e ON tl.emp_num = e.emp_num
+        ORDER BY tl.created_at DESC
+            LIMIT #{limit}
+    </select>
+
+    <!-- 특정 사원의 업무 로그 조회 -->
+    <select id="getTaskLogsByEmpNum" resultMap="TaskLogResultMap">
+        SELECT tl.*, t.title AS task_title, p.id AS project_id, p.name AS project_name, e.name AS emp_name
+        FROM task_logs tl
+                 INNER JOIN tasks t ON tl.task_id = t.id
+                 LEFT JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees e ON tl.emp_num = e.emp_num
+        WHERE tl.emp_num = #{empNum}
+        ORDER BY tl.created_at DESC
+            LIMIT #{limit}
+    </select>
+
+    <!-- 특정 프로젝트의 업무 로그 조회 -->
+    <select id="getTaskLogsByProjectId" resultMap="TaskLogResultMap">
+        SELECT tl.*, t.title AS task_title, p.id AS project_id, p.name AS project_name, e.name AS emp_name
+        FROM task_logs tl
+                 INNER JOIN tasks t ON tl.task_id = t.id
+                 LEFT JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees e ON tl.emp_num = e.emp_num
+        WHERE t.project_id = #{projectId}
+        ORDER BY tl.created_at DESC
+            LIMIT #{limit}
+    </select>
+
+    <!-- 특정 업무의 로그 조회 -->
+    <select id="getTaskLogsByTaskId" resultMap="TaskLogResultMap">
+        SELECT tl.*, t.title AS task_title, p.id AS project_id, p.name AS project_name, e.name AS emp_name
+        FROM task_logs tl
+                 INNER JOIN tasks t ON tl.task_id = t.id
+                 LEFT JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees e ON tl.emp_num = e.emp_num
+        WHERE tl.task_id = #{taskId}
+        ORDER BY tl.created_at DESC
+    </select>
+
+    <!-- 업무 로그 추가 -->
+    <insert id="insertTaskLog" parameterType="com.example.projectdemo.domain.projects.dto.TaskLogDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO task_logs (
+        task_id, emp_num, log_type, old_value, new_value, comment, created_at
+        ) VALUES (
+        #{taskId}, #{empNum}, #{logType}, #{oldValue}, #{newValue}, #{comment},
+        <choose>
+            <when test="createdAt != null">#{createdAt}</when>
+            <otherwise>NOW()</otherwise>
+        </choose>
+        )
+    </insert>
+
+    <!-- 특정 기간 내의 업무 로그 조회 -->
+    <select id="getTaskLogsByDateRange" resultMap="TaskLogResultMap">
+        SELECT tl.*, t.title AS task_title, p.id AS project_id, p.name AS project_name, e.name AS emp_name
+        FROM task_logs tl
+                 INNER JOIN tasks t ON tl.task_id = t.id
+                 LEFT JOIN projects p ON t.project_id = p.id
+                 LEFT JOIN employees e ON tl.emp_num = e.emp_num
+        WHERE tl.created_at BETWEEN #{startDate} AND #{endDate}
+        ORDER BY tl.created_at DESC
+    </select>
+
+</mapper>

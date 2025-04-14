@@ -1,3 +1,4 @@
+// ScheduleParticipantDTO.java
 package com.example.projectdemo.domain.projects.dto;
 
 import lombok.AllArgsConstructor;
@@ -12,10 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleParticipantDTO {
-    private Integer id;
     private Integer scheduleId;
     private String empNum;
-    private String empName; // 매핑용
-    private String status;
-    private LocalDateTime respondedAt;
+    private String empName;
+    private String status; // 참석, 불참, 미정
+    private LocalDateTime joinedAt;
 }

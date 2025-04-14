@@ -1,7 +1,6 @@
 package com.example.projectdemo.domain.projects.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,22 +8,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TodoDTO {
     private Integer id;
-    private String empNum;
     private String title;
     private String content;
-    private boolean completed;
-    private LocalDate dueDate;
+    private String empNum;
     private String priority;
+    private LocalDate dueDate;
+    private boolean completed;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime completedAt;
 
-    // 추가 정보
-    private long remainingDays; // 남은 일수
-    private boolean isOverdue; // 마감일 초과 여부
+    // 화면 표시용 메타데이터 (실제 DB 컬럼에는 없음)
+    private Integer remainingDays;
+    private boolean isOverdue;
 }

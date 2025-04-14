@@ -1,6 +1,9 @@
 /* Work Management CSS */
 
 /* Task Progress Bar Styles */
+.container-fluid{
+    margin-top: 80px;
+}
 .task-progress {
     height: 10px;
     border-radius: 5px;
@@ -148,4 +151,80 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
     }
+}
+
+.task-progress {
+    height: 10px;
+    margin-bottom: 10px;
+}
+.priority-high {
+    border-left: 4px solid #dc3545;
+}
+.priority-medium {
+    border-left: 4px solid #ffc107;
+}
+.priority-low {
+    border-left: 4px solid #0d6efd;
+}
+.tab-content {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+}
+.project-card {
+    transition: transform 0.3s;
+    cursor: pointer;
+    height: 100%;
+}
+.project-card:hover {
+    transform: translateY(-5px);
+}
+.todo-list-item {
+    cursor: pointer;
+}
+.todo-list-item.completed {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+.todo-list-item:hover {
+    background-color: #f8f9fa;
+}
+.task-list-item {
+    border-left-width: 4px;
+    transition: background-color 0.2s;
+}
+.task-list-item:hover {
+    background-color: #f8f9fa;
+}
+.task-log-item {
+    border-left: 3px solid #6c757d;
+    padding-left: 15px;
+    margin-bottom: 15px;
+}
+/* 새로운 사이드바 스타일 */
+.work-sidebar {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 56px);
+    padding-top: 20px;
+    border-right: 1px solid #dee2e6;
+}
+.work-sidebar .nav-link {
+    color: #495057;
+    padding: 10px 15px;
+    border-radius: 0;
+    margin-bottom: 5px;
+}
+.work-sidebar .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+}
+.work-sidebar .nav-link:hover:not(.active) {
+    background-color: #e9ecef;
+}
+.work-sidebar .nav-link i {
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
 }
