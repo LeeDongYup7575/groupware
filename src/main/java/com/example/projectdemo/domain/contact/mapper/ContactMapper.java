@@ -27,4 +27,11 @@ public interface ContactMapper {
     // 개인주소록 연락처 수정
     void updatePersonalContact(@Param("contact") PersonalContactDTO dto);
 
+    // 공유 주소록(사원 연락처) 검색
+    List<EmployeeContactDTO> searchSharedContacts(@Param("queryPattern") String queryPattern);
+
+    // 개인 주소록 검색 (로그인한 사원의 개인 주소록)
+    List<PersonalContactDTO> searchPersonalContacts(@Param("empId") Integer empId,
+                                                    @Param("queryPattern") String queryPattern);
+
 }

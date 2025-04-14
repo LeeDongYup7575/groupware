@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contact")
@@ -123,6 +124,28 @@ public class ContactApiController {
         }
     }
 
+
+    /**
+     * 연락처 검색
+     */
+    @GetMapping("/search")
+    public ResponseEntity<Map<String, Object>> searchContacts(
+            @RequestParam String query,
+            HttpServletRequest request) {
+        try {
+            // 개인 주소록 검색을 위해 empId 확인 (로그인된 사용자)
+            Integer empId = (Integer) request.getAttribute("id");
+            if (empId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            // Service에서 검색 결과(공유, 개인)를 조회
+            Map<String, Object> result = contactService.searchContacts(empId, query);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 
 }
