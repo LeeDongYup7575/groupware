@@ -90,4 +90,43 @@
         WHERE id = #{contact.id}
     </update>
 
+    <!-- 공유 주소록 검색: 이름, 내부 이메일, 전화번호, 부서명을 대상으로 LIKE 검색 -->
+    <select id="searchSharedContacts" resultType="com.example.projectdemo.domain.contact.dto.EmployeeContactDTO">
+        SELECT
+            employees.emp_num,
+            employees.name,
+            employees.internal_email,
+            employees.phone,
+            employees.dep_id,
+            departments.name AS dep_name,
+            employees.pos_id,
+            positions.title AS pos_title
+        FROM
+            employees
+                JOIN departments ON employees.dep_id = departments.id
+                JOIN positions ON employees.pos_id = positions.id
+        WHERE
+            employees.name LIKE #{queryPattern}
+           OR employees.internal_email LIKE #{queryPattern}
+           OR employees.phone LIKE #{queryPattern}
+           OR departments.name LIKE #{queryPattern}
+        ORDER BY
+            employees.name;
+    </select>
+
+    <!-- 개인 주소록 검색: 이름, 이메일, 전화번호, 메모를 대상으로 LIKE 검색 -->
+    <select id="searchPersonalContacts" resultType="com.example.projectdemo.domain.contact.dto.PersonalContactDTO">
+        SELECT *
+        FROM personal_contacts
+        WHERE emp_id = #{empId}
+          AND (
+            name LIKE #{queryPattern}
+                OR email LIKE #{queryPattern}
+                OR phone LIKE #{queryPattern}
+                OR memo LIKE #{queryPattern}
+            )
+        ORDER BY name;
+    </select>
+
+
 </mapper>

@@ -6,7 +6,9 @@ import com.example.projectdemo.domain.contact.mapper.ContactMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContactService {
@@ -56,5 +58,21 @@ public class ContactService {
         contactMapper.updatePersonalContact(dto);
     }
 
+    /**
+     * 연락처 검색
+     */
+    public Map<String, Object> searchContacts(Integer empId, String query) {
+        // 검색어를 LIKE 패턴으로 가공 (예: "%검색어%")
+        String queryPattern = "%" + query + "%";
+        // 공유 주소록 검색 (사원 연락처)
+        List<EmployeeContactDTO> sharedResults = contactMapper.searchSharedContacts(queryPattern);
+        // 개인 주소록 검색 (로그인한 사용자)
+        List<PersonalContactDTO> personalResults = contactMapper.searchPersonalContacts(empId, queryPattern);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("shared", sharedResults);
+        result.put("personal", personalResults);
+        return result;
+    }
 
 }
