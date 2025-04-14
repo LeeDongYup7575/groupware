@@ -2,11 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{board/board-layout :: html(
         '통합게시판 목록',
-        ~{::style},
+        ~{::head/link},
+        ~{::head/style},
         ~{::#contents},
         ~{::script}
       )}">
 <head>
+    <link th:remove="all"></link>
     <style>
         /* 페이지별 추가 스타일 */
         th, td{border: 1px solid;}
@@ -55,6 +57,12 @@
         <!-- 페이지네이션 -->
     </div>
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- 페이지네이션 JS -->
+<script src="/assets/js/board/pagination.js"></script>
+
 <script>
     // 페이지별 스크립트
 </script>

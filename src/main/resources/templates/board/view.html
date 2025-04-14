@@ -3,6 +3,7 @@
       th:replace="~{board/board-layout :: html(
         '게시글 상세',
         ~{::head/link},
+        ~{::head/style},
         ~{::#contents},
         ~{::script}
       )}">
@@ -13,136 +14,427 @@
     <title th:text="${post.title} + ' - 게시판'">게시글 제목 - 게시판</title>
     <style>
         /* 페이지별 추가 스타일 */
+        /* 답글 관련 스타일 */
+        .reply-actions {
+            margin-top: 8px;
+        }
+
+        .btn-reply {
+            background: none;
+            border: none;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-right: 10px;
+        }
+
+        .btn-reply:hover {
+            text-decoration: underline;
+        }
+
+        .reply-form-container {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .reply-form {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .reply-textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .reply-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .reply-cancel-btn, .reply-submit-btn {
+            padding: 5px 12px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .reply-cancel-btn {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        .reply-submit-btn {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        /* 대댓글 목록 스타일 */
+        .replies-container {
+            margin-top: 15px;
+            margin-left: 25px;
+            border-left: 2px solid #e5e7eb;
+            padding-left: 15px;
+        }
+
+        .reply {
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .reply-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .reply-author-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .reply-author-info img {
+            margin-right: 8px;
+        }
+
+        .reply-date {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-left: 10px;
+        }
+
+        .reply-body {
+            padding-left: 32px;
+        }
+
+        .reply-content {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .reply-actions {
+            display: flex;
+        }
+
+        .reply-actions button {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-right: 10px;
+        }
+
+        .reply-actions button:hover {
+            color: #2563eb;
+        }
+
         /* 페이지별 추가 스타일 */
     </style>
 </head>
 <body>
-    <div id="contents">
-        <div class="container">
-            <div class="header">
-                <h1 th:text="${post.title}">게시글 제목</h1>
-                <a href="/board" class="back-button">목록으로</a>
-            </div>
+<div id="contents">
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${post.title}">게시글 제목</h1>
+            <a href="/board" class="back-button">목록으로</a>
+        </div>
 
-            <div class="post-info">
+        <div class="post-info">
             <span>
                 <strong>작성자:</strong> <span th:text="${post.author}">작성자</span>
             </span>
-                <span>
+            <span>
                 <strong>작성일:</strong> <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01</span>
             </span>
+        </div>
+
+        <div class="post-content" th:utext="${post.content}">
+            게시글 내용입니다.
+        </div>
+
+        <!-- 첨부 파일 목록 -->
+        <div class="attachments-container" th:if="${!#lists.isEmpty(attachments)}">
+            <h3 class="attachments-title">
+                <i class="fas fa-paperclip"></i> 첨부파일
+            </h3>
+            <ul class="attachments-list">
+                <li class="attachment-item" th:each="attachment : ${attachments}">
+                    <a class="attachment-download" th:href="@{/api/attachments/download/{id}(id=${attachment.id})}"
+                       th:text="${attachment.originName}" download>파일명</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <a th:href="@{/board/edit/{id}(id=${post.id})}" class="btn btn-primary">수정</a>
+            <button onclick="confirmDelete()" class="btn btn-danger">삭제</button>
+        </div>
+
+        <!-- 댓글 영역 -->
+        <div class="comments-section">
+            <h3 class="comments-title">댓글</h3>
+
+            <!-- 댓글 작성 폼 -->
+            <div class="comment-form-container">
+                <input type="hidden" name="postId" th:value="${post.id}"/>
+                <div class="form-group">
+                    <textarea id="comment-content" name="content" placeholder="댓글을 작성해주세요." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="submitComment(null)">댓글 작성</button>
+                </div>
             </div>
 
-            <div class="post-content" th:utext="${post.content}">
-                게시글 내용입니다.
-            </div>
+            <!-- 댓글 목록 -->
+            <div class="comment-list">
+                <!-- 댓글 목록 표시 -->
+                <th:block th:if="${comments != null}" th:each="comment : ${comments}">
+                    <div class="comment" th:if="${!comment.isDeleted}">
 
-            <!-- 첨부 파일 목록 -->
-            <div class="attachments-container" th:if="${!#lists.isEmpty(attachments)}">
-                <h3 class="attachments-title">
-                    <i class="fas fa-paperclip"></i> 첨부파일
-                </h3>
-                <ul class="attachments-list">
-                    <li class="attachment-item" th:each="attachment : ${attachments}">
-                        <a class="attachment-download" th:href="@{/api/attachments/download/{id}(id=${attachment.id})}" th:text="${attachment.originName}" download>파일명</a>
-                    </li>
-                </ul>
-            </div>
+                        <!-- 댓글 상단 (작성자 정보 및 액션 버튼) -->
+                        <div class="comment-header">
 
-            <div class="action-buttons">
-                <a th:href="@{/board/edit/{id}(id=${post.id})}" class="btn btn-primary">수정</a>
-                <button onclick="confirmDelete()" class="btn btn-danger">삭제</button>
+                            <!-- 작성자 프로필 및 정보 -->
+                            <div class="comment-author-info">
+
+                                <img th:src="${comment.profileImgUrl != null ? comment.profileImgUrl : '/assets/images/default-profile.png'}"
+                                     alt="프로필" width="30" height="30" class="rounded-circle">
+
+                                <div class="author-details">
+                                    <span class="author-name" th:text="${comment.empName}">작성자</span>
+                                    <span class="comment-date"
+                                          th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+                                </div>
+                            </div>
+
+                            <!-- 본인 댓글인 경우에만 수정/삭제 버튼 표시 -->
+                            <div class="comment-actions" th:if="${comment.empId == empId}">
+                                <button type="button" class="btn-edit" th:data-comment-id="${comment.id}"
+                                        onclick="showEditForm(this.getAttribute('data-comment-id'))">수정
+                                </button>
+                                <button type="button" class="btn-delete" th:data-comment-id="${comment.id}"
+                                        onclick="deleteComment(this.getAttribute('data-comment-id'))">삭제
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 댓글 본문 -->
+                        <div class="comment-body">
+                            <div class="comment-content" th:id="'comment-content-' + ${comment.id}"
+                                 th:text="${comment.content}">댓글 내용
+                            </div>
+
+                            <!-- 댓글 수정 폼 (기본적으로 숨김) - 각 댓글마다 따로 존재해야 함 -->
+                            <div class="comment-edit-container" th:id="'comment-edit-container-' + ${comment.id}"
+                                 style="display: none;">
+                                <textarea class="comment-edit-textarea" th:id="'comment-edit-textarea-' + ${comment.id}"
+                                          rows="3" th:text="${comment.content}"></textarea>
+                                <div class="comment-edit-actions">
+                                    <button type="button" class="comment-edit-cancel-btn"
+                                            th:onclick="'cancelEdit(' + ${comment.id} + ')'">취소
+                                    </button>
+                                    <button type="button" class="comment-edit-save-btn"
+                                            th:onclick="'updateComment(' + ${comment.id} + ')'">저장
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 답글 버튼 추가 -->
+                            <div class="reply-actions">
+                                <button type="button" class="btn-reply"
+                                        th:onclick="'showReplyForm(' + ${comment.id} + ')'">
+                                    답글
+                                </button>
+                            </div>
+
+                            <!-- 답글 작성 폼 (기본적으로 숨김) -->
+                            <div class="reply-form-container" th:id="'reply-form-container-' + ${comment.id}"
+                                 style="display: none;">
+                                <div class="reply-form">
+                            <textarea class="reply-textarea" th:id="'reply-textarea-' + ${comment.id}"
+                                      placeholder="답글을 입력하세요..."></textarea>
+                                    <div class="reply-form-actions">
+                                        <button type="button" class="reply-cancel-btn"
+                                                th:onclick="'cancelReply(' + ${comment.id} + ')'">취소
+                                        </button>
+                                        <button type="button" class="reply-submit-btn"
+                                                th:onclick="'submitReply(' + ${comment.id} + ')'">등록
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 대댓글 목록 -->
+                            <div class="replies-container" th:if="${comment.replies != null && !comment.replies.empty}">
+                                <div class="reply" th:each="reply : ${comment.replies}" th:if="${!reply.isDeleted}">
+                                    <div class="reply-header">
+                                        <!-- 대댓글 작성자 정보 -->
+                                        <div class="reply-author-info">
+                                            <img th:src="${reply.profileImgUrl != null ? reply.profileImgUrl : '/assets/images/default-profile.png'}"
+                                                 alt="프로필" width="24" height="24" class="rounded-circle">
+                                            <div class="author-details">
+                                                <span class="author-name" th:text="${reply.empName}">작성자</span>
+                                                <span class="reply-date"
+                                                      th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- 본인 대댓글인 경우에만 수정/삭제 버튼 표시 -->
+                                        <div class="reply-actions" th:if="${reply.empId == empId}">
+                                            <button type="button" class="btn-edit" th:data-comment-id="${reply.id}"
+                                                    onclick="showEditForm(this.getAttribute('data-comment-id'))">수정
+                                            </button>
+                                            <button type="button" class="btn-delete" th:data-comment-id="${reply.id}"
+                                                    onclick="deleteComment(this.getAttribute('data-comment-id'))">삭제
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- 대댓글 본문 -->
+                                    <div class="reply-body">
+                                        <div class="reply-content" th:id="'comment-content-' + ${reply.id}"
+                                             th:text="${reply.content}">대댓글 내용
+                                        </div>
+
+                                        <!-- 대댓글 수정 폼 (기본적으로 숨김) -->
+                                        <div class="comment-edit-container"
+                                             th:id="'comment-edit-container-' + ${reply.id}"
+                                             style="display: none;">
+                                    <textarea class="comment-edit-textarea"
+                                              th:id="'comment-edit-textarea-' + ${reply.id}"
+                                              rows="2" th:text="${reply.content}"></textarea>
+                                            <div class="comment-edit-actions">
+                                                <button type="button" class="comment-edit-cancel-btn"
+                                                        th:onclick="'cancelEdit(' + ${reply.id} + ')'">취소
+                                                </button>
+                                                <button type="button" class="comment-edit-save-btn"
+                                                        th:onclick="'updateComment(' + ${reply.id} + ')'">저장
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </th:block>
+
             </div>
         </div>
 
-        <form id="deleteForm" th:action="@{/board/delete/{id}(id=${post.id})}" method="post" style="display:none;"></form>
 
-        <script th:inline="javascript">
-            /*<![CDATA[*/
-            // Thymeleaf를 통해 서버에서 값을 받아옴
-            if (typeof postId === 'undefined') {
-                var postId = /*[[${post.id}]]*/ null;
+    </div>
+
+    <form id="deleteForm" th:action="@{/board/delete/{id}(id=${post.id})}" method="post" style="display:none;"></form>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Thymeleaf를 통해 서버에서 값을 받아옴
+        if (typeof postId === 'undefined') {
+            var postId = /*[[${post.id}]]*/ null;
+        }
+        if (typeof postEmpId === 'undefined') {
+            var postEmpId = /*[[${post.empId}]]*/ null;
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButton = document.querySelector('.action-buttons button');
+            const editButton = document.querySelector('.action-buttons a');
+            const token = localStorage.getItem('accessToken');
+
+            if (!token) {
+                // 로그인하지 않은 경우 수정/삭제 버튼 숨기기
+                if (deleteButton) deleteButton.style.display = 'none';
+                if (editButton) editButton.style.display = 'none';
+                return;
             }
-            if (typeof postEmpId === 'undefined') {
-                var postEmpId = /*[[${post.empId}]]*/ null;
-            }
 
+            // 현재 로그인한 사용자 정보 가져오기
+            fetch('/api/posts/current-user', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('사용자 정보를 가져올 수 없습니다.');
+                    }
+                    return response.json();
+                })
+                .then(user => {
+                    // 문자열로 변환하여 비교
+                    const userId = String(user.id);
+                    const authorId = String(postEmpId);
 
-            document.addEventListener('DOMContentLoaded', function() {
-                const deleteButton = document.querySelector('.action-buttons button');
-                const editButton = document.querySelector('.action-buttons a');
-                const token = localStorage.getItem('accessToken');
-
-                if (!token) {
-                    // 로그인하지 않은 경우 수정/삭제 버튼 숨기기
+                    // 작성자가 아닌 경우 버튼 숨기기
+                    if (userId !== authorId) {
+                        if (deleteButton) deleteButton.style.display = 'none';
+                        if (editButton) editButton.style.display = 'none';
+                    } else {
+                        // 작성자인 경우 버튼 표시 유지
+                        if (deleteButton) deleteButton.style.display = 'inline-block';
+                        if (editButton) editButton.style.display = 'inline-block';
+                    }
+                })
+                .catch(error => {
+                    // 오류 발생 시 버튼 숨기기
                     if (deleteButton) deleteButton.style.display = 'none';
                     if (editButton) editButton.style.display = 'none';
-                    return;
-                }
+                });
+        });
 
-                // 현재 로그인한 사용자 정보 가져오기
-                fetch('/api/posts/current-user', {
-                    method: 'GET',
+        function confirmDelete() {
+            if (confirm("선택한 글을 삭제하시겠습니까?")) {
+                const token = localStorage.getItem('accessToken');
+
+                fetch(`/api/posts/${postId}`, {
+                    method: 'DELETE',
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
                 })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error('사용자 정보를 가져올 수 없습니다.');
+                            return response.json().then(err => {
+                                throw new Error(err.message || '삭제 실패');
+                            });
                         }
                         return response.json();
                     })
-                    .then(user => {
-                        // 문자열로 변환하여 비교
-                        const userId = String(user.id);
-                        const authorId = String(postEmpId);
-
-                        // 작성자가 아닌 경우 버튼 숨기기
-                        if (userId !== authorId) {
-                            if (deleteButton) deleteButton.style.display = 'none';
-                            if (editButton) editButton.style.display = 'none';
-                        } else {
-                            // 작성자인 경우 버튼 표시 유지
-                            if (deleteButton) deleteButton.style.display = 'inline-block';
-                            if (editButton) editButton.style.display = 'inline-block';
-                        }
+                    .then(data => {
+                        alert('게시글이 성공적으로 삭제되었습니다.');
+                        window.location.href = '/board'; // 목록 페이지로 리다이렉트
                     })
                     .catch(error => {
-                        // 오류 발생 시 버튼 숨기기
-                        if (deleteButton) deleteButton.style.display = 'none';
-                        if (editButton) editButton.style.display = 'none';
+                        alert('게시글 삭제 중 오류가 발생했습니다: ' + error.message);
+                        console.error('Error:', error);
                     });
-            });
-
-            function confirmDelete() {
-                if (confirm("선택한 글을 삭제하시겠습니까?")) {
-                    const token = localStorage.getItem('accessToken');
-
-                    fetch(`/api/posts/${postId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        }
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.json().then(err => { throw new Error(err.message || '삭제 실패'); });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            alert('게시글이 성공적으로 삭제되었습니다.');
-                            window.location.href = '/board'; // 목록 페이지로 리다이렉트
-                        })
-                        .catch(error => {
-                            alert('게시글 삭제 중 오류가 발생했습니다: ' + error.message);
-                            console.error('Error:', error);
-                        });
-                }
             }
-            /*]]>*/
-        </script>
-    </div>
+        }
+
+        /*]]>*/
+    </script>
+
+    <!-- 댓글 js -->
+    <script src="/assets/js/board/comments.js"></script>
+</div>
 </body>
 </html>

@@ -4,9 +4,13 @@ import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.board.dto.AttachmentsDTO;
 import com.example.projectdemo.domain.board.dto.BoardsDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.entity.Comments;
 import com.example.projectdemo.domain.board.service.AttachmentsService;
 import com.example.projectdemo.domain.board.service.BoardsService;
+import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
+import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +18,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -28,6 +33,12 @@ public class BoardController {
 
     @Autowired
     private AttachmentsService attachmentsService;
+
+    @Autowired
+    private CommentsService commentsService;
+
+    @Autowired
+    private EmployeesService employeesService;
 
 
     // 통합 게시판 - 모든 권한 있는 게시판의 게시글 보기
@@ -67,7 +78,8 @@ public class BoardController {
 
     // 게시글 상세 보기
     @GetMapping("/post/{id}")
-    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model) {
+    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model, Principal principal) {
+
         int empId = (int)request.getAttribute("id");
 
         // 게시글 정보 가져오기
@@ -86,6 +98,22 @@ public class BoardController {
         model.addAttribute("post", post);
         model.addAttribute("board", board);
         model.addAttribute("attachments", attachments);
+
+        // 댓글 목록 조회
+        List<Comments> comments = commentsService.getCommentsByPostId(id);
+
+        for (Comments comment : comments) {
+            System.out.println("댓글 ID: " + comment.getId() + ", 작성자: " + comment.getEmpName());
+        }
+
+        model.addAttribute("comments", comments);
+
+        // 로그인한 사용자 ID를 모델에 추가
+        model.addAttribute("empId", empId);
+
+        // 현재 로그인한 사용자 정보
+//        EmployeesDTO currentEmployee = employeesService.findByEmpNum(principal.getName());
+//        model.addAttribute("currentEmployeeId", currentEmployee.getId());
 
         return "board/view";
     }

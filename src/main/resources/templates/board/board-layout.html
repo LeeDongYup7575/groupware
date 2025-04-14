@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:fragment="html(pageTitle, pageStyles, pageContent, pageScripts)">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="html(pageTitle, pageStyles, pageInlineStyles, pageContent, pageScripts)">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +15,11 @@
     <!-- 게시판 공통 스타일 포함-->
     <link rel="stylesheet" th:href="@{/assets/css/board/board-common.css}">
 
-    <!-- 페이지별 추가 스타일 -->
+    <!-- 외부 CSS -->
     <th:block th:replace="${pageStyles}"></th:block>
+
+    <!--  페이지별 인라인 스타일  -->
+    <th:block th:replace="${pageInlineStyles}"></th:block>
 </head>
 <body>
 <!-- 헤더 포함 -->
