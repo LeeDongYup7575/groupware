@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.leave.dao;
 
 import com.example.projectdemo.domain.edsm.dto.EdsmBusinessContactDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.leave.dto.LeaveGrantsDTO;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
 import com.example.projectdemo.domain.work.dto.OverTimeDTO;
 import org.apache.ibatis.session.SqlSession;
@@ -88,4 +89,14 @@ public class LeavesDAO {
         return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.selectByLeavesFromDocId",id);
     }
 
+    public List<LeaveGrantsDTO> getLeaveGrantsByYear(int empId, int year) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("empId", empId);
+        params.put("year", year);
+        return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.getLeaveGrantsByYear",params);
+    }
+
+    public EmployeesDTO getEmployeesByEmpId(int empId) {
+        return mybatis.selectOne("com.example.projectdemo.domain.leave.dao.LeavesDAO.getEmployeesById",empId);
+    }
 }
