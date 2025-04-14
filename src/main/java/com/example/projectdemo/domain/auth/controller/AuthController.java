@@ -303,9 +303,8 @@ public class AuthController {
                     userData.getGender()
             );
 
-            int empId = (int) request.getAttribute("id");
-
-            leavesService.initializeEmployeeLeave(empId);
+            System.out.println(userData.getEmpNum());
+            leavesService.initializeEmployeeLeave(userData.getEmpNum());
 
             return ResponseEntity.ok(Map.of(
                     "message", "회원가입이 완료되었습니다. 임시 비밀번호가 이메일로 발송되었습니다."

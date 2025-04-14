@@ -122,9 +122,9 @@
         ORDER BY grant_date
     </select>
 
-    <!-- EmployeesMapper.xml 또는 관련 매퍼 파일 내에 정의될 것으로 예상됩니다 -->
-    <select id="getEmployeeById" parameterType="int" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
-        SELECT * FROM employees WHERE id = #{empId}
+
+    <select id="getEmployeeByEmpNum" parameterType="string" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT * FROM employees WHERE emp_num = #{empNum}
     </select>
 
 

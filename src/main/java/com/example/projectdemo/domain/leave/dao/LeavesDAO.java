@@ -96,7 +96,7 @@ public class LeavesDAO {
         return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.getLeaveGrantsByYear",params);
     }
 
-    public EmployeesDTO getEmployeesByEmpId(int empId) {
-        return mybatis.selectOne("com.example.projectdemo.domain.leave.dao.LeavesDAO.getEmployeesById",empId);
+    public EmployeesDTO getEmployeesByEmpNum(String empNum) {
+        return mybatis.selectOne("com.example.projectdemo.domain.leave.dao.LeavesDAO.getEmployeeByEmpNum",empNum);
     }
 }
