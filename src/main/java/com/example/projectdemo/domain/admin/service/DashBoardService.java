@@ -1,10 +1,7 @@
 package com.example.projectdemo.domain.admin.service;
 
 import com.example.projectdemo.domain.admin.dao.DashBoardDAO;
-import com.example.projectdemo.domain.admin.dto.AttendanceRankingDTO;
-import com.example.projectdemo.domain.admin.dto.DepartmentListDTO;
-import com.example.projectdemo.domain.admin.dto.EmployeeStatusDTO;
-import com.example.projectdemo.domain.admin.dto.TodayAbsencesDTO;
+import com.example.projectdemo.domain.admin.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +19,7 @@ public class DashBoardService {
         return dashBoardDAO.getDeplist();
     }
 
-    public List<AttendanceRankingDTO> getAttendanceRanking(){
+    public List<AttendanceRankingDTO> getAttendanceRanking() {
         return dashBoardDAO.getAttendanceRanking();
     }
 
@@ -32,5 +29,14 @@ public class DashBoardService {
 
     public List<TodayAbsencesDTO> getTodayAbsences() {
         return dashBoardDAO.getTodayAbsences();
+    }
+
+    public DashBoardDTO getDashBoard() {
+        DashBoardDTO dto = new DashBoardDTO(
+                dashBoardDAO.getTotalEmployees(),
+                dashBoardDAO.getTodayMeetingRoomBookings(),
+                dashBoardDAO.getTodaySuppliesBookings(),
+                dashBoardDAO.getEmployees());
+        return dto;
     }
 }

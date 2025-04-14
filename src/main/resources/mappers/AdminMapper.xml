@@ -34,4 +34,26 @@
           and work_date = curdate()
         group by status, emp_id;
     </select>
+    <select id="getTotalEmployees" resultType="int">
+        select count(*) as count from employees;
+    </select>
+    <select id="getTodayMeetingRoomBookings" resultType="int">
+        select count(*) as count
+        from meeting_room_booking
+        where Date (start) = curdate()
+          and booking_status = 'confirmed';
+    </select>
+    <select id="getTodaySuppliesBookings" resultType="int">
+        select count(*) as count
+        from supplies_booking
+        where DAte(start) = curdate()
+          and booking_status = 'confirmed';</select>
+    <select id="getRecentLogins" resultType="com.example.projectdemo.domain.admin.dto.RecentLoginDTO">
+        select e.emp_num, e.name, e.last_login, d.name as departmentName, p.title as positionTitle
+        from employees e
+                 left join departments d on e.dep_id = d.id
+                 left join positions p on e.pos_id = p.id
+        where Date (last_login) = curDate()
+        order by last_login;
+    </select>
 </mapper>

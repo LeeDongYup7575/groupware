@@ -1,9 +1,6 @@
 package com.example.projectdemo.domain.admin.controller;
 
-import com.example.projectdemo.domain.admin.dto.AttendanceRankingDTO;
-import com.example.projectdemo.domain.admin.dto.DepartmentListDTO;
-import com.example.projectdemo.domain.admin.dto.EmployeeStatusDTO;
-import com.example.projectdemo.domain.admin.dto.TodayAbsencesDTO;
+import com.example.projectdemo.domain.admin.dto.*;
 import com.example.projectdemo.domain.admin.service.DashBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +21,12 @@ public class AdminApiController {
     /**
      * 관리자 대시보드 데이터 API 추가하면 됩니덩
      **/
-//    @GetMapping("/dashboard")
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashBoardDTO> dashBoard() {
+        return ResponseEntity.ok(dashBoardService.getDashBoard());
+    }
     @GetMapping("/department-distribution")
     public ResponseEntity<List<DepartmentListDTO>> departmentDistribution() {
-        System.out.println(dashBoardService.getDepartmentDistribution().size());
         return ResponseEntity.ok(dashBoardService.getDepartmentDistribution());
     }
 
