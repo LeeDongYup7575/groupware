@@ -77,3 +77,7 @@ mvnw.cmd
 .gitattributes
 
 src/main/resources/static/static/
+src/main/resources/static/asset-manifest.json
+src/main/resources/static/favicon.ico
+src/main/resources/static/index.html
+src/main/resources/static/manifest.json
