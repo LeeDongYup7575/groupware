@@ -2,12 +2,7 @@ package com.example.projectdemo.domain.projects.service;
 
 import com.example.projectdemo.domain.projects.dto.ScheduleDTO;
 import com.example.projectdemo.domain.projects.dto.ScheduleParticipantDTO;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.example.projectdemo.domain.projects.mapper.ScheduleMapper;
-import com.example.projectdemo.domain.projects.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ScheduleService{
+public class ScheduleService {
 
     @Autowired
     private final ScheduleMapper scheduleMapper;
@@ -39,6 +34,14 @@ public class ScheduleService{
     }
 
     public ScheduleDTO createSchedule(ScheduleDTO schedule) {
+        // 기본값 설정 (필요시)
+        if (schedule.getRepeatType() == null) {
+            schedule.setRepeatType("없음");
+        }
+        if (schedule.getColor() == null) {
+            schedule.setColor("#3498db");
+        }
+
         scheduleMapper.insertSchedule(schedule);
         return schedule;
     }
@@ -71,7 +74,6 @@ public class ScheduleService{
         scheduleMapper.updateParticipantStatus(scheduleId, empNum, status);
         return scheduleMapper.selectScheduleParticipant(scheduleId, empNum);
     }
-
 
     public void removeScheduleParticipant(Integer scheduleId, String empNum) {
         scheduleMapper.deleteScheduleParticipant(scheduleId, empNum);

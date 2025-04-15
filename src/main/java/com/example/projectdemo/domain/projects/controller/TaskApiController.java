@@ -135,18 +135,25 @@ public class TaskApiController {
     public ResponseEntity<TaskDTO> updateTaskProgress(@PathVariable Integer id,
                                                       @RequestBody Map<String, Integer> body,
                                                       HttpServletRequest request) {
-        String empNum = (String) request.getAttribute("empNum");
-        if (empNum == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        try {
+            String empNum = (String) request.getAttribute("empNum");
+            if (empNum == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
-        Integer progress = body.get("progress");
-        if (progress == null || progress < 0 || progress > 100) {
-            return ResponseEntity.badRequest().build();
-        }
+            Integer progress = body.get("progress");
+            if (progress == null || progress < 0 || progress > 100) {
+                return ResponseEntity.badRequest().build();
+            }
 
-        TaskDTO updatedTask = taskService.updateTaskProgress(id, progress, empNum);
-        return ResponseEntity.ok(updatedTask);
+            System.out.println("TaskId: " + id + ", Progress: " + progress + ", EmpNum: " + empNum); // 로깅 추가
+
+            TaskDTO updatedTask = taskService.updateTaskProgress(id, progress, empNum);
+            return ResponseEntity.ok(updatedTask);
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 스택 트레이스 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     /**
@@ -244,7 +251,11 @@ public class TaskApiController {
         }
 
         try {
-            taskService.updateSubTaskCompletion(subTaskId, completed);
+            // completed 값에 따라 상태를 "완료" 또는 "미완료"로 설정
+            String status = completed ? "완료" : "미완료";
+
+            // 메서드 시그니처도 변경해야 함 (TaskService에서)
+            taskService.updateSubTaskStatus(subTaskId, status);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

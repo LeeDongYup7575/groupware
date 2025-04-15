@@ -344,7 +344,7 @@
                             showEventDetails(info.event);
                         },
                         select: function(info) {
-                            openScheduleModal(null, info.startStr, info.endStr, info.allDay);
+                            openScheduleModal(null, info.startStr, info.endStr, info.isAllDay);
                         },
                         eventDrop: function(info) {
                             updateEventDates(info.event);
@@ -486,7 +486,7 @@
                                                 title: schedule.title,
                                                 start: schedule.startTime,
                                                 end: schedule.endTime,
-                                                allDay: schedule.isAllDay,
+                                                isAllDay: schedule.isAllDay,
                                                 backgroundColor: schedule.color || '#3498db',
                                                 borderColor: schedule.color || '#3498db',
                                                 extendedProps: {
@@ -553,7 +553,7 @@
                                                 title: `[업무] ${task.title}`,
                                                 start: task.startDate,
                                                 end: task.dueDate,
-                                                allDay: true,
+                                                isAllDay: true,
                                                 backgroundColor: color,
                                                 borderColor: color,
                                                 textColor: '#ffffff',
@@ -678,7 +678,7 @@
                                     <h4>${event.title}</h4>
                                     <p class="text-muted">
                                         <i class="fas fa-calendar-alt"></i> ${formatDateTime(event.start)} ${event.end ? '~ ' + formatDateTime(event.end) : ''}
-                                        ${event.allDay ? ' (종일)' : ''}
+                                        ${event.isAllDay ? ' (종일)' : ''}
                                     </p>
 
                                     ${event.extendedProps.location ? `
@@ -805,7 +805,7 @@
                     }
 
                     // Open schedule modal for creating or editing
-                    function openScheduleModal(scheduleId, startStr, endStr, allDay) {
+                    function openScheduleModal(scheduleId, startStr, endStr, isAllDay) {
                         // Reset form
                         $('#scheduleForm')[0].reset();
                         $('#schedule-id').val('');
@@ -892,7 +892,7 @@
                             // Set date-time values from calendar selection
                             $('#schedule-start-date').val(formatDateTimeForInput(startStr));
                             $('#schedule-end-date').val(formatDateTimeForInput(endStr));
-                            $('#schedule-all-day').prop('checked', allDay);
+                            $('#schedule-all-day').prop('checked', isAllDay);
                         } else {
                             // Set default values for new schedule
                             const now = new Date();
@@ -996,7 +996,7 @@
                             const updateData = {
                                 startTime: event.start.toISOString(),
                                 endTime: event.end ? event.end.toISOString() : event.start.toISOString(),
-                                isAllDay: event.allDay
+                                isAllDay: event.isAllDay
                             };
 
                             $.ajax({

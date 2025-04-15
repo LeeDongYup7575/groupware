@@ -115,7 +115,7 @@ public class TaskService {
 
         // 완료 상태로 변경되면 완료일시 설정
         if ("완료".equals(task.getStatus()) && !"완료".equals(oldTask.getStatus())) {
-            task.setCompletedAt(LocalDateTime.now());
+            task.setCompletedDate(LocalDate.now()); // completedAt -> completedDate로 변경
         }
 
         if (taskMapper.updateTask(task) > 0) {
@@ -157,22 +157,35 @@ public class TaskService {
      */
     @Transactional
     public TaskDTO updateTaskProgress(Integer taskId, Integer progress, String empNum) {
-        TaskDTO task = taskMapper.getTaskById(taskId);
+        try {
+            TaskDTO task = taskMapper.getTaskById(taskId);
 
-        if (task == null) {
-            throw new RuntimeException("존재하지 않는 업무입니다.");
-        }
+            if (task == null) {
+                throw new RuntimeException("존재하지 않는 업무입니다.");
+            }
 
-        Integer oldProgress = task.getProgress();
+            Integer oldProgress = task.getProgress();
+            System.out.println("Updating task progress: taskId=" + taskId + ", oldProgress=" + oldProgress + ", newProgress=" + progress); // 로깅 추가
 
-        if (taskMapper.updateTaskProgress(taskId, progress) > 0) {
+            // 업무 진행률 업데이트
+            int updateResult = taskMapper.updateTaskProgress(taskId, progress);
+            System.out.println("Update result: " + updateResult); // 업데이트 결과 로깅
+
             // 업무 로그 생성
-            createTaskLog(taskId, empNum, "진행률 변경", oldProgress + "%", progress + "%", null);
+            TaskLogDTO log = new TaskLogDTO();
+            log.setTaskId(taskId);
+            log.setEmpNum(empNum);
+            log.setLogType("진행률 변경");
+            log.setOldValue(oldProgress + "%");
+            log.setNewValue(progress + "%");
+            log.setCreatedAt(LocalDateTime.now());
+            taskMapper.insertTaskLog(log);
 
             return getTaskById(taskId);
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 스택 트레이스 출력
+            throw e;
         }
-
-        throw new RuntimeException("업무 진행률을 변경할 수 없습니다.");
     }
 
     /**
@@ -230,7 +243,7 @@ public class TaskService {
         subTask.setUpdatedAt(LocalDateTime.now());
 
         // 완료 상태로 변경되면 완료일시 설정
-        if (subTask.isCompleted()) {
+        if (subTask.getStatus().equals("완료")) {
             subTask.setCompletedAt(LocalDateTime.now());
         }
 
@@ -273,10 +286,10 @@ public class TaskService {
     }
 
     /**
-     * 하위 업무의 완료 상태를 변경합니다.
+     * 하위 업무의 상태를 변경합니다.
      */
     @Transactional
-    public void updateSubTaskCompletion(Integer subTaskId, boolean completed) {
+    public void updateSubTaskStatus(Integer subTaskId, String status) {
         // 먼저 하위 업무 정보를 조회
         SubTaskDTO subTask = taskMapper.getSubTaskById(subTaskId);
 
@@ -284,10 +297,7 @@ public class TaskService {
             throw new RuntimeException("존재하지 않는 하위 업무입니다.");
         }
 
-        boolean oldValue = subTask.isCompleted();
-
-        // status 값을 생성 - completed에 따라 "완료" 또는 "미완료"
-        String status = completed ? "완료" : "미완료";
+        String oldStatus = subTask.getStatus();
 
         if (taskMapper.updateSubTaskStatus(subTaskId, status) <= 0) {
             throw new RuntimeException("하위 업무 상태를 변경할 수 없습니다.");
@@ -298,8 +308,8 @@ public class TaskService {
 
         // 업무 로그 생성
         createTaskLog(subTask.getTaskId(), parentTask.getAssigneeEmpNum(),
-                "하위 업무 상태 변경", oldValue ? "완료" : "미완료", completed ? "완료" : "미완료",
-                subTask.getTitle() + " 업무가 " + (completed ? "완료" : "미완료") + " 상태로 변경되었습니다.");
+                "하위 업무 상태 변경", oldStatus, status,
+                subTask.getTitle() + " 업무가 " + status + " 상태로 변경되었습니다.");
 
         // 부모 업무의 진행률을 업데이트
         updateParentTaskProgress(subTask.getTaskId());
@@ -319,7 +329,7 @@ public class TaskService {
         int completedCount = 0;
 
         for (SubTaskDTO subTask : subTasks) {
-            if (subTask.isCompleted()) {
+            if (subTask.getStatus().equals("완료")) {
                 completedCount++;
             }
         }
@@ -334,13 +344,26 @@ public class TaskService {
     /**
      * 업무 메타데이터를 처리합니다. (남은 일수, 지연 여부 등)
      */
-    private TaskDTO processTaskMetadata(TaskDTO task) {
+    public TaskDTO processTaskMetadata(TaskDTO task) {
         if (task != null) {
             // 남은 일수 계산
             if (task.getDueDate() != null) {
-                long daysUntilDue = ChronoUnit.DAYS.between(LocalDate.now(), task.getDueDate());
+                LocalDate now = LocalDate.now();
+                long daysUntilDue = ChronoUnit.DAYS.between(now, task.getDueDate());
                 task.setRemainingDays((int) daysUntilDue);
                 task.setOverdue(daysUntilDue < 0 && !"완료".equals(task.getStatus()));
+            }
+
+            // 현재 진행도에 따라 상태 자동 업데이트
+            if (task.getProgress() != null) {
+                if (task.getProgress() == 0 && !"미시작".equals(task.getStatus())) {
+                    task.setStatus("미시작");
+                } else if (task.getProgress() == 100 && !"완료".equals(task.getStatus())) {
+                    task.setStatus("완료");
+                    task.setCompletedDate(LocalDate.now());
+                } else if (task.getProgress() > 0 && task.getProgress() < 100 && !"진행중".equals(task.getStatus())) {
+                    task.setStatus("진행중");
+                }
             }
         }
         return task;
@@ -349,7 +372,7 @@ public class TaskService {
     /**
      * 업무 목록의 메타데이터를 일괄 처리합니다.
      */
-    private List<TaskDTO> processTasksMetadata(List<TaskDTO> tasks) {
+    public List<TaskDTO> processTasksMetadata(List<TaskDTO> tasks) {
         if (tasks != null) {
             return tasks.stream()
                     .map(this::processTaskMetadata)

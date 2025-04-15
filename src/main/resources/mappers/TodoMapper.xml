@@ -5,8 +5,22 @@
 
 <mapper namespace="com.example.projectdemo.domain.projects.mapper.TodoMapper">
 
+    <!-- 결과 매핑 -->
+    <resultMap id="TodoResultMap" type="com.example.projectdemo.domain.projects.dto.TodoDTO">
+        <id property="id" column="id" />
+        <result property="empNum" column="emp_num" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="dueDate" column="due_date" />
+        <result property="priority" column="priority" />
+        <result property="completed" column="completed" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="completedAt" column="completed_at" />
+    </resultMap>
+
     <!-- 전체 할 일 목록 (직원 기준) -->
-    <select id="selectTodosByEmployee" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+    <select id="selectTodosByEmployee" resultMap="TodoResultMap">
         SELECT *
         FROM todo_list
         WHERE emp_num = #{empNum}
@@ -14,7 +28,7 @@
     </select>
 
     <!-- 개별 할 일 조회 -->
-    <select id="selectTodoById" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+    <select id="selectTodoById" resultMap="TodoResultMap">
         SELECT *
         FROM todo_list
         WHERE id = #{id}
@@ -23,35 +37,40 @@
     <!-- 할 일 추가 -->
     <insert id="insertTodo" parameterType="com.example.projectdemo.domain.projects.dto.TodoDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO todo_list (
-            title, content, emp_num, priority, due_date, completed,
-            created_at, updated_at, completed_at
+            emp_num, title, content, priority, due_date, completed,
+            created_at
         )
         VALUES (
-                   #{title}, #{content}, #{empNum}, #{priority}, #{dueDate}, #{completed},
-                   #{createdAt}, #{updatedAt}, #{completedAt}
+                   #{empNum}, #{title}, #{content}, #{priority}, #{dueDate}, #{completed},
+                   NOW()
                )
     </insert>
-
 
     <!-- 할 일 수정 -->
     <update id="updateTodo" parameterType="com.example.projectdemo.domain.projects.dto.TodoDTO">
         UPDATE todo_list
         SET title = #{title},
             content = #{content},
-            emp_num = #{empNum},
             priority = #{priority},
             due_date = #{dueDate},
             completed = #{completed},
-            updated_at = #{updatedAt},
-            completed_at = #{completedAt}
+            updated_at = NOW(),
+            completed_at = CASE
+                               WHEN #{completed} = 1 AND (completed_at IS NULL OR completed = 0) THEN NOW()
+                               WHEN #{completed} = 0 THEN NULL
+                               ELSE completed_at
+                END
         WHERE id = #{id}
     </update>
-
 
     <!-- 할 일 완료 여부 업데이트 -->
     <update id="updateTodoCompletion">
         UPDATE todo_list
-        SET completed = #{completed}
+        SET completed = #{completed},
+            completed_at = CASE
+                               WHEN #{completed} = 1 THEN NOW()
+                               ELSE NULL
+                END
         WHERE id = #{id}
     </update>
 
@@ -62,7 +81,7 @@
     </delete>
 
     <!-- 특정 날짜의 할 일 조회 -->
-    <select id="selectTodosByDate" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+    <select id="selectTodosByDate" resultMap="TodoResultMap">
         SELECT *
         FROM todo_list
         WHERE emp_num = #{empNum}
@@ -71,7 +90,7 @@
     </select>
 
     <!-- 우선순위에 따른 할 일 조회 -->
-    <select id="selectTodosByPriority" resultType="com.example.projectdemo.domain.projects.dto.TodoDTO">
+    <select id="selectTodosByPriority" resultMap="TodoResultMap">
         SELECT *
         FROM todo_list
         WHERE emp_num = #{empNum}
@@ -79,4 +98,55 @@
         ORDER BY due_date ASC
     </select>
 
+    <!-- 특정 기간의 할 일 조회 -->
+    <select id="selectTodosByDateRange" resultMap="TodoResultMap">
+        SELECT *
+        FROM todo_list
+        WHERE emp_num = #{empNum}
+          AND due_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY due_date ASC
+    </select>
+
+    <!-- 기한이 지난 할 일 조회 -->
+    <select id="selectOverdueTodos" resultMap="TodoResultMap">
+        SELECT *
+        FROM todo_list
+        WHERE emp_num = #{empNum}
+          AND due_date &lt; CURRENT_DATE()
+          AND completed = 0
+        ORDER BY due_date ASC
+    </select>
+
+    <!-- 완료된 할 일 조회 -->
+    <select id="selectCompletedTodos" resultMap="TodoResultMap">
+        SELECT *
+        FROM todo_list
+        WHERE emp_num = #{empNum}
+          AND completed = 1
+        ORDER BY completed_at DESC
+    </select>
+
+    <!-- 직원별 할 일 개수 통계 -->
+    <select id="countTodosByEmployee" resultType="int">
+        SELECT COUNT(*)
+        FROM todo_list
+        WHERE emp_num = #{empNum}
+    </select>
+
+    <!-- 직원별 완료된 할 일 개수 통계 -->
+    <select id="countCompletedTodosByEmployee" resultType="int">
+        SELECT COUNT(*)
+        FROM todo_list
+        WHERE emp_num = #{empNum}
+          AND completed = 1
+    </select>
+
+    <!-- 직원별 기한이 지난 할 일 개수 통계 -->
+    <select id="countOverdueTodosByEmployee" resultType="int">
+        SELECT COUNT(*)
+        FROM todo_list
+        WHERE emp_num = #{empNum}
+          AND due_date &lt; CURRENT_DATE()
+          AND completed = 0
+    </select>
 </mapper>

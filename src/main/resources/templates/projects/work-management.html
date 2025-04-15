@@ -31,9 +31,7 @@
                 <a th:href="@{/workmanagement/register}" class="nav-link">
                     <i class="fas fa-plus-circle"></i> 등록
                 </a>
-<!--                <a th:href="@{/workmanagement/schedule}" class="nav-link">-->
-<!--                    <i class="fas fa-calendar-alt"></i> 일정-->
-<!--                </a>-->
+
                 <a th:href="@{/workmanagement/schedule}" class="nav-link">
                     <i class="fas fa-calendar-alt"></i> 일정
                 </a>
@@ -134,7 +132,6 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                                <button type="button" class="btn btn-primary" id="edit-project-btn">수정</button>
                             </div>
                         </div>
                     </div>
@@ -185,6 +182,28 @@
                             </div>
                         </div>
                         <!-- End of task items -->
+                    </div>
+                </div>
+                <!-- 업무 진행도 업데이트 모달 -->
+                <div class="modal fade" id="taskProgressModal" tabindex="-1" aria-labelledby="taskProgressModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="task-progress-modal-title">업무 진행도 업데이트</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="task-id-for-progress">
+                                <div class="mb-3">
+                                    <label for="task-progress-slider" class="form-label">진행도: <span id="task-progress-value">0%</span></label>
+                                    <input type="range" class="form-range" min="0" max="100" step="5" id="task-progress-slider">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" id="save-progress-btn">저장</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -311,107 +330,196 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script th:inline="javascript">
-        $(document).ready(function() {
+
+    $(document).ready(function() {
         // 현재 페이지에 따라 사이드바 활성화
         highlightActiveSidebar();
 
         // Task logs Ajax loading
         loadTaskLogs();
 
-            $('.project-card').off('click').on('click', function() {
-                const projectId = $(this).data('project-id');
-                openProjectModal(projectId);
-            });
+        // 프로젝트 카드 클릭 이벤트
+        initProjectCardEvents();
 
         // Todo checkbox click
-        $('.todo-checkbox').on('change', function(e) {
-        e.stopPropagation();
-        const todoId = $(this).closest('.todo-list-item').data('todo-id');
-        toggleTodoCompletion(todoId);
-    });
+        $(document).on('change', '.todo-checkbox', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            toggleTodoCompletion(todoId);
+        });
 
         // Todo item click (excluding checkbox)
-        $('.todo-list-item').on('click', function(e) {
-        if (!$(e.target).hasClass('todo-checkbox') && !$(e.target).hasClass('edit-todo-btn') && !$(e.target).hasClass('delete-todo-btn')) {
-        const todoId = $(this).data('todo-id');
-        openTodoModal(todoId);
-    }
-    });
+        $(document).on('click', '.todo-list-item', function(e) {
+            if (!$(e.target).hasClass('todo-checkbox') &&
+                !$(e.target).hasClass('edit-todo-btn') &&
+                !$(e.target).hasClass('delete-todo-btn') &&
+                !$(e.target).hasClass('fa-edit') &&
+                !$(e.target).hasClass('fa-trash')) {
+                const todoId = $(this).data('todo-id');
+                openTodoModal(todoId);
+            }
+        });
 
         // Edit todo button click
-        $('.edit-todo-btn').on('click', function(e) {
-        e.stopPropagation();
-        const todoId = $(this).closest('.todo-list-item').data('todo-id');
-        openTodoModal(todoId);
-    });
+        $(document).on('click', '.edit-todo-btn', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            openTodoModal(todoId);
+        });
 
         // Delete todo button click
-        $('.delete-todo-btn').on('click', function(e) {
-        e.stopPropagation();
-        const todoId = $(this).closest('.todo-list-item').data('todo-id');
-        if (confirm('정말로 이 할 일을 삭제하시겠습니까?')) {
-        deleteTodo(todoId);
-    }
-    });
+        $(document).on('click', '.delete-todo-btn', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            if (confirm('정말로 이 할 일을 삭제하시겠습니까?')) {
+                deleteTodo(todoId);
+            }
+        });
 
         // Save todo button click
         $('#save-todo-btn').on('click', function() {
-        saveTodo();
-    });
+            if (validateTodoForm()) {
+                saveTodo();
+            }
+        });
 
         // Task filter change
         $('#task-filter').on('change', function() {
-        const status = $(this).val();
-        filterTasks(status);
-    });
+            const status = $(this).val();
+            filterTasks(status);
+        });
 
         // Task search
         $('#task-search').on('keyup', function() {
-        const searchText = $(this).val().toLowerCase();
-        searchTasks(searchText);
-    });
+            const searchText = $(this).val().toLowerCase();
+            searchTasks(searchText);
+        });
 
         // Todo search
         $('#todo-search').on('keyup', function() {
-        const searchText = $(this).val().toLowerCase();
-        searchTodos(searchText);
-    });
+            const searchText = $(this).val().toLowerCase();
+            searchTodos(searchText);
+        });
 
         // Project search
         $('#project-search').on('keyup', function() {
-        const searchText = $(this).val().toLowerCase();
-        searchProjects(searchText);
-    });
+            const searchText = $(this).val().toLowerCase();
+            searchProjects(searchText);
+        });
 
         // Log search
         $('#log-search').on('keyup', function() {
-        const searchText = $(this).val().toLowerCase();
-        searchLogs(searchText);
-    });
+            const searchText = $(this).val().toLowerCase();
+            searchLogs(searchText);
+        });
+
+        // 업무 탭 클릭 이벤트
+        $('#workTabs a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            if (e.target.id === 'task-logs-tab') {
+                // 로그 탭이 활성화되면 최신 로그 로드
+                loadTaskLogs();
+            }
+        });
+
+        // 업무 항목 클릭 이벤트 - 진행도 모달 표시
+        $(document).on('click', '.task-list-item', function() {
+            const taskId = $(this).data('task-id');
+            const currentProgress = parseInt($(this).find('.progress-bar').attr('aria-valuenow'));
+            const taskTitle = $(this).find('h5').text();
+
+            // 업무 진행도 업데이트 모달 준비
+            $('#task-progress-modal-title').text(`${taskTitle} - 진행도 업데이트`);
+            $('#task-progress-slider').val(currentProgress);
+            $('#task-progress-value').text(`${currentProgress}%`);
+            $('#task-id-for-progress').val(taskId);
+
+            // 진행도 모달 표시
+            $('#taskProgressModal').modal('show');
+        });
+
+        // 진행도 슬라이더 값 변경 시 실시간 업데이트
+        $('#task-progress-slider').on('input', function() {
+            const progressValue = $(this).val();
+            $('#task-progress-value').text(`${progressValue}%`);
+        });
+
+        // 진행도 저장 버튼 클릭
+        $('#save-progress-btn').on('click', function() {
+            const taskId = $('#task-id-for-progress').val();
+            const progress = parseInt($('#task-progress-slider').val());
+
+            // 진행도 업데이트 API 호출
+            updateTaskProgress(taskId, progress);
+        });
     });
 
-        // 현재 페이지 URL에 따라 사이드바 메뉴 활성화
-        function highlightActiveSidebar() {
+    // 현재 페이지 URL에 따라 사이드바 메뉴 활성화
+    function highlightActiveSidebar() {
         const currentPath = window.location.pathname;
         $('.work-sidebar .nav-link').removeClass('active');
 
         if (currentPath.endsWith('/register')) {
-        $('.work-sidebar .nav-link[href$="/register"]').addClass('active');
-    } else if (currentPath.endsWith('/schedule')) {
-        $('.work-sidebar .nav-link[href$="/schedule"]').addClass('active');
-    } else {
-        $('.work-sidebar .nav-link[href$="/workmanagement"]').addClass('active');
+            $('.work-sidebar .nav-link[href$="/register"]').addClass('active');
+        } else if (currentPath.endsWith('/schedule')) {
+            $('.work-sidebar .nav-link[href$="/schedule"]').addClass('active');
+        } else {
+            $('.work-sidebar .nav-link[href$="/workmanagement"]').addClass('active');
+        }
     }
+    // 업무 진행도 업데이트 함수
+    function updateTaskProgress(taskId, progress) {
+        $.ajax({
+            url: `/api/tasks/${taskId}/progress`,
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({ progress: progress }),
+            success: function(updatedTask) {
+                // 모달 닫기
+                $('#taskProgressModal').modal('hide');
+
+                // 성공 시 UI 업데이트
+                const taskItem = $(`.task-list-item[data-task-id="${taskId}"]`);
+                taskItem.find('.progress-bar').css('width', `${progress}%`)
+                    .attr('aria-valuenow', progress)
+                    .text(`${progress}%`);
+
+                // 상태 변경 (진행도에 따라)
+                let newStatusClass = '';
+                let newStatusText = '';
+
+                if (progress === 0) {
+                    newStatusClass = 'bg-secondary';
+                    newStatusText = '미시작';
+                } else if (progress === 100) {
+                    newStatusClass = 'bg-success';
+                    newStatusText = '완료';
+                } else {
+                    newStatusClass = 'bg-primary';
+                    newStatusText = '진행중';
+                }
+
+                taskItem.find('.badge')
+                    .removeClass('bg-secondary bg-primary bg-success')
+                    .addClass(newStatusClass)
+                    .text(newStatusText);
+
+                // 알림 표시
+                alert('진행도가 업데이트되었습니다.');
+            },
+            error: function(xhr, status, error) {
+                console.error("진행률 업데이트 오류:", xhr.responseText);
+                alert('진행도 업데이트에 실패했습니다: ' + error);
+            }
+        });
     }
 
-        // Load task logs via AJAX
-        function loadTaskLogs() {
+    function loadTaskLogs() {
         $.ajax({
             url: '/api/tasks/logs/recent',
             method: 'GET',
-            success: function(logs) {
-                console.log('API 응답:', logs);
-                renderTaskLogs(logs);
+            data: { limit: 20 }, // 최근 20개 로그만 가져오기
+            success: function(response) {
+                renderTaskLogs(response);
             },
             error: function(xhr, status, error) {
                 console.error('로그 로드 오류:', xhr, status, error);
@@ -420,65 +528,89 @@
         });
     }
 
-        // Render task logs
-        function renderTaskLogs(logs) {
-        // 로그 데이터 구조 확인 및 처리
-        console.log('Received logs data:', logs);
-
+    // Render task logs
+    function renderTaskLogs(logs) {
         // 데이터가 없거나 잘못된 형식인 경우 처리
         if (!logs || (Array.isArray(logs) && logs.length === 0)) {
-        $('#task-logs-container').html('<div class="alert alert-info">최근 업무 로그가 없습니다.</div>');
-        return;
-    }
+            $('#task-logs-container').html('<div class="alert alert-info">최근 업무 로그가 없습니다.</div>');
+            return;
+        }
 
         // 로그가 배열이 아닌 경우 처리 (객체의 특정 속성에 배열이 있을 수 있음)
         let logsArray = logs;
         if (!Array.isArray(logs)) {
-        // 객체 내부에 data 또는 content 등의 속성이 있는지 확인
-        if (logs.data && Array.isArray(logs.data)) {
-        logsArray = logs.data;
-    } else if (logs.content && Array.isArray(logs.content)) {
-        logsArray = logs.content;
-    } else if (logs.items && Array.isArray(logs.items)) {
-        logsArray = logs.items;
-    } else if (logs.logs && Array.isArray(logs.logs)) {
-        logsArray = logs.logs;
-    } else {
-        // 적절한 배열을 찾을 수 없는 경우
-        $('#task-logs-container').html('<div class="alert alert-warning">로그 데이터 형식이 올바르지 않습니다.</div>');
-        return;
-    }
-    }
+            // 객체 내부에 data 또는 content 등의 속성이 있는지 확인
+            if (logs.data && Array.isArray(logs.data)) {
+                logsArray = logs.data;
+            } else if (logs.content && Array.isArray(logs.content)) {
+                logsArray = logs.content;
+            } else if (logs.items && Array.isArray(logs.items)) {
+                logsArray = logs.items;
+            } else if (logs.logs && Array.isArray(logs.logs)) {
+                logsArray = logs.logs;
+            } else {
+                // 적절한 배열을 찾을 수 없는 경우
+                $('#task-logs-container').html('<div class="alert alert-warning">로그 데이터 형식이 올바르지 않습니다.</div>');
+                return;
+            }
+        }
 
         // 배열이 비어있는 경우
         if (logsArray.length === 0) {
-        $('#task-logs-container').html('<div class="alert alert-info">최근 업무 로그가 없습니다.</div>');
-        return;
-    }
+            $('#task-logs-container').html('<div class="alert alert-info">최근 업무 로그가 없습니다.</div>');
+            return;
+        }
 
         let html = '';
         logsArray.forEach(log => {
-        html += `
-                <div class="task-log-item">
-                    <div class="d-flex justify-content-between">
-                        <h6>${log.empName || '사용자'} (${log.logType || '업데이트'})</h6>
-                        <small class="text-muted">${log.createdAt ? formatDateTime(log.createdAt) : '날짜 정보 없음'}</small>
+            // 로그 타입에 따른 아이콘과 색상
+            let iconClass = 'fas fa-info-circle text-info';
+            if (log.logType === '업무 생성') {
+                iconClass = 'fas fa-plus-circle text-success';
+            } else if (log.logType === '업무 수정') {
+                iconClass = 'fas fa-edit text-primary';
+            } else if (log.logType === '상태 변경') {
+                iconClass = 'fas fa-exchange-alt text-warning';
+            } else if (log.logType === '진행률 변경') {
+                iconClass = 'fas fa-chart-line text-primary';
+            } else if (log.logType === '하위 업무 추가') {
+                iconClass = 'fas fa-tasks text-success';
+            } else if (log.logType === '하위 업무 완료') {
+                iconClass = 'fas fa-check-circle text-success';
+            }
+
+            html += `
+        <div class="task-log-item card mb-2">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="${iconClass} me-2"></i>
+                        <strong>${log.empName || '사용자'}</strong>
+                        <span class="badge bg-secondary ms-2">${log.logType || '업데이트'}</span>
                     </div>
+                    <small class="text-muted">${log.createdAt ? formatDateTime(new Date(log.createdAt)) : '날짜 정보 없음'}</small>
+                </div>
+                <div class="mt-2">
                     <p class="mb-1">
                         <strong>${log.taskTitle || '업무'}</strong>
-                        ${log.oldValue ? `<span class="text-muted">${log.oldValue}</span> → ` : ''}
-                        <span class="text-primary">${log.newValue || ''}</span>
+                        ${log.projectName ? `<span class="text-muted">[${log.projectName}]</span>` : ''}
                     </p>
-                    ${log.comment ? `<p class="text-muted">${log.comment}</p>` : ''}
+                    ${log.oldValue ?
+                `<p class="mb-0 small"><span class="text-muted">${log.oldValue}</span> → <span class="text-primary">${log.newValue || ''}</span></p>` :
+                (log.newValue ? `<p class="mb-0 small"><span class="text-primary">${log.newValue}</span></p>` : '')
+            }
+                    ${log.comment ? `<p class="text-muted small mt-1">${log.comment}</p>` : ''}
                 </div>
-                `;
-    });
+            </div>
+        </div>
+    `;
+        });
 
         $('#task-logs-container').html(html);
     }
 
-        // Open todo modal for editing or creating
-        function openTodoModal(todoId) {
+    // Open todo modal for editing or creating
+    function openTodoModal(todoId) {
         // Reset form
         $('#todoForm')[0].reset();
         $('#todo-id').val('');
@@ -486,31 +618,35 @@
 
         // If todoId is provided, load todo data
         if (todoId) {
-        $('#todoModalLabel').text('할 일 수정');
+            $('#todoModalLabel').text('할 일 수정');
 
-        $.ajax({
-        url: `/api/todos/${todoId}`,
-        method: 'GET',
-        success: function(todo) {
-        $('#todo-id').val(todo.id);
-        $('#todo-title').val(todo.title);
-        $('#todo-content').val(todo.content);
-        $('#todo-due-date').val(formatDate(todo.dueDate));
-        $('#todo-priority').val(todo.priority);
-    }
-    });
-    } else {
-        // Set default due date to tomorrow
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        $('#todo-due-date').val(formatDate(tomorrow));
-    }
+            $.ajax({
+                url: `/api/todos/${todoId}`,
+                method: 'GET',
+                success: function(todo) {
+                    $('#todo-id').val(todo.id);
+                    $('#todo-title').val(todo.title);
+                    $('#todo-content').val(todo.content);
+                    $('#todo-due-date').val(formatDate(new Date(todo.dueDate)));
+                    $('#todo-priority').val(todo.priority);
+                },
+                error: function(xhr, status, error) {
+                    console.error('할 일 데이터 로드 오류:', error);
+                    alert('할 일 정보를 불러오는데 실패했습니다.');
+                }
+            });
+        } else {
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            $('#todo-due-date').val(formatDate(tomorrow));
+        }
 
         $('#todoModal').modal('show');
     }
 
-        // Toggle todo completion
-        function toggleTodoCompletion(todoId) {
+    // Todo 토글 기능
+    function toggleTodoCompletion(todoId) {
         $.ajax({
             url: `/api/todos/${todoId}/toggle`,
             method: 'PATCH',
@@ -519,51 +655,93 @@
                 if (todo.completed) {
                     todoItem.addClass('completed');
                     todoItem.find('.todo-checkbox').prop('checked', true);
+                    todoItem.find('h5, p').css('text-decoration', 'line-through');
+
+                    // 완료 상태 표시
+                    let statusText = todoItem.find('small:contains("마감일")');
+                    statusText.html(`<i class="fas fa-calendar-alt"></i> ${formatDate(new Date(todo.dueDate))} <span class="text-success">(완료됨)</span>`);
                 } else {
                     todoItem.removeClass('completed');
                     todoItem.find('.todo-checkbox').prop('checked', false);
+                    todoItem.find('h5, p').css('text-decoration', 'none');
+
+                    // 남은 일수 또는 마감일 초과 표시
+                    let statusText = todoItem.find('small:contains("마감일")');
+                    const dueDate = new Date(todo.dueDate);
+                    const today = new Date();
+                    const isOverdue = dueDate < today;
+
+                    if (isOverdue) {
+                        statusText.html(`<i class="fas fa-calendar-alt"></i> ${formatDate(dueDate)} <span class="text-danger">(마감일 초과)</span>`);
+                    } else {
+                        const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                        statusText.html(`<i class="fas fa-calendar-alt"></i> ${formatDate(dueDate)} (남은 일수: ${daysLeft}일)`);
+                    }
                 }
+            },
+            error: function(xhr, status, error) {
+                alert('할 일 상태 변경에 실패했습니다: ' + error);
             }
         });
     }
 
-        // Save todo (create or update)
-        function saveTodo() {
+    // 새로운 Todo 아이템 생성 시 유효성 검사
+    function validateTodoForm() {
+        const title = $('#todo-title').val().trim();
+        const dueDate = $('#todo-due-date').val();
+
+        if (!title) {
+            alert('제목을 입력해주세요.');
+            $('#todo-title').focus();
+            return false;
+        }
+
+        if (!dueDate) {
+            alert('마감일을 선택해주세요.');
+            $('#todo-due-date').focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    // Todo 저장 기능
+    function saveTodo() {
         const todoId = $('#todo-id').val();
         const todoData = {
-        title: $('#todo-title').val(),
-        content: $('#todo-content').val(),
-        dueDate: $('#todo-due-date').val(),
-        priority: $('#todo-priority').val()
-    };
-
-        // Validate form
-        if (!todoData.title || !todoData.dueDate) {
-        alert('제목과 마감일은 필수 입력 항목입니다.');
-        return;
-    }
+            title: $('#todo-title').val(),
+            content: $('#todo-content').val(),
+            dueDate: $('#todo-due-date').val(),
+            priority: $('#todo-priority').val()
+        };
 
         const method = todoId ? 'PUT' : 'POST';
         const url = todoId ? `/api/todos/${todoId}` : '/api/todos';
 
         $.ajax({
-        url: url,
-        method: method,
-        contentType: 'application/json',
-        data: JSON.stringify(todoData),
-        success: function() {
-        $('#todoModal').modal('hide');
-        // Refresh page to show updated todo list
-        window.location.reload();
-    },
-        error: function(xhr, status, error) {
-        alert('할 일 저장에 실패했습니다.');
-    }
-    });
+            url: url,
+            method: method,
+            contentType: 'application/json',
+            data: JSON.stringify(todoData),
+            success: function(todo) {
+                $('#todoModal').modal('hide');
+
+                // 새 할 일인 경우 목록에 추가
+                if (!todoId) {
+                    addTodoToList(todo);
+                } else {
+                    // 기존 할 일인 경우 목록 업데이트
+                    updateTodoInList(todo);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('할 일 저장에 실패했습니다: ' + error);
+            }
+        });
     }
 
-        // Delete todo
-        function deleteTodo(todoId) {
+    // Delete todo
+    function deleteTodo(todoId) {
         $.ajax({
             url: `/api/todos/${todoId}`,
             method: 'DELETE',
@@ -576,23 +754,65 @@
         });
     }
 
-        // Filter tasks by status
-        function filterTasks(status) {
-        if (status === 'all') {
-        $('.task-list-item').show();
-    } else {
-        $('.task-list-item').hide();
-        $(`.task-list-item .badge:contains("${status}")`).closest('.task-list-item').show();
-    }
+    // 프로젝트 카드 클릭 이벤트 처리
+    function initProjectCardEvents() {
+        $('.project-card').off('click').on('click', function() {
+            const projectId = $(this).data('project-id');
+            openProjectModal(projectId);
+        });
     }
 
-        // Search tasks
-        function searchTasks(searchText) {
+    // 프로젝트 모달 열기
+    function openProjectModal(projectId) {
+        // 모달 내용 초기화
+        $('#project-detail-container').html(`
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">로딩 중...</span>
+            </div>
+            <p>프로젝트 정보를 불러오는 중입니다...</p>
+        </div>
+    `);
+
+        // 모달 표시
+        $('#projectDetailModal').modal('show');
+
+        // 프로젝트 정보 가져오기
+        $.ajax({
+            url: `/api/projects/${projectId}`,
+            method: 'GET',
+            success: function(project) {
+                renderProjectDetail(project);
+            },
+            error: function(xhr, status, error) {
+                $('#project-detail-container').html(`
+                <div class="alert alert-danger">
+                    <p>프로젝트 정보를 불러오는데 실패했습니다.</p>
+                    <p>오류: ${error}</p>
+                </div>
+            `);
+            }
+        });
+    }
+
+    // Filter tasks by status
+    function filterTasks(status) {
+        if (status === 'all') {
+            $('.task-list-item').show();
+        } else {
+            $('.task-list-item').hide();
+            $(`.task-list-item .badge:contains("${status}")`).closest('.task-list-item').show();
+        }
+    }
+
+    // Search tasks
+    function searchTasks(searchText) {
         $('.task-list-item').each(function() {
             const title = $(this).find('h5').text().toLowerCase();
             const description = $(this).find('p').text().toLowerCase();
+            const projectName = $(this).find('small:contains("프로젝트명")').text().toLowerCase();
 
-            if (title.includes(searchText) || description.includes(searchText)) {
+            if (title.includes(searchText) || description.includes(searchText) || projectName.includes(searchText)) {
                 $(this).show();
             } else {
                 $(this).hide();
@@ -600,8 +820,8 @@
         });
     }
 
-        // Search todos
-        function searchTodos(searchText) {
+    // Search todos
+    function searchTodos(searchText) {
         $('.todo-list-item').each(function() {
             const title = $(this).find('h5').text().toLowerCase();
             const content = $(this).find('p').text().toLowerCase();
@@ -614,13 +834,14 @@
         });
     }
 
-        // Search projects
-        function searchProjects(searchText) {
+    // Search projects
+    function searchProjects(searchText) {
         $('.project-card').each(function() {
             const name = $(this).find('.card-header span:first-child').text().toLowerCase();
             const description = $(this).find('.card-text').text().toLowerCase();
+            const members = $(this).find('small:contains("참여자")').text().toLowerCase();
 
-            if (name.includes(searchText) || description.includes(searchText)) {
+            if (name.includes(searchText) || description.includes(searchText) || members.includes(searchText)) {
                 $(this).closest('.col').show();
             } else {
                 $(this).closest('.col').hide();
@@ -628,12 +849,12 @@
         });
     }
 
-        // Search logs
-        function searchLogs(searchText) {
+    // 로그 검색 기능
+    function searchLogs(searchText) {
         $('.task-log-item').each(function() {
             const text = $(this).text().toLowerCase();
 
-            if (text.includes(searchText)) {
+            if (text.includes(searchText.toLowerCase())) {
                 $(this).show();
             } else {
                 $(this).hide();
@@ -641,11 +862,28 @@
         });
     }
 
-        // Format date (yyyy-MM-dd)
-        function formatDate(date) {
-        if (typeof date === 'string') {
-        date = new Date(date);
+    // 프로젝트별 업무 로그 필터링
+    function loadProjectTaskLogs(projectId) {
+        $.ajax({
+            url: `/api/tasks/logs/project/${projectId}`,
+            method: 'GET',
+            data: { limit: 50 }, // 최대 50개 로그 가져오기
+            success: function(logs) {
+                renderTaskLogs(logs);
+                $('#task-logs-tab').tab('show'); // 로그 탭으로 자동 전환
+            },
+            error: function(xhr, status, error) {
+                console.error('프로젝트 로그 로드 오류:', xhr, status, error);
+                $('#task-logs-container').html('<div class="alert alert-danger">프로젝트 업무 로그를 불러오는데 실패했습니다.</div>');
+            }
+        });
     }
+
+    // Format date (yyyy-MM-dd)
+    function formatDate(date) {
+        if (!(date instanceof Date) || isNaN(date)) {
+            return '날짜 없음';
+        }
 
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -654,293 +892,424 @@
         return `${year}-${month}-${day}`;
     }
 
-        // Format date and time (yyyy-MM-dd HH:mm)
-        function formatDateTime(datetime) {
-        if (typeof datetime === 'string') {
-        datetime = new Date(datetime);
-    }
+    // Format date and time (yyyy-MM-dd HH:mm)
+    function formatDateTime(date) {
+        if (!(date instanceof Date) || isNaN(date)) {
+            return '날짜 정보 없음';
+        }
 
-        const year = datetime.getFullYear();
-        const month = String(datetime.getMonth() + 1).padStart(2, '0');
-        const day = String(datetime.getDate()).padStart(2, '0');
-        const hours = String(datetime.getHours()).padStart(2, '0');
-        const minutes = String(datetime.getMinutes()).padStart(2, '0');
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
 
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     }
-        // 프로젝트 모달 열기
-        function openProjectModal(projectId) {
-            // 모달 내용 초기화
-            $('#project-detail-container').html(`
-            <div class="text-center">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">로딩 중...</span>
-                </div>
-                <p>프로젝트 정보를 불러오는 중입니다...</p>
-            </div>
-        `);
 
-            // 모달 표시
-            $('#projectDetailModal').modal('show');
+    // 기존 할 일 항목 업데이트
+    function updateTodoInList(todo) {
+        const todoItem = $(`.todo-list-item[data-todo-id="${todo.id}"]`);
+        const dueDate = new Date(todo.dueDate);
+        const today = new Date();
+        const isOverdue = dueDate < today && !todo.completed;
+        const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
 
-            // 프로젝트 정보 가져오기
-            $.ajax({
-                url: `/workmanagement/project/${projectId}`,
-                method: 'GET',
-                success: function(project) {
-                    renderProjectDetail(project);
-                },
-                error: function(xhr, status, error) {
-                    $('#project-detail-container').html(`
-                    <div class="alert alert-danger">
-                        <p>프로젝트 정보를 불러오는데 실패했습니다.</p>
-                        <p>오류: ${error}</p>
-                    </div>
-                `);
-                }
-            });
+        let priorityClass = '';
+        if (todo.priority === '높음') {
+            priorityClass = 'bg-danger';
+        } else if (todo.priority === '중간') {
+            priorityClass = 'bg-warning';
+        } else {
+            priorityClass = 'bg-info';
         }
 
-        // 프로젝트 상세 정보 렌더링
-        function renderProjectDetail(project) {
-            // 프로젝트 진행률 상태에 따른 클래스
-            let progressClass = '';
-            if (project.progress < 30) {
-                progressClass = 'bg-danger';
-            } else if (project.progress < 70) {
-                progressClass = 'bg-warning';
-            } else {
-                progressClass = 'bg-success';
-            }
+        // 항목 내용 업데이트
+        todoItem.find('h5').text(todo.title).css('text-decoration', todo.completed ? 'line-through' : 'none');
+        todoItem.find('p').text(todo.content || '').css('text-decoration', todo.completed ? 'line-through' : 'none');
+        todoItem.find('.badge').removeClass('bg-danger bg-warning bg-info').addClass(priorityClass).text(todo.priority);
 
-            // 프로젝트 상태에 따른 뱃지 클래스
+        // 날짜 정보 업데이트
+        let dateInfo = `<i class="fas fa-calendar-alt"></i> ${formatDate(dueDate)}`;
+        if (todo.completed) {
+            dateInfo += ' <span class="text-success">(완료됨)</span>';
+        } else if (isOverdue) {
+            dateInfo += ' <span class="text-danger">(마감일 초과)</span>';
+        } else {
+            dateInfo += ` (남은 일수: ${daysLeft}일)`;
+        }
+        todoItem.find('small').html(dateInfo);
+    }
+
+    // 새 할 일을 목록에 추가
+    function addTodoToList(todo) {
+        const dueDate = new Date(todo.dueDate);
+        const today = new Date();
+        const isOverdue = dueDate < today && !todo.completed;
+        const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+        let priorityClass = '';
+        if (todo.priority === '높음') {
+            priorityClass = 'bg-danger';
+        } else if (todo.priority === '중간') {
+            priorityClass = 'bg-warning';
+        } else {
+            priorityClass = 'bg-info';
+        }
+
+        const html = `
+        <div class="list-group-item list-group-item-action todo-list-item ${todo.completed ? 'completed' : ''}"
+             data-todo-id="${todo.id}">
+            <div class="d-flex align-items-center">
+                <input class="form-check-input me-2 todo-checkbox" type="checkbox" ${todo.completed ? 'checked' : ''}>
+                <div class="flex-grow-1">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1" style="${todo.completed ? 'text-decoration: line-through' : ''}">${todo.title}</h5>
+                        <span class="badge ${priorityClass}">${todo.priority}</span>
+                    </div>
+                    <p class="mb-1" style="${todo.completed ? 'text-decoration: line-through' : ''}">${todo.content || ''}</p>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-alt"></i>
+                        ${formatDate(dueDate)}
+                        ${todo.completed ?
+            '<span class="text-success">(완료됨)</span>' :
+            (isOverdue ?
+                '<span class="text-danger">(마감일 초과)</span>' :
+                `(남은 일수: ${daysLeft}일)`)
+        }
+                    </small>
+                </div>
+                <div class="ms-2">
+                    <button class="btn btn-sm btn-outline-primary edit-todo-btn">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger delete-todo-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+        $('#todo-list').prepend(html);
+
+        // 새로 추가된 항목에 이벤트 핸들러 등록
+        initTodoEvents();
+    }
+
+    // Todo 이벤트 초기화
+    function initTodoEvents() {
+        // 체크박스 클릭 이벤트
+        $('.todo-checkbox').off('change').on('change', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            toggleTodoCompletion(todoId);
+        });
+
+        // 할 일 항목 클릭 이벤트 (체크박스, 편집, 삭제 버튼 제외)
+        $('.todo-list-item').off('click').on('click', function(e) {
+            if (!$(e.target).hasClass('todo-checkbox') &&
+                !$(e.target).hasClass('edit-todo-btn') &&
+                !$(e.target).hasClass('delete-todo-btn') &&
+                !$(e.target).hasClass('fa-edit') &&
+                !$(e.target).hasClass('fa-trash')) {
+                const todoId = $(this).data('todo-id');
+                openTodoModal(todoId);
+            }
+        });
+
+        // 편집 버튼 클릭 이벤트
+        $('.edit-todo-btn').off('click').on('click', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            openTodoModal(todoId);
+        });
+
+        // 삭제 버튼 클릭 이벤트
+        $('.delete-todo-btn').off('click').on('click', function(e) {
+            e.stopPropagation();
+            const todoId = $(this).closest('.todo-list-item').data('todo-id');
+            if (confirm('정말로 이 할 일을 삭제하시겠습니까?')) {
+                deleteTodo(todoId);
+            }
+        });
+    }
+
+    // 프로젝트 상세 정보 렌더링 함수
+    function renderProjectDetail(project) {
+        // 프로젝트 진행률 상태에 따른 클래스
+        let progressClass = '';
+        if (project.progress < 30) {
+            progressClass = 'bg-danger';
+        } else if (project.progress < 70) {
+            progressClass = 'bg-warning';
+        } else {
+            progressClass = 'bg-success';
+        }
+
+        // 프로젝트 상태에 따른 뱃지 클래스
+        let statusClass = '';
+        if (project.status === '진행중') {
+            statusClass = 'bg-primary';
+        } else if (project.status === '완료') {
+            statusClass = 'bg-success';
+        } else if (project.status === '지연') {
+            statusClass = 'bg-danger';
+        } else {
+            statusClass = 'bg-warning';
+        }
+
+        // 날짜 포맷팅
+        const startDate = project.startDate ? formatDate(new Date(project.startDate)) : '미정';
+        const endDate = project.endDate ? formatDate(new Date(project.endDate)) : '미정';
+
+        // 프로젝트 상세 정보 HTML 생성
+        let html = `
+        <div class="project-detail">
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h3>${project.name} <span class="badge ${statusClass}">${project.status}</span></h3>
+                    <p class="text-muted">프로젝트 기간: ${startDate} ~ ${endDate}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p>진행률</p>
+                    <div class="progress">
+                        <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${project.progress}%"
+                            aria-valuenow="${project.progress}" aria-valuemin="0" aria-valuemax="100">
+                            ${project.progress}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>프로젝트 설명</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>${project.description || '프로젝트 설명이 없습니다.'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5>참여자</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                            ${project.memberNames && project.memberNames.length > 0 ?
+            project.memberNames.map(member => `
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        ${member}
+                                        <span class="badge bg-primary rounded-pill">참여자</span>
+                                    </li>
+                                `).join('') :
+            '<li class="list-group-item">참여자가 없습니다.</li>'
+        }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5>진행 상황</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>전체 업무:</strong> ${project.taskCount || 0}개</p>
+                            <p><strong>완료된 업무:</strong> ${project.completedTaskCount || 0}개</p>
+                            <p><strong>남은 업무:</strong> ${(project.taskCount || 0) - (project.completedTaskCount || 0)}개</p>
+
+                            <div class="progress mt-3">
+                                <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${project.progress}%"
+                                    aria-valuenow="${project.progress}" aria-valuemin="0" aria-valuemax="100">
+                                    ${project.progress}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>업무 목록</h5>
+                            <div>
+                                <button class="btn btn-sm btn-primary" id="load-tasks-btn" data-project-id="${project.id}">
+                                    업무 불러오기
+                                </button>
+                                <button class="btn btn-sm btn-info" id="load-logs-btn" data-project-id="${project.id}">
+                                    로그 보기
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="project-tasks-container">
+                                <p class="text-center">업무 목록을 불러오려면 버튼을 클릭하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+        // 프로젝트 상세 정보 렌더링 함수 (마지막 부분)
+        // HTML 삽입
+        $('#project-detail-container').html(html);
+
+        // 업무 불러오기 버튼 이벤트 등록
+        $('#load-tasks-btn').off('click').on('click', function() {
+            const projectId = $(this).data('project-id');
+            loadProjectTasks(projectId);
+        });
+
+        // 로그 보기 버튼 이벤트 등록
+        $('#load-logs-btn').off('click').on('click', function() {
+            const projectId = $(this).data('project-id');
+            loadProjectTaskLogs(projectId);
+            $('#projectDetailModal').modal('hide'); // 프로젝트 모달 닫기
+        });
+    }
+
+    // 프로젝트의 업무 목록 불러오기
+    function loadProjectTasks(projectId) {
+        $('#project-tasks-container').html(`
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">로딩 중...</span>
+            </div>
+            <p>업무 목록을 불러오는 중입니다...</p>
+        </div>
+    `);
+
+        $.ajax({
+            url: `/api/projects/${projectId}/tasks`,
+            method: 'GET',
+            success: function(tasks) {
+                renderProjectTasks(tasks);
+            },
+            error: function(xhr, status, error) {
+                $('#project-tasks-container').html(`
+                <div class="alert alert-danger">
+                    <p>업무 목록을 불러오는데 실패했습니다.</p>
+                    <p>오류: ${error}</p>
+                </div>
+            `);
+            }
+        });
+    }
+
+    // 프로젝트 업무 목록 렌더링
+    function renderProjectTasks(tasks) {
+        if (!tasks || tasks.length === 0) {
+            $('#project-tasks-container').html('<p class="text-center">이 프로젝트에 등록된 업무가 없습니다.</p>');
+            return;
+        }
+
+        let html = `
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>제목</th>
+                        <th>담당자</th>
+                        <th>상태</th>
+                        <th>우선순위</th>
+                        <th>진행률</th>
+                        <th>마감일</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+        tasks.forEach(task => {
+            // 상태에 따른 뱃지 클래스
             let statusClass = '';
-            if (project.status === '진행중') {
+            if (task.status === '미시작') {
+                statusClass = 'bg-secondary';
+            } else if (task.status === '진행중') {
                 statusClass = 'bg-primary';
-            } else if (project.status === '완료') {
+            } else if (task.status === '완료') {
                 statusClass = 'bg-success';
-            } else if (project.status === '지연') {
-                statusClass = 'bg-danger';
             } else {
                 statusClass = 'bg-warning';
             }
 
-            // 날짜 포맷팅
-            const startDate = project.startDate ? formatDate(new Date(project.startDate)) : '미정';
-            const endDate = project.endDate ? formatDate(new Date(project.endDate)) : '미정';
-
-            // 프로젝트 상세 정보 HTML 생성
-            let html = `
-            <div class="project-detail">
-                <div class="row mb-4">
-                    <div class="col-md-8">
-                        <h3>${project.name} <span class="badge ${statusClass}">${project.status}</span></h3>
-                        <p class="text-muted">프로젝트 기간: ${startDate} ~ ${endDate}</p>
-                    </div>
-                    <div class="col-md-4 text-end">
-                        <p>진행률</p>
-                        <div class="progress">
-                            <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${project.progress}%"
-                                aria-valuenow="${project.progress}" aria-valuemin="0" aria-valuemax="100">
-                                ${project.progress}%
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>프로젝트 설명</h5>
-                            </div>
-                            <div class="card-body">
-                                <p>${project.description || '프로젝트 설명이 없습니다.'}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h5>참여자</h5>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                ${project.memberNames && project.memberNames.length > 0 ?
-                project.memberNames.map(member => `
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            ${member}
-                                            <span class="badge bg-primary rounded-pill">참여자</span>
-                                        </li>
-                                    `).join('') :
-                '<li class="list-group-item">참여자가 없습니다.</li>'
+            // 우선순위에 따른 뱃지 클래스
+            let priorityClass = '';
+            if (task.priority === '높음') {
+                priorityClass = 'bg-danger';
+            } else if (task.priority === '중간') {
+                priorityClass = 'bg-warning';
+            } else {
+                priorityClass = 'bg-info';
             }
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h5>진행 상황</h5>
-                            </div>
-                            <div class="card-body">
-                                <p><strong>전체 업무:</strong> ${project.taskCount || 0}개</p>
-                                <p><strong>완료된 업무:</strong> ${project.completedTaskCount || 0}개</p>
-                                <p><strong>남은 업무:</strong> ${(project.taskCount || 0) - (project.completedTaskCount || 0)}개</p>
-
-                                <div class="progress mt-3">
-                                    <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${project.progress}%"
-                                        aria-valuenow="${project.progress}" aria-valuemin="0" aria-valuemax="100">
-                                        ${project.progress}%
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5>업무 목록</h5>
-                                <button class="btn btn-sm btn-primary" id="load-tasks-btn" data-project-id="${project.id}">
-                                    업무 불러오기
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                <div id="project-tasks-container">
-                                    <p class="text-center">업무 목록을 불러오려면 버튼을 클릭하세요.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-            // HTML 삽입
-            $('#project-detail-container').html(html);
-
-            // 업무 불러오기 버튼 이벤트 등록
-            $('#load-tasks-btn').on('click', function() {
-                const projectId = $(this).data('project-id');
-                loadProjectTasks(projectId);
-            });
-        }
-
-        // 프로젝트의 업무 목록 불러오기
-        function loadProjectTasks(projectId) {
-            $('#project-tasks-container').html(`
-            <div class="text-center">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">로딩 중...</span>
-                </div>
-                <p>업무 목록을 불러오는 중입니다...</p>
-            </div>
-        `);
-
-            $.ajax({
-                url: `/api/projects/${projectId}/tasks`,
-                method: 'GET',
-                success: function(tasks) {
-                    renderProjectTasks(tasks);
-                },
-                error: function(xhr, status, error) {
-                    $('#project-tasks-container').html(`
-                    <div class="alert alert-danger">
-                        <p>업무 목록을 불러오는데 실패했습니다.</p>
-                        <p>오류: ${error}</p>
-                    </div>
-                `);
-                }
-            });
-        }
-
-        // 프로젝트 업무 목록 렌더링
-        function renderProjectTasks(tasks) {
-            if (!tasks || tasks.length === 0) {
-                $('#project-tasks-container').html('<p class="text-center">이 프로젝트에 등록된 업무가 없습니다.</p>');
-                return;
-            }
-
-            let html = `
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>제목</th>
-                            <th>담당자</th>
-                            <th>상태</th>
-                            <th>우선순위</th>
-                            <th>진행률</th>
-                            <th>마감일</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-            tasks.forEach(task => {
-                // 상태에 따른 뱃지 클래스
-                let statusClass = '';
-                if (task.status === '미시작') {
-                    statusClass = 'bg-secondary';
-                } else if (task.status === '진행중') {
-                    statusClass = 'bg-primary';
-                } else if (task.status === '완료') {
-                    statusClass = 'bg-success';
-                } else {
-                    statusClass = 'bg-warning';
-                }
-
-                // 우선순위에 따른 뱃지 클래스
-                let priorityClass = '';
-                if (task.priority === '높음') {
-                    priorityClass = 'bg-danger';
-                } else if (task.priority === '중간') {
-                    priorityClass = 'bg-warning';
-                } else {
-                    priorityClass = 'bg-info';
-                }
-
-                html += `
-                <tr class="task-row" data-task-id="${task.id}">
-                    <td>${task.title}</td>
-                    <td>${task.assigneeName || '미배정'}</td>
-                    <td><span class="badge ${statusClass}">${task.status}</span></td>
-                    <td><span class="badge ${priorityClass}">${task.priority}</span></td>
-                    <td>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: ${task.progress}%"
-                                aria-valuenow="${task.progress}" aria-valuemin="0" aria-valuemax="100">
-                                ${task.progress}%
-                            </div>
-                        </div>
-                    </td>
-                    <td>${task.dueDate ? formatDate(new Date(task.dueDate)) : '미정'}</td>
-                </tr>
-            `;
-            });
 
             html += `
-                    </tbody>
-                </table>
-            </div>
+            <tr class="task-row" data-task-id="${task.id}">
+                <td>${task.title}</td>
+                <td>${task.assigneeName || '미배정'}</td>
+                <td><span class="badge ${statusClass}">${task.status}</span></td>
+                <td><span class="badge ${priorityClass}">${task.priority}</span></td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: ${task.progress}%"
+                            aria-valuenow="${task.progress}" aria-valuemin="0" aria-valuemax="100">
+                            ${task.progress}%
+                        </div>
+                    </div>
+                </td>
+                <td>${task.dueDate ? formatDate(new Date(task.dueDate)) : '미정'}</td>
+            </tr>
         `;
+        });
 
-            $('#project-tasks-container').html(html);
+        html += `
+                </tbody>
+            </table>
+        </div>
+    `;
 
-            // 업무 행 클릭 이벤트 등록
-            $('.task-row').on('click', function() {
-                const taskId = $(this).data('task-id');
-                // 업무 상세 정보 모달 또는 페이지로 이동
-                alert(`업무 ID: ${taskId} - 업무 상세 기능 구현 필요`);
-            });
-        }
+        $('#project-tasks-container').html(html);
+
+        // 업무 행 클릭 이벤트 등록
+        $('.task-row').off('click').on('click', function() {
+            const taskId = $(this).data('task-id');
+            openTaskDetailModal(taskId);
+        });
+    }
+
+    // 업무 상세 모달 열기 (새 함수)
+    function openTaskDetailModal(taskId) {
+        // Ajax로 업무 상세 정보 조회
+        $.ajax({
+            url: `/api/tasks/${taskId}`,
+            method: 'GET',
+            success: function(task) {
+                // 업무 진행도 모달을 재활용하여 상세 정보 표시
+                $('#task-progress-modal-title').text(`${task.title} - 진행도 업데이트`);
+                $('#task-progress-slider').val(task.progress);
+                $('#task-progress-value').text(`${task.progress}%`);
+                $('#task-id-for-progress').val(taskId);
+
+                // 모달 표시
+                $('#taskProgressModal').modal('show');
+            },
+            error: function(xhr, status, error) {
+                alert('업무 정보를 불러오는데 실패했습니다: ' + error);
+            }
+        });
+    }
+
 </script>
 <div th:replace="fragments/header :: headerScripts"></div>
 </body>

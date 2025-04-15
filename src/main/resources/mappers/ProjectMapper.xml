@@ -3,7 +3,7 @@
 
 <mapper namespace="com.example.projectdemo.domain.projects.mapper.ProjectMapper">
 
-    <!-- 프로젝트 기본 결과 매핑 -->
+    <!-- Update the ProjectResultMap to include all fields -->
     <resultMap id="ProjectResultMap" type="com.example.projectdemo.domain.projects.dto.ProjectDTO">
         <id property="id" column="id" />
         <result property="name" column="name" />
@@ -11,6 +11,7 @@
         <result property="status" column="status" />
         <result property="startDate" column="start_date" />
         <result property="endDate" column="end_date" />
+        <result property="actualEndDate" column="actual_end_date" />
         <result property="depId" column="dep_id" />
         <result property="depName" column="dep_name" />
         <result property="managerEmpNum" column="manager_emp_num" />
@@ -31,6 +32,7 @@
         <result property="posTitle" column="pos_title" />
         <result property="role" column="role" />
         <result property="joinedAt" column="joined_at" />
+        <result property="leftAt" column="left_at" />
     </resultMap>
 
     <!-- 모든 프로젝트 조회 -->
@@ -105,11 +107,11 @@
     <!-- 새 프로젝트 등록 -->
     <insert id="insertProject" parameterType="com.example.projectdemo.domain.projects.dto.ProjectDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO projects (
-            name, description, status, start_date, end_date, dep_id,
-            manager_emp_num, progress, created_at
+            name, description, status, start_date, end_date, actual_end_date, dep_id,
+            manager_emp_num, progress, is_public, created_at
         ) VALUES (
-                     #{name}, #{description}, #{status}, #{startDate}, #{endDate}, #{depId},
-                     #{managerEmpNum}, #{progress}, NOW()
+                     #{name}, #{description}, #{status}, #{startDate}, #{endDate}, #{actualEndDate}, #{depId},
+                     #{managerEmpNum}, #{progress}, #{isPublic}, NOW()
                  )
     </insert>
 
@@ -121,6 +123,7 @@
             status = #{status},
             start_date = #{startDate},
             end_date = #{endDate},
+            actual_end_date = #{actualEndDate},
             dep_id = #{depId},
             manager_emp_num = #{managerEmpNum},
             progress = #{progress},

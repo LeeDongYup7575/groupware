@@ -235,8 +235,8 @@
                                 <div class="schedule-item" th:each="schedule : ${upcomingSchedules}">
                                     <div class="schedule-date">
                                         <span th:text="${#temporals.format(schedule.startTime, 'yyyy-MM-dd')}">날짜</span>
-                                        <span th:if="${schedule.allDay}" class="badge bg-info">종일</span>
-                                        <span th:unless="${schedule.allDay}"
+                                        <span th:if="${schedule.isAllDay}" class="badge bg-info">종일</span>
+                                        <span th:unless="${schedule.isAllDay}"
                                               th:text="${#temporals.format(schedule.startTime, 'HH:mm')} + ' ~ ' + ${#temporals.format(schedule.endTime, 'HH:mm')}">시간</span>
                                     </div>
                                     <div class="schedule-details">

@@ -1,7 +1,11 @@
 package com.example.projectdemo.domain.projects.controller;
 
+import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.projects.dto.TaskDTO;
 import com.example.projectdemo.domain.projects.dto.TaskLogDTO;
 import com.example.projectdemo.domain.projects.service.TaskLogService;
+import com.example.projectdemo.domain.projects.service.TaskService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,13 +23,40 @@ public class TaskLogController {
     @Autowired
     private TaskLogService taskLogService;
 
+    @Autowired
+    private EmployeesService employeesService;
+
+    @Autowired
+    private TaskService taskService;
+
     /**
      * 최근 업무 로그 조회
      */
     @GetMapping("/recent")
     public ResponseEntity<List<TaskLogDTO>> getRecentTaskLogs(
-            @RequestParam(defaultValue = "20") int limit) {
-        return ResponseEntity.ok(taskLogService.getRecentTaskLogs(limit));
+            @RequestParam(defaultValue = "0") int limit) {
+        List<TaskLogDTO> logs = taskLogService.getRecentTaskLogs(limit);
+
+        // 로그에 필요한 업무 타이틀과 프로젝트명 정보 추가
+        logs.forEach(log -> {
+            if (log.getTaskTitle() == null && log.getTaskId() != null) {
+                TaskDTO task = taskService.getTaskById(log.getTaskId());
+                if (task != null) {
+                    log.setTaskTitle(task.getTitle());
+                    log.setProjectName(task.getProjectName());
+                }
+            }
+
+            // 사원 이름 정보가 없는 경우 조회
+            if (log.getEmpName() == null && log.getEmpNum() != null) {
+                EmployeesDTO employee = employeesService.findByEmpNum(log.getEmpNum());
+                if (employee != null) {
+                    log.setEmpName(employee.getName());
+                }
+            }
+        });
+
+        return ResponseEntity.ok(logs);
     }
 
     /**
@@ -49,7 +80,28 @@ public class TaskLogController {
     public ResponseEntity<List<TaskLogDTO>> getTaskLogsByProject(
             @PathVariable Integer projectId,
             @RequestParam(defaultValue = "50") int limit) {
-        return ResponseEntity.ok(taskLogService.getTaskLogsByProject(projectId, limit));
+        List<TaskLogDTO> logs = taskLogService.getTaskLogsByProject(projectId, limit);
+
+        // 로그에 필요한 업무 타이틀과 프로젝트명 정보 추가
+        logs.forEach(log -> {
+            if (log.getTaskTitle() == null && log.getTaskId() != null) {
+                TaskDTO task = taskService.getTaskById(log.getTaskId());
+                if (task != null) {
+                    log.setTaskTitle(task.getTitle());
+                    log.setProjectName(task.getProjectName());
+                }
+            }
+
+            // 사원 이름 정보가 없는 경우 조회
+            if (log.getEmpName() == null && log.getEmpNum() != null) {
+                EmployeesDTO employee = employeesService.findByEmpNum(log.getEmpNum());
+                if (employee != null) {
+                    log.setEmpName(employee.getName());
+                }
+            }
+        });
+
+        return ResponseEntity.ok(logs);
     }
 
     /**

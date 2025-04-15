@@ -14,28 +14,28 @@ import java.util.List;
 public class TaskDTO {
     private Integer id;
     private Integer projectId;
-    private String projectName;  // JOIN 결과 (실제 DB 컬럼에는 없음)
+    private String projectName;  // JOIN 결과
     private String title;
     private String description;
     private String status;
     private Integer progress;
     private String priority;
     private String reporterEmpNum;
-    private String reporterName;  // JOIN 결과 (실제 DB 컬럼에는 없음)
+    private String reporterName;  // JOIN 결과
     private String assigneeEmpNum;
-    private String assigneeName;  // JOIN 결과 (실제 DB 컬럼에는 없음)
+    private String assigneeName;  // JOIN 결과
     private LocalDate startDate;
     private LocalDate dueDate;
+    private LocalDate completedDate;  // completedAt 대신 completedDate로 변경
     private Integer estimatedHours;
     private Integer actualHours;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime completedAt;
 
-    // 하위 업무 목록 (실제 DB 컬럼에는 없음)
+    // 하위 업무 목록
     private List<SubTaskDTO> subTasks;
 
-    // 화면 표시용 메타데이터 (실제 DB 컬럼에는 없음)
+    // 화면 표시용 메타데이터
     private Integer remainingDays;
     private boolean isOverdue;
 }

@@ -94,26 +94,36 @@ public class ProjectApiController {
     }
 
     /**
-     * 프로젝트 상태 업데이트
+     * 프로젝트 상태 업데이트 - 완료 상태 확인 로직 활용
      */
     @PatchMapping("/{id}/status")
-    public ResponseEntity<ProjectDTO> updateProjectStatus(@PathVariable Integer id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> updateProjectStatus(@PathVariable Integer id, @RequestBody Map<String, String> body) {
         String status = body.get("status");
         if (status == null || status.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        ProjectDTO updatedProject = projectService.updateProjectStatus(id, status);
-        return ResponseEntity.ok(updatedProject);
+        try {
+            ProjectDTO updatedProject = projectService.updateProjectStatus(id, status);
+            return ResponseEntity.ok(updatedProject);
+        } catch (RuntimeException e) {
+            // 이미 완료된 프로젝트 등의 예외 처리
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
+
     /**
-     * 프로젝트 완료 처리
+     * 프로젝트 완료 처리 - 예외 처리 추가
      */
     @PatchMapping("/{id}/complete")
-    public ResponseEntity<ProjectDTO> completeProject(@PathVariable Integer id) {
-        ProjectDTO completedProject = projectService.completeProject(id);
-        return ResponseEntity.ok(completedProject);
+    public ResponseEntity<?> completeProject(@PathVariable Integer id) {
+        try {
+            ProjectDTO completedProject = projectService.completeProject(id);
+            return ResponseEntity.ok(completedProject);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     /**

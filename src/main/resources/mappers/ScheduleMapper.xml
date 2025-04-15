@@ -6,7 +6,6 @@
     <!-- 일정 기본 결과 매핑 -->
     <resultMap id="ScheduleResultMap" type="com.example.projectdemo.domain.projects.dto.ScheduleDTO">
         <id property="id" column="id"/>
-        <result property="empNum" column="emp_num"/>
         <result property="creatorEmpNum" column="creator_emp_num"/>
         <result property="creatorName" column="creator_name"/>
         <result property="title" column="title"/>
@@ -14,7 +13,12 @@
         <result property="location" column="location"/>
         <result property="startTime" column="start_time"/>
         <result property="endTime" column="end_time"/>
-        <result property="allDay" column="all_day"/>
+        <result property="isAllDay" column="is_all_day"/>
+        <result property="repeatType" column="repeat_type"/>
+        <result property="repeatEndDate" column="repeat_end_date"/>
+        <result property="color" column="color"/>
+        <result property="notificationType" column="notification_type"/>
+        <result property="notificationMinutes" column="notification_minutes"/>
         <result property="projectId" column="project_id"/>
         <result property="projectName" column="project_name"/>
         <result property="createdAt" column="created_at"/>
@@ -39,19 +43,20 @@
         ORDER BY s.start_time ASC
     </select>
 
-    <!-- 사원 일정 조회 -->
+    <!-- 사원 일정 조회 수정 -->
     <select id="findSchedulesByEmpNum" parameterType="String" resultMap="ScheduleResultMap">
         SELECT s.*, e.name AS creator_name, p.name AS project_name
         FROM schedules s
                  LEFT JOIN employees e ON s.creator_emp_num = e.emp_num
                  LEFT JOIN projects p ON s.project_id = p.id
-        WHERE s.emp_num = #{empNum} OR s.creator_emp_num = #{empNum}
+        WHERE s.creator_emp_num = #{empNum}
            OR EXISTS (
             SELECT 1 FROM schedule_participants sp
             WHERE sp.schedule_id = s.id AND sp.emp_num = #{empNum}
         )
         ORDER BY s.start_time ASC
     </select>
+
 
     <!-- 특정 프로젝트의 일정 조회 -->
     <select id="selectSchedulesByProject" parameterType="Integer" resultMap="ScheduleResultMap">
@@ -99,14 +104,16 @@
         WHERE s.id = #{id}
     </select>
 
-    <!-- 일정 등록 -->
+    <!-- 일정 등록 수정 -->
     <insert id="insertSchedule" parameterType="com.example.projectdemo.domain.projects.dto.ScheduleDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO schedules (
             creator_emp_num, title, description, location,
-            start_time, end_time, all_day, project_id, created_at
+            start_time, end_time, is_all_day, repeat_type, repeat_end_date,
+            color, notification_type, notification_minutes, project_id, created_at
         ) VALUES (
                      #{creatorEmpNum}, #{title}, #{description}, #{location},
-                     #{startTime}, #{endTime}, #{allDay}, #{projectId}, NOW()
+                     #{startTime}, #{endTime}, #{isAllDay}, #{repeatType}, #{repeatEndDate},
+                     #{color}, #{notificationType}, #{notificationMinutes}, #{projectId}, NOW()
                  )
     </insert>
 
@@ -118,7 +125,12 @@
             location = #{location},
             start_time = #{startTime},
             end_time = #{endTime},
-            all_day = #{allDay},
+            is_all_day = #{isAllDay},
+            repeat_type = #{repeatType},
+            repeat_end_date = #{repeatEndDate},
+            color = #{color},
+            notification_type = #{notificationType},
+            notification_minutes = #{notificationMinutes},
             project_id = #{projectId},
             updated_at = NOW()
         WHERE id = #{id}

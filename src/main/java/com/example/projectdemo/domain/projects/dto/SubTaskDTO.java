@@ -15,9 +15,10 @@ public class SubTaskDTO {
     private Integer taskId;
     private String title;
     private String description;
-    private boolean completed;
+    private String status;         // completed 대신 status 필드로 변경
+    private Integer progress;      // 추가: progress 필드
     private String assigneeEmpNum;
-    private String assigneeName;  // JOIN 결과 (실제 DB 컬럼에는 없음)
+    private String assigneeName;   // JOIN 결과
     private LocalDate dueDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

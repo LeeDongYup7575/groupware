@@ -13,9 +13,9 @@ public class Tasks {
     private Integer id;
     private String title;               // 업무 제목
     private String description;         // 업무 설명
-    private Integer projectId;          // 프로젝트 ID (null 가능 - 프로젝트와 무관한 업무일 수 있음)
-    private Integer assigneeId;         // 담당자 ID
-    private Integer reporterId;         // 보고자 ID
+    private Integer projectId;          // 프로젝트 ID
+    private String assigneeEmpNum;      // 담당자 사원번호 (수정)
+    private String reporterEmpNum;      // 보고자 사원번호 (수정)
     private String status;              // 상태(미시작, 진행중, 완료, 보류 등)
     private String priority;            // 우선순위 (높음, 중간, 낮음)
     private Integer progress;           // 진행도 (0-100%)
