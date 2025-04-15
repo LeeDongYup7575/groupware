@@ -158,6 +158,8 @@ body {
     }
 }
 
+
+/* ----------------------------------------------------*/
 /* 문서 유형 제목 스타일 */
 .main-content > span {
     display: block;
@@ -169,6 +171,59 @@ body {
     padding-bottom: 12px;
     border-bottom: 2px solid #e6f0fb;
 }
+
+
+.navi-content{
+    display: flex;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+
+}
+
+.navi-content>select{
+    display: none;
+    width: 170px;
+    height: 50px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1a3b66;
+    border: 0;
+    border-radius: 8px;
+    text-align: center;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%234a90e2' stroke-width='2' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+    background-position: right 1px center;
+    background-size:12px;
+    background-repeat: no-repeat;
+    outline: none;
+}
+/* 포커스 상태에서 테두리 제거 */
+.navi-content>select:focus {
+    border: 0;
+    outline: none;
+    box-shadow: none; /* 일부 브라우저에서 적용되는 포커스 그림자 효과 제거 */
+}
+
+/* 선택(active) 상태에서도 테두리 제거 */
+.navi-content>select:active {
+    border: 0;
+    outline: none;
+    box-shadow: none;
+}
+
+
+.navi-content> span{
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a3b66;
+    margin: 0 0 25px 0;
+    position: relative;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e6f0fb;
+}
+
 
 /* 문서 유형 선택 스타일 */
 .document-type-select {
@@ -514,11 +569,19 @@ body {
     .sidebar.open {
         transform: translateX(0);
     }
+
+    #select{
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {
     .main-content {
         padding: 16px;
+    }
+
+    #select{
+        display: block;
     }
 
     .document-type-select {

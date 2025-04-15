@@ -1,6 +1,8 @@
 package com.example.projectdemo.domain.attendance.service;
 
+import com.example.projectdemo.config.HolidayApiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,12 +21,11 @@ public class HolidayService {
 
     private final RestTemplate restTemplate;
 
-    private static final String API_URL = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo";
-    private static final String SERVICE_KEY = "JpUfXhfGf9vZkQS2T%2FvIfRbdnVRSJFw170R4O47dm1TLkOMV3WjL88xF92Ic%2B150fjg%2FCCobaebABguDNHNhtw%3D%3D";
+    private final HolidayApiProperties holidayApiProperties;
 
     public Set<LocalDate> getHolidayList(int year, int month) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(API_URL)
-                .queryParam("serviceKey", SERVICE_KEY)
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(holidayApiProperties.getUrl())
+                .queryParam("serviceKey", holidayApiProperties.getKey())
                 .queryParam("solYear", year)
                 .queryParam("solMonth", String.format("%02d", month));
 

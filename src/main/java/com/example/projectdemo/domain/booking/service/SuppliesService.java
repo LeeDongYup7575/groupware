@@ -70,35 +70,32 @@ public class SuppliesService {
         return suppliesMapper.isSupplyAvailable(supplyId, quantity, startTime, endTime, null);
     }
 
-    // 비품 예약 등록
-//    @Transactional
-//    public SuppliesBookingDTO createBooking(String empNum, BookingRequestDTO requestDTO) {
-//        // 문자열 날짜/시간을 LocalDateTime으로 변환
-//        LocalDateTime startDateTime = parseDateTime(requestDTO.getStartDate(), requestDTO.getStartTime());
-//        LocalDateTime endDateTime = parseDateTime(requestDTO.getEndDate(), requestDTO.getEndTime());
-//
-//        // 비품 예약 가능 여부 확인
-//        if (!isSupplyAvailable(requestDTO.getSupplyId(), requestDTO.getQuantity(), startDateTime, endDateTime)) {
-//            throw new RuntimeException("해당 시간에 비품을 예약할 수 없습니다.");
-//        }
-//
-//        // 예약 객체 생성
-//        SuppliesBooking booking = new SuppliesBooking();
-//        booking.setSupplyId(requestDTO.getSupplyId());
-//        booking.setEmpNum(empNum);
-//        booking.setQuantity(requestDTO.getQuantity());
-//        booking.setStart(startDateTime);
-//        booking.setEnd(endDateTime);
-//        booking.setPurpose(requestDTO.getPurpose());
-//        booking.setBookingStatus("CONFIRMED");
-//        booking.setCreatedAt(LocalDateTime.now());
-//
-//        // 예약 등록
-//        suppliesMapper.insertSuppliesBooking(booking);
-//
-//        // 등록된 예약 반환
-//        return convertToBookingDto(booking);
-//    }
+    // 특정 시간대에 사용 가능한 비품 수량 조회
+    public int getAvailableQuantityInPeriod(Integer supplyId, LocalDateTime startTime, LocalDateTime endTime) {
+        return suppliesMapper.getAvailableQuantityInPeriod(supplyId, startTime, endTime);
+    }
+
+    // 엔티티를 DTO로 변환하되 실시간 가용 수량 계산
+    private SuppliesDTO convertToDtoWithRealTimeAvailability(Supplies supplies) {
+        if (supplies == null) return null;
+
+        // 현재 시점의 예약된 수량 계산
+        LocalDateTime now = LocalDateTime.now();
+        int bookedQuantity = suppliesMapper.getBookedQuantityAtTime(supplies.getId(), now);
+
+        // 실시간 가용 수량 계산
+        int realTimeAvailableQuantity = supplies.getTotalQuantity() - bookedQuantity;
+
+        return new SuppliesDTO(
+                supplies.getId(),
+                supplies.getName(),
+                supplies.getCategory(),
+                supplies.getTotalQuantity(),
+                realTimeAvailableQuantity,
+                supplies.getDescription(),
+                supplies.getIsAvailable()
+        );
+    }
 
     @Transactional
     public List<SuppliesBookingDTO> createMultipleBookings(String empNum, BookingRequestDTO requestDTO) {
@@ -194,27 +191,6 @@ public class SuppliesService {
         return LocalDateTime.of(date, time);
     }
 
-    // 엔티티를 DTO로 변환하되 실시간 가용 수량 계산
-    private SuppliesDTO convertToDtoWithRealTimeAvailability(Supplies supplies) {
-        if (supplies == null) return null;
-
-        // 현재 시점의 예약된 수량 계산
-        LocalDateTime now = LocalDateTime.now();
-        int bookedQuantity = suppliesMapper.getBookedQuantityAtTime(supplies.getId(), now);
-
-        // 실시간 가용 수량 계산
-        int realTimeAvailableQuantity = supplies.getTotalQuantity() - bookedQuantity;
-
-        return new SuppliesDTO(
-                supplies.getId(),
-                supplies.getName(),
-                supplies.getCategory(),
-                supplies.getTotalQuantity(),
-                realTimeAvailableQuantity,
-                supplies.getDescription(),
-                supplies.getIsAvailable()
-        );
-    }
 
     // 예약 엔티티를 DTO로 변환하는 유틸리티 메서드
     private SuppliesBookingDTO convertToBookingDto(SuppliesBooking booking) {

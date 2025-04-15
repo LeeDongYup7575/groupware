@@ -50,16 +50,6 @@
             border-radius: 8px;
             margin-bottom: 1rem;
         }
-        .supplies-card .available {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #28a745;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
         .btn {
             display: block;
             width: 100%;
@@ -137,6 +127,12 @@
         h1 {
             margin: 0;
         }
+        .info-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -145,6 +141,7 @@
         <i class="fas fa-arrow-left"></i> 뒤로가기
     </button>
     <h1>비품 예약</h1>
+    <p class="info-text">선택하신 비품의 실제 가용 수량은 날짜와 시간 선택 후 확인할 수 있습니다.</p>
 
     <div class="filter-section">
         <select id="category-filter">
@@ -161,7 +158,6 @@
              th:data-category="${supply.category}"
              th:data-total-quantity="${supply.availableQuantity}">
 
-            <span class="available" th:text="${supply.availableQuantity + '개 남음'}"></span>
             <img th:src="@{/api/placeholder/200/150}" th:alt="${supply.name}">
             <h3 th:text="${supply.name}"></h3>
             <p th:text="${supply.description}"></p>
@@ -262,7 +258,6 @@
             }
         });
     });
-
 </script>
 </body>
 </html>

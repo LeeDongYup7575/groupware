@@ -162,7 +162,8 @@
                 </div>
             </div>
 
-            <!-- HTML 수정 부분 -->
+
+            <!-- 오류가 발생하는 근무시간 검증 섹션 수정 -->
             <div class="form-section validation-section">
                 <h3 class="form-header">근무시간 검증</h3>
                 <div class="validation-info">
@@ -185,17 +186,16 @@
                         <td>176시간</td>
                     </tr>
                     <tr class="current-row">
-                        <td th:text="${statisticsByMonth[0].workHours} + '시간'">136시간</td>
-                        <td th:text="${currentMonthTotalOvertime} + '시간'">1시간</td>
-                        <td th:text="${(statisticsByMonth[0] != null ? statisticsByMonth[0].workHours : 0) + (currentMonthTotalOvertime != null ? currentMonthTotalOvertime : 0)} + '시간'">137시간</td>
-
-
+                        <td>현재 누적</td>
+                        <td th:text="${statisticsByMonth != null and not #lists.isEmpty(statisticsByMonth) ? statisticsByMonth[0].workHours : 0} + '시간'">0시간</td>
+                        <td th:text="${currentMonthTotalOvertime != null ? currentMonthTotalOvertime : 0} + '시간'" class="overtime-hours">0시간</td>
+                        <td th:text="${(statisticsByMonth != null and not #lists.isEmpty(statisticsByMonth) ? statisticsByMonth[0].workHours : 0) + (currentMonthTotalOvertime != null ? currentMonthTotalOvertime : 0)} + '시간'">0시간</td>
                     </tr>
                     <tr class="estimation-row">
                         <td>신청 후 예상</td>
-                        <td th:each="stat : ${statisticsByMonth}" th:text="${stat.workHours}+'시간'">136시간</td>
-                        <td><span class="overtime-hours expected">${currentMonthTotalOvertime}시간</span></td>
-                        <td>139시간</td>
+                        <td th:text="${statisticsByMonth != null and not #lists.isEmpty(statisticsByMonth) ? statisticsByMonth[0].workHours : 0} + '시간'">0시간</td>
+                        <td><span class="overtime-hours expected">0시간</span></td>
+                        <td><span class="total-expected">0시간</span></td>
                     </tr>
                     </tbody>
                 </table>
@@ -254,16 +254,15 @@
 </div>
 
 <script>
-
     document.querySelector(".add-button").onclick = function() {
         location.href = "/leaves/leavesForm";
     };
+
     // 연장 근무시간(신청 후 예상) 갱신 함수
     function recalcEstimation() {
-        // 서버에서 받아온 현재 누적값
-        const baseRegular = 136;  // 정규 근무 시간 (현재 누적)
-        const baseOvertime = parseFloat("[[${currentMonthTotalOvertime}]]");  // 서버 렌더링 값
-        // const baseTotal = baseRegular + baseOvertime; // 굳이 필요 없음
+        // 서버에서 받아온 현재 누적값 (타임리프 변수를 JavaScript 변수로 안전하게 변환)
+        const baseRegular = [[${statisticsByMonth != null and not #lists.isEmpty(statisticsByMonth) ? statisticsByMonth[0].workHours : 0}]];
+        const baseOvertime = [[${currentMonthTotalOvertime != null ? currentMonthTotalOvertime : 0}]];
 
         // 선택된 시작/종료 시간 값 읽기
         let startHour = parseInt($("#startHour").val(), 10) || 0;
@@ -280,24 +279,25 @@
         let newOvertimeHours = newOvertimeMinutes / 60;
 
         // 예상 연장 및 총 근무시간
-        let estimatedOvertime = baseOvertime + newOvertimeHours;
-        let estimatedTotal = baseRegular + estimatedOvertime;
+        let estimatedOvertime = parseFloat(baseOvertime) + newOvertimeHours;
+        let estimatedTotal = parseFloat(baseRegular) + estimatedOvertime;
 
         // 반올림 또는 소수점 1자리 표시
         estimatedOvertime = estimatedOvertime.toFixed(1);
         estimatedTotal = estimatedTotal.toFixed(1);
 
         // 테이블 갱신
-        let $estimationRow = $(".estimation-row");
-        $estimationRow.find("td").eq(1).text(baseRegular + "시간");
-        $estimationRow.find(".overtime-hours.expected").text(estimatedOvertime + "시간");
-        $estimationRow.find("td").eq(3).text(estimatedTotal + "시간");
+        $(".estimation-row .overtime-hours.expected").text(estimatedOvertime + "시간");
+        $(".estimation-row .total-expected").text(estimatedTotal + "시간");
     }
-
 
     // 선택한 연장근무 시간 변경시 계산 함수 실행 (drop-down 변경 이벤트에 바인딩)
     $("#startHour, #startMinute, #endHour, #endMinute").on("change", recalcEstimation);
+
     $(document).ready(function() {
+        // 초기 계산 실행
+        recalcEstimation();
+
         // 드롭다운 메뉴
         $('.dropdown-header').click(function() {
             $(this).parent().toggleClass('open');
@@ -381,37 +381,33 @@
             $("#approvalModal").fadeOut();
         });
 
-        $(function () {
-            // 1. 오늘 날짜 구하기
-            const today = new Date();
+        // 날짜 관련 초기화
+        // 1. 오늘 날짜 구하기
+        const today = new Date();
 
-            // 2. 요일 배열
-            const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+        // 2. 요일 배열
+        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
-            // 3. yyyy-mm-dd (요일) 형식 만들기
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const date = String(today.getDate()).padStart(2, '0');
-            const day = dayNames[today.getDay()];
-            const formatted = `${year}-${month}-${date} (${day})`;
+        // 3. yyyy-mm-dd (요일) 형식 만들기
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const date = String(today.getDate()).padStart(2, '0');
+        const day = dayNames[today.getDay()];
+        const formatted = `${year}-${month}-${date} (${day})`;
 
-            // 4. input에 값 설정
-            $('#workDate').val(formatted);
+        // 4. input에 값 설정
+        $('#workDate').val(formatted);
 
-            // 5. datepicker 초기화
-            $("#workDate").datepicker({
-                dateFormat: 'yy-mm-dd (D)',
-                dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-                dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
-                monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-                monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-                showMonthAfterYear: true,
-                yearSuffix: '년',
-                firstDay: 0
-            });
-
-            // 6. 기타 로직 호출
-            recalcEstimation();
+        // 5. datepicker 초기화
+        $("#workDate").datepicker({
+            dateFormat: 'yy-mm-dd (D)',
+            dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+            dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+            monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+            showMonthAfterYear: true,
+            yearSuffix: '년',
+            firstDay: 0
         });
 
         // 기안하기 버튼 클릭 시 실행되는 코드
@@ -446,10 +442,9 @@
             }
 
             // 4. 월 최대 연장근무 시간 체크
-            const currentOvertimeText = $(".current-row .overtime-hours").text();
-            const currentOvertime = parseFloat(currentOvertimeText.replace("시간", ""));
+            const baseOvertime = [[${currentMonthTotalOvertime != null ? currentMonthTotalOvertime : 0}]];
             const newOvertimeHours = (endInMinutes - startInMinutes) / 60;
-            const totalOvertime = currentOvertime + newOvertimeHours;
+            const totalOvertime = parseFloat(baseOvertime) + newOvertimeHours;
 
             if (totalOvertime > 12) {
                 alert("월 최대 연장근무 시간(12시간)을 초과합니다.");
@@ -460,7 +455,7 @@
             const dateValue = $("#workDate").val();
             const day = dateValue.split(" (")[1].replace(")", "");
 
-            if (day === "Sat" || day === "Sun") {
+            if (day === "토" || day === "일") {
                 if (!confirm("주말에 연장근무를 신청하시겠습니까?")) {
                     return false;
                 }
