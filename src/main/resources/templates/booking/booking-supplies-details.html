@@ -112,6 +112,32 @@
             margin-bottom: 1rem;
             display: none;
         }
+        .availability-info {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .available {
+            color: #28a745;
+        }
+        .not-available {
+            color: #dc3545;
+        }
+        .checking {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .time-selector-help {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        .inventory-check-btn {
+            background-color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        .inventory-check-btn:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -167,6 +193,7 @@
                 </select>
                 <input type="hidden" id="start-time" required>
             </div>
+            <div class="time-selector-help">업무 시간: 09:00 ~ 18:00, 10분 단위로 선택 가능</div>
         </div>
 
         <div class="form-group">
@@ -195,6 +222,7 @@
                 </select>
                 <input type="hidden" id="end-time" required>
             </div>
+            <div class="time-selector-help">최소 예약 시간은 1시간입니다</div>
         </div>
 
         <div class="form-group">
@@ -202,6 +230,7 @@
             <textarea id="purpose" rows="4" placeholder="비품 사용 목적을 간단히 작성해주세요" required></textarea>
         </div>
 
+        <button type="button" id="check-real-time-availability" class="btn inventory-check-btn">선택 시간 비품 재고 확인</button>
         <button type="button" id="check-availability" class="btn">예약 가능 여부 확인</button>
         <button type="submit" id="submit-booking" class="btn" style="display:none;">예약 신청</button>
     </form>
@@ -217,6 +246,7 @@
         const errorMessage = document.getElementById('error-message');
         const successMessage = document.getElementById('success-message');
         const checkAvailabilityBtn = document.getElementById('check-availability');
+        const checkRealTimeAvailabilityBtn = document.getElementById('check-real-time-availability');
         const submitBookingBtn = document.getElementById('submit-booking');
 
         // 시간 드롭다운 이벤트 리스너 추가
@@ -351,20 +381,34 @@
         };
 
         const populateSuppliesList = async () => {
+            selectedSuppliesList.innerHTML = ''; // 목록 초기화
+
             for (const supply of selectedSupplies) {
                 const supplyDetails = await fetchSupplyDetails(supply.id);
                 const supplyItem = document.createElement('div');
                 supplyItem.classList.add('selected-supplies-item');
+                supplyItem.setAttribute('data-supply-id', supply.id);
+                supplyItem.setAttribute('data-quantity', supply.quantity);
 
                 if (supplyDetails) {
                     supplyItem.innerHTML = `
-                        <span>${supplyDetails.name || supply.id}</span>
-                        <span>수량: ${supply.quantity}개</span>
+                        <div>
+                            <span>${supplyDetails.name || supply.id}</span>
+                            <div class="availability-info time-specific-availability" style="display:none;">
+                                선택 시간대 가용 수량: <span class="checking">확인 중...</span>
+                            </div>
+                        </div>
+                        <span>신청 수량: ${supply.quantity}개</span>
                     `;
                 } else {
                     supplyItem.innerHTML = `
-                        <span>비품 ID: ${supply.id}</span>
-                        <span>수량: ${supply.quantity}개</span>
+                        <div>
+                            <span>비품 ID: ${supply.id}</span>
+                            <div class="availability-info">
+                                데이터를 불러올 수 없습니다.
+                            </div>
+                        </div>
+                        <span>신청 수량: ${supply.quantity}개</span>
                     `;
                 }
 
@@ -387,6 +431,12 @@
             successMessage.style.display = 'none';
             checkAvailabilityBtn.style.display = 'block';
             submitBookingBtn.style.display = 'none';
+
+            // 시간별 가용성 정보 초기화
+            const availabilityInfos = document.querySelectorAll('.time-specific-availability');
+            availabilityInfos.forEach(info => {
+                info.style.display = 'none';
+            });
         }
 
         // 시간 유효성 검증 함수
@@ -434,6 +484,61 @@
             return true;
         }
 
+        // 선택한 시간에 비품 실시간 재고 확인
+        checkRealTimeAvailabilityBtn.addEventListener('click', function() {
+            // 먼저 시간 유효성 검증
+            if (!validateTimeInputs()) {
+                return;
+            }
+
+            const bookingDate = document.getElementById('booking-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            // 시간별 가용성 정보 표시
+            const availabilityInfos = document.querySelectorAll('.time-specific-availability');
+            availabilityInfos.forEach(info => {
+                info.style.display = 'block';
+                const statusSpan = info.querySelector('span');
+                statusSpan.textContent = '확인 중...';
+                statusSpan.className = 'checking';
+            });
+
+            // 각 비품별로 시간별 가용성 확인
+            const supplyItems = document.querySelectorAll('.selected-supplies-item');
+
+            supplyItems.forEach(async (item) => {
+                const supplyId = item.getAttribute('data-supply-id');
+                const requestedQuantity = parseInt(item.getAttribute('data-quantity'));
+                const availabilityInfo = item.querySelector('.time-specific-availability span');
+
+                try {
+                    // 새로 추가한 API 엔드포인트 사용
+                    const response = await fetch(`/api/booking/supplies/${supplyId}/available-quantity?startDate=${bookingDate}&startTime=${startTime}&endDate=${bookingDate}&endTime=${endTime}`);
+                    const result = await response.json();
+
+                    // 결과에서 가용 수량 가져오기
+                    const availableQuantity = result.availableQuantity;
+
+                    // 요청한 수량이 사용 가능한지 확인
+                    const isQuantityAvailable = availableQuantity >= requestedQuantity;
+
+                    // 결과 표시
+                    if (isQuantityAvailable) {
+                        availabilityInfo.textContent = `${availableQuantity}개 이용 가능 (요청: ${requestedQuantity}개)`;
+                        availabilityInfo.className = 'available';
+                    } else {
+                        availabilityInfo.textContent = `${availableQuantity}개만 이용 가능 (요청: ${requestedQuantity}개)`;
+                        availabilityInfo.className = 'not-available';
+                    }
+                } catch (error) {
+                    console.error('Error checking availability:', error);
+                    availabilityInfo.textContent = '재고 확인 실패';
+                    availabilityInfo.className = 'not-available';
+                }
+            });
+        });
+
         // 예약 가능 여부 확인
         checkAvailabilityBtn.addEventListener('click', function() {
             // 먼저 시간 유효성 검증
@@ -461,6 +566,9 @@
                         successMessage.style.display = 'block';
                         checkAvailabilityBtn.style.display = 'none';
                         submitBookingBtn.style.display = 'block';
+
+                        // 실시간 가용 수량 업데이트
+                        checkRealTimeAvailabilityBtn.click();
                     } else {
                         errorMessage.style.display = 'block';
                         successMessage.style.display = 'none';

@@ -57,4 +57,13 @@ public interface SuppliesMapper {
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime,
             @Param("excludeBookingId") Integer excludeBookingId);
+
+    /**
+     * 특정 시간대에 사용 가능한 비품 수량 조회
+     * 해당 비품의 총 수량에서 해당 시간대에 이미 예약된 수량을 뺀 값
+     */
+    int getAvailableQuantityInPeriod(
+            @Param("supplyId") Integer supplyId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
 }

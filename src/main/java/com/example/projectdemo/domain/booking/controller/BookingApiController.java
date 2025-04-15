@@ -214,7 +214,26 @@ public class BookingApiController {
         }
     }
 
-    // 비품 예약 등록
+    @GetMapping("/supplies/{supplyId}/available-quantity")
+    public ResponseEntity<Map<String, Integer>> getAvailableQuantityInPeriod(
+            @PathVariable Integer supplyId,
+            @RequestParam String startDate,
+            @RequestParam String startTime,
+            @RequestParam String endDate,
+            @RequestParam String endTime) {
+
+        LocalDateTime startDateTime = parseDateTime(startDate, startTime);
+        LocalDateTime endDateTime = parseDateTime(endDate, endTime);
+
+        // 해당 시간대에 사용 가능한 비품 수량 조회
+        int availableQuantity = suppliesService.getAvailableQuantityInPeriod(supplyId, startDateTime, endDateTime);
+
+        Map<String, Integer> response = new HashMap<>();
+        response.put("availableQuantity", availableQuantity);
+
+        return ResponseEntity.ok(response);
+    }
+
     // 비품 예약 등록
     @PostMapping("/supplies-bookings")
     public ResponseEntity<List<SuppliesBookingDTO>> createSuppliesBookings(

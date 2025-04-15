@@ -106,19 +106,30 @@
         WHERE id = #{supplyId}
     </update>
 
-    <!-- 특정 시간대에 비품 예약 가능 여부 확인 -->
+    <!-- 특정 시간대에 비품 예약 가능 여부 확인 (수정된 버전) -->
     <select id="isSupplyAvailable" resultType="boolean">
         SELECT
-            CASE
-                WHEN (
-                    (SELECT total_quantity FROM supplies WHERE id = #{supplyId}) >=
-                    (#{quantity} + (SELECT COALESCE(SUM(quantity), 0)
-                                    FROM supplies_booking
-                                    WHERE supply_id = #{supplyId}
-                                      AND booking_status != 'CANCELLED'
-        AND (start &lt;= #{endTime} AND end &gt;= #{startTime})))
-        ) THEN TRUE
-        ELSE FALSE END
+        IF(
+        (SELECT total_quantity FROM supplies WHERE id = #{supplyId}) >=
+        (#{quantity} +
+        <if test="excludeBookingId != null">
+            (SELECT COALESCE(SUM(quantity), 0)
+            FROM supplies_booking
+            WHERE supply_id = #{supplyId}
+            AND id != #{excludeBookingId}
+            AND booking_status != 'CANCELLED'
+            AND (start &lt;= #{endTime} AND end &gt;= #{startTime}))
+        </if>
+        <if test="excludeBookingId == null">
+            (SELECT COALESCE(SUM(quantity), 0)
+            FROM supplies_booking
+            WHERE supply_id = #{supplyId}
+            AND booking_status != 'CANCELLED'
+            AND (start &lt;= #{endTime} AND end &gt;= #{startTime}))
+        </if>
+        ),
+        1, 0
+        ) AS available
     </select>
 
     <!-- 특정 시점에 예약된 비품 수량 조회 -->
@@ -127,8 +138,22 @@
         FROM supplies_booking
         WHERE supply_id = #{supplyId}
           AND booking_status != 'CANCELLED'
-        AND start &lt;= #{dateTime}
-              AND end &gt;= #{dateTime}
+          AND start &lt;= #{dateTime}
+                AND end &gt;= #{dateTime}
+    </select>
+
+    <!-- 특정 시간대에 사용 가능한 비품 수량 조회 -->
+    <select id="getAvailableQuantityInPeriod" resultType="int">
+        SELECT
+            (SELECT total_quantity FROM supplies WHERE id = #{supplyId}) -
+            COALESCE(
+                    (SELECT SUM(quantity)
+                     FROM supplies_booking
+                     WHERE supply_id = #{supplyId}
+                       AND booking_status != 'CANCELLED'
+               AND (start &lt;= #{endTime} AND end &gt;= #{startTime})),
+            0
+        ) AS available_quantity
     </select>
 
     <!-- 특정 기간에 예약된 최대 비품 수량 조회 -->
@@ -143,9 +168,7 @@
               AND sb.booking_status != 'CANCELLED'
             AND (sb.id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
             AND (sb.start BETWEEN #{startTime} AND #{endTime})
-
         UNION
-
         SELECT
             sb.end as time_point
         FROM
@@ -153,7 +176,7 @@
         WHERE
             sb.supply_id = #{supplyId}
           AND sb.booking_status != 'CANCELLED'
-                AND (sb.id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
+              AND (sb.id != #{excludeBookingId} OR #{excludeBookingId} IS NULL)
           AND (sb.end BETWEEN #{startTime} AND #{endTime})
             ),
             quantities_at_times AS (
