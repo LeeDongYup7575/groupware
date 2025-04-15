@@ -3,6 +3,8 @@
  */
 document.addEventListener('DOMContentLoaded', function() {
 
+    const sidebar = document.querySelector('.sidebar');
+
     // 사이드바 토글 기능
 
     // 클래스가 'toggle-menu'인 모든 li 요소를 선택합니다.
@@ -63,12 +65,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 사이드바 외부 클릭 시 닫기 (모바일)
     document.addEventListener('click', function(event) {
-        if (window.innerWidth <= 1200 &&
-            !sidebar.contains(event.target) &&
-            !sidebarToggle.contains(event.target) &&
-            sidebar.classList.contains('open')) {
 
+        if (
+            window.innerWidth <= 1200 &&
+            sidebar &&
+            !sidebar.contains(event.target) &&
+            sidebar.classList.contains('open')
+        ) {
             sidebar.classList.remove('open');
         }
+
     });
 });
