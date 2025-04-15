@@ -61,10 +61,6 @@ public class EdsmService {
         return edao.selectByAllApprovalFromIdExpected(empNum);
     }
 
-    //결재 상태 <진행>
-    //로그인한 사원이 결재권자이거나 본인이 기안한문서가 진행중인경우
-
-
-    //결재 상태<완료>
+    //
 
 }

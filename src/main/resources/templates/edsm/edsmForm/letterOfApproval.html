@@ -50,21 +50,22 @@
         </div>
       </div>
     </div>
+
     <div class="menu-section">
       <div class="menu-header">
         <i class="fas fa-chevron-down"></i>
         나의 문서함
       </div>
       <div class="menu-items">
-        <div class="menu-item">
+        <div class="menu-item" id="myWritten">
           <i class="fas fa-pen"></i>
           기안
         </div>
-        <div class="menu-item">
+        <div class="menu-item" id="approval">
           <i class="fas fa-file-signature"></i>
           승인
         </div>
-        <div class="menu-item">
+        <div class="menu-item" id="rejected">
           <i class="fas fa-undo"></i>
           반려
         </div>
@@ -164,23 +165,10 @@
               <div class="approval-header">신청</div>
               <div class="approval-body">
                 <div class="approval-body-cell">
-                  <div class="drafter-stamp" style="
-                      width: 60px;
-                      height: 60px;
-                      border: 2px solid green;
-                      border-radius: 50%;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      color: green;
-                      font-weight: bold;
-                      transform: rotate(-15deg);">신청</div>
-
-                  <div class="drafter-name" style="margin: 5px 0;font-weight: bold;"
-                       th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
-                  <div class="drafter-date" style="font-size: 12px;color: #777;" th:text="${currentTime}"></div>
+                  <div class="drafter-stamp">신청</div>
+                  <div class="drafter-name" th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
+                  <div class="drafter-date" th:text="${currentTime}"></div>
                 </div>
-
               </div>
             </div>
 
@@ -194,7 +182,6 @@
 
               <div class="approval-body approval-body-2">
                 <div class="approval-body-cell approval-body-cell-2" >
-
                   <div class="approval-message">결재라인을 입력해주세요</div>
                 </div>
               </div>
@@ -209,22 +196,25 @@
           <input type="hidden" name="approvalLine" id="approvalLine" value="" />
         </div>
 
-        <div class="form-group">
-          <label class="title">제목</label>
-          <input type="text" name="title" placeholder="제목입력" style="width: 100%;">
+        <div class="main2-contents">
+          <div class="form-contents">
+            <label class="contents-label">제목</label>
+            <input type="text" name="title" placeholder="제목입력" class="label-input">
+          </div>
+
+          <div class="form-contents">
+            <label class="contents-label" for="content">품의내용</label>
+            <textarea id="content" name="content" class="label-textarea" placeholder="예시)&#10;품의사유 :&#10;용도 :&#10;구매처 :"></textarea>
+          </div>
+
+          <div class="form-contents">
+            <label class="contents-label">예상비용</label>
+            <div class="form-row">
+              <input type="text" name="expectedCost" placeholder="금액을 입력하세요" style="width: 180px; padding: 10px 12px; border: 1px solid #d1e0ef; border-radius: 6px; font-size: 14px;">
+              <span style="margin-left: 10px; color: #4a5568; font-size: 14px;">원</span>
+            </div>
+          </div>
         </div>
-
-
-        <div class="form-contents">
-          <label class="contents-label" for="content">품의내용</label>
-
-          <textarea id="content" name="content" class="label-textarea" placeholder="예시)&#10;품의사유 :&#10;용도 :&#10;구매처 :"></textarea>
-          <label class="contents-label" for="content">예상비용</label>
-          <input type="text" name="expectedCost" placeholder="금액을 입력하세요" style="width: 15%;">
-          <span>원</span>
-        </div>
-
-
 
         <!-- 파일첨부 영역 -->
         <div class="attachment-section">
@@ -233,8 +223,7 @@
             파일 선택
           </label>
           <!-- 실제 파일 입력 요소는 숨김 -->
-          <input type="file" class="attachment-link" id="fileAttachment" name="fileAttachment" multiple/>
-
+          <input type="file" id="fileAttachment" name="fileAttachment" multiple style="display: none;"/>
 
           <div class="attachment-drop-area">
             첨부파일이 없습니다.
@@ -243,7 +232,7 @@
 
         <!-- 폼 제출 버튼 -->
         <div class="form-row">
-          <button type="submit" class="button">제출하기</button>
+          <button type="submit" class="button" style="background: linear-gradient(135deg, #4a90e2 0%, #3a80d2 100%); color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);">제출하기</button>
         </div>
       </form>
     </div>
@@ -286,17 +275,13 @@
           </div>
         </div>
         <br/>
-        <button id="saveApprovalLine" class="button">선택 완료</button>
+        <button id="saveApprovalLine" style="display: block; width: 100%; margin-top: 20px; background-color: #4a90e2; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">선택 완료</button>
       </div>
     </div>
-
-
-
-</div>
+  </div>
 </div>
 
 <script th:inline="javascript">
-
   $(document).ready(function() {
     //작성자 정보 전역변수설정
     //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
@@ -330,6 +315,20 @@
 
     $("#create-button").on("click", function () {
       location.href = "/edsmForm/input";
+    });
+
+    // 나의 문서함
+    // 기안 버튼
+    $("#myWritten").on("click", function () {
+      location.href = "/edsm/myWritten";
+    });
+    // 승인버튼
+    $("#approval").on("click", function () {
+      location.href = "/edsm/approval";
+    });
+    // 반려버튼
+    $("#rejected").on("click", function () {
+      location.href = "/edsm/rejected";
     });
 
     // form select 변경 이벤트
@@ -476,6 +475,6 @@
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
 <!-- 공통 사이드바 스크립트 포함 -->
-<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
+<script th:src="@{/assets/js/fragments/sidebar-common.js}"></script>
 </body>
 </html>
