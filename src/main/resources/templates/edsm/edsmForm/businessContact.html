@@ -344,6 +344,7 @@
 
 
 <script th:inline="javascript">
+  // 기존 스크립트
   $(document).ready(function() {
     //작성자 정보 전역변수설정
     //오류 신경쓰지마시길 원래 이렇게 된다네요 ....
@@ -352,62 +353,157 @@
       position: /*[[${employee.positionTitle}]]*/,
       name: /*[[${employee.name}]]*/
     };
-
-
-    // 초기화 및 이벤트 바인딩
-    let storedValue = [[${bc}]];
+    let storedValue = [[${documentFormId}]];
     if (storedValue) {
       $("#formSelect").val(storedValue);
     }
 
+    // 폼이 수정되었는지 추적하는 변수
+    let formModified = false;
 
-    $("#main").on("click", function () {
-      location.href = "/edsm/main";
-    });
-    $("#expected").on("click", function () {
-      location.href = "/edsm/expected";
-    });
+    // 폼이 처음 로드된 후에는 변경되지 않은 상태로 초기화
+    console.log("페이지 로드 시 formModified:", formModified);
 
-    $("#wait").on("click", function () {
-      location.href = "/edsm/wait";
-    });
-    $("#progress").on("click", function () {
-      location.href = "/edsm/progress";
+    // 폼 필드 변경 감지 - 실제 값이 변경되었는지 확인
+    $("input, textarea, select").on("change", function() {
+      formModified = true;
+      console.log("폼 필드 변경됨:", $(this).attr('name') || $(this).attr('id'));
     });
 
-    $("#complete").on("click", function () {
-      location.href = "/edsm/complete";
+    // 텍스트 입력 필드(input, textarea)의 경우 키 입력도 감지
+    $("input[type='text'], textarea").on("input", function() {
+      // 입력 값이 있을 때만 변경으로 처리
+      if ($(this).val().trim() !== "") {
+        formModified = true;
+        console.log("텍스트 입력됨:", $(this).attr('name') || $(this).attr('id'));
+      }
     });
 
-    $("#create-button").on("click", function () {
-      location.href = "/edsmForm/input";
+    // 파일 첨부 변경 감지
+    $("#fileAttachment").on("change", function() {
+      if (this.files.length > 0) {
+        formModified = true;
+        console.log("파일 첨부됨");
+      }
+    });
+
+    // 결재선 설정 변경 감지
+    $("#saveApprovalLine").on("click", function() {
+      const approvalLineContent = $("#approvalLine").val();
+      if (approvalLineContent && approvalLineContent !== "[]") {
+        formModified = true;
+        console.log("결재선 설정됨");
+      }
+    });
+
+    // 페이지 이탈 시 경고 함수
+    function handleNavigation(event, targetUrl) {
+      if (formModified) {
+        event.preventDefault();
+
+        // 경고 모달 표시
+        $("#navigationWarningModal").css("display", "flex");
+
+        // 계속 진행 버튼 클릭 시 저장하지 않고 이동
+        $("#continueNavigation").off("click").on("click", function() {
+          formModified = false; // 플래그 초기화
+          $("#navigationWarningModal").fadeOut(200);
+          window.location.href = targetUrl;
+        });
+
+        // 취소 버튼 클릭 시 현재 페이지 유지
+        $("#cancelNavigation").off("click").on("click", function() {
+          $("#navigationWarningModal").fadeOut(200);
+        });
+
+        return false;
+      } else {
+        // 변경사항이 없으면 그냥 페이지 이동
+        console.log("변경사항 없음, 페이지 이동:", targetUrl);
+        window.location.href = targetUrl;
+        return true;
+      }
+    }
+
+    // 사이드바 메뉴 항목에 이벤트 핸들러 적용
+    $("#main").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/main");
+    });
+
+    $("#expected").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/expected");
+    });
+
+    $("#wait").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/wait");
+    });
+
+    $("#progress").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/progress");
+    });
+
+    $("#complete").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/complete");
+    });
+
+    $("#create-button").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsmForm/input");
     });
 
     // 나의 문서함
-    // 기안 버튼
-    $("#myWritten").on("click", function () {
-      location.href = "/edsm/myWritten";
-    });
-    // 승인버튼
-    $("#approval").on("click", function () {
-      location.href = "/edsm/approval";
-    });
-    // 반려버튼
-    $("#rejected").on("click", function () {
-      location.href = "/edsm/rejected";
+    $("#myWritten").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/myWritten");
     });
 
-    // form select 변경 이벤트
-    $("#documentType").on("change", function() {
+    $("#approval").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/approval");
+    });
+
+    $("#rejected").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/rejected");
+    });
+
+    // 문서 종류 변경 시 처리
+    $("#documentType").off("change").on("change", function(e) {
       let selectedValue = $(this).val();
-      console.log("선택된 값:", selectedValue);
-      location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
+      if(selectedValue) {
+        console.log("문서 종류 변경됨:", selectedValue);
+
+        // 양식 변경 시에도 페이지 이탈 경고
+        if (formModified) {
+          e.preventDefault(); // 기본 이벤트 방지
+          let event = { preventDefault: function() {} };
+          return handleNavigation(event, "/edsmForm/" + selectedValue + "?documentType=" + selectedValue);
+        } else {
+          location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
+        }
+      }
+    });
+
+    // 브라우저의 기본 beforeunload 이벤트도 처리
+    window.addEventListener("beforeunload", function(e) {
+      if (formModified) {
+        // 표준 경고 메시지 (브라우저마다 다르게 표시될 수 있음)
+        const message = "작성 중인 내용이 있습니다. 페이지를 나가시겠습니까?";
+        e.returnValue = message;
+        return message;
+      }
     });
 
     // 모달 열기, 닫기
     $("#approvalSettingButton").on("click", function () {
       $("#approvalModal").fadeIn();
     });
+
     $(".close").on("click", function () {
       $("#approvalModal").fadeOut();
     });
@@ -454,7 +550,6 @@
     // selectedList를 Sortable로 설정하여 순서 변경 가능하도록 함
     $("#selectedList").sortable({
       placeholder: "ui-state-highlight"
-
     });
     $("#selectedList").disableSelection();
 
@@ -484,8 +579,6 @@
       });
       $("#approvalModal").fadeOut();
     });
-
-
 
     // 전역 DataTransfer 객체 생성
     let dt = new DataTransfer();
@@ -523,7 +616,7 @@
       $(".attachment-drop-area").html(html);
     }
 
-// 개별 파일 삭제 이벤트 처리
+    // 개별 파일 삭제 이벤트 처리
     $(document).on("click", ".remove-file", function() {
       let index = $(this).data("index");
       // DataTransfer 객체에서 해당 인덱스의 파일 제거
@@ -541,154 +634,11 @@
       updateAttachmentArea();
     });
 
-
-    // 커스텀 알림 모달 HTML 추가
-    const customAlertHTML = `
-    <div id="customAlertModal" class="custom-alert-modal">
-      <div class="custom-alert-content">
-        <div class="custom-alert-header">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>필수 항목 입력 필요</h3>
-        </div>
-        <div class="custom-alert-body">
-          <p>다음 필수 항목을 입력해주세요:</p>
-          <ul id="customAlertList"></ul>
-        </div>
-        <div class="custom-alert-footer">
-          <button id="customAlertConfirm" class="custom-alert-button">확인</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-    $("body").append(customAlertHTML);
-
-    // 커스텀 알림 모달 스타일 추가
-    const customAlertStyle = `
-    <style>
-      .custom-alert-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-        font-family: 'Noto Sans KR', sans-serif;
-      }
-
-      .custom-alert-content {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        width: 400px;
-        max-width: 90%;
-        overflow: hidden;
-        animation: alertAppear 0.3s ease;
-      }
-
-      @keyframes alertAppear {
-        from { transform: scale(0.8); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-      }
-
-      .custom-alert-header {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-bottom: 1px solid #e9ecef;
-        display: flex;
-        align-items: center;
-      }
-
-      .custom-alert-header i {
-        color: #f27474;
-        font-size: 24px;
-        margin-right: 15px;
-      }
-
-      .custom-alert-header h3 {
-        margin: 0;
-        color: #333;
-        font-size: 18px;
-        font-weight: 600;
-      }
-
-      .custom-alert-body {
-        padding: 20px;
-      }
-
-      .custom-alert-body p {
-        margin: 0 0 15px 0;
-        color: #555;
-      }
-
-      .custom-alert-body ul {
-        margin: 0;
-        padding-left: 10px;
-        list-style-type: none;
-      }
-
-      .custom-alert-body li {
-        margin: 8px 0;
-        display: flex;
-        align-items: center;
-      }
-
-      .custom-alert-body li i {
-        margin-right: 10px;
-        color: #f27474;
-      }
-
-      .custom-alert-footer {
-        padding: 15px 20px;
-        border-top: 1px solid #e9ecef;
-        text-align: right;
-      }
-
-      .custom-alert-button {
-        background: linear-gradient(135deg, #4a90e2 0%, #3a80d2 100%);
-        color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
-      }
-
-      .custom-alert-button:hover {
-        background: linear-gradient(135deg, #3a80d2 0%, #2a70c2 100%);
-        box-shadow: 0 6px 8px rgba(74, 144, 226, 0.3);
-      }
-    </style>
-  `;
-
-    $("head").append(customAlertStyle);
-
-    // 커스텀 알림 표시 함수
-    function showCustomAlert(items) {
-      const listContainer = $("#customAlertList");
-      listContainer.empty();
-
-      items.forEach(item => {
-        listContainer.append(`<li><i class="fas fa-exclamation-circle"></i> ${item}</li>`);
-      });
-
-      $("#customAlertModal").css("display", "flex");
-    }
-
-    // 커스텀 알림 닫기
-    $("#customAlertConfirm").on("click", function() {
-      $("#customAlertModal").fadeOut(200);
-    });
-
-    // 폼 제출 이벤트 처리
+    // 폼 제출 시 경고 비활성화
     $("#documentForm").on("submit", function(e) {
+      // 폼 제출 시 변경 플래그 초기화
+      formModified = false;
+
       // 필수 필드 검증
       let isValid = true;
       let errorFields = [];
@@ -739,12 +689,204 @@
       return true;
     });
 
+    // 모달이 이미 존재하는지 확인 후 추가
+    if ($("#customAlertModal").length === 0) {
+      // 커스텀 알림 모달 HTML 추가
+      const customAlertHTML = `
+        <div id="customAlertModal" class="custom-alert-modal">
+            <div class="custom-alert-content">
+                <div class="custom-alert-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>필수 항목 입력 필요</h3>
+                </div>
+                <div class="custom-alert-body">
+                    <p>다음 필수 항목을 입력해주세요:</p>
+                    <ul id="customAlertList"></ul>
+                </div>
+                <div class="custom-alert-footer">
+                    <button id="customAlertConfirm" class="custom-alert-button">확인</button>
+                </div>
+            </div>
+        </div>`;
 
+      $("body").append(customAlertHTML);
+    }
+
+    if ($("#navigationWarningModal").length === 0) {
+      // 페이지 이탈 경고 모달 HTML 추가
+      const navigationWarningHTML = `
+        <div id="navigationWarningModal" class="custom-alert-modal">
+            <div class="custom-alert-content">
+                <div class="custom-alert-header">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>작성 중인 내용이 있습니다</h3>
+                </div>
+                <div class="custom-alert-body">
+                    <p>저장하지 않은 내용은 모두 사라집니다. 계속 진행하시겠습니까?</p>
+                </div>
+                <div class="custom-alert-footer">
+                    <button id="cancelNavigation" class="custom-alert-button-cancel">취소</button>
+                    <button id="continueNavigation" class="custom-alert-button">계속 진행</button>
+                </div>
+            </div>
+        </div>`;
+
+      $("body").append(navigationWarningHTML);
+    }
+
+    // 스타일이 이미 존재하는지 확인 후 추가
+    if ($("style:contains('.custom-alert-button-cancel')").length === 0) {
+      // 커스텀 알림 모달 스타일 추가
+      const customAlertStyle = `
+        <style>
+            .custom-alert-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 9999;
+                justify-content: center;
+                align-items: center;
+                font-family: 'Noto Sans KR', sans-serif;
+            }
+
+            .custom-alert-content {
+                background-color: white;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                width: 400px;
+                max-width: 90%;
+                overflow: hidden;
+                animation: alertAppear 0.3s ease;
+            }
+
+            @keyframes alertAppear {
+                from { transform: scale(0.8); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+
+            .custom-alert-header {
+                background-color: #f8f9fa;
+                padding: 20px;
+                border-bottom: 1px solid #e9ecef;
+                display: flex;
+                align-items: center;
+            }
+
+            .custom-alert-header i {
+                color: #f27474;
+                font-size: 24px;
+                margin-right: 15px;
+            }
+
+            .custom-alert-header h3 {
+                margin: 0;
+                color: #333;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .custom-alert-body {
+                padding: 20px;
+            }
+
+            .custom-alert-body p {
+                margin: 0 0 15px 0;
+                color: #555;
+            }
+
+            .custom-alert-body ul {
+                margin: 0;
+                padding-left: 10px;
+                list-style-type: none;
+            }
+
+            .custom-alert-body li {
+                margin: 8px 0;
+                display: flex;
+                align-items: center;
+            }
+
+            .custom-alert-body li i {
+                margin-right: 10px;
+                color: #f27474;
+            }
+
+            .custom-alert-footer {
+                padding: 15px 20px;
+                border-top: 1px solid #e9ecef;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
+            .custom-alert-button {
+                background: linear-gradient(135deg, #4a90e2 0%, #3a80d2 100%);
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+                box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
+            }
+
+            .custom-alert-button:hover {
+                background: linear-gradient(135deg, #3a80d2 0%, #2a70c2 100%);
+                box-shadow: 0 6px 8px rgba(74, 144, 226, 0.3);
+            }
+
+            .custom-alert-button-cancel {
+                background: #f1f3f5;
+                color: #495057;
+                border: 1px solid #ced4da;
+                padding: 10px 25px;
+                border-radius: 6px;
+                font-size: 14px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .custom-alert-button-cancel:hover {
+                background: #e9ecef;
+            }
+        </style>`;
+
+      $("head").append(customAlertStyle);
+    }
+
+    // 커스텀 알림 표시 함수
+    function showCustomAlert(items) {
+      const listContainer = $("#customAlertList");
+      listContainer.empty();
+
+      items.forEach(item => {
+        listContainer.append(`<li><i class="fas fa-exclamation-circle"></i> ${item}</li>`);
+      });
+
+      $("#customAlertModal").css("display", "flex");
+    }
+
+    // 커스텀 알림 닫기
+    $("#customAlertConfirm").off("click").on("click", function() {
+      $("#customAlertModal").fadeOut(200);
+    });
+
+    // 콘솔에 디버깅 정보 표시
+    console.log("스크립트 로드 완료: 페이지 이탈 경고 시스템 활성화됨");
   });
 </script>
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
 <!-- 공통 사이드바 스크립트 포함 -->
 <script th:src="@{/assets/js/fragments/sidebar-common.js}"></script>
+
+
 </body>
 </html>
