@@ -3,6 +3,7 @@ package com.example.projectdemo.domain.attendance.scheduler;
 import com.example.projectdemo.domain.attendance.entity.Attendance;
 import com.example.projectdemo.domain.attendance.enums.AttendanceStatus;
 import com.example.projectdemo.domain.attendance.mapper.AttendanceMapper;
+import com.example.projectdemo.domain.attendance.service.HolidayService;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -23,6 +25,7 @@ public class AutoCheckoutScheduler {
 
     private final AttendanceMapper attendanceMapper;
     private final EmployeesMapper employeesMapper;
+    private final HolidayService holidayService;
 
     private static final LocalTime STANDARD_END_TIME = LocalTime.of(18, 0); // 오후 6시
 
@@ -36,6 +39,19 @@ public class AutoCheckoutScheduler {
         log.info("자동 퇴근 처리 작업 시작");
         LocalDate today = LocalDate.now();
         LocalTime checkoutTime = STANDARD_END_TIME;
+
+        // ✅ 공휴일 체크
+        if (holidayService.isHoliday(today)) {
+            log.info("공휴일이므로 자동 퇴근/결근 처리 스킵");
+            return;
+        }
+
+        // ✅ 주말 체크
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            log.info("주말이므로 자동 퇴근/결근 처리 스킵");
+            return;
+        }
 
         try {
             // 전체 직원 ID 목록 가져오기
