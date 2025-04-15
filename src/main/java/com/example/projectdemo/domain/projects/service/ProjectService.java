@@ -344,7 +344,7 @@ public class ProjectService {
         member.setProjectId(projectId);
         member.setEmpNum(empNum);
         member.setRole(role);
-        member.setJoinedAt(LocalDateTime.now());
+        member.setJoinedAt(LocalDateTime.now());  // 현재 시간으로 설정
 
         if (projectMapper.insertProjectMember(member) <= 0) {
             throw new RuntimeException("프로젝트 멤버 추가 실패");

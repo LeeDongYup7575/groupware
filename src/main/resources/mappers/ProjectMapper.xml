@@ -104,14 +104,13 @@
         ORDER BY p.created_at DESC
     </select>
 
-    <!-- 새 프로젝트 등록 -->
-    <insert id="insertProject" parameterType="com.example.projectdemo.domain.projects.dto.ProjectDTO" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertProject" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO projects (
-            name, description, status, start_date, end_date, actual_end_date, dep_id,
-            manager_emp_num, progress, is_public, created_at
+            name, description, manager_emp_num, start_date, end_date,
+            actual_end_date, status, dep_id, created_at, updated_at
         ) VALUES (
-                     #{name}, #{description}, #{status}, #{startDate}, #{endDate}, #{actualEndDate}, #{depId},
-                     #{managerEmpNum}, #{progress}, #{isPublic}, NOW()
+                     #{name}, #{description}, #{managerEmpNum}, #{startDate}, #{endDate},
+                     null, #{status}, #{depId}, NOW(), NOW()
                  )
     </insert>
 
@@ -126,7 +125,6 @@
             actual_end_date = #{actualEndDate},
             dep_id = #{depId},
             manager_emp_num = #{managerEmpNum},
-            progress = #{progress},
             is_public = #{isPublic},
             updated_at = NOW()
         WHERE id = #{id}
@@ -185,13 +183,5 @@
             updated_at = NOW()
         WHERE id = #{id}
     </update>
-
-    <!-- 프로젝트 진행률 업데이트 -->
-<!--    <update id="updateProjectProgress">-->
-<!--        UPDATE projects-->
-<!--        SET progress = #{progress},-->
-<!--            updated_at = NOW()-->
-<!--        WHERE id = #{id}-->
-<!--    </update>-->
 
 </mapper>

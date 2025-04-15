@@ -136,51 +136,95 @@
                     </div>
                 </div>
 
-                <!-- My Tasks Tab -->
-                <div class="tab-pane fade" id="my-tasks" role="tabpanel" aria-labelledby="my-tasks-tab">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <select id="task-filter" class="form-select">
-                                <option value="all">모든 업무</option>
-                                <option value="미시작">미시작</option>
-                                <option value="진행중">진행중</option>
-                                <option value="완료">완료</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="task-search" class="form-control" placeholder="업무 검색...">
-                                <button class="btn btn-outline-primary" type="button">검색</button>
+                <!-- 업무 등록 모달 -->
+                <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addTaskModalLabel">새 업무 등록</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="add-task-form">
+                                    <input type="hidden" id="project-id-for-task" value="">
+
+                                    <div class="mb-3">
+                                        <label for="task-title" class="form-label">업무 제목</label>
+                                        <input type="text" class="form-control" id="task-title" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="task-description" class="form-label">업무 설명</label>
+                                        <textarea class="form-control" id="task-description" rows="3"></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="task-priority" class="form-label">우선순위</label>
+                                        <select class="form-select" id="task-priority">
+                                            <option value="낮음">낮음</option>
+                                            <option value="중간" selected>중간</option>
+                                            <option value="높음">높음</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="task-due-date" class="form-label">마감일</label>
+                                        <input type="date" class="form-control" id="task-due-date">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="task-assignee" class="form-label">담당자</label>
+                                        <select class="form-select" id="task-assignee">
+                                            <option value="">담당자 선택</option>
+                                            <!-- 다른 프로젝트 멤버들은 JavaScript로 동적 로드 -->
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                                <button type="button" class="btn btn-primary" id="save-task-btn">저장</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="list-group" id="task-list">
-                        <!-- Task items will be rendered here -->
-                        <div th:each="task : ${assignedTasks}" class="list-group-item list-group-item-action task-list-item"
-                             th:classappend="${task.priority == '높음' ? 'priority-high' : task.priority == '중간' ? 'priority-medium' : 'priority-low'}"
-                             th:data-task-id="${task.id}">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1" th:text="${task.title}">업무 제목</h5>
-                                <span class="badge" th:classappend="${task.status == '미시작' ? 'bg-secondary' : task.status == '진행중' ? 'bg-primary' : 'bg-success'}" th:text="${task.status}">상태</span>
-                            </div>
-                            <p class="mb-1" th:text="${task.description}">업무 설명</p>
-                            <div class="progress task-progress">
-                                <div class="progress-bar" role="progressbar" th:style="'width: ' + ${task.progress} + '%'" th:attr="aria-valuenow=${task.progress}" aria-valuemin="0" aria-valuemax="100" th:text="${task.progress + '%'}">0%</div>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <span th:text="${#temporals.format(task.startDate, 'yyyy-MM-dd')} + ' ~ ' + ${#temporals.format(task.dueDate, 'yyyy-MM-dd')}">기간</span>
-                                    <span th:if="${task.isOverdue}" class="text-danger"> (마감일 초과)</span>
-                                    <span th:unless="${task.isOverdue}"> (남은 일수: <span th:text="${task.remainingDays}">0</span>일)</span>
-                                </small>
-                                <small class="text-muted">
-                                    <i class="fas fa-project-diagram"></i> <span th:text="${task.projectName}">프로젝트명</span>
-                                </small>
+                <!-- My Tasks Tab -->
+                <div class="tab-pane fade" id="my-tasks" role="tabpanel" aria-labelledby="my-tasks-tab">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5>내 담당 업무</h5>
+                                <div class="d-flex">
+                                    <!-- 업무 필터 -->
+                                    <select class="form-select form-select-sm me-2" id="my-task-filter">
+                                        <option value="all">전체</option>
+                                        <option value="incomplete">미완료</option>
+                                        <option value="complete">완료</option>
+                                        <option value="overdue">지연</option>
+                                    </select>
+                                    <!-- 업무 정렬 -->
+                                    <select class="form-select form-select-sm me-2" id="my-task-sort">
+                                        <option value="dueDate">마감일순</option>
+                                        <option value="priority">우선순위순</option>
+                                        <option value="project">프로젝트별</option>
+                                    </select>
+                                    <!-- 검색창 -->
+                                    <input type="text" class="form-control form-control-sm" id="my-task-search"
+                                           placeholder="업무 검색...">
+                                </div>
                             </div>
                         </div>
-                        <!-- End of task items -->
+                        <div class="card-body">
+                            <div id="my-tasks-container">
+                                <div class="text-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">로딩 중...</span>
+                                    </div>
+                                    <p>내 업무를 불러오는 중입니다...</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- 업무 진행도 업데이트 모달 -->
@@ -330,7 +374,18 @@
 
 <script th:inline="javascript">
 
+    var currentUser = {
+        empNum: null,
+        name: null
+    };
+
+
+    // 전역 변수로 현재 사용자 ID 선언 (임시 해결책)
+    var currentUserEmpNum = "";
+
     $(document).ready(function() {
+
+        loadCurrentUserInfo();
         // 현재 페이지에 따라 사이드바 활성화
         highlightActiveSidebar();
 
@@ -358,16 +413,6 @@
                 openTodoModal(todoId);
             }
         });
-
-        // 상태 변경 버튼 클릭 이벤트 - document.ready에서 제거하고 renderProjectDetail에서만 처리
-        // 이 부분을 제거하여 중복 바인딩 방지
-        // $(document).on('click', '.change-status-btn', function() {
-        //     const status = $(this).data('status');
-        //     const projectId = $('#complete-project-btn').data('project-id');
-        //     if (confirm(`프로젝트 상태를 "${status}"로 변경하시겠습니까?`)) {
-        //         updateProjectStatus(projectId, status);
-        //     }
-        // });
 
         // Edit todo button click
         $(document).on('click', '.edit-todo-btn', function(e) {
@@ -463,9 +508,61 @@
 
         // 프로젝트 탭이 활성화될 때 프로젝트 정보 새로고침
         $('#workTabs button[data-bs-target="#projects"]').on('shown.bs.tab', function() {
-            refreshProjects();
+            refreshUserProjects()
         });
+
+        // 내 업무 탭이 활성화될 때 업무 목록 불러오기
+        $('#workTabs button[data-bs-target="#my-tasks"]').on('shown.bs.tab', function() {
+            loadMyTasks();
+        });
+
+        // 내 업무 필터 변경 시 이벤트
+        $('#my-task-filter').on('change', function() {
+            filterMyTasks();
+        });
+
+        // 내 업무 정렬 변경 시 이벤트
+        $('#my-task-sort').on('change', function() {
+            sortMyTasks();
+        });
+
+        // 내 업무 검색 시 이벤트
+        $('#my-task-search').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            searchMyTasks(searchText);
+        });
+
     });
+
+    // 현재 사용자 정보 가져오기
+    function loadCurrentUserInfo() {
+        $.ajax({
+            url: '/api/auth/current-user',
+            method: 'GET',
+            success: function(user) {
+                currentUser.empNum = user.empNum;
+                console.log("현재 사용자 정보 로드 완료:", currentUser);
+            },
+            error: function(xhr, status, error) {
+                console.error("사용자 정보 로드 실패:", error);
+            }
+        });
+    }
+
+    // 사용자 프로젝트 새로고침 함수
+    function refreshUserProjects() {
+        $.ajax({
+            url: '/api/projects/my-projects', // 사용자 프로젝트만 가져오는 API
+            method: 'GET',
+            success: function(projects) {
+                renderProjects(projects);
+            },
+            error: function(xhr, status, error) {
+                console.error('프로젝트 로드 오류:', error);
+                alert('프로젝트 정보를 불러오는데 실패했습니다.');
+            }
+        });
+    }
 
     // 현재 페이지 URL에 따라 사이드바 메뉴 활성화
     function highlightActiveSidebar() {
@@ -495,6 +592,258 @@
             }
         });
     }
+
+    // 내 업무 목록 불러오기
+    function loadMyTasks() {
+        $('#my-tasks-container').html(`
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">로딩 중...</span>
+            </div>
+            <p>내 업무를 불러오는 중입니다...</p>
+        </div>
+    `);
+
+        $.ajax({
+            url: '/api/tasks/my-tasks',
+            method: 'GET',
+            success: function(tasks) {
+                // 전역 변수에 업무 목록 저장 (필터링용)
+                window.myTasks = tasks;
+                renderMyTasks(tasks);
+            },
+            error: function(xhr, status, error) {
+                $('#my-tasks-container').html(`
+                <div class="alert alert-danger">
+                    <p>업무 목록을 불러오는데 실패했습니다.</p>
+                    <p>오류: ${error}</p>
+                </div>
+            `);
+            }
+        });
+    }
+    // 내 업무 목록 렌더링
+    function renderMyTasks(tasks) {
+        if (!tasks || tasks.length === 0) {
+            $('#my-tasks-container').html('<p class="text-center">담당하는 업무가 없습니다.</p>');
+            return;
+        }
+
+        let html = `
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>프로젝트</th>
+                        <th>업무</th>
+                        <th>상태</th>
+                        <th>우선순위</th>
+                        <th>진행률</th>
+                        <th>마감일</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+        tasks.forEach(task => {
+            // 상태에 따른 뱃지 클래스
+            let statusClass = '';
+            if (task.status === '미시작') {
+                statusClass = 'bg-secondary';
+            } else if (task.status === '진행중') {
+                statusClass = 'bg-primary';
+            } else if (task.status === '완료') {
+                statusClass = 'bg-success';
+            } else {
+                statusClass = 'bg-warning';
+            }
+
+            // 우선순위에 따른 뱃지 클래스
+            let priorityClass = '';
+            if (task.priority === '높음') {
+                priorityClass = 'bg-danger';
+            } else if (task.priority === '중간') {
+                priorityClass = 'bg-warning';
+            } else {
+                priorityClass = 'bg-info';
+            }
+
+            // 마감일 처리
+            let dueDateDisplay = task.dueDate ? formatDate(new Date(task.dueDate)) : '미정';
+            let dueDateClass = '';
+
+            // 마감일이 지난 경우 빨간색으로 표시
+            if (task.dueDate && new Date(task.dueDate) < new Date() && task.status !== '완료') {
+                dueDateClass = 'text-danger fw-bold';
+            }
+
+            html += `
+            <tr class="task-list-item" data-task-id="${task.id}">
+                <td>${task.projectName || '-'}</td>
+                <td>${task.title}</td>
+                <td><span class="badge ${statusClass}">${task.status}</span></td>
+                <td><span class="badge ${priorityClass}">${task.priority}</span></td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: ${task.progress}%"
+                            aria-valuenow="${task.progress}" aria-valuemin="0" aria-valuemax="100">
+                            ${task.progress}%
+                        </div>
+                    </div>
+                </td>
+                <td class="${dueDateClass}">${dueDateDisplay}</td>
+            </tr>
+        `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+        $('#my-tasks-container').html(html);
+
+        // 업무 행 클릭 이벤트 등록
+        $('.task-list-item').on('click', function() {
+            const taskId = $(this).data('task-id');
+            openTaskDetailModal(taskId);
+        });
+    }
+
+
+    // 내 업무 필터링
+    function filterMyTasks() {
+        const filterValue = $('#my-task-filter').val();
+
+        if (!window.myTasks) return;
+
+        let filteredTasks = [...window.myTasks];
+
+        // 필터 적용
+        if (filterValue === 'incomplete') {
+            filteredTasks = filteredTasks.filter(task => task.status !== '완료');
+        } else if (filterValue === 'complete') {
+            filteredTasks = filteredTasks.filter(task => task.status === '완료');
+        } else if (filterValue === 'overdue') {
+            const today = new Date();
+            filteredTasks = filteredTasks.filter(task =>
+                task.dueDate && new Date(task.dueDate) < today && task.status !== '완료'
+            );
+        }
+
+        // 정렬 적용 (현재 선택된 정렬 기준)
+        sortTasksByCurrentCriteria(filteredTasks);
+
+        // 렌더링
+        renderMyTasks(filteredTasks);
+    }
+
+    // 내 업무 정렬
+    function sortMyTasks() {
+        const sortValue = $('#my-task-sort').val();
+
+        if (!window.myTasks) return;
+
+        // 현재 필터 적용된 작업 목록 가져오기
+        const filterValue = $('#my-task-filter').val();
+        let tasksToSort = [...window.myTasks];
+
+        // 필터 적용
+        if (filterValue === 'incomplete') {
+            tasksToSort = tasksToSort.filter(task => task.status !== '완료');
+        } else if (filterValue === 'complete') {
+            tasksToSort = tasksToSort.filter(task => task.status === '완료');
+        } else if (filterValue === 'overdue') {
+            const today = new Date();
+            tasksToSort = tasksToSort.filter(task =>
+                task.dueDate && new Date(task.dueDate) < today && task.status !== '완료'
+            );
+        }
+
+        // 정렬 적용
+        if (sortValue === 'dueDate') {
+            tasksToSort.sort((a, b) => {
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            });
+        } else if (sortValue === 'priority') {
+            const priorityOrder = { '높음': 1, '중간': 2, '낮음': 3 };
+            tasksToSort.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        } else if (sortValue === 'project') {
+            tasksToSort.sort((a, b) => {
+                if (!a.projectName) return 1;
+                if (!b.projectName) return -1;
+                return a.projectName.localeCompare(b.projectName);
+            });
+        }
+
+        // 렌더링
+        renderMyTasks(tasksToSort);
+    }
+
+    // 현재 선택된 기준으로 작업 정렬
+    function sortTasksByCurrentCriteria(tasks) {
+        const sortValue = $('#my-task-sort').val();
+
+        if (sortValue === 'dueDate') {
+            tasks.sort((a, b) => {
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            });
+        } else if (sortValue === 'priority') {
+            const priorityOrder = { '높음': 1, '중간': 2, '낮음': 3 };
+            tasks.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        } else if (sortValue === 'project') {
+            tasks.sort((a, b) => {
+                if (!a.projectName) return 1;
+                if (!b.projectName) return -1;
+                return a.projectName.localeCompare(b.projectName);
+            });
+        }
+
+        return tasks;
+    }
+
+    // 내 업무 검색
+    function searchMyTasks(searchText) {
+        if (!window.myTasks) return;
+
+        if (!searchText) {
+            // 검색어가 없으면 필터와 정렬만 적용
+            filterMyTasks();
+            return;
+        }
+
+        // 검색어로 필터링
+        let searchedTasks = window.myTasks.filter(task =>
+            task.title.toLowerCase().includes(searchText) ||
+            (task.description && task.description.toLowerCase().includes(searchText)) ||
+            (task.projectName && task.projectName.toLowerCase().includes(searchText))
+        );
+
+        // 현재 필터 적용
+        const filterValue = $('#my-task-filter').val();
+        if (filterValue === 'incomplete') {
+            searchedTasks = searchedTasks.filter(task => task.status !== '완료');
+        } else if (filterValue === 'complete') {
+            searchedTasks = searchedTasks.filter(task => task.status === '완료');
+        } else if (filterValue === 'overdue') {
+            const today = new Date();
+            searchedTasks = searchedTasks.filter(task =>
+                task.dueDate && new Date(task.dueDate) < today && task.status !== '완료'
+            );
+        }
+
+        // 정렬 적용
+        sortTasksByCurrentCriteria(searchedTasks);
+
+        // 렌더링
+        renderMyTasks(searchedTasks);
+    }
+
 
     // Render task logs
     function renderTaskLogs(logs) {
@@ -793,8 +1142,6 @@
         <div class="btn-group w-100">
             <button class="btn btn-sm btn-outline-secondary change-status-btn" data-status="준비중">준비중</button>
             <button class="btn btn-sm btn-outline-primary change-status-btn" data-status="진행중">진행중</button>
-            <button class="btn btn-sm btn-outline-warning change-status-btn" data-status="보류">보류</button>
-            <button class="btn btn-sm btn-outline-danger change-status-btn" data-status="지연">지연</button>
             <button class="btn btn-sm btn-outline-success change-status-btn" data-status="완료">완료</button>
         </div>
     </div>
@@ -1207,8 +1554,6 @@
                         <div class="btn-group w-100">
                             <button class="btn btn-sm btn-outline-secondary change-status-btn" data-status="준비중">준비중</button>
                             <button class="btn btn-sm btn-outline-primary change-status-btn" data-status="진행중">진행중</button>
-                            <button class="btn btn-sm btn-outline-warning change-status-btn" data-status="보류">보류</button>
-                            <button class="btn btn-sm btn-outline-danger change-status-btn" data-status="지연">지연</button>
                             <button class="btn btn-sm btn-outline-success change-status-btn" data-status="완료">완료</button>
                         </div>
                     </div>
@@ -1224,6 +1569,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>업무 목록</h5>
                     <div>
+                    <button class="btn btn-sm btn-success" id="add-task-btn" data-project-id="${project.id}">
+                          <i class="fas fa-plus"></i> 새 업무 추가
+                    </button>
                         <button class="btn btn-sm btn-primary" id="load-tasks-btn" data-project-id="${project.id}">
                             업무 불러오기
                         </button>
@@ -1246,6 +1594,8 @@
     </div>
 </div>
 `;
+
+
 
         // HTML 삽입
         $('#project-detail-container').html(html);
@@ -1280,6 +1630,12 @@
                 updateProjectStatus(projectId, status);
             }
         });
+
+        $('#add-task-btn').off('click').on('click', function() {
+            const projectId = $(this).data('project-id');
+            openAddTaskModal(projectId);
+        });
+
     }
 
     // 프로젝트 완료 함수
@@ -1363,6 +1719,154 @@
             error: function(xhr, status, error) {
                 console.error('프로젝트 로드 오류:', error);
                 alert('프로젝트 정보를 불러오는데 실패했습니다.');
+            }
+        });
+    }
+
+
+    // 업무 추가 모달 열기
+    function openAddTaskModal(projectId) {
+        // 모달 폼 초기화
+        $('#add-task-form')[0].reset();
+
+        // 프로젝트 ID 설정
+        $('#project-id-for-task').val(projectId);
+
+        // 프로젝트 멤버 목록 로드
+        loadProjectMembers(projectId);
+
+        // 오늘 날짜를 기본값으로 설정 (마감일)
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        $('#task-due-date').val(formattedDate);
+
+        // 모달 표시
+        $('#addTaskModal').modal('show');
+    }
+
+    // 프로젝트 멤버 로드 함수
+    function loadProjectMembers(projectId) {
+        // 담당자 선택 드롭다운 요소
+        const assigneeSelect = $('#task-assignee');
+
+        // 기존 옵션 초기화 (첫 번째 옵션 "담당자 선택"만 남김)
+        assigneeSelect.empty();
+        assigneeSelect.append('<option value="">담당자 선택</option>');
+
+        // 로딩 표시
+        assigneeSelect.prop('disabled', true);
+        assigneeSelect.append('<option>멤버 로딩 중...</option>');
+
+        // Ajax 요청으로 프로젝트 멤버 목록 가져오기
+        $.ajax({
+            url: `/api/projects/${projectId}/members`,
+            method: 'GET',
+            success: function(members) {
+                // 로딩 옵션 제거
+                assigneeSelect.empty();
+                assigneeSelect.append('<option value="">담당자 선택</option>');
+
+                // 멤버가 없는 경우
+                if (!members || members.length === 0) {
+                    assigneeSelect.append('<option disabled>프로젝트 멤버가 없습니다</option>');
+                    assigneeSelect.prop('disabled', false);
+                    return;
+                }
+
+                // 멤버 옵션 추가
+                members.forEach(member => {
+                    assigneeSelect.append(`
+                    <option value="${member.empNum}">${member.name} (${member.role || '멤버'})</option>
+                `);
+                });
+
+                // 현재 사용자를 기본 선택 (가능한 경우)
+                // 현재 사용자 정보가 있다면 설정
+                if (typeof currentUserEmpNum !== 'undefined' && currentUserEmpNum) {
+                    // 현재 사용자가 멤버 목록에 있는지 확인
+                    const hasCurrentUser = members.some(member => member.empNum === currentUserEmpNum);
+                    if (hasCurrentUser) {
+                        assigneeSelect.val(currentUserEmpNum);
+                    }
+                }
+
+                // 드롭다운 활성화
+                assigneeSelect.prop('disabled', false);
+            },
+            error: function(xhr, status, error) {
+                console.error('프로젝트 멤버 로드 오류:', error);
+
+                // 오류 표시
+                assigneeSelect.empty();
+                assigneeSelect.append('<option value="">담당자 선택</option>');
+                assigneeSelect.append('<option disabled>멤버 로드 실패</option>');
+                assigneeSelect.prop('disabled', false);
+            }
+        });
+    }
+
+    // 업무 저장 버튼 클릭 이벤트
+    $('#save-task-btn').off('click').on('click', function() {
+        if (validateTaskForm()) {
+            saveTask();
+        }
+    });
+
+    // 업무 폼 유효성 검사
+    function validateTaskForm() {
+        const title = $('#task-title').val().trim();
+        if (!title) {
+            alert('업무 제목을 입력해주세요.');
+            return false;
+        }
+
+        const assignee = $('#task-assignee').val();
+        if (!assignee) {
+            alert('담당자를 선택해주세요.');
+            return false;
+        }
+
+        return true;
+    }
+
+    // 업무 저장
+    function saveTask() {
+        if (!validateTaskForm()) {
+            return;
+        }
+
+        const task = {
+            projectId: $('#project-id-for-task').val(),
+            title: $('#task-title').val().trim(),
+            description: $('#task-description').val().trim(),
+            priority: $('#task-priority').val(),
+            dueDate: $('#task-due-date').val() || null,
+            assigneeEmpNum: $('#task-assignee').val(),
+            status: '미시작',
+            progress: 0
+        };
+
+        $.ajax({
+            url: '/api/tasks',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(task),
+            success: function(createdTask) {
+                // 모달 닫기
+                $('#addTaskModal').modal('hide');
+
+                // 폼 초기화
+                $('#add-task-form')[0].reset();
+
+                // 업무 목록 새로고침 (프로젝트 상세 페이지에 있는 경우)
+                const projectId = task.projectId;
+                loadProjectTasks(projectId);
+
+                alert('업무가 등록되었습니다.');
+            },
+            error: function(xhr, status, error) {
+                alert('업무 등록에 실패했습니다: ' + error);
+                console.error('업무 등록 실패:', xhr.responseText);
             }
         });
     }

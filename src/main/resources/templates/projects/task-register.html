@@ -11,8 +11,11 @@
   <!-- Custom CSS -->
 
 <!--  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">-->
-  <link rel="stylesheet" th:href="@{/assets/css/projects/project-register.css}">
+<!--  <link rel="stylesheet" th:href="@{/assets/css/projects/project-register.css}">-->
   <style>
+    body{
+      margin-top: 80px;
+    }
     .required-mark {
       color: #dc3545;
       margin-left: 3px;
@@ -41,12 +44,7 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">프로젝트 등록</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-          <div class="btn-group me-2">
-            <a th:href="@{/workmanagement}" class="btn btn-sm btn-outline-primary">업무 관리</a>
-            <a th:href="@{/workmanagement/schedule}" class="btn btn-sm btn-outline-info">일정</a>
-          </div>
-        </div>
+
       </div>
 
       <div class="form-container">
@@ -170,8 +168,169 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+  /**
+   * 프로젝트 등록 페이지 JavaScript
+   */
+  $(document).ready(function() {
+    // 날짜 필드 초기 설정 - 오늘 날짜를 기본값으로
+    const today = new Date().toISOString().split('T')[0];
+    $('#project-start-date').val(today);
+
+    // 멤버 검색 기능
+    $('#search-members-btn').click(function() {
+      const searchText = $('#project-members-search').val().toLowerCase();
+
+      if (searchText.trim() === '') {
+        // 검색어가 없으면 모든 항목 표시
+        $('#available-members option').show();
+        return;
+      }
+
+      // 검색어로 필터링
+      $('#available-members option').each(function() {
+        const optionText = $(this).text().toLowerCase();
+        if (optionText.includes(searchText)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    });
+
+    // 검색창에서 엔터 키 처리
+    $('#project-members-search').keypress(function(e) {
+      if (e.which === 13) {
+        $('#search-members-btn').click();
+        e.preventDefault();
+      }
+    });
+
+    // 멤버 추가 버튼 클릭
+    $('#add-member-btn').click(function() {
+      $('#available-members option:selected').each(function() {
+        const optionValue = $(this).val();
+        const optionText = $(this).text();
+
+        // 이미 선택된 멤버인지 확인
+        if ($('#selected-members option[value="' + optionValue + '"]').length === 0) {
+          $('#selected-members').append(
+                  $('<option></option>')
+                          .val(optionValue)
+                          .text(optionText)
+          );
+        }
+      });
+    });
+
+    // 멤버 제거 버튼 클릭
+    $('#remove-member-btn').click(function() {
+      $('#selected-members option:selected').each(function() {
+        // 현재 로그인한 사용자(매니저)는 제거하지 않음
+        const currentUserEmpNum = $('#current-user-emp-num').val();
+        if ($(this).val() !== currentUserEmpNum) {
+          $(this).remove();
+        }
+      });
+    });
+
+    // 취소 버튼 클릭
+    $('#cancel-project-btn').click(function() {
+      if (confirm('프로젝트 등록을 취소하시겠습니까? 입력한 내용은 저장되지 않습니다.')) {
+        window.location.href = '/workmanagement';
+      }
+    });
+
+    // 프로젝트 등록 버튼 클릭
+    $('#save-project-btn').click(function() {
+      // 폼 유효성 검사
+      if (!validateProjectForm()) {
+        return;
+      }
+
+      // 프로젝트 데이터 수집
+      const projectData = {
+        name: $('#project-name').val(),
+        description: $('#project-description').val(),
+        status: $('#project-status').val(),
+        startDate: $('#project-start-date').val(),
+        endDate: $('#project-end-date').val(),
+        depId: $('#project-department').val() || null,
+        managerEmpNum: $('#current-user-emp-num').val(),
+        members: []
+      };
+
+      // 디버깅을 위해 데이터 로깅
+      console.log('전송할 프로젝트 데이터:', projectData);
+
+      // 아래 코드 추가: 선택된 멤버 수집
+      $('#selected-members option').each(function() {
+        const empNum = $(this).val();
+        // 매니저는 이미 별도로 설정되어 있으므로 추가 멤버만 넣음
+        if (empNum !== projectData.managerEmpNum) {
+          projectData.members.push({
+            empNum: empNum,
+            role: '멤버'  // 역할을 지정
+          });
+        }
+      });
+
+      // AJAX 요청으로 프로젝트 등록
+      $.ajax({
+        url: '/api/projects/create',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(projectData),
+        success: function(response) {
+          alert('프로젝트가 성공적으로 등록되었습니다.');
+          window.location.href = '/workmanagement';
+        },
+        error: function(xhr) {
+          let errorMsg = '프로젝트 등록에 실패했습니다.';
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMsg += ' ' + xhr.responseJSON.message;
+          }
+          alert(errorMsg);
+          console.error('프로젝트 등록 실패:', xhr.responseText);
+        }
+      });
+    });
+
+    // 프로젝트 폼 유효성 검사
+    function validateProjectForm() {
+      // 필수 입력 필드 검사
+      const requiredFields = [
+        { id: 'project-name', name: '프로젝트명' },
+        { id: 'project-description', name: '프로젝트 설명' },
+        { id: 'project-start-date', name: '시작일' },
+        { id: 'project-end-date', name: '종료 예정일' }
+      ];
+
+      for (const field of requiredFields) {
+        const value = $('#' + field.id).val();
+        if (!value || value.trim() === '') {
+          alert(field.name + '을(를) 입력해주세요.');
+          $('#' + field.id).focus();
+          return false;
+        }
+      }
+
+      // 날짜 유효성 검사
+      const startDate = new Date($('#project-start-date').val());
+      const endDate = new Date($('#project-end-date').val());
+
+      if (endDate < startDate) {
+        alert('종료 예정일은 시작일 이후로 설정해주세요.');
+        $('#project-end-date').focus();
+        return false;
+      }
+
+      return true;
+    }
+  });
+</script>
+
 <!-- Custom JavaScript -->
-<script th:src="@{/assets/js/projects/project-register.js}"></script>
 <div th:replace="fragments/header :: headerScripts"></div>
 
 <!-- 스타일시트 추가 -->

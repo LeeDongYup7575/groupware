@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -34,4 +35,7 @@ public class ProjectDTO {
     private int taskCount;         // Total tasks
     private int completedTaskCount; // Completed tasks
     private List<String> memberNames; // Project member names
+
+    // Project members data for registration
+    private List<Map<String, String>> members; // For adding members during project creation
 }

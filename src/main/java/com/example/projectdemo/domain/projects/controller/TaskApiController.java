@@ -73,23 +73,64 @@ public class TaskApiController {
         return ResponseEntity.ok(taskService.getTasksByProject(projectId));
     }
 
-    /**
-     * 신규 업무 등록
-     */
+    // 내 담당 업무 목록 조회
+    @GetMapping("/my-tasks")
+    public ResponseEntity<List<TaskDTO>> getMyTasks(HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        List<TaskDTO> tasks = taskService.getTasksByAssignee(empNum);
+
+        // 추가 데이터 처리 (예: 마감일 기준 정렬)
+        tasks.sort((t1, t2) -> {
+            if (t1.getDueDate() == null) return 1;
+            if (t2.getDueDate() == null) return -1;
+            return t1.getDueDate().compareTo(t2.getDueDate());
+        });
+
+        return ResponseEntity.ok(tasks);
+    }
+
+    // 내가 생성한 업무 목록 조회
+    @GetMapping("/my-created-tasks")
+    public ResponseEntity<List<TaskDTO>> getMyCreatedTasks(HttpServletRequest request) {
+        String empNum = (String) request.getAttribute("empNum");
+        List<TaskDTO> tasks = taskService.getTasksByCreator(empNum);
+        return ResponseEntity.ok(tasks);
+    }
+
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(@RequestBody TaskDTO task, HttpServletRequest request) {
+        // 현재 로그인한 사용자 정보 가져오기
         String empNum = (String) request.getAttribute("empNum");
-        if (empNum == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        // 리포터(업무 생성자) 설정
+        task.setReporterEmpNum(empNum);
+
+        // 담당자가 지정되지 않은 경우 확인
+        if (task.getAssigneeEmpNum() == null || task.getAssigneeEmpNum().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
 
-        // 현재 사용자를 업무 작성자로 설정
-        task.setReporterEmpNum(empNum);
-        task.setCreatedAt(LocalDateTime.now());
+        // 업무 기본 상태 설정
+        if (task.getStatus() == null) {
+            task.setStatus("미시작");
+        }
 
-        TaskDTO createdTask = taskService.createTask(task);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+        // 진행률 기본값 설정
+        if (task.getProgress() == null) {
+            task.setProgress(0);
+        }
+
+        try {
+            TaskDTO createdTask = taskService.createTask(task);
+            return ResponseEntity.ok(createdTask);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
     }
+
+
 
     /**
      * 업무 정보 업데이트
