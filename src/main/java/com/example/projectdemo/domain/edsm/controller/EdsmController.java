@@ -125,9 +125,15 @@ public class EdsmController {
     }
 
 
-    //결재 상태 <진행 중>
-    @RequestMapping("/progress")
-    public String progress(Model model, HttpServletRequest request) {
+
+
+    //---------------------------------------------------------------------------------------//
+
+
+    // 나의 문서함
+    //기안한 문서
+    @RequestMapping("/myWritten")
+    public String myWritten(Model model, HttpServletRequest request) {
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String)request.getAttribute("empNum");
 
@@ -144,21 +150,98 @@ public class EdsmController {
 
         model.addAttribute("employee", employee);
 
-        model.addAttribute("progress","진행");
+        List<EdsmDocumentDTO> myWrittenDocumentBc = edao.selectByAllMyWrittenDocumentBc(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentCdv = edao.selectByAllMyWrittenDocumentCdv(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentLoa = edao.selectByAllMyWrittenDocumentLoa(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentLeaves = edao.selectByAllMyWrittenDocumentLeaves(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentOvertime = edao.selectByAllMyWrittenDocumentOvertime(empNum);
 
-        model.addAttribute("main","전체");
+        model.addAttribute("myWrittenDocumentBc",myWrittenDocumentBc);
+        model.addAttribute("myWrittenDocumentCdv",myWrittenDocumentCdv);
+        model.addAttribute("myWrittenDocumentLoa",myWrittenDocumentLoa);
+        model.addAttribute("myWrittenDocumentLeaves",myWrittenDocumentLeaves);
+        model.addAttribute("myWrittenDocumentOvertime",myWrittenDocumentOvertime);
 
-        //로그인한 사원이 결재권자이거나 본인이 기안한문서가 진행중인경우(!수정해야함)
-        List<EdsmDocumentDTO> allDocument = edao.selectByAllDocument(empNum);
 
-        model.addAttribute("allDocumentList",allDocument);
 
-        return "edsm/main";
+        return "edsm/edsmMyDocument/myWrittenDocument";
     }
 
+    //승인된 문서
+    @RequestMapping("/approval")
+    public String approval(Model model, HttpServletRequest request) {
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String)request.getAttribute("empNum");
+
+        if (empNum == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
 
 
 
+
+        List<EdsmDocumentDTO> myApprovalDocumentBc = edao.selectByAllMyApprovalDocumentBc(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentCdv = edao.selectByAllMyApprovalDocumentCdv(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentLoa = edao.selectByAllMyApprovalDocumentLoa(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentLeaves = edao.selectByAllMyApprovalDocumentLeaves(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentOvertime = edao.selectByAllMyApprovalDocumentOvertime(empNum);
+
+        model.addAttribute("myApprovalDocumentBc",myApprovalDocumentBc);
+        model.addAttribute("myApprovalDocumentCdv",myApprovalDocumentCdv);
+        model.addAttribute("myApprovalDocumentLoa",myApprovalDocumentLoa);
+        model.addAttribute("myApprovalDocumentLeaves",myApprovalDocumentLeaves);
+        model.addAttribute("myApprovalDocumentOvertime",myApprovalDocumentOvertime);
+
+
+
+        return "edsm/edsmMyDocument/approvalDocument";
+    }
+
+    //반려된 문서
+    @RequestMapping("/rejected")
+    public String rejected(Model model, HttpServletRequest request) {
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String)request.getAttribute("empNum");
+
+        if (empNum == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) { //예외처리
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
+
+
+
+
+        List<EdsmDocumentDTO> myRejectedDocumentBc = edao.selectByAllMyRejectedDocumentBc(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentCdv = edao.selectByAllMyRejectedDocumentCdv(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentLoa = edao.selectByAllMyRejectedDocumentLoa(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentLeaves = edao.selectByAllMyRejectedDocumentLeaves(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentOvertime = edao.selectByAllMyRejectedDocumentOvertime(empNum);
+
+        model.addAttribute("myRejectedDocumentBc",myRejectedDocumentBc);
+        model.addAttribute("myRejectedDocumentCdv",myRejectedDocumentCdv);
+        model.addAttribute("myRejectedDocumentLoa",myRejectedDocumentLoa);
+        model.addAttribute("myRejectedDocumentLeaves",myRejectedDocumentLeaves);
+        model.addAttribute("myRejectedDocumentOvertime",myRejectedDocumentOvertime);
+
+        return "edsm/edsmMyDocument/rejectedDocument";
+    }
 
 
 

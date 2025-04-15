@@ -246,4 +246,325 @@
     </select>
 
 
+
+    <!-- 나의 기안문서 보기(전체 - 업무연락) -->
+    <select id="SelectByAllMyWrittenDocumentBc" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1001
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(전체 - 지출결의서) -->
+    <select id="SelectByAllMyWrittenDocumentCdv" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1002
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(전체 - 품의서) -->
+    <select id="SelectByAllMyWrittenDocumentLoa" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1003
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(전체 - 휴가 신청서) -->
+    <select id="SelectByAllMyWrittenDocumentLeaves" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1004
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(전체 - 연장근무신청서) -->
+    <select id="SelectByAllMyWrittenDocumentOvertime" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1005
+        ORDER BY ed.draft_date DESC
+    </select>
+
+<!-- ......... -->
+
+    <!-- 나의 기안문서 보기(승인 - 업무연락) -->
+    <select id="SelectByAllMyApprovalDocumentBc" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1001 and ed.status = '승인'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(승인 - 지출결의서) -->
+    <select id="SelectByAllMyApprovalDocumentCdv" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1002 and ed.status = '승인'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(승인 - 품의서) -->
+    <select id="SelectByAllMyApprovalDocumentLoa" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1003 and ed.status = '승인'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(승인 - 휴가 신청서) -->
+    <select id="SelectByAllMyApprovalDocumentLeaves" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1004 and ed.status = '승인'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(승인 - 연장근무신청서) -->
+    <select id="SelectByAllMyApprovalDocumentOvertime" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1005 and ed.status = '승인'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+
+    <!-- 나의 기안문서 보기 ( 반려) -->
+    <!-- 나의 기안문서 보기(반려 - 업무연락) -->
+    <select id="SelectByAllMyRejectedDocumentBc" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1001 and ed.status = '반려'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(반려 - 지출결의서) -->
+    <select id="SelectByAllMyRejectedDocumentCdv" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1002 and ed.status = '반려'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(반려 - 품의서) -->
+    <select id="SelectByAllMyRejectedDocumentLoa" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1003 and ed.status = '반려'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(반려 - 휴가 신청서) -->
+    <select id="SelectByAllMyRejectedDocumentLeaves" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1004 and ed.status = '반려'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+    <!-- 나의 기안문서 보기(반려 - 연장근무신청서) -->
+    <select id="SelectByAllMyRejectedDocumentOvertime" resultType="com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO">
+        SELECT
+            ed.id,
+            ed.edsm_form_id AS edsmFormId,
+            ed.title,
+            ed.content,
+            ed.retention_period AS retentionPeriod,
+            ed.security_grade AS securityGrade,
+            ed.drafter_id AS drafterId,
+            ed.draft_date AS drafterDate,
+            ed.approval_date AS approvalDate,
+            ed.status,
+            emp.name AS drafterName
+        FROM groupware.edsm_document ed
+                 JOIN groupware.employees emp ON ed.drafter_id = emp.emp_num
+        WHERE
+            ed.drafter_id = #{empNum} and ed.edsm_form_id = 1005 and ed.status = '반려'
+        ORDER BY ed.draft_date DESC
+    </select>
+
+
 </mapper>

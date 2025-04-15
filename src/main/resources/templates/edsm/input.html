@@ -55,15 +55,15 @@
                 나의 문서함
             </div>
             <div class="menu-items">
-                <div class="menu-item">
+                <div class="menu-item" id="myWritten">
                     <i class="fas fa-pen"></i>
                     기안
                 </div>
-                <div class="menu-item">
+                <div class="menu-item" id="approval">
                     <i class="fas fa-file-signature"></i>
                     승인
                 </div>
-                <div class="menu-item">
+                <div class="menu-item" id="rejected">
                     <i class="fas fa-undo"></i>
                     반려
                 </div>
@@ -134,6 +134,19 @@
     });
     $("#create-button").on("click", function () {
         location.href = "/edsmForm/input";
+    });
+    // 나의 문서함
+    // 기안 버튼
+    $("#myWritten").on("click", function () {
+        location.href = "/edsm/myWritten";
+    });
+    // 승인버튼
+    $("#approval").on("click", function () {
+        location.href = "/edsm/approval";
+    });
+    // 반려버튼
+    $("#rejected").on("click", function () {
+        location.href = "/edsm/rejected";
     });
 
     // 문서 종류 선택 시 설명 표시
