@@ -42,6 +42,12 @@
         SELECT * FROM employees
     </select>
 
+
+    <select id="findAllEmployeeIds" resultType="int">
+        SELECT emp_id FROM employees
+    </select>
+
+
     <!-- 사원번호로 직원 조회 (DTO 반환) -->
     <select id="findByEmpNum" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
         SELECT

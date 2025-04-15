@@ -263,7 +263,10 @@
                 color: '#ff9f89',           // 기본 배경색
                 textColor: '#fff'
             }],
-            events: weeklyEvents
+            events: weeklyEvents,
+            eventClick: function(info) {
+                info.jsEvent.preventDefault(); // 링크 이동 막기
+            }
         });
         calendar.render();
 

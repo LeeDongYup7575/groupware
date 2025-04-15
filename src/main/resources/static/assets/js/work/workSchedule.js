@@ -99,6 +99,14 @@ document.addEventListener('DOMContentLoaded', function () {
         ],
 
         eventClick: function (info) {
+            info.jsEvent.preventDefault();
+            // ✅ 공휴일 이벤트는 모달 띄우지 않음
+            if (
+                info.event.classNames.includes('korean-holiday') ||
+                (info.event.extendedProps.description && info.event.extendedProps.description.includes('기념일을 숨기려면'))
+            ) {
+                return;
+            }
             const { title, extendedProps, start, end } = info.event;
             const modalTitle = document.getElementById('modalTitle');
             const modalTime = document.getElementById('modalTime');

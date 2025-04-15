@@ -19,7 +19,14 @@ public interface AttendanceMapper {
 
     Attendance getAttendanceByEmployeeAndDate(@Param("empId") Integer empId, @Param("workDate") LocalDate workDate);
 
+    List<Attendance> getAttendanceListByEmployeeAndDate(@Param("empId") Integer empId, @Param("date") LocalDate date);
+
+
     List<Attendance> getAttendanceHistoryByEmployeeId(@Param("empId") Integer empId);
+
+    // AttendanceMapper.java
+    Attendance getLatestCheckIn(@Param("empId") Integer empId, @Param("date") LocalDate date);
+
 
     List<Attendance> getAttendanceHistoryByEmployeeIdAndDateRange(
             @Param("empId") Integer empId,
