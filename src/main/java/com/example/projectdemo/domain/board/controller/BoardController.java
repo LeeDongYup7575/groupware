@@ -224,17 +224,30 @@ public class BoardController {
         }
     }
 
-    @GetMapping("/manage") // 게시판 관리
-    public String manageBoards(@PathVariable Integer id, HttpServletRequest request, Model model) {
-
+    @GetMapping("/manage")
+    public String manageBoards(HttpServletRequest request, Model model) {
+        // 요청에서 사용자 ID와 역할 가져오기
         int empId = (int) request.getAttribute("id");
+        String role = (String) request.getAttribute("role");
 
-        // 사용자가 관리할 수 있는 게시판 목록 가져오기 (소유자 또는 관리자 권한)
-        List<BoardsDTO> manageableBoards = boardsService.getManageableBoards(empId);
-        model.addAttribute("boards", manageableBoards);
+        // 모든 게시판 정보 가져오기
+        List<BoardsDTO> allBoards = boardsService.getAllBoards();
+
+        // 각 게시판에 대한 추가 정보 설정
+        for (BoardsDTO board : allBoards) {
+            // 게시글 수 조회
+            int totalPosts = postsService.countPostsByBoardId(board.getId());
+
+            // 데이터 세팅
+            board.setTotalPosts(totalPosts);
+
+        }
+
+        model.addAttribute("boards", allBoards);
 
         return "board/manage";
     }
+
 
     // 게시글 수정 폼 표시
     @GetMapping("/edit/{id}")
