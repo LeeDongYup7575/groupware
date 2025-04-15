@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.employees.service;
 
 import com.example.projectdemo.config.PasswordEncoder;
 import com.example.projectdemo.domain.auth.service.EmailService;
+import com.example.projectdemo.domain.contact.service.ContactService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesInfoUpdateDTO;
 import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
@@ -42,6 +43,9 @@ public class EmployeesService {
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private ContactService contactService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -204,6 +208,10 @@ public class EmployeesService {
         if (updated <= 0) {
             throw new RuntimeException("회원 정보 업데이트에 실패했습니다.");
         }
+
+        // roundcube(메일클라이언트)의 공유주소록에 사원 정보 등록
+        enrichEmployeeData(employee);
+        contactService.registerToSharedAddressBook(employee.getName(), internalEmail, phone, employee.getPositionTitle(), employee.getDepartmentName());
 
         // 이메일 발송
         emailService.sendTempPasswordEmail(employee.getEmail(), tempPassword);
