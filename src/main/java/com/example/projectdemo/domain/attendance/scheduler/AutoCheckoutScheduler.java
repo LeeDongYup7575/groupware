@@ -30,48 +30,71 @@ public class AutoCheckoutScheduler {
      * 매일 오후 6시 5분에 실행되는 스케줄러
      * 출근했지만 퇴근 기록이 없는 직원들에게 자동으로 퇴근 처리
      */
-    @Scheduled(cron = "0 5 18 * * ?") // 매일 오후 6시 5분에 실행
+    @Scheduled(cron = "0 5 18 * * ?")
     @Transactional
     public void processAutoCheckout() {
         log.info("자동 퇴근 처리 작업 시작");
-
-        // 오늘 날짜
         LocalDate today = LocalDate.now();
+        LocalTime checkoutTime = STANDARD_END_TIME;
 
         try {
-            // 오늘 출근했지만 퇴근 기록이 없는 직원들의 출근 기록을 조회
-            List<Attendance> attendancesToUpdate = attendanceMapper.findCheckedInWithoutCheckout(today);
+            // 전체 직원 ID 목록 가져오기
+            List<Integer> allEmployeeIds = employeesMapper.findAllEmployeeIds();
 
-            log.info("자동 퇴근 처리 대상 직원 수: {}", attendancesToUpdate.size());
+            for (Integer empId : allEmployeeIds) {
+                // 오늘의 출근 기록 조회
+                List<Attendance> todayRecords = attendanceMapper.getAttendanceListByEmployeeAndDate(empId, today);
 
-            for (Attendance attendance : attendancesToUpdate) {
-                // 퇴근 시간을 오후 6시로 설정
-                LocalTime checkoutTime = STANDARD_END_TIME;
+                boolean hasCheckIn = todayRecords.stream().anyMatch(a -> a.getCheckIn() != null);
+                boolean hasCheckOut = todayRecords.stream().anyMatch(a -> a.getCheckOut() != null);
 
-                // 근무 시간 계산 (분 단위로 계산 후 시간으로 변환)
-                BigDecimal workHours = BigDecimal.ZERO;
-                if (attendance.getCheckIn() != null) {
-                    long minutes = attendance.getCheckIn().until(checkoutTime, ChronoUnit.MINUTES);
-                    double hours = minutes / 60.0;
-                    workHours = BigDecimal.valueOf(hours);
+                if (hasCheckIn && !hasCheckOut) {
+                    // 출근은 했지만 퇴근 안 한 경우 → 퇴근 기록 insert
+                    Attendance checkInRecord = todayRecords.stream()
+                            .filter(a -> a.getCheckIn() != null)
+                            .findFirst()
+                            .orElse(null);
+
+                    if (checkInRecord != null) {
+                        long minutes = checkInRecord.getCheckIn().until(checkoutTime, ChronoUnit.MINUTES);
+                        BigDecimal workHours = BigDecimal.valueOf(minutes / 60.0);
+
+                        Attendance checkoutRecord = Attendance.builder()
+                                .empId(empId)
+                                .workDate(today)
+                                .checkOut(checkoutTime)
+                                .status(AttendanceStatus.CHECKOUT.getStatus())
+                                .workHours(workHours)
+                                .build();
+
+                        attendanceMapper.insertAttendance(checkoutRecord);
+                        employeesMapper.updateAttendStatus(empId, AttendanceStatus.CHECKOUT.getStatus());
+
+                        log.debug("자동 퇴근 insert 완료: ID={}, 시간={}", empId, checkoutTime);
+                    }
                 }
 
-                // 퇴근 상태 업데이트
-                attendance.setCheckOut(checkoutTime);
-                attendance.setStatus(AttendanceStatus.CHECKOUT.getStatus());
-                attendance.setWorkHours(workHours);
-                attendanceMapper.updateAttendance(attendance);
+                if (!hasCheckIn) {
+                    // 출근 기록 없음 → 결근 insert
+                    Attendance absentRecord = Attendance.builder()
+                            .empId(empId)
+                            .workDate(today)
+                            .status(AttendanceStatus.ABSENT.getStatus()) // "결근"
+                            .workHours(BigDecimal.ZERO)
+                            .build();
 
-                // 직원 상태 업데이트
-                employeesMapper.updateAttendStatus(attendance.getEmpId(), AttendanceStatus.CHECKOUT.getStatus());
+                    attendanceMapper.insertAttendance(absentRecord);
+                    employeesMapper.updateAttendStatus(empId, AttendanceStatus.ABSENT.getStatus());
 
-                log.debug("자동 퇴근 처리 완료: 직원 ID={}, 퇴근시간={}", attendance.getEmpId(), checkoutTime);
+                    log.debug("결근 처리 완료: ID={}", empId);
+                }
             }
 
-            log.info("자동 퇴근 처리 작업 완료");
+            log.info("자동 퇴근/결근 처리 완료");
         } catch (Exception e) {
-            log.error("자동 퇴근 처리 중 오류 발생", e);
+            log.error("자동 퇴근 처리 오류", e);
             throw e;
         }
     }
+
 }

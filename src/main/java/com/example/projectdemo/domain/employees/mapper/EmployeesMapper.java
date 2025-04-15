@@ -15,6 +15,9 @@ public interface EmployeesMapper {
     // 사원 전체 조회
     List<EmployeesDTO> selectEmpAll();
 
+    // 사원 전체 ID 조회
+    List<Integer> findAllEmployeeIds();
+
     // 필터를 적용한 사원 조회 (페이지네이션 포함)
     List<EmployeesDTO> selectEmployeesWithFilters(Map<String, Object> params);
 

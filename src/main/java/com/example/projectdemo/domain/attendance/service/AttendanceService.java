@@ -38,42 +38,26 @@ public class AttendanceService {
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
-        Attendance attendance = attendanceMapper.getAttendanceByEmployeeAndDate(empId, today);
+        String status = now.isBefore(LATE_TIME)
+                ? AttendanceStatus.NORMAL.getStatus()
+                : AttendanceStatus.LATE.getStatus();
 
+        Attendance attendance = Attendance.builder()
+                .empId(empId)
+                .workDate(today)
+                .checkIn(now)
+                .status(status)
+                .workHours(BigDecimal.ZERO)
+                .build();
 
-        String status;
-        if (now.isBefore(LATE_TIME)) {
-            status = AttendanceStatus.NORMAL.getStatus();
-        } else {
-            status = AttendanceStatus.LATE.getStatus();
-        }
+        attendanceMapper.insertAttendance(attendance);
 
-        if (attendance == null) {
-            attendance = Attendance.builder()
-                    .empId(empId)
-                    .workDate(today)
-                    .checkIn(now)
-                    .status(status)
-                    .workHours(BigDecimal.ZERO)
-                    .build();
-
-            attendanceMapper.insertAttendance(attendance);
-
-            employee.setAttendStatus(status);
-            employeeMapper.updateAttendStatus(employee.getId(), status);
-        } else {
-            if (attendance.getCheckIn() == null) {
-                attendance.setCheckIn(now);
-                attendance.setStatus(status);
-                attendanceMapper.updateAttendance(attendance);
-
-                employee.setAttendStatus(status);
-                employeeMapper.updateAttendStatus(employee.getId(), status);
-            }
-        }
+        employee.setAttendStatus(status);
+        employeeMapper.updateAttendStatus(employee.getId(), status);
 
         return attendance;
     }
+
 
 
     @Transactional
@@ -86,34 +70,38 @@ public class AttendanceService {
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
 
-        Attendance attendance = attendanceMapper.getAttendanceByEmployeeAndDate(empId, today);
+        // 퇴근 상태 판단
+        String status = now.isBefore(STANDARD_END_TIME)
+                ? AttendanceStatus.EARLY_LEAVE.getStatus()
+                : AttendanceStatus.CHECKOUT.getStatus();
 
-        if (attendance == null) {
-            throw new RuntimeException("No check-in record found for today");
-        }
-
-        String status = AttendanceStatus.CHECKOUT.getStatus();
-        if (now.isBefore(STANDARD_END_TIME)) {
-            status = AttendanceStatus.EARLY_LEAVE.getStatus();
-        }
+        // 가장 최근 출근기록 찾기 (있다면 workHours 계산)
+        Attendance latestCheckIn = attendanceMapper.getLatestCheckIn(empId, today);
 
         BigDecimal workHours = BigDecimal.ZERO;
-        if (attendance.getCheckIn() != null) {
-            long minutes = attendance.getCheckIn().until(now, ChronoUnit.MINUTES);
+        if (latestCheckIn != null && latestCheckIn.getCheckIn() != null) {
+            long minutes = latestCheckIn.getCheckIn().until(now, ChronoUnit.MINUTES);
             double hours = minutes / 60.0;
             workHours = BigDecimal.valueOf(hours);
         }
 
-        attendance.setCheckOut(now);
-        attendance.setStatus(status);
-        attendance.setWorkHours(workHours);
-        attendanceMapper.updateAttendance(attendance);
+        // 새로운 레코드로 저장
+        Attendance attendance = Attendance.builder()
+                .empId(empId)
+                .workDate(today)
+                .checkOut(now)
+                .status(status)
+                .workHours(workHours)
+                .build();
+
+        attendanceMapper.insertAttendance(attendance);
 
         employee.setAttendStatus(status);
         employeeMapper.updateAttendStatus(employee.getId(), status);
 
         return attendance;
     }
+
 
 
     public Attendance getAttendanceByEmployeeAndDate(Integer empId, LocalDate date) {
