@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 개인주소록 주소 저장
     document.getElementById('saveContactBtn').addEventListener('click', function () {
-        console.log("버튼 클릭");
         const name = document.getElementById('nameInput').value.trim();
         const email = document.getElementById('emailInput').value;
         const phone = document.getElementById('phoneInput').value;
@@ -93,13 +92,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (res.ok) {
                         resetContactForm();
                         modal.classList.add('hidden');
-                        loadContacts('personal', 'all');
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const search = urlParams.get('search');
+
+                        if (search && search.trim() !== '') {
+                            searchContacts(search); // 검색 중이면 다시 검색
+                        } else {
+                            loadContacts('personal', 'all'); // 일반 모드면 전체 다시 로드
+                        }
                     } else {
                         alert('수정에 실패했습니다.');
                     }
                 })
                 .catch(error => {
-                    console.error('수정 중 오류 발생:', error);
                     alert('서버 오류로 수정에 실패했습니다.');
                 });
 
@@ -115,13 +121,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (res.status === 201) {
                         modal.classList.add('hidden');
-                        loadContacts('personal', 'all');
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const search = urlParams.get('search');
+
+                        if (search && search.trim() !== '') {
+                            searchContacts(search); // ✅ 검색 중이면 다시 검색
+                        } else {
+                            loadContacts('personal', 'all'); // 일반 상태면 전체 다시 로드
+                        }
                     } else {
                         alert('저장에 실패했습니다.');
                     }
                 })
                 .catch(error => {
-                    console.error('저장 중 오류 발생:', error);
                     alert('서버 오류로 저장에 실패했습니다.');
                 });
         }
@@ -130,7 +143,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // 개인 주소록 삭제 이벤트
     document.addEventListener('click', function (e) {
         if (e.target.id === 'deleteContactsBtn') {
-            const checked = document.querySelectorAll('.contact-checkbox:checked');
+            // 검색 상태 여부 확인
+            const urlParams = new URLSearchParams(window.location.search);
+            const isSearchMode = urlParams.has('search');
+
+            // 검색된 상태에서는 검색결과 중 personal 테이블에서만 체크된 항목 찾기
+            let checked = [];
+            if (isSearchMode) {
+                const personalSearchTable = document.querySelector('#searchResultsContainer .contact-table.personal');
+                if (personalSearchTable) {
+                    checked = personalSearchTable.querySelectorAll('.contact-checkbox:checked');
+                }
+            } else {
+                // 일반 모드일 때는 기본 테이블에서 찾기
+                const visibleTable = Array.from(document.querySelectorAll('.contact-table'))
+                    .find(table => getComputedStyle(table).display !== 'none');
+                if (visibleTable) {
+                    checked = visibleTable.querySelectorAll('.contact-checkbox:checked');
+                }
+            }
 
             if (checked.length === 0) {
                 alert('삭제할 항목을 선택해주세요.');
@@ -141,8 +172,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // 체크된 항목들의 부모 tr에서 data-id 수집
             const ids = Array.from(checked).map(cb => Number(cb.closest('tr').dataset.id));
+
 
             fetch('/api/contact/personal/delete', {
                 method: 'DELETE',
@@ -154,8 +185,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 .then(response => {
                     if (response.ok) {
                         // 주소록 다시 불러오기
-                        loadContacts('personal', 'all');
-                        updateHeaderForSelection(); // 테이블 헤더 초기화
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const search = urlParams.get('search');
+
+                        if (search) {
+                            // 검색된 상태라면 다시 검색
+                            searchContacts(search);
+                        } else {
+                            // 일반 탭 로딩
+                            loadContacts('personal', 'all');
+                            updateHeaderForSelection();
+                        }
                     } else {
                         alert('삭제에 실패했습니다.');
                     }
@@ -389,20 +429,42 @@ function renderContacts(data, tab) {
                 ${tab === 'personal' ? `<input type="checkbox" class="contact-checkbox">` : ''}
             </td>
             <td class="name-col">${contact.name}</td>
-            <td>${tab === 'shared' ? contact.internalEmail : contact.email || ''}</td>
+            <td>
+                <a href="#" class="email-link" onclick="openMailComposePopup('${tab === 'shared' ? contact.internalEmail : contact.email || ''}')">
+                    ${tab === 'shared' ? contact.internalEmail : contact.email || ''}
+                </a>
+            </td>
             <td>${contact.phone}</td>
             <td class="info-col">${tab === 'shared' ? contact.depName : contact.memo || ''}</td>
         `;
 
         // 연락처 행 클릭 감시 (상세 보기 모달 띄우기 위해)
         tr.addEventListener('click', function (e) {
-            // 체크박스 누를 땐 무시
-            if (e.target.classList.contains('contact-checkbox')) return;
+            if (e.target.classList.contains('contact-checkbox') ||
+                e.target.tagName === 'A'
+            ) return; // 체크박스 또는 이메일 링크 클릭은 무시
+
             openDetailModal(contact, tab);
         });
 
         tbody.appendChild(tr);
     });
+}
+
+// 메일 전송 팝업
+function openMailComposePopup(email) {
+    if (!email) return;
+
+    const width = 600;
+    const height = 600;
+
+    // 현재 창의 화면 크기 기준 위치 계산
+    const left = window.screenX + window.outerWidth - width - 20;  // 오른쪽에서 20px 띄움
+    const top = window.screenY + window.outerHeight - height - 40; // 아래에서 40px 띄움
+
+    const url = `http://techx.kro.kr:8081/roundcube/?_task=mail&_action=compose&_to=${encodeURIComponent(email)}`;
+    window.open(url, 'composeMail',
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
 }
 
 // active 클래스 토글 전용 함수
@@ -471,17 +533,38 @@ window.addEventListener('popstate', function(event) {
 
 // 체크 여부 판단
 function updateSelectAllCheckbox() {
-    const allCheckboxes = document.querySelectorAll('.contact-checkbox');
-    const checkedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
-    const selectAll = document.querySelector('.select-all-checkbox');
+    const urlParams = new URLSearchParams(window.location.search);
+    const isSearchMode = urlParams.has('search');
+
+    let allCheckboxes = [];
+    let checkedCheckboxes = [];
+    let selectAll;
+
+    if (isSearchMode) {
+        // 검색 결과 personal 테이블 기준
+        const personalSearchTable = document.querySelector('#searchResultsContainer .contact-table.personal');
+        if (personalSearchTable) {
+            allCheckboxes = personalSearchTable.querySelectorAll('.contact-checkbox');
+            checkedCheckboxes = personalSearchTable.querySelectorAll('.contact-checkbox:checked');
+            selectAll = personalSearchTable.querySelector('.select-all-checkbox');
+        }
+    } else {
+        // 일반 personal 테이블 기준
+        const visibleTable = Array.from(document.querySelectorAll('.contact-table'))
+            .find(table => getComputedStyle(table).display !== 'none');
+        if (visibleTable) {
+            allCheckboxes = visibleTable.querySelectorAll('.contact-checkbox');
+            checkedCheckboxes = visibleTable.querySelectorAll('.contact-checkbox:checked');
+            selectAll = visibleTable.querySelector('.select-all-checkbox');
+        }
+    }
 
     if (!selectAll) return;
 
-    // 체크된 게 0개면 전체 선택 체크박스도 해제
-    if (checkedCheckboxes.length === 0) {
-        selectAll.checked = false;
-    }
+    selectAll.checked = (allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length);
 }
+
+
 
 
 // 개인주소록 연락처 체크박스 선택 시 버튼 처리
@@ -719,7 +802,8 @@ function createSearchSection(title, results, tab) {
 
             // 이메일
             const tdEmail = document.createElement("td");
-            tdEmail.textContent = (tab === "shared") ? contact.internalEmail : (contact.email || '');
+            const email = (tab === "shared") ? contact.internalEmail : (contact.email || '');
+            tdEmail.innerHTML = `<a href="#" class="email-link" onclick="openMailComposePopup('${email}')">${email}</a>`;
             tr.appendChild(tdEmail);
 
             // 전화번호

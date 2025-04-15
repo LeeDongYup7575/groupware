@@ -288,3 +288,19 @@ main {
 .search-section .contact-table {
     margin-bottom: 10px;
 }
+
+/* 이메일 링크 */
+.email-link {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.email-link:hover {
+    color: #0078d4;
+    text-decoration: underline;
+}
+
+.contact-table tbody tr {
+    cursor: pointer;
+}
