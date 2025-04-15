@@ -344,19 +344,34 @@ public class EmployeesService {
      * 사내 이메일 생성
      */
     public String generateInternalEmail(String name) {
-        String romanized = KoreanRomanizer.romanize(name, KoreanCharacter.Type.NameTypical); // 예: "강윤진" → "Kang Yunjin"
+        String romanized = KoreanRomanizer.romanize(name, KoreanCharacter.Type.NameTypical);
         String[] parts = romanized.split(" ");
 
-        String lastName = parts[0].toLowerCase(); // 예: kang
-        String firstName = parts[1].toLowerCase(); // 예: yunjin
+        String lastName = parts[0].toLowerCase();
+        String firstName = parts[1].toLowerCase();
+        String domain = "@techx.kro.kr";
 
-        String emailPrefix = firstName.charAt(0) + lastName; // 예: ykang
-
-        if (mailService.emailExists(emailPrefix + "@techx.kro.kr")) {
-            emailPrefix = firstName + lastName; // 예: yunjinkang
+        // 1. ykang
+        String prefix = firstName.charAt(0) + lastName;
+        if (!mailService.emailExists(prefix + domain)) {
+            return prefix + domain;
         }
 
-        return emailPrefix + "@techx.kro.kr";
+        // 2. y.kang
+        prefix = firstName.charAt(0) + "." + lastName;
+        if (!mailService.emailExists(prefix + domain)) {
+            return prefix + domain;
+        }
+
+        // 3. yunjinkang
+        prefix = firstName + lastName;
+        if (!mailService.emailExists(prefix + domain)) {
+            return prefix + domain;
+        }
+
+        // 4. yunjin.kang
+        prefix = firstName + "." + lastName;
+        return prefix + domain;
     }
 
     /**
