@@ -2,7 +2,12 @@ package com.example.projectdemo.domain.contact.service;
 
 import com.example.projectdemo.domain.contact.dto.EmployeeContactDTO;
 import com.example.projectdemo.domain.contact.dto.PersonalContactDTO;
+import com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO;
 import com.example.projectdemo.domain.contact.mapper.ContactMapper;
+import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
+import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
+import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
+import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +19,12 @@ import java.util.Map;
 public class ContactService {
     @Autowired
     private ContactMapper contactMapper;
+
+    @Autowired
+    private PositionsMapper positionsMapper;
+
+    @Autowired
+    private DepartmentsMapper departmentsMapper;
 
     /**
      * 공유주소록(사원연락처) 조회
@@ -75,4 +86,35 @@ public class ContactService {
         return result;
     }
 
+    /**
+     * 사원 연락처 정보 roundcube 공유 주소록에 추가
+     */
+    public void registerToSharedAddressBook(String name, String email, String phone, String positionTitle, String departmentName) {
+
+        String vcard = String.join("\n",
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                "N:;" + name + ";;;",
+                "FN:" + name,
+                "EMAIL;TYPE=work:" + email,
+                "TEL;TYPE=cell:" + phone,
+                "TITLE:" + positionTitle,
+                "X-DEPARTMENT:" + departmentName,
+                "END:VCARD"
+        );
+
+
+        String words = name + " " + email + " " + phone.replace("-", "");
+
+        RoundcubeContactDTO contact = RoundcubeContactDTO.builder()
+                .name(name)
+                .email(email)
+                .firstname(name)
+                .vcard(vcard)
+                .words(words)
+                .build();
+
+        contactMapper.insertSharedContact(contact);
+
+    }
 }
