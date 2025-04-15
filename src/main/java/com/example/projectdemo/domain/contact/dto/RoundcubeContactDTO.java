@@ -16,4 +16,5 @@ public class RoundcubeContactDTO {
     private String vcard;
     private String words;
     private Integer userId;
+    private Integer empId;
 }

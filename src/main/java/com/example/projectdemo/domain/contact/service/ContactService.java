@@ -10,6 +10,7 @@ import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,10 +51,49 @@ public class ContactService {
     /**
      * 개인 주소록에 연락처 추가
      */
+    @Transactional
     public void addPersonalContact(Integer empId, PersonalContactDTO contact) {
         contact.setEmpId(empId);
         contactMapper.insertPersonalContact(contact);
+
+        // Roundcube 주소록에도 등록 (이름만 필수, 나머지는 선택)
+        registerToPersonalRoundcubeAddressBook(contact);
     }
+
+    /**
+     * Roundcube 개인 주소록에 추가
+     */
+    public void registerToPersonalRoundcubeAddressBook(PersonalContactDTO dto) {
+
+        String vcard = String.join("\n",
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                "N:;" + dto.getName() + ";;;",
+                "FN:" + dto.getName(),
+                dto.getEmail() != null ? "EMAIL:" + dto.getEmail() : null,
+                dto.getPhone() != null ? "TEL:" + dto.getPhone() : null,
+                dto.getMemo() != null ? "NOTE:" + dto.getMemo() : null,
+                "END:VCARD"
+        ).replaceAll("(?m)^null\\n?", ""); // null 줄 제거
+
+        String words = dto.getName() + " " +
+                (dto.getEmail() != null ? dto.getEmail() : "") + " " +
+                (dto.getPhone() != null ? dto.getPhone().replace("-", "") : "");
+
+        RoundcubeContactDTO contactDTO = RoundcubeContactDTO.builder()
+                    .name(dto.getName())
+                    .email(dto.getEmail() != null ? dto.getEmail() : "")
+                    .firstname(dto.getName())
+                    .vcard(vcard)
+                    .words(words.trim())
+                    .empId(dto.getEmpId()) // 그룹웨어 사용자 ID
+                    .build();
+
+        contactMapper.insertPersonalRoundcubeContact(contactDTO);
+
+
+    }
+
 
     /**
      * 개인 주소록 연락처 삭제

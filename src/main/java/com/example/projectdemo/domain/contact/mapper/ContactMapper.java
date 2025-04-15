@@ -22,6 +22,9 @@ public interface ContactMapper {
     // 개인주소록에 연락처 추가
     void insertPersonalContact(@Param("contact") PersonalContactDTO contact);
 
+    //  개인 주소록에 추가된 연락처 roundcube 주소록에 추가
+    void insertPersonalRoundcubeContact(RoundcubeContactDTO contact);
+
     // 개인주소록 연락처 삭제
     void deleteContactsByIds(@Param("ids") List<Integer> ids);
 
