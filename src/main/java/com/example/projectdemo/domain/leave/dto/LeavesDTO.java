@@ -8,7 +8,7 @@ import java.util.Date;
 @Data
 public class LeavesDTO {
     private int id;
-    private String empId;
+    private int empId;
     private int edsmDocId;
     private String leaveType;
     private String startDate;
