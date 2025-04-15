@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조직도</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
+    <!-- 사이드바 스타일 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+    <!-- 조직도 스타일 포함-->
+    <link rel="stylesheet" href="/assets/css/org/org.css">
+</head>
+<body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+
+
+<div class="main-container">
+
+    <!-- 조직도 사이드바 -->
+    <div th:replace="fragments/sidebar/org-sidebar :: sidebar"></div>
+
+
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+
+        <!-- 검색 기능 -->
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="orgSearchInput" placeholder="이름, 부서, 직급 검색">
+        </div>
+
+
+        <div class="org-section" id="allEmployees">
+            <h2>
+                전체 <span class="dept-count" id="totalCount">(0)</span>
+            </h2>
+
+            <div id="employeeGrid">
+                <!-- 직원 카드가 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <div class="org-section hidden" id="deptEmployees">
+            <h2>
+                <span id="currentDeptName">부서명</span> <span class="dept-count" id="currentDeptCount">(0)</span>
+            </h2>
+
+            <div class="employee-grid" id="deptEmployeeGrid">
+                <!-- 부서별 직원 카드가 여기에 동적으로 추가됨 -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 직원 상세 정보 모달 -->
+    <div class="modal-overlay" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <div class="modal-profile" id="modalProfileContainer">
+                    <!-- 프로필 이미지 또는 이니셜이 들어감 -->
+                </div>
+                <div class="modal-name" id="modalName"></div>
+                <div class="modal-position" id="modalPosition"></div>
+            </div>
+            <div class="modal-body">
+                <div class="info-item">
+                    <div class="info-label">이메일</div>
+                    <div class="info-value" id="modalEmail"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">전화번호</div>
+                    <div class="info-value" id="modalPhone"></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">부서</div>
+                    <div class="info-value" id="modalDept"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 초기 데이터 로드
+        loadDepartments();
+        loadAllEmployees();
+
+        // 검색 기능
+        const searchInput = document.getElementById('orgSearchInput');
+        searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+
+            if (query.length > 0) {
+                searchEmployees(query);
+            } else {
+                // 검색어가 없으면 전체 직원 표시
+                document.getElementById('allEmployees').classList.remove('hidden');
+                document.getElementById('deptEmployees').classList.add('hidden');
+            }
+        });
+    });
+
+    // 부서 목록 로드
+    function loadDepartments() {
+        fetch('/api/org/employees')
+            .then(response => response.json())
+            .then(employees => {
+                // 부서별 직원 수 계산
+                const deptCounts = {};
+                const deptNames = {};
+
+                employees.forEach(emp => {
+                    if (emp.depId) {
+                        if (!deptCounts[emp.depId]) {
+                            deptCounts[emp.depId] = 0;
+                            deptNames[emp.depId] = emp.departmentName || '부서 없음';
+                        }
+                        deptCounts[emp.depId]++;
+                    }
+                });
+
+                // 부서 목록 렌더링
+                const departmentList = document.getElementById('departmentList');
+                departmentList.innerHTML = '';
+
+                // 부서 ID 순으로 정렬
+                const deptIds = Object.keys(deptCounts).sort((a, b) => parseInt(a) - parseInt(b));
+
+                deptIds.forEach(deptId => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+            <span class="dept-name" data-dept-id="${deptId}">${deptNames[deptId]} <span class="dept-count">(${deptCounts[deptId]})</span></span>
+          `;
+                    departmentList.appendChild(li);
+
+                    // 부서 클릭 이벤트
+                    const deptName = li.querySelector('.dept-name');
+                    deptName.addEventListener('click', function () {
+                        const deptId = this.getAttribute('data-dept-id');
+
+                        // 활성화 상태 업데이트
+                        document.querySelectorAll('.dept-name').forEach(d => {
+                            d.classList.remove('active');
+                        });
+                        this.classList.add('active');
+
+                        // 부서별 직원 표시
+                        loadDepartmentEmployees(deptId);
+                    });
+                });
+
+                // 전체 직원 수 업데이트
+                document.getElementById('totalCount').textContent = `(${employees.length})`;
+
+                // 전체 항목 클릭 이벤트
+                document.querySelector('.dept-name[data-dept-id="0"]').addEventListener('click', function () {
+                    document.querySelectorAll('.dept-name').forEach(d => {
+                        d.classList.remove('active');
+                    });
+                    this.classList.add('active');
+
+                    document.getElementById('allEmployees').classList.remove('hidden');
+                    document.getElementById('deptEmployees').classList.add('hidden');
+                });
+            })
+            .catch(error => {
+                console.error('부서 목록 로드 오류:', error);
+            });
+    }
+
+    // 모든 직원 로드 함수
+    function loadAllEmployees() {
+        fetch('/api/org/employees')
+            .then(response => response.json())
+            .then(employees => {
+                // 전체 직원 수 업데이트
+                document.getElementById('totalCount').textContent = `(${employees.length})`;
+
+                // 부서별로 그룹화
+                const employeesByDept = {};
+                const deptNames = {};
+
+                employees.forEach(emp => {
+                    const deptId = emp.depId || 0;
+                    if (!employeesByDept[deptId]) {
+                        employeesByDept[deptId] = [];
+                        deptNames[deptId] = emp.departmentName || '부서 없음';
+                    }
+                    employeesByDept[deptId].push(emp);
+                });
+
+                // employeeGrid 초기화
+                const employeeGrid = document.getElementById('employeeGrid');
+                employeeGrid.innerHTML = '';
+
+                // 각 부서별로 섹션 생성
+                Object.keys(employeesByDept).forEach(deptId => {
+                    // 부서 제목 섹션 생성
+                    const deptSection = document.createElement('div');
+                    deptSection.className = 'org-section';
+                    deptSection.innerHTML = `
+          <h3>
+            TECHX > ${deptNames[deptId]} <span class="dept-count">(${employeesByDept[deptId].length})</span>
+          </h3>
+          <div class="employee-grid dept-${deptId}-grid"></div>
+        `;
+                    employeeGrid.appendChild(deptSection);
+
+                    // 해당 부서의 직원 카드 추가
+                    const deptGrid = deptSection.querySelector(`.dept-${deptId}-grid`);
+                    employeesByDept[deptId].forEach(emp => {
+                        const card = document.createElement('div');
+                        card.className = 'employee-card';
+                        card.setAttribute('data-emp-id', emp.id);
+                        card.onclick = function () {
+                            showEmployeeDetail(emp.id);
+                        };
+
+                        // 프로필 이미지 또는 이니셜
+                        let profileContent;
+                        if (emp.profileImgUrl) {
+                            profileContent = `<img src="${emp.profileImgUrl}" alt="${emp.name}">`;
+                        } else {
+                            const initial = emp.name ? emp.name.charAt(0) : '?';
+                            profileContent = `<div class="profile-placeholder">${initial}</div>`;
+                        }
+
+                        card.innerHTML = `
+            <div class="profile-image">
+              ${profileContent}
+            </div>
+            <div class="employee-name">${emp.name || '이름 없음'}</div>
+            <div class="employee-position">${emp.positionTitle || '직급 없음'}</div>
+          `;
+
+                        deptGrid.appendChild(card);
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('직원 목록 로드 오류:', error);
+            });
+    }
+
+    // 부서별 직원 로드
+    function loadDepartmentEmployees(deptId) {
+        if (deptId === '0') {
+            // 전체 직원 표시
+            document.getElementById('allEmployees').classList.remove('hidden');
+            document.getElementById('deptEmployees').classList.add('hidden');
+            return;
+        }
+
+        fetch(`/api/org/department/${deptId}`)
+            .then(response => response.json())
+            .then(data => {
+                // 부서 정보 업데이트
+                document.getElementById('currentDeptName').textContent = data.departmentName;
+                document.getElementById('currentDeptCount').textContent = `(${data.employees.length})`;
+
+                // 직원 목록 렌더링
+                renderEmployees(data.employees, 'deptEmployeeGrid');
+
+                // 섹션 표시 전환
+                document.getElementById('allEmployees').classList.add('hidden');
+                document.getElementById('deptEmployees').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('부서별 직원 로드 오류:', error);
+            });
+    }
+
+    // 직원 검색
+    function searchEmployees(query) {
+        fetch(`/api/org/search?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(employees => {
+                // 부서 정보 업데이트
+                document.getElementById('currentDeptName').textContent = '검색 결과';
+                document.getElementById('currentDeptCount').textContent = `(${employees.length})`;
+
+                // 직원 목록 렌더링
+                renderEmployees(employees, 'deptEmployeeGrid');
+
+                // 섹션 표시 전환
+                document.getElementById('allEmployees').classList.add('hidden');
+                document.getElementById('deptEmployees').classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('직원 검색 오류:', error);
+            });
+    }
+
+    // 직원 목록 렌더링
+    function renderEmployees(employees, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+
+        employees.forEach(emp => {
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            card.setAttribute('data-emp-id', emp.id);
+            card.onclick = function () {
+                showEmployeeDetail(emp.id);
+            };
+
+            // 프로필 이미지 또는 이니셜
+            let profileContent;
+            if (emp.profileImgUrl) {
+                profileContent = `<img src="${emp.profileImgUrl}" alt="${emp.name}">`;
+            } else {
+                const initial = emp.name ? emp.name.charAt(0) : '?';
+                profileContent = `<div class="profile-placeholder">${initial}</div>`;
+            }
+
+            card.innerHTML = `
+        <div class="profile-image">
+          ${profileContent}
+        </div>
+        <div class="employee-name">${emp.name || '이름 없음'}</div>
+        <div class="employee-position">${emp.positionTitle || '직급 없음'}</div>
+      `;
+
+            container.appendChild(card);
+        });
+    }
+
+    // 직원 상세 정보 모달
+    function showEmployeeDetail(empId) {
+        fetch(`/api/org/employee/${empId}`)
+            .then(response => response.json())
+            .then(emp => {
+                // 프로필 이미지 또는 이니셜
+                const profileContainer = document.getElementById('modalProfileContainer');
+                if (emp.profileImgUrl) {
+                    profileContainer.innerHTML = `<img src="${emp.profileImgUrl}" alt="${emp.name}">`;
+                } else {
+                    const initial = emp.name ? emp.name.charAt(0) : '?';
+                    profileContainer.innerHTML = `<div class="profile-placeholder">${initial}</div>`;
+                }
+
+                // 기본 정보 설정
+                document.getElementById('modalName').textContent = emp.name || '이름 없음';
+                document.getElementById('modalPosition').textContent = emp.positionTitle || '직급 없음';
+                document.getElementById('modalEmail').textContent = emp.internalEmail || emp.email || '이메일 없음';
+                document.getElementById('modalPhone').textContent = emp.phone || '전화번호 없음';
+                document.getElementById('modalDept').textContent = emp.departmentName || '부서 없음';
+
+                // 모달 표시
+                document.getElementById('employeeModal').classList.add('show');
+            })
+            .catch(error => {
+                console.error('직원 상세 정보 로드 오류:', error);
+            });
+    }
+
+    // 모달 닫기
+    function closeModal() {
+        document.getElementById('employeeModal').classList.remove('show');
+    }
+</script>
+</body>
+</html>
