@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 개인주소록 주소 저장
     document.getElementById('saveContactBtn').addEventListener('click', function () {
-        console.log("버튼 클릭");
         const name = document.getElementById('nameInput').value.trim();
         const email = document.getElementById('emailInput').value;
         const phone = document.getElementById('phoneInput').value;
@@ -93,13 +92,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (res.ok) {
                         resetContactForm();
                         modal.classList.add('hidden');
-                        loadContacts('personal', 'all');
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const search = urlParams.get('search');
+
+                        if (search && search.trim() !== '') {
+                            searchContacts(search); // 검색 중이면 다시 검색
+                        } else {
+                            loadContacts('personal', 'all'); // 일반 모드면 전체 다시 로드
+                        }
                     } else {
                         alert('수정에 실패했습니다.');
                     }
                 })
                 .catch(error => {
-                    console.error('수정 중 오류 발생:', error);
                     alert('서버 오류로 수정에 실패했습니다.');
                 });
 
