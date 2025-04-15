@@ -85,6 +85,9 @@
                                     (employee.attendStatus == '조퇴' ? 'current-status status-early-leave' : 'current-status')))}"
                       th:text="${employee.attendStatus != null ? employee.attendStatus : '미출근'}">미출근</span>
             </p>
+            <p><strong>현재 시간:</strong> <span id="current-time">-</span></p>
+
+            <!--            <p><strong>현재 시간:</strong> <span id="current-time" th:text="${#temporals.format(currentTime, 'yyyy-MM-dd HH:mm:ss')}">2023-01-01 09:00:00</span></p>-->
         </div>
 
         <div class="btn-group" role="group" aria-label="Attendance options">
@@ -106,6 +109,10 @@
                                (selectedType == 'EARLY_LEAVE' ? '조퇴' : '퇴근')))}">정상출근</strong>
         </p>
 
+        <!--        <div class="qr-image">-->
+        <!--            <img th:src="@{/qr/generate-qr(type=${selectedType != null ? selectedType : 'NORMAL'})}"-->
+        <!--                 alt="QR Code" id="qrImage" class="img-fluid">-->
+        <!--        </div>-->
         <div class="qr-image">
             <img id="qrImage" class="img-fluid" alt="QR Code">
         </div>
@@ -134,6 +141,7 @@
             String(now.getHours()).padStart(2, '0') + ':' +
             String(now.getMinutes()).padStart(2, '0') + ':' +
             String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('current-time').textContent = formattedTime;
     }
 
     // QR 코드 로드 함수
