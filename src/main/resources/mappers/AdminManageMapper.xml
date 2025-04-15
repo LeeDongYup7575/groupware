@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AdminManageMapper">
+    <select id="getDepartmentList" resultType="com.example.projectdemo.domain.employees.dto.DepartmentsDTO">
+        select * from departments;
+    </select>
+    <select id="getPositionList" resultType="com.example.projectdemo.domain.employees.dto.PositionsDTO">
+        select * from positions;
+    </select>
+    <insert id="addDepartment">
+        insert into departments (name,sort_order) values (#{name},0);
+    </insert>
+    <delete id="deleteDepartment" parameterType="int">
+        DELETE FROM departments WHERE id = #{id}
+    </delete>
+</mapper>

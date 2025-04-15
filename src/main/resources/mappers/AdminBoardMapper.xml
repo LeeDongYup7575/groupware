@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AdminBoardMapper">
+    <select id="getBoardList" resultType="com.example.projectdemo.domain.board.dto.BoardsDTO">
+        select * from boards;
+    </select>
+    <update id="updateStatus">
+        update boards
+        set is_active = #{isActive}
+        where id = #{id}
+    </update>
+
+</mapper>
