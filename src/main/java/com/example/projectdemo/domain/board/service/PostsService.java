@@ -47,6 +47,12 @@ public class PostsService {
         return postsMapper.getPostsByBoardId(boardId);
     }
 
+
+    // 게시판 ID로 게시글 수 조회
+    public int countPostsByBoardId(Integer boardId) {
+        return postsMapper.countPostsByBoardId(boardId);
+    }
+
     // 게시글 상세 조회
     public PostsDTO getPostById(int id) {
         PostsDTO post = postsMapper.getPostById(id);

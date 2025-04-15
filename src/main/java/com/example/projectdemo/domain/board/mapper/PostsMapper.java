@@ -21,6 +21,9 @@ public interface PostsMapper {
     // 특정 게시판의 게시글 조회
     List<PostsDTO> getPostsByBoardId(Integer boardId);
 
+    // 게시판 ID로 게시글 수 조회
+    int countPostsByBoardId(Integer boardId);
+
     // 게시글 상세 조회
     PostsDTO getPostById(Integer id);
 

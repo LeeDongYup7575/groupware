@@ -5,7 +5,8 @@
 <!-- BoardMapper.xml -->
 <mapper namespace="com.example.projectdemo.domain.board.mapper.BoardsMapper">
     <select id="getAllBoards" resultType="com.example.projectdemo.domain.board.dto.BoardsDTO">
-        SELECT * FROM boards WHERE is_active = 1 ORDER BY sort_order
+        SELECT *
+        FROM boards
     </select>
 
     <select id="getBoardById" resultType="com.example.projectdemo.domain.board.dto.BoardsDTO">

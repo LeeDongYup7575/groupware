@@ -31,6 +31,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             response.setContentType("application/json");
             response.getWriter().write("{\"message\":\"관리자 권한이 필요합니다.\",\"status\":403}");
             return false;
+        } else if (requestURI.startsWith("/board/manage") && !isAdmin(role)) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"message\":\"관리자 권한이 필요합니다.\",\"status\":403}");
+            return false;
         }
 
         return true;
