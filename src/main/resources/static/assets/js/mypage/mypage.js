@@ -298,9 +298,9 @@ function updateInfo() {
     const emailInput = document.getElementById("email");
     const profileInput = document.getElementById('profile-input');
 
-    // 전화번호 유효성 검사 (숫자와 하이픈만 허용)
-    const phonePattern = /^010-\d{4}-\d{4}$/; // 010-1234-5678 형식
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    // 전화번호 이메일 유효성 검사
+    const phonePattern = /^010-\d{4}-\d{4}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!phonePattern.test(phoneInput.value)) {
         alert('전화번호는 010-XXXX-XXXX 형식으로 입력해주세요.');
