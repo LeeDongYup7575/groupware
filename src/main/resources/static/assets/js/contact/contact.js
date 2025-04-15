@@ -121,13 +121,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (res.status === 201) {
                         modal.classList.add('hidden');
-                        loadContacts('personal', 'all');
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const search = urlParams.get('search');
+
+                        if (search && search.trim() !== '') {
+                            searchContacts(search); // ✅ 검색 중이면 다시 검색
+                        } else {
+                            loadContacts('personal', 'all'); // 일반 상태면 전체 다시 로드
+                        }
                     } else {
                         alert('저장에 실패했습니다.');
                     }
                 })
                 .catch(error => {
-                    console.error('저장 중 오류 발생:', error);
                     alert('서버 오류로 저장에 실패했습니다.');
                 });
         }
