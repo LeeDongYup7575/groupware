@@ -8,39 +8,141 @@
         ~{::script}
       )}">
 <head>
-    <link th:remove="all"></link>
+    <!-- summernote -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+
     <style>
-        /* 페이지별 추가 스타일 */
-        /* 페이지별 추가 스타일 */
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
 <div id="contents">
     <h1 class="page-title">게시글 수정</h1>
 
-    <form th:action="@{/board/edit/{id}(id=${post.id})}" method="post" class="post-edit-form">
-        <div class="form-group">
-            <label for="title">제목</label>
-            <input type="text" id="title" name="title" class="form-control"
-                   th:value="${post.title}" required>
-        </div>
+    <div class="post-form">
+        <form id="postForm" th:action="@{/board/edit/{id}(id=${post.id})}" method="post">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="제목을 입력하세요"
+                       th:value="${post.title}" required>
+            </div>
 
-        <div class="form-group">
-            <label for="content">내용</label>
-            <textarea id="content" name="content" class="form-control"
-                      th:text="${post.content}" required></textarea>
-        </div>
+            <div class="form-group">
+                <label for="summernote">내용</label>
+                <textarea id="summernote" name="content" class="form-control" required></textarea>
+                <!-- 원래 내용을 히든 필드에 저장 (HTML 이스케이프하지 않음) -->
+                <div id="original-content" style="display: none;" th:utext="${post.content}"></div>
+            </div>
 
-        <div class="btn-container">
-            <button type="submit" class="btn btn-primary">수정 완료</button>
-            <a th:href="@{/board/post/{id}(id=${post.id})}" class="btn btn-secondary">취소</a>
-        </div>
-    </form>
+            <div class="form-actions">
+                <a th:href="@{/board/post/{id}(id=${post.id})}" class="btn">취소</a>
+                <button type="submit" class="btn btn-primary">수정완료</button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<script th:fragment="script">
-    document.addEventListener('DOMContentLoaded', function() {
-        // 필요한 경우 JavaScript 로직 추가
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- summernote -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.min.js"></script>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        // 서버에서 받은 원본 내용 (이미 HTML로 렌더링된 상태)
+        const originalContent = document.getElementById('original-content').innerHTML;
+
+        // HTML 엔티티를 디코드하는 함수
+        function decodeHtmlEntities(text) {
+            const textArea = document.createElement('textarea');
+            textArea.innerHTML = text;
+            return textArea.value;
+        }
+
+        // HTML 문자열인지 확인
+        function isHtmlContent(text) {
+            // 간단한 HTML 태그 체크 정규식
+            return /<\/?[a-z][\s\S]*>/i.test(text);
+        }
+
+        // 콘텐츠 처리
+        let processedContent = originalContent;
+
+        // 이미 HTML 태그가 포함되어 있는지 확인
+        if (!isHtmlContent(processedContent)) {
+            // HTML 태그가 텍스트로 표시되는 경우 처리
+            processedContent = processedContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        }
+
+        // HTML 엔티티 디코딩 적용
+        processedContent = decodeHtmlEntities(processedContent);
+
+        // Summernote 초기화
+        $('#summernote').summernote({
+            height: 300,
+            lang: "ko-KR",
+            focus: true,
+            placeholder: '내용을 입력해주세요',
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview']]
+            ],
+            fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '30', '36'],
+            callbacks: {
+                onImageUpload: function (files) {
+                    // 파일 업로드 처리
+                    for (let i = 0; i < files.length; i++) {
+                        uploadSummernoteImage(files[i], this);
+                    }
+                }
+            }
+        });
+
+        // 처리된 내용을 에디터에 설정
+        $('#summernote').summernote('code', processedContent);
+
+        // 이미지 업로드 함수
+        function uploadSummernoteImage(file, editor) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                url: '/api/posts/upload/image',  // 서버 이미지 업로드 엔드포인트
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')  // JWT 인증 추가
+                },
+                success: function (data) {
+                    // 서버에서 반환된 이미지 URL을 에디터에 삽입
+                    $(editor).summernote('insertImage', data.url);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus + ' : ' + errorThrown);
+                    alert('이미지 업로드에 실패했습니다.');
+                }
+            });
+        }
+
+        // 폼 제출 이벤트 처리
+        $('#postForm').on('submit', function (e) {
+            // 내용이 실제 HTML로 저장되도록 처리
+            const content = $('#summernote').summernote('code');
+            // 필요한 경우 여기서 추가 처리
+        });
     });
 </script>
 </body>
