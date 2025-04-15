@@ -73,7 +73,18 @@
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
 
-    <span>결재 예정 문서</span><br>
+    <div class="navi-content">
+        <span>결재 예정 문서</span>
+        <select id="select" align-items="right">
+            <option>문서 메뉴 선택</option>
+            <option value="나의 결재 상태 (전체)">나의 결재 상태 (전체)</option>
+            <option value="결재 대기 문서">결재 대기 문서</option>
+            <option value="결재 예정 문서">결재 예정 문서</option>
+            <option value="나의 문서함 (전체)">나의 문서함 (전체)</option>
+            <option value="나의 문서함 (승인)">나의 문서함 (승인)</option>
+            <option value="나의 문서함 (반려)">나의 문서함 (반려)</option>
+        </select>
+    </div>
     <table class="document-table">
         <thead>
         <tr>
@@ -231,6 +242,32 @@
             // 페이지 숫자 혹은 그룹 이동 버튼을 클릭했을 경우
             renderPagination(targetPage);
             showPage(targetPage);
+        });
+        // select 요소에 변경 이벤트 추가
+        $("#select").on("change", function() {
+            const selectedValue = $(this).val();
+
+            // 선택된 옵션에 따라 다른 페이지로 이동
+            switch(selectedValue) {
+                case "나의 결재 상태 (전체)":
+                    location.href = "/edsm/main";
+                    break;
+                case "결재 대기 문서":
+                    location.href = "/edsm/wait";
+                    break;
+                case "결재 예정 문서":
+                    location.href = "/edsm/expected";
+                    break;
+                case "나의 문서함 (전체)":
+                    location.href = "/edsm/myWritten";
+                    break;
+                case "나의 문서함 (승인)":
+                    location.href = "/edsm/approval";
+                    break;
+                case "나의 문서함 (반려)":
+                    location.href = "/edsm/rejected";
+                    break;
+            }
         });
     });
 </script>
