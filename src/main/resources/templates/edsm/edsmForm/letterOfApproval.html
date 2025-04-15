@@ -297,47 +297,145 @@
       $("#formSelect").val(storedValue);
     }
 
-    $("#main").on("click", function () {
-      location.href = "/edsm/main";
-    });
-    $("#expected").on("click", function () {
-      location.href = "/edsm/expected";
+    // 폼이 수정되었는지 추적하는 변수
+    let formModified = false;
+
+    // 폼이 처음 로드된 후에는 변경되지 않은 상태로 초기화
+    console.log("페이지 로드 시 formModified:", formModified);
+
+    // 폼 필드 변경 감지 - 실제 값이 변경되었는지 확인
+    $("input, textarea, select").on("change", function() {
+      formModified = true;
+      console.log("폼 필드 변경됨:", $(this).attr('name') || $(this).attr('id'));
     });
 
-    $("#wait").on("click", function () {
-      location.href = "/edsm/wait";
-    });
-    $("#progress").on("click", function () {
-      location.href = "/edsm/progress";
-    });
-
-    $("#complete").on("click", function () {
-      location.href = "/edsm/complete";
+    // 텍스트 입력 필드(input, textarea)의 경우 키 입력도 감지
+    $("input[type='text'], textarea").on("input", function() {
+      // 입력 값이 있을 때만 변경으로 처리
+      if ($(this).val().trim() !== "") {
+        formModified = true;
+        console.log("텍스트 입력됨:", $(this).attr('name') || $(this).attr('id'));
+      }
     });
 
-    $("#create-button").on("click", function () {
-      location.href = "/edsmForm/input";
+    // 파일 첨부 변경 감지
+    $("#fileAttachment").on("change", function() {
+      if (this.files.length > 0) {
+        formModified = true;
+        console.log("파일 첨부됨");
+      }
+    });
+
+    // 결재선 설정 변경 감지
+    $("#saveApprovalLine").on("click", function() {
+      const approvalLineContent = $("#approvalLine").val();
+      if (approvalLineContent && approvalLineContent !== "[]") {
+        formModified = true;
+        console.log("결재선 설정됨");
+      }
+    });
+
+    // 페이지 이탈 시 경고 함수
+    function handleNavigation(event, targetUrl) {
+      if (formModified) {
+        event.preventDefault();
+
+        // 경고 모달 표시
+        $("#navigationWarningModal").css("display", "flex");
+
+        // 계속 진행 버튼 클릭 시 저장하지 않고 이동
+        $("#continueNavigation").off("click").on("click", function() {
+          formModified = false; // 플래그 초기화
+          $("#navigationWarningModal").fadeOut(200);
+          window.location.href = targetUrl;
+        });
+
+        // 취소 버튼 클릭 시 현재 페이지 유지
+        $("#cancelNavigation").off("click").on("click", function() {
+          $("#navigationWarningModal").fadeOut(200);
+        });
+
+        return false;
+      } else {
+        // 변경사항이 없으면 그냥 페이지 이동
+        console.log("변경사항 없음, 페이지 이동:", targetUrl);
+        window.location.href = targetUrl;
+        return true;
+      }
+    }
+
+    // 사이드바 메뉴 항목에 이벤트 핸들러 적용
+    $("#main").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/main");
+    });
+
+    $("#expected").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/expected");
+    });
+
+    $("#wait").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/wait");
+    });
+
+    $("#progress").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/progress");
+    });
+
+    $("#complete").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/complete");
+    });
+
+    $("#create-button").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsmForm/input");
     });
 
     // 나의 문서함
-    // 기안 버튼
-    $("#myWritten").on("click", function () {
-      location.href = "/edsm/myWritten";
-    });
-    // 승인버튼
-    $("#approval").on("click", function () {
-      location.href = "/edsm/approval";
-    });
-    // 반려버튼
-    $("#rejected").on("click", function () {
-      location.href = "/edsm/rejected";
+    $("#myWritten").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/myWritten");
     });
 
-    // form select 변경 이벤트
-    $("#documentType").on("change", function() {
-      var selectedValue = $(this).val();
-      console.log("선택된 값:", selectedValue);
-      location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
+    $("#approval").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/approval");
+    });
+
+    $("#rejected").off("click").on("click", function(e) {
+      e.preventDefault(); // 기본 이벤트 방지
+      return handleNavigation(e, "/edsm/rejected");
+    });
+
+    // 문서 종류 변경 시 처리
+    $("#documentType").off("change").on("change", function(e) {
+      let selectedValue = $(this).val();
+      if(selectedValue) {
+        console.log("문서 종류 변경됨:", selectedValue);
+
+        // 양식 변경 시에도 페이지 이탈 경고
+        if (formModified) {
+          e.preventDefault(); // 기본 이벤트 방지
+          let event = { preventDefault: function() {} };
+          return handleNavigation(event, "/edsmForm/" + selectedValue + "?documentType=" + selectedValue);
+        } else {
+          location.href = "/edsmForm/" + selectedValue + "?documentType=" + selectedValue;
+        }
+      }
+    });
+
+    // 브라우저의 기본 beforeunload 이벤트도 처리
+    window.addEventListener("beforeunload", function(e) {
+      if (formModified) {
+        // 표준 경고 메시지 (브라우저마다 다르게 표시될 수 있음)
+        const message = "작성 중인 내용이 있습니다. 페이지를 나가시겠습니까?";
+        e.returnValue = message;
+        return message;
+      }
     });
 
     // 모달 열기, 닫기
@@ -457,7 +555,7 @@
       $(".attachment-drop-area").html(html);
     }
 
-// 개별 파일 삭제 이벤트 처리
+    // 개별 파일 삭제 이벤트 처리
     $(document).on("click", ".remove-file", function() {
       let index = $(this).data("index");
       // DataTransfer 객체에서 해당 인덱스의 파일 제거
@@ -474,7 +572,98 @@
       $("#fileAttachment")[0].files = dt.files;
       updateAttachmentArea();
     });
-// 커스텀 알림 모달 HTML 추가
+
+    // 콤마 포맷 지원을 위한 함수 - 입력 중에 포맷을 적용하지 않음
+    $("input[name='expectedCost']").on("keydown keyup", function(e) {
+      // 콤마와 숫자 키만 허용 (백스페이스, 화살표 키 등도 허용)
+      // 키보드에서 직접 입력 이벤트에만 적용
+      if (e.type === 'keydown') {
+        // 숫자 키 (0-9, 키패드 0-9)
+        const isNumericKey = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+        // 콤마 키
+        const isCommaKey = e.keyCode === 188 || e.keyCode === 110;
+        // 제어 키 (백스페이스, 삭제, 방향키 등)
+        const isControlKey = e.keyCode === 8 || e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 46
+                || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40
+                || e.ctrlKey || e.metaKey;
+
+        // 허용되지 않는 키를 눌렀다면 이벤트 취소
+        if (!(isNumericKey || isCommaKey || isControlKey)) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    // 폼 제출 이벤트 처리
+    $("#documentForm").on("submit", function(e) {
+      // 폼 제출 시 변경 플래그 초기화
+      formModified = false;
+
+      // 필수 필드 검증
+      let isValid = true;
+      let errorFields = [];
+
+      // 보존 연한 검증
+      const retentionPeriod = $("select[name='retentionPeriod']").val();
+      if (!retentionPeriod) {
+        isValid = false;
+        errorFields.push("보존 연한");
+      }
+
+      // 보안 등급 검증
+      const securityGrade = $("select[name='securityGrade']").val();
+      if (!securityGrade) {
+        isValid = false;
+        errorFields.push("보안 등급");
+      }
+
+      // 결재라인 검증
+      const approvalLine = $("#approvalLine").val();
+      if (!approvalLine || approvalLine === "[]") {
+        isValid = false;
+        errorFields.push("결재 라인");
+      }
+
+      // 제목 검증
+      const title = $("input[name='title']").val().trim();
+      if (!title) {
+        isValid = false;
+        errorFields.push("제목");
+      }
+
+      // 품의내용 검증
+      const content = $("#content").val().trim();
+      if (!content) {
+        isValid = false;
+        errorFields.push("품의 내용");
+      }
+
+      // 예상비용 검증
+      const expectedCost = $("input[name='expectedCost']").val().trim();
+      if (!expectedCost) {
+        isValid = false;
+        errorFields.push("예상 비용");
+      } else {
+        // 숫자와 콤마만 포함되어 있는지 확인
+        const costPattern = /^[0-9,]+$/;
+        if (!costPattern.test(expectedCost)) {
+          isValid = false;
+          errorFields.push("예상비용 (숫자와 콤마만 입력 가능)");
+        }
+      }
+
+      // 유효성 검사 실패 시 폼 제출 중단 및 알림 표시
+      if (!isValid) {
+        e.preventDefault(); // 폼 제출 방지
+        showCustomAlert(errorFields);
+        return false;
+      }
+
+      // 모든 검증 통과 시 폼 제출 계속 진행
+      return true;
+    });
+
+    // 커스텀 알림 모달 HTML 추가
     const customAlertHTML = `
     <div id="customAlertModal" class="custom-alert-modal">
       <div class="custom-alert-content">
@@ -490,10 +679,34 @@
           <button id="customAlertConfirm" class="custom-alert-button">확인</button>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 
-    $("body").append(customAlertHTML);
+    // 페이지 이탈 경고 모달 HTML 추가
+    const navigationWarningHTML = `
+    <div id="navigationWarningModal" class="custom-alert-modal">
+      <div class="custom-alert-content">
+        <div class="custom-alert-header">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>작성 중인 내용이 있습니다</h3>
+        </div>
+        <div class="custom-alert-body">
+          <p>저장하지 않은 내용은 모두 사라집니다. 계속 진행하시겠습니까?</p>
+        </div>
+        <div class="custom-alert-footer">
+          <button id="cancelNavigation" class="custom-alert-button-cancel">취소</button>
+          <button id="continueNavigation" class="custom-alert-button">계속 진행</button>
+        </div>
+      </div>
+    </div>`;
+
+    // 모달이 이미 존재하는지 확인 후 추가
+    if ($("#customAlertModal").length === 0) {
+      $("body").append(customAlertHTML);
+    }
+
+    if ($("#navigationWarningModal").length === 0) {
+      $("body").append(navigationWarningHTML);
+    }
 
     // 커스텀 알림 모달 스타일 추가
     const customAlertStyle = `
@@ -577,7 +790,9 @@
       .custom-alert-footer {
         padding: 15px 20px;
         border-top: 1px solid #e9ecef;
-        text-align: right;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
       }
 
       .custom-alert-button {
@@ -597,10 +812,28 @@
         background: linear-gradient(135deg, #3a80d2 0%, #2a70c2 100%);
         box-shadow: 0 6px 8px rgba(74, 144, 226, 0.3);
       }
-    </style>
-  `;
 
-    $("head").append(customAlertStyle);
+      .custom-alert-button-cancel {
+        background: #f1f3f5;
+        color: #495057;
+        border: 1px solid #ced4da;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .custom-alert-button-cancel:hover {
+        background: #e9ecef;
+      }
+    </style>`;
+
+    // 스타일이 이미 존재하는지 확인 후 추가
+    if ($("style:contains('.custom-alert-button-cancel')").length === 0) {
+      $("head").append(customAlertStyle);
+    }
 
     // 커스텀 알림 표시 함수
     function showCustomAlert(items) {
@@ -617,93 +850,6 @@
     // 커스텀 알림 닫기
     $("#customAlertConfirm").on("click", function() {
       $("#customAlertModal").fadeOut(200);
-    });
-
-    // 콤마 포맷 지원을 위한 함수 - 입력 중에 포맷을 적용하지 않음
-    $("input[name='expectedCost']").on("keydown keyup", function(e) {
-      // 콤마와 숫자 키만 허용 (백스페이스, 화살표 키 등도 허용)
-      // 키보드에서 직접 입력 이벤트에만 적용
-      if (e.type === 'keydown') {
-        // 숫자 키 (0-9, 키패드 0-9)
-        const isNumericKey = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
-        // 콤마 키
-        const isCommaKey = e.keyCode === 188 || e.keyCode === 110;
-        // 제어 키 (백스페이스, 삭제, 방향키 등)
-        const isControlKey = e.keyCode === 8 || e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 46
-                || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40
-                || e.ctrlKey || e.metaKey;
-
-        // 허용되지 않는 키를 눌렀다면 이벤트 취소
-        if (!(isNumericKey || isCommaKey || isControlKey)) {
-          e.preventDefault();
-        }
-      }
-    });
-
-    // 폼 제출 이벤트 처리
-    $("#documentForm").on("submit", function(e) {
-      // 필수 필드 검증
-      let isValid = true;
-      let errorFields = [];
-
-      // 보존 연한 검증
-      const retentionPeriod = $("select[name='retentionPeriod']").val();
-      if (!retentionPeriod) {
-        isValid = false;
-        errorFields.push("보존 연한");
-      }
-
-      // 보안 등급 검증
-      const securityGrade = $("select[name='securityGrade']").val();
-      if (!securityGrade) {
-        isValid = false;
-        errorFields.push("보안 등급");
-      }
-
-      // 결재라인 검증
-      const approvalLine = $("#approvalLine").val();
-      if (!approvalLine || approvalLine === "[]") {
-        isValid = false;
-        errorFields.push("결재라인");
-      }
-
-      // 제목 검증
-      const title = $("input[name='title']").val().trim();
-      if (!title) {
-        isValid = false;
-        errorFields.push("제목");
-      }
-
-      // 품의내용 검증
-      const content = $("#content").val().trim();
-      if (!content) {
-        isValid = false;
-        errorFields.push("품의내용");
-      }
-
-      // 예상비용 검증
-      const expectedCost = $("input[name='expectedCost']").val().trim();
-      if (!expectedCost) {
-        isValid = false;
-        errorFields.push("예상비용");
-      } else {
-        // 숫자와 콤마만 포함되어 있는지 확인
-        const costPattern = /^[0-9,]+$/;
-        if (!costPattern.test(expectedCost)) {
-          isValid = false;
-          errorFields.push("예상비용 (숫자와 콤마만 입력 가능)");
-        }
-      }
-
-      // 유효성 검사 실패 시 폼 제출 중단 및 알림 표시
-      if (!isValid) {
-        e.preventDefault(); // 폼 제출 방지
-        showCustomAlert(errorFields);
-        return false;
-      }
-
-      // 모든 검증 통과 시 폼 제출 계속 진행
-      return true;
     });
   });
 </script>
