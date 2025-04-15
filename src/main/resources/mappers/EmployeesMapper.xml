@@ -228,4 +228,30 @@
         WHERE id = #{id}
     </update>
 
+    <!--  관리자 권한(ROLE_ADMIN)을 가진 사원의 ID 목록을 조회 -->
+    <select id="getAdminIds" resultType="java.lang.Integer">
+        SELECT id
+        FROM employees
+        WHERE role = 'ROLE_ADMIN'
+          AND enabled = 1
+          AND id IS NOT NULL
+    </select>
+
+    <!--  활성화된 직원 목록 가져오기  -->
+    <select id="getAllActiveEmployees" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
+        SELECT id,
+               emp_num,
+               name,
+               gender,
+               phone,
+               email,
+               internal_email,
+               profile_img_url,
+               dep_id,
+               pos_id
+        FROM employees
+        WHERE enabled = 1
+        ORDER BY name
+    </select>
+
 </mapper>

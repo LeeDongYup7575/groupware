@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.projectdemo.domain.board.mapper.BoardPermissionsMapper">
+
+    <select id="getPermissionsByBoardId" resultType="com.example.projectdemo.domain.board.dto.BoardPermissionsDTO">
+        SELECT bp.*, e.name as emp_name, e.position as emp_position, d.name as emp_department
+        FROM board_permissions bp
+                 LEFT JOIN employees e ON bp.emp_id = e.id
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE bp.board_id = #{boardId}
+    </select>
+
+    <select id="getPermissionByBoardAndEmp" resultType="com.example.projectdemo.domain.board.dto.BoardPermissionsDTO">
+        SELECT *
+        FROM board_permissions
+        WHERE board_id = #{boardId}
+          AND emp_id = #{empId}
+    </select>
+
+    <insert id="insertPermission">
+        INSERT INTO board_permissions (board_id, emp_id, permission_type, created_at)
+        VALUES (#{boardId}, #{empId}, '멤버', NOW())
+    </insert>
+
+    <update id="updatePermission" parameterType="com.example.projectdemo.domain.board.dto.BoardPermissionsDTO">
+        UPDATE board_permissions
+        SET permission_type = #{permissionType}
+        WHERE board_id = #{boardId}
+          AND emp_id = #{empId}
+    </update>
+
+    <delete id="deletePermission">
+        DELETE
+        FROM board_permissions
+        WHERE board_id = #{boardId}
+          AND emp_id = #{empId}
+    </delete>
+
+    <delete id="deleteAllPermissionsByBoardId" parameterType="java.lang.Integer">
+        DELETE
+        FROM board_permissions
+        WHERE board_id = #{boardId}
+    </delete>
+
+    <select id="getManageableBoardIdsByEmpId" resultType="java.lang.Integer">
+        SELECT board_id
+        FROM board_permissions
+        WHERE emp_id = #{empId}
+          AND permission_type = '쓰기'
+    </select>
+
+    <select id="hasManagePermission" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM board_permissions
+        WHERE board_id = #{boardId}
+          AND emp_id = #{empId}
+    </select>
+
+    <insert id="batchInsertPermissions" parameterType="java.util.List">
+        INSERT INTO board_permissions (board_id, emp_id, permission_type, created_at)
+        VALUES
+        <foreach collection="list" item="permission" separator=",">
+            (#{permission.boardId}, #{permission.empId}, #{permission.permissionType}, #{permission.createdAt})
+        </foreach>
+    </insert>
+
+</mapper>
