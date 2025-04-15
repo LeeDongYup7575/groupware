@@ -491,7 +491,8 @@
             <tr th:if="${mySuppliesBookings.isEmpty()}">
               <td colspan="8" class="no-data">예약된 비품이 없습니다.</td>
             </tr>
-            <tr th:each="booking : ${mySuppliesBookings}">
+            <tr th:each="booking : ${mySuppliesBookings}"
+                th:if="${booking.end > T(java.time.LocalDateTime).now()}">
               <td th:text="${booking.supplyName}"></td>
               <td th:text="${booking.quantity}"></td>
               <td th:text="${#temporals.format(booking.start, 'yyyy-MM-dd')}"></td>
