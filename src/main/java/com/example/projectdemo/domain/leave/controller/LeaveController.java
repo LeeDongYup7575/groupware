@@ -154,7 +154,6 @@ public class LeaveController {
     @PostMapping("/submitLeave")
     public String submitLeave(
             @RequestParam("drafterId") String drafterId,
-            @RequestParam("empId") String empId,
             @RequestParam("leaveStartDate[]") List<String> leaveStartDates,
             @RequestParam("leaveEndDate[]") List<String> leaveEndDates,
             @RequestParam("leaveType[]") List<String> leaveTypes,
@@ -168,6 +167,9 @@ public class LeaveController {
         EdsmBusinessContactDTO bcdto = new EdsmBusinessContactDTO();
 
         String empNum = (String)request.getAttribute("empNum");
+        int empId = (int) request.getAttribute("id");
+
+        if (empId == 0) return "redirect:/auth/login";
 
         if (empNum == null) { //예외처리
             return "redirect:/attend/main";
@@ -191,7 +193,7 @@ public class LeaveController {
         for (int i = 0; i < leaveStartDates.size(); i++) {
             LeavesDTO leavesdto = new LeavesDTO();
 
-            leavesdto.setEmpId(drafterId);
+            leavesdto.setEmpId(empId);
             leavesdto.setStartDate(leaveStartDates.get(i));
             leavesdto.setEndDate(leaveEndDates.get(i));
             String leaveTypeValue = leaveTypes.get(i).replace("[", "").replace("]", "");

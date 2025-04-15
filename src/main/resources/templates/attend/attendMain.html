@@ -179,16 +179,35 @@
     for (var i = 0; i < attendList.length; i++) {
         var record = attendList[i];
 
+        // 타임스탬프를 Date 객체로 변환
+        const workDate = new Date(record.workDate);
+
+        // YYYY-MM-DD 형식으로 변환
+        const year = workDate.getFullYear();
+        const month = String(workDate.getMonth() + 1).padStart(2, '0');
+        const day = String(workDate.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+
+        // 출근 기록 추가
         if (record.checkIn) {
-            const dateStr = new Date(record.workDate).toISOString().split('T')[0];
             weeklyEvents.push({
                 title: '출근',
                 start: `${dateStr}T${record.checkIn}`,
-                end: record.checkOut ? `${dateStr}T${record.checkOut}` : null,
                 color: '#4CAF50'
             });
         }
+
+        // 퇴근 기록 추가
+        if (record.checkOut) {
+            weeklyEvents.push({
+                title: '퇴근',
+                start: `${dateStr}T${record.checkOut}`,
+                color: '#FF5722'
+            });
+        }
     }
+
+
     for (var i = 0; i < leavesList.length; i++) {
         var leave = leavesList[i];
 
