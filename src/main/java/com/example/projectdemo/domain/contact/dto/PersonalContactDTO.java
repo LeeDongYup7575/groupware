@@ -16,4 +16,5 @@ public class PersonalContactDTO {
     private String email;
     private String phone;
     private String memo;
+    private Integer roundcubeContactId;
 }

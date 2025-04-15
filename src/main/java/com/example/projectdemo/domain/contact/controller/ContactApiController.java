@@ -93,8 +93,9 @@ public class ContactApiController {
      * 개인 주소록 연락처 삭제
      */
     @DeleteMapping("/personal/delete")
-    public ResponseEntity<Void> deletePersonalContacts(@RequestBody List<Integer> ids) {
+    public ResponseEntity<Void> deletePersonalContacts(@RequestBody List<Integer> ids, HttpServletRequest request) {
         try {
+            Integer empId = (Integer) request.getAttribute("id");
             if (ids == null || ids.isEmpty()) {
                 return ResponseEntity.badRequest().build(); // 잘못된 요청
             }
@@ -111,13 +112,9 @@ public class ContactApiController {
      * 개인 주소록 연락처 수정
      */
     @PutMapping("/personal/{id}")
-    public ResponseEntity<Void> updatePersonalContact(
-            @PathVariable int id,
-            @RequestBody PersonalContactDTO dto
-    ) {
+    public ResponseEntity<Void> updatePersonalContact(@PathVariable int id, @RequestBody PersonalContactDTO dto) {
         try {
-            dto.setId(id); // id 바인딩
-            contactService.updatePersonalContact(dto);
+            contactService.updatePersonalContact(id, dto); // id 별도 전달
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoundcubeContactDTO {
+    private Integer contactId;
     private String name;
     private String email;
     private String firstname;
     private String vcard;
     private String words;
     private Integer userId;
+    private Integer empId;
 }

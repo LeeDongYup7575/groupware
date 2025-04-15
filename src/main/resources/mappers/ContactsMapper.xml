@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.projectdemo.domain.contact.mapper.ContactMapper">
+
+    <!-- 주소록 id로 roundcube_contact_id 조회 -->
+    <select id="findRoundcubeContactIdById" resultType="int">
+        SELECT roundcube_contact_id
+        FROM personal_contacts
+        WHERE id = #{id}
+    </select>
+
     <!-- 모든 사원의 연락처 정보 조회 -->
     <select id="findAllEmpContacts" resultType="com.example.projectdemo.domain.contact.dto.EmployeeContactDTO">
         SELECT
@@ -54,13 +62,27 @@
             employees.name;
     </select>
 
-    <!-- 부서별 공유주소록(사원연락처) 조회 -->
+    <!-- 개인주소록에 연락처 추가 -->
     <insert id="insertPersonalContact">
-        INSERT INTO
-            personal_contacts (emp_id, name, email, phone, memo)
-        VALUES
-            (#{contact.empId}, #{contact.name}, #{contact.email}, #{contact.phone}, #{contact.memo})
+        INSERT INTO personal_contacts (emp_id, name, email, phone, memo, roundcube_contact_id)
+        VALUES (#{contact.empId}, #{contact.name}, #{contact.email}, #{contact.phone}, #{contact.memo}, #{contact.roundcubeContactId})
     </insert>
+
+    <!-- 개인 주소록에 추가된 연락처 roundcube 주소록에 추가 -->
+    <insert id="insertPersonalRoundcubeContact"
+            parameterType="com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO"
+            useGeneratedKeys="true"
+            keyProperty="contactId">
+        INSERT INTO roundcube.contacts (
+            changed, del, name, email, firstname, vcard, words, user_id
+        )
+        SELECT
+            NOW(), 0, #{name}, #{email}, #{firstname}, #{vcard}, #{words}, u.user_id
+        FROM employees e
+                 JOIN roundcube.users u ON u.username = e.internal_email
+        WHERE e.id = #{empId}
+    </insert>
+
 
     <!-- 개인 주소록(사원 연락처) 조회 -->
     <select id="findPersonalContactsByEmpId" resultType="com.example.projectdemo.domain.contact.dto.PersonalContactDTO">
@@ -68,6 +90,26 @@
         FROM personal_contacts
         WHERE emp_id = #{empId}
     </select>
+
+
+    <!-- personal_contacts → roundcube_contact_id 조회 -->
+    <select id="findRoundcubeContactIdsByPersonalIds" resultType="int">
+        SELECT roundcube_contact_id
+        FROM personal_contacts
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- roundcube.contacts에서 삭제 -->
+    <delete id="deleteRoundcubeContactsByIds">
+        DELETE FROM roundcube.contacts
+        WHERE contact_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <!-- 개인주소록 연락처 삭제 -->
     <delete id="deleteContactsByIds">
@@ -83,11 +125,23 @@
     <update id="updatePersonalContact" parameterType="com.example.projectdemo.domain.contact.dto.PersonalContactDTO">
         UPDATE personal_contacts
         SET
-            name = #{contact.name},
-            email = #{contact.email},
-            phone = #{contact.phone},
-            memo = #{contact.memo}
-        WHERE id = #{contact.id}
+            name = #{name},
+            email = #{email},
+            phone = #{phone},
+            memo = #{memo}
+        WHERE id = #{id}
+    </update>
+
+    <!-- roundcube 연락처 수정 -->
+    <update id="updateRoundcubeContact" parameterType="com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO">
+        UPDATE roundcube.contacts
+        SET name = #{name},
+            email = #{email},
+            firstname = #{firstname},
+            vcard = #{vcard},
+            words = #{words},
+            changed = NOW()
+        WHERE contact_id = #{contactId}
     </update>
 
     <!-- 공유 주소록 검색: 이름, 내부 이메일, 전화번호, 부서명을 대상으로 LIKE 검색 -->
