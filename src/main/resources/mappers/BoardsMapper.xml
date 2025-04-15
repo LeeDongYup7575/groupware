@@ -23,4 +23,57 @@
     <select id="getGlobalBoards" resultType="com.example.projectdemo.domain.board.dto.BoardsDTO">
         SELECT * FROM boards WHERE is_global = 1 AND is_active = 1 ORDER BY sort_order
     </select>
+
+    <!-- 새로 추가된 쿼리 -->
+    <insert id="insertBoard" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO boards (name, is_global, description, is_active, sort_order, created_at)
+        VALUES (#{name}, #{isGlobal}, #{description}, #{isActive}, #{sortOrder}, NOW())
+    </insert>
+
+    <update id="updateBoard" parameterType="com.example.projectdemo.domain.board.dto.BoardsDTO">
+        UPDATE boards
+        SET name        = #{name},
+            is_global   = #{isGlobal},
+            description = #{description},
+            is_active   = #{isActive},
+            sort_order  = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteBoard" parameterType="java.lang.Integer">
+        UPDATE boards
+        SET is_active = 0
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateBoardSortOrder">
+        UPDATE boards
+        SET sort_order = #{sortOrder}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getMaxSortOrder" resultType="java.lang.Integer">
+        SELECT MAX(sort_order)
+        FROM boards
+    </select>
+
+    <select id="existsByName" parameterType="java.lang.String" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM boards WHERE name = #{name} AND is_active = 1)
+    </select>
+
+    <select id="getManageableBoardsByEmpId" resultType="com.example.projectdemo.domain.board.dto.BoardsDTO">
+        SELECT b.*
+        FROM boards b
+                 JOIN board_permissions bp ON b.id = bp.board_id
+        WHERE bp.emp_id = #{empId}
+          AND bp.permission_type = '쓰기'
+          AND b.is_active = 1
+        ORDER BY b.sort_order
+    </select>
+
+    <select id="isGlobalBoard" resultType="boolean">
+        SELECT is_global
+        FROM boards
+        WHERE id = #{boardId}
+    </select>
 </mapper>

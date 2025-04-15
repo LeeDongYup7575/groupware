@@ -1,6 +1,5 @@
 package com.example.projectdemo.domain.board.controller;
 
-import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.board.dto.AttachmentsDTO;
 import com.example.projectdemo.domain.board.dto.BoardsDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
@@ -9,7 +8,6 @@ import com.example.projectdemo.domain.board.service.AttachmentsService;
 import com.example.projectdemo.domain.board.service.BoardsService;
 import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
-import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -40,7 +39,6 @@ public class BoardController {
     @Autowired
     private EmployeesService employeesService;
 
-
     // 통합 게시판 - 모든 권한 있는 게시판의 게시글 보기
     @GetMapping("")
     public String integratedBoard(HttpServletRequest request, Model model) {
@@ -49,6 +47,10 @@ public class BoardController {
 
         // 접근 가능한 모든 게시글 조회
         List<PostsDTO> posts = postsService.getAccessiblePosts(empId);
+
+        // 접근 가능한 게시판 목록 추가
+        List<BoardsDTO> accessibleBoards = boardsService.getAccessibleBoards(empId);
+        model.addAttribute("accessibleBoards", accessibleBoards);
 
         model.addAttribute("posts", posts);
         model.addAttribute("boardName", "통합 게시판");
@@ -65,6 +67,10 @@ public class BoardController {
         if (!boardsService.hasAccess(empId, boardId)) {
             return "board/integrated-list";
         }
+
+        // 모든 접근 가능한 게시판 목록 추가
+        List<BoardsDTO> accessibleBoards = boardsService.getAccessibleBoards(empId);
+        model.addAttribute("accessibleBoards", accessibleBoards);
 
         BoardsDTO board = boardsService.getBoardById(boardId);
         List<PostsDTO> posts = postsService.getPostsByBoardId(boardId);
@@ -102,18 +108,10 @@ public class BoardController {
         // 댓글 목록 조회
         List<Comments> comments = commentsService.getCommentsByPostId(id);
 
-        for (Comments comment : comments) {
-            System.out.println("댓글 ID: " + comment.getId() + ", 작성자: " + comment.getEmpName());
-        }
-
         model.addAttribute("comments", comments);
 
         // 로그인한 사용자 ID를 모델에 추가
         model.addAttribute("empId", empId);
-
-        // 현재 로그인한 사용자 정보
-//        EmployeesDTO currentEmployee = employeesService.findByEmpNum(principal.getName());
-//        model.addAttribute("currentEmployeeId", currentEmployee.getId());
 
         return "board/view";
     }
@@ -134,9 +132,108 @@ public class BoardController {
         return "board/create"; // 게시판 만들기
     }
 
-    @GetMapping("/manage")
-    public String manageBoard() {
-        return "board/manage"; // 게시판 관리
+    @PostMapping("/create") // 게시판 만들기
+    public String createBoard(BoardsDTO requestDTO,
+                              HttpServletRequest request,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+
+        // isActive 값 확인 및 설정
+        String isActiveParam = request.getParameter("isActive");
+
+        // 체크박스가 체크되면 "on" 또는 "true"가 전송됨, 체크 안되면 null
+        boolean isActive = isActiveParam != null;
+        requestDTO.setActive(isActive);
+
+        try {
+            // 멤버 권한 정보 디버깅
+            String[] memberIds = request.getParameterValues("memberIds");
+            String[] permissions = request.getParameterValues("permissions");
+
+            // 권한 정보 직접 설정
+            if (memberIds != null && permissions != null) {
+                List<Integer> memberIdList = new ArrayList<>();
+                List<String> permissionList = new ArrayList<>();
+
+                for (int i = 0; i < memberIds.length; i++) {
+                    // 빈 문자열 또는 숫자로 변환할 수 없는 값 건너뛰기
+                    if (memberIds[i] == null || memberIds[i].trim().isEmpty()) {
+                        continue;
+                    }
+
+                    try {
+                        int memberId = Integer.parseInt(memberIds[i]);
+                        memberIdList.add(memberId);
+
+                        // 권한 정보 추가
+                        if (i < permissions.length) {
+                            permissionList.add(permissions[i]);
+                        } else {
+                            // 권한이 없으면 기본값 설정
+                            permissionList.add("읽기");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("잘못된 멤버 ID 형식: " + memberIds[i]);
+                        // 잘못된 형식은 건너뛰기
+                    }
+                }
+
+                // 유효한 멤버 ID가 있을 경우에만 설정
+                if (!memberIdList.isEmpty()) {
+                    requestDTO.setMemberIds(memberIdList);
+                    requestDTO.setPermissions(permissionList);
+                }
+            }
+
+            // request에서 empId 가져오기
+            int empId = (int) request.getAttribute("id");
+
+            // isGlobal 값 처리
+            String isGlobalParam = request.getParameter("isGlobal");
+            if (isGlobalParam != null) {
+                // "true" 또는 1이면 true로 설정
+                boolean isGlobal = "true".equals(isGlobalParam) || "1".equals(isGlobalParam);
+                requestDTO.setGlobal(isGlobal);
+            }
+
+            // 수정 후 (문자열 배열을 Integer 리스트로 변환)
+            List<Integer> memberIdList = new ArrayList<>();
+            if (memberIds != null) {
+                for (String id : memberIds) {
+                    if (id != null && !id.trim().isEmpty()) {
+                        try {
+                            memberIdList.add(Integer.parseInt(id.trim()));
+                        } catch (NumberFormatException e) {
+                            // 변환 오류 무시
+                        }
+                    }
+                }
+            }
+            // DB에 저장
+            boardsService.createBoard(requestDTO, empId, memberIdList);
+
+            redirectAttributes.addFlashAttribute("message", "게시판이 성공적으로 생성되었습니다.");
+            redirectAttributes.addFlashAttribute("alertType", "alert-success");
+
+            return "redirect:/board";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("message", "게시판 생성 중 오류가 발생했습니다: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("alertType", "alert-danger");
+
+            return "redirect:/board/create";
+        }
+    }
+
+    @GetMapping("/manage") // 게시판 관리
+    public String manageBoards(@PathVariable Integer id, HttpServletRequest request, Model model) {
+
+        int empId = (int) request.getAttribute("id");
+
+        // 사용자가 관리할 수 있는 게시판 목록 가져오기 (소유자 또는 관리자 권한)
+        List<BoardsDTO> manageableBoards = boardsService.getManageableBoards(empId);
+        model.addAttribute("boards", manageableBoards);
+
+        return "board/manage";
     }
 
     // 게시글 수정 폼 표시
