@@ -34,24 +34,8 @@
 
 <div class="container-fluid">
   <div class="row">
+    <div th:replace="fragments/sidebar/work-sidebar :: work-sidebar"></div>
     <!-- Sidebar fragment -->
-    <!-- 새로운 업무 사이드바 -->
-    <div class="col-md-2 work-sidebar">
-      <div class="nav flex-column">
-        <a th:href="@{/workmanagement}" class="nav-link active">
-          <i class="fas fa-tasks"></i> 업무
-        </a>
-        <a th:href="@{/workmanagement/register}" class="nav-link">
-          <i class="fas fa-plus-circle"></i> 등록
-        </a>
-        <!--                <a th:href="@{/workmanagement/schedule}" class="nav-link">-->
-        <!--                    <i class="fas fa-calendar-alt"></i> 일정-->
-        <!--                </a>-->
-        <a th:href="@{/workmanagement/schedule}" class="nav-link">
-          <i class="fas fa-calendar-alt"></i> 일정
-        </a>
-      </div>
-    </div>
 
     <!-- Main content -->
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -189,5 +173,11 @@
 <!-- Custom JavaScript -->
 <script th:src="@{/assets/js/projects/project-register.js}"></script>
 <div th:replace="fragments/header :: headerScripts"></div>
+
+<!-- 스타일시트 추가 -->
+<th:block th:replace="fragments/sidebar/work-sidebar :: sidebar-styles"></th:block>
+
+<!-- 스크립트 추가 (jQuery 아래에 위치) -->
+<th:block th:replace="fragments/sidebar/work-sidebar :: sidebar-scripts"></th:block>
 </body>
 </html>

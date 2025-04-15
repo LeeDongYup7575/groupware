@@ -132,12 +132,11 @@
         WHERE id = #{id}
     </update>
 
-    <!-- 프로젝트 상태 변경 -->
     <update id="updateProjectStatus">
         UPDATE projects
         SET status = #{status},
             updated_at = NOW()
-        WHERE id = #{projectId}
+        WHERE id = #{id}
     </update>
 
     <!-- 프로젝트 삭제 -->
@@ -178,5 +177,21 @@
         DELETE FROM project_members
         WHERE project_id = #{projectId} AND emp_num = #{empNum}
     </delete>
+
+    <!-- 프로젝트 실제 종료일 업데이트 -->
+    <update id="updateProjectActualEndDate">
+        UPDATE projects
+        SET actual_end_date = #{actualEndDate},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 프로젝트 진행률 업데이트 -->
+<!--    <update id="updateProjectProgress">-->
+<!--        UPDATE projects-->
+<!--        SET progress = #{progress},-->
+<!--            updated_at = NOW()-->
+<!--        WHERE id = #{id}-->
+<!--    </update>-->
 
 </mapper>

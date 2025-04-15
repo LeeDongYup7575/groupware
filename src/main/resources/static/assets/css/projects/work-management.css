@@ -1,5 +1,7 @@
 /* Work Management CSS */
-
+body{
+    margin:80px;
+}
 /* Task Progress Bar Styles */
 .task-progress {
     height: 10px;
@@ -148,4 +150,34 @@
         padding: 0.25rem 0.5rem;
         font-size: 0.75rem;
     }
+}
+
+.project-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.task-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.task-row:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.progress {
+    height: 20px;
+}
+
+.progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }

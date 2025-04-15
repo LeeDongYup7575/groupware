@@ -47,7 +47,7 @@
       <li><a href="#"><span class="sidebar-icon">👥</span> 조직도</a></li>
       <!-- 관리자 페이지 인터셉터로 권한 확인 후 연결됩니당 -->
       <li th:if="${isAdmin}">
-        <a th:href="${adminUrl}" id="adminLink"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a>
+        <a th:href="@{/admin}" id="adminLink"><span class="sidebar-icon">⚙️</span> 관리자 페이지</a>
       </li>
       <li><a th:href="@{/faq}"><span class="sidebar-icon">❓</span> FAQ</a></li>
     </ul>

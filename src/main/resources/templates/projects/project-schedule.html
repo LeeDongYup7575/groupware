@@ -48,7 +48,7 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar fragment -->
-        <div th:replace="~{fragments/sidebar/main-sidebar :: sidebar}"></div>
+        <div th:replace="~{fragments/sidebar/work-sidebar :: sidebar}"></div>
 
         <!-- Main content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -1122,5 +1122,11 @@
         </main>
     </div>
 </div>
+
+<!-- 스타일시트 추가 -->
+<th:block th:replace="fragments/sidebar/work-sidebar :: sidebar-styles"></th:block>
+
+<!-- 스크립트 추가 (jQuery 아래에 위치) -->
+<th:block th:replace="fragments/sidebar/work-sidebar :: sidebar-scripts"></th:block>
 </body>
 </html>
