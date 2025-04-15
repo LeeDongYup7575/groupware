@@ -9,17 +9,12 @@ import com.example.projectdemo.domain.employees.mapper.DepartmentsMapper;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.mapper.PositionsMapper;
 import com.example.projectdemo.domain.mail.service.MailService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import net.crizin.KoreanCharacter;
 import net.crizin.KoreanRomanizer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -431,6 +426,21 @@ public class EmployeesService {
         } catch (Exception e) {
             throw new RuntimeException("직원 활성화 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * 활성화된 직원 목록 가져오기
+     */
+    public List<EmployeesDTO> getAllActiveEmployees() {
+
+        List<EmployeesDTO> employees = employeeMapper.getAllActiveEmployees();
+
+        // Fetch additional data for each employee
+        for (EmployeesDTO employee : employees) {
+            enrichEmployeeData(employee);
+        }
+
+        return employees;
     }
 
 }

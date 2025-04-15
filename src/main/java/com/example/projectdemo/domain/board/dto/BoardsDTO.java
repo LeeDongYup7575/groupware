@@ -17,7 +17,7 @@ public class BoardsDTO {
 
     private Integer id;
     private String name;
-    private Integer sortOrder;
+    private Integer sortOrder = 1; // 기본값 1로 설정
     private boolean isGlobal;
     private boolean isActive;
     private String description;
