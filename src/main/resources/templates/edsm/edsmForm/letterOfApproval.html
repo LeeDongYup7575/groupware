@@ -182,7 +182,9 @@
 
               <div class="approval-body approval-body-2">
                 <div class="approval-body-cell approval-body-cell-2" >
-                  <div class="approval-message">결재라인을 입력해주세요</div>
+                  <div class="approval-message">결재라인을 입력해주세요
+                    <br/>(신청자 본인은 자동 등록 및 승인 처리됩니다.)
+                  </div>
                 </div>
               </div>
             </div>
@@ -261,7 +263,7 @@
               <li th:each="emp : ${list_emp}"
                   th:attr="data-department=${emp.depId}, data-employee-id=${emp.empNum}, data-employee-position=${emp.positionTitle}, data-employee-name=${emp.name}"
                   th:text="${emp.positionTitle} + ' ' + ${emp.name}"
-                  style="cursor: pointer; padding: 5px; border-bottom: 1px solid #eee;">
+                  style="cursor: pointer; padding: 5px; border-bottom: 1px solid #eee; list-style: none">
               </li>
             </ul>
           </div>
@@ -370,9 +372,12 @@
                 .css({
                   padding: "5px",
                   border: "1px solid #ccc",
+                  borderRadius: "5px",
                   marginBottom: "5px",
                   background: "#f9f9f9",
+                  listStyle: "none",
                   cursor: "pointer"
+
                 });
         $("#selectedList").append(newItem);
       }
@@ -469,7 +474,237 @@
       $("#fileAttachment")[0].files = dt.files;
       updateAttachmentArea();
     });
+// 커스텀 알림 모달 HTML 추가
+    const customAlertHTML = `
+    <div id="customAlertModal" class="custom-alert-modal">
+      <div class="custom-alert-content">
+        <div class="custom-alert-header">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>필수 항목 입력 필요</h3>
+        </div>
+        <div class="custom-alert-body">
+          <p>다음 필수 항목을 입력해주세요:</p>
+          <ul id="customAlertList"></ul>
+        </div>
+        <div class="custom-alert-footer">
+          <button id="customAlertConfirm" class="custom-alert-button">확인</button>
+        </div>
+      </div>
+    </div>
+  `;
 
+    $("body").append(customAlertHTML);
+
+    // 커스텀 알림 모달 스타일 추가
+    const customAlertStyle = `
+    <style>
+      .custom-alert-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Noto Sans KR', sans-serif;
+      }
+
+      .custom-alert-content {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        width: 400px;
+        max-width: 90%;
+        overflow: hidden;
+        animation: alertAppear 0.3s ease;
+      }
+
+      @keyframes alertAppear {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      .custom-alert-header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+      }
+
+      .custom-alert-header i {
+        color: #f27474;
+        font-size: 24px;
+        margin-right: 15px;
+      }
+
+      .custom-alert-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .custom-alert-body {
+        padding: 20px;
+      }
+
+      .custom-alert-body p {
+        margin: 0 0 15px 0;
+        color: #555;
+      }
+
+      .custom-alert-body ul {
+        margin: 0;
+        padding-left: 10px;
+        list-style-type: none;
+      }
+
+      .custom-alert-body li {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .custom-alert-body li i {
+        margin-right: 10px;
+        color: #f27474;
+      }
+
+      .custom-alert-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #e9ecef;
+        text-align: right;
+      }
+
+      .custom-alert-button {
+        background: linear-gradient(135deg, #4a90e2 0%, #3a80d2 100%);
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
+      }
+
+      .custom-alert-button:hover {
+        background: linear-gradient(135deg, #3a80d2 0%, #2a70c2 100%);
+        box-shadow: 0 6px 8px rgba(74, 144, 226, 0.3);
+      }
+    </style>
+  `;
+
+    $("head").append(customAlertStyle);
+
+    // 커스텀 알림 표시 함수
+    function showCustomAlert(items) {
+      const listContainer = $("#customAlertList");
+      listContainer.empty();
+
+      items.forEach(item => {
+        listContainer.append(`<li><i class="fas fa-exclamation-circle"></i> ${item}</li>`);
+      });
+
+      $("#customAlertModal").css("display", "flex");
+    }
+
+    // 커스텀 알림 닫기
+    $("#customAlertConfirm").on("click", function() {
+      $("#customAlertModal").fadeOut(200);
+    });
+
+    // 콤마 포맷 지원을 위한 함수 - 입력 중에 포맷을 적용하지 않음
+    $("input[name='expectedCost']").on("keydown keyup", function(e) {
+      // 콤마와 숫자 키만 허용 (백스페이스, 화살표 키 등도 허용)
+      // 키보드에서 직접 입력 이벤트에만 적용
+      if (e.type === 'keydown') {
+        // 숫자 키 (0-9, 키패드 0-9)
+        const isNumericKey = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+        // 콤마 키
+        const isCommaKey = e.keyCode === 188 || e.keyCode === 110;
+        // 제어 키 (백스페이스, 삭제, 방향키 등)
+        const isControlKey = e.keyCode === 8 || e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 46
+                || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40
+                || e.ctrlKey || e.metaKey;
+
+        // 허용되지 않는 키를 눌렀다면 이벤트 취소
+        if (!(isNumericKey || isCommaKey || isControlKey)) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    // 폼 제출 이벤트 처리
+    $("#documentForm").on("submit", function(e) {
+      // 필수 필드 검증
+      let isValid = true;
+      let errorFields = [];
+
+      // 보존 연한 검증
+      const retentionPeriod = $("select[name='retentionPeriod']").val();
+      if (!retentionPeriod) {
+        isValid = false;
+        errorFields.push("보존 연한");
+      }
+
+      // 보안 등급 검증
+      const securityGrade = $("select[name='securityGrade']").val();
+      if (!securityGrade) {
+        isValid = false;
+        errorFields.push("보안 등급");
+      }
+
+      // 결재라인 검증
+      const approvalLine = $("#approvalLine").val();
+      if (!approvalLine || approvalLine === "[]") {
+        isValid = false;
+        errorFields.push("결재라인");
+      }
+
+      // 제목 검증
+      const title = $("input[name='title']").val().trim();
+      if (!title) {
+        isValid = false;
+        errorFields.push("제목");
+      }
+
+      // 품의내용 검증
+      const content = $("#content").val().trim();
+      if (!content) {
+        isValid = false;
+        errorFields.push("품의내용");
+      }
+
+      // 예상비용 검증
+      const expectedCost = $("input[name='expectedCost']").val().trim();
+      if (!expectedCost) {
+        isValid = false;
+        errorFields.push("예상비용");
+      } else {
+        // 숫자와 콤마만 포함되어 있는지 확인
+        const costPattern = /^[0-9,]+$/;
+        if (!costPattern.test(expectedCost)) {
+          isValid = false;
+          errorFields.push("예상비용 (숫자와 콤마만 입력 가능)");
+        }
+      }
+
+      // 유효성 검사 실패 시 폼 제출 중단 및 알림 표시
+      if (!isValid) {
+        e.preventDefault(); // 폼 제출 방지
+        showCustomAlert(errorFields);
+        return false;
+      }
+
+      // 모든 검증 통과 시 폼 제출 계속 진행
+      return true;
+    });
   });
 </script>
 <!-- 헤더 관련 스크립트 포함 -->

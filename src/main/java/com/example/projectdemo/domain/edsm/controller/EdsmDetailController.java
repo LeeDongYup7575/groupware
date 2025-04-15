@@ -245,4 +245,35 @@ public class EdsmDetailController {
         return "false";
     }
 
+
+    @ResponseBody
+    @GetMapping("/getRejectionReason")
+    public String getRejectionReason(ApprovalLineDTO approvalLineDTO,HttpServletRequest request){
+
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String) request.getAttribute("empNum");
+        if (empNum == null) {
+            return "edsm/main";
+        }
+
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+        if (employee == null) {
+            return "edsm/main";
+        }
+
+        System.out.println("승인자 아이디: " + approvalLineDTO.getApproverId());
+        System.out.println("문서 번호: " + approvalLineDTO.getDocumentId());
+        String result = edsmDetailService.getRejectionReason(approvalLineDTO);
+
+
+        return result;
+
+
+
+
+
+
+
+    }
+
 }

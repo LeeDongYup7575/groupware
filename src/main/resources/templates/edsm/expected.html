@@ -82,10 +82,13 @@
             <th>기안자</th>
             <th>기안일</th>
             <th>구분</th>
-            <th>상태</th>
+            <th>나의 결재</th>
         </tr>
         </thead>
         <tbody>
+        <tr th:if="${#lists.isEmpty(expectedDocumentList)}">
+            <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
+        </tr>
         <tr th:each="exdoc : ${expectedDocumentList}">
             <td th:text="${exdoc.id}"></td>
             <td th:switch="${exdoc.edsmFormId}">

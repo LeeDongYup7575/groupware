@@ -150,11 +150,13 @@ public class EdsmController {
 
         model.addAttribute("employee", employee);
 
-        List<EdsmDocumentDTO> myWrittenDocumentBc = edao.selectByAllMyWrittenDocumentBc(empNum);
-        List<EdsmDocumentDTO> myWrittenDocumentCdv = edao.selectByAllMyWrittenDocumentCdv(empNum);
-        List<EdsmDocumentDTO> myWrittenDocumentLoa = edao.selectByAllMyWrittenDocumentLoa(empNum);
-        List<EdsmDocumentDTO> myWrittenDocumentLeaves = edao.selectByAllMyWrittenDocumentLeaves(empNum);
-        List<EdsmDocumentDTO> myWrittenDocumentOvertime = edao.selectByAllMyWrittenDocumentOvertime(empNum);
+
+
+        List<EdsmDocumentDTO> myWrittenDocumentBc = edsmService.selectByAllMyWrittenDocumentBc(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentCdv = edsmService.selectByAllMyWrittenDocumentCdv(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentLoa = edsmService.selectByAllMyWrittenDocumentLoa(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentLeaves = edsmService.selectByAllMyWrittenDocumentLeaves(empNum);
+        List<EdsmDocumentDTO> myWrittenDocumentOvertime = edsmService.selectByAllMyWrittenDocumentOvertime(empNum);
 
         model.addAttribute("myWrittenDocumentBc",myWrittenDocumentBc);
         model.addAttribute("myWrittenDocumentCdv",myWrittenDocumentCdv);
@@ -189,11 +191,11 @@ public class EdsmController {
 
 
 
-        List<EdsmDocumentDTO> myApprovalDocumentBc = edao.selectByAllMyApprovalDocumentBc(empNum);
-        List<EdsmDocumentDTO> myApprovalDocumentCdv = edao.selectByAllMyApprovalDocumentCdv(empNum);
-        List<EdsmDocumentDTO> myApprovalDocumentLoa = edao.selectByAllMyApprovalDocumentLoa(empNum);
-        List<EdsmDocumentDTO> myApprovalDocumentLeaves = edao.selectByAllMyApprovalDocumentLeaves(empNum);
-        List<EdsmDocumentDTO> myApprovalDocumentOvertime = edao.selectByAllMyApprovalDocumentOvertime(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentBc = edsmService.selectByAllMyApprovalDocumentBc(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentCdv = edsmService.selectByAllMyApprovalDocumentCdv(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentLoa = edsmService.selectByAllMyApprovalDocumentLoa(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentLeaves = edsmService.selectByAllMyApprovalDocumentLeaves(empNum);
+        List<EdsmDocumentDTO> myApprovalDocumentOvertime = edsmService.selectByAllMyApprovalDocumentOvertime(empNum);
 
         model.addAttribute("myApprovalDocumentBc",myApprovalDocumentBc);
         model.addAttribute("myApprovalDocumentCdv",myApprovalDocumentCdv);
@@ -228,11 +230,11 @@ public class EdsmController {
 
 
 
-        List<EdsmDocumentDTO> myRejectedDocumentBc = edao.selectByAllMyRejectedDocumentBc(empNum);
-        List<EdsmDocumentDTO> myRejectedDocumentCdv = edao.selectByAllMyRejectedDocumentCdv(empNum);
-        List<EdsmDocumentDTO> myRejectedDocumentLoa = edao.selectByAllMyRejectedDocumentLoa(empNum);
-        List<EdsmDocumentDTO> myRejectedDocumentLeaves = edao.selectByAllMyRejectedDocumentLeaves(empNum);
-        List<EdsmDocumentDTO> myRejectedDocumentOvertime = edao.selectByAllMyRejectedDocumentOvertime(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentBc = edsmService.selectByAllMyRejectedDocumentBc(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentCdv = edsmService.selectByAllMyRejectedDocumentCdv(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentLoa = edsmService.selectByAllMyRejectedDocumentLoa(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentLeaves = edsmService.selectByAllMyRejectedDocumentLeaves(empNum);
+        List<EdsmDocumentDTO> myRejectedDocumentOvertime = edsmService.selectByAllMyRejectedDocumentOvertime(empNum);
 
         model.addAttribute("myRejectedDocumentBc",myRejectedDocumentBc);
         model.addAttribute("myRejectedDocumentCdv",myRejectedDocumentCdv);
