@@ -225,11 +225,21 @@
     <update id="UpdateApprovalStatus" parameterType="map">
         UPDATE groupware.approval_line
         SET status = #{status},
+            reason = #{reason},
             approved_at = NOW()
         WHERE document_id = #{documentId}
           AND approver_id = #{approverId}
           AND approval_no = #{approvalNo}
     </update>
+
+    <update id="UpdateNextApproverStatus" parameterType="map">
+        UPDATE groupware.approval_line SET status = #{newStatus}, approved_at = null WHERE document_id = #{documentId} AND approval_no = #{approvalNo} AND status = #{currentStatus}
+    </update>
+
+
+    <select id="SelectByRejectionReason" resultType="com.example.projectdemo.domain.edsm.dto.ApprovalLineDTO">
+        select reason from groupware.approval_line where document_id = #{documentId} and approver_id = #{approverId} and status = '반려'
+    </select>
 
 
     <!-- 파일 첨부 -->

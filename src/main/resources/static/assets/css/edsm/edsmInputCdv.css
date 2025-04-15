@@ -884,7 +884,14 @@ input[type="file"] {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(74, 144, 226, 0.25);
 }
+#availableList li{
+    text-align: center;
+}
 
+#selectedList li{
+    list-style: none;
+    text-align: center;
+}
 /* 반응형 */
 @media (min-width: 1201px) {
     .main-container {

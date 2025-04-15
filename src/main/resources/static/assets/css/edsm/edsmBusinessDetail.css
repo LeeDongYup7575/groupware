@@ -284,7 +284,7 @@ select:disabled {
     padding: 15px;
     border: 1px solid #e2e8f0;
     text-align: center;
-    height: 140px;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -646,7 +646,23 @@ select:disabled {
 
 #approvalModal p {
     color: #4a5568;
+    margin-bottom: 10px;
+}
+.modal-reason{
+    width: 100%;
+    padding: 12px;
     margin-bottom: 20px;
+    border: 1px solid #d1e0ef;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #4a5568;
+    transition: all 0.2s;
+}
+
+.modal-reason:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
 }
 
 #approvalModal button,
@@ -754,7 +770,7 @@ select:disabled {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    margin-top: 10px;
+
     box-shadow: 0 2px 6px rgba(74, 144, 226, 0.2);
 }
 

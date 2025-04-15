@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class EdsmDAO {
@@ -42,6 +43,13 @@ public class EdsmDAO {
         return mybatis.insert("Edsm.InsertByBcApproval", aldto);
 
     }
+
+
+
+
+
+
+
     // 기안자를 기준으로 모든 문서 출력
     public List<EdsmDocumentDTO> selectByAllDocument(String empNum) {
         return mybatis.selectList("Edsm.SelectByAllDocument", empNum);
@@ -111,11 +119,14 @@ public class EdsmDAO {
         return mybatis.selectList("Edsm.SelectByDocumentIdFromApprovalLine", id);
     }
 
-    //결재라인 상태 업데이트
+    //결재라인 상태 업데이트(대기->승인 or 반려)
     public int updateApprovalStatus(ApprovalLineDTO approvalLineDTO) {
         return mybatis.update("Edsm.UpdateApprovalStatus", approvalLineDTO);
     }
-
+    //결재라인 상태 업데이스(예정->대기)
+    public int updateNextApproverStatus(Map<String,Object> param) {
+        return mybatis.update("Edsm.UpdateNextApproverStatus",param);
+    }
 //--------------------------------------------------------------------------------//
     //나의 기안문서 보기(전체 - 업무연락)
     public List<EdsmDocumentDTO> selectByAllMyWrittenDocumentBc(String empNum) {
@@ -226,6 +237,21 @@ public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentBc(String empNum) {
 
 
         return mybatis.selectList("Edsm.SelectByAllMyRejectedDocumentOvertime", empNum);
+    }
+
+    //사유 가져오기
+    public String getRejectionReason(ApprovalLineDTO approvalLineDTO) {
+
+        ApprovalLineDTO approvalLine = mybatis.selectOne("Edsm.SelectByRejectionReason", approvalLineDTO);
+
+
+        if(approvalLine != null){
+            return approvalLine.getReason();
+        }
+
+            return "사유가 없습니다.";
+
+
     }
 
 

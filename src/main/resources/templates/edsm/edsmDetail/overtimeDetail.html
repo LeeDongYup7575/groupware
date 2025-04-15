@@ -196,21 +196,55 @@
 
                         <div class="approval-body approval-body-2">
                             <div class="approval-body-cell approval-body-cell-2" th:each="appList : ${approvalLineList}">
-                                <div class="approval-stamp" th:text="${appList.status}"></div>
-                                <div class="approval-name" th:text="${appList.approverPosition}+' '+${appList.approverName}"></div>
-                                <div class="approval-date" th:text="${#dates.format(appList.approvalAt, 'yyyy-MM-dd')}"></div>
-                                <!-- 버튼은 상태가 '대기'이고, 현재 로그인한 사원번호와 결재자 사원번호가 일치할 때만 나타남 -->
-                                <div class="approval-btn" th:if="${appList.status == '대기' and appList.approverId == employee.empNum}">
-                                    <!-- data-document-id와 data-approval-no를 저장하여 후에 AJAX 요청 시 사용 -->
-                                    <button type="button" class="approvalBtn"
-                                            th:attr="data-document-id=${appList.documentId}, data-approver-id=${appList.approverId}, data-approval-no=${appList.approvalNo}">
-                                        결재하기
-                                    </button>
+                                <div>
+                                    <div class="approval-stamp"
+                                         th:classappend="${appList.status == '반려'} ? 'rejected-stamp' : (${appList.status == '예정'} ? 'expected-stamp' : '')"
+                                         th:text="${appList.status}"
+                                         th:attr="data-document-id=${appList.documentId}, data-approver-id=${appList.approverId}"
+                                         th:style="${appList.status == '반려'} ? 'cursor: pointer; color: #e74c3c; border-color: #e74c3c;' :
+                                  (${appList.status == '예정'} ? 'color: #2ecc71; border-color: #2ecc71;' : 'cursor: default;')">
+                                    </div>
+
                                 </div>
+
+                                <div class="approval-content">
+                                    <div class="approval-name" th:text="${appList.approverPosition}+' '+${appList.approverName}"></div>
+                                    <div class="approval-date" th:text="${#dates.format(appList.approvalAt, 'yyyy-MM-dd')}"></div>
+
+                                    <!-- 버튼은 상태가 '대기'이고, 현재 로그인한 사원번호와 결재자 사원번호가 일치할 때만 나타남 -->
+                                    <div class="approval-btn" th:if="${appList.status == '대기' and appList.approverId == employee.empNum}">
+
+                                        <!-- data-document-id와 data-approval-no를 저장하여 후에 AJAX 요청 시 사용 -->
+                                        <button type="button" class="approvalBtn"
+                                                th:attr="data-document-id=${appList.documentId}, data-approver-id=${appList.approverId}, data-approval-no=${appList.approvalNo}">
+                                            결재하기
+                                        </button>
+                                    </div>
+
+                                </div>
+
+
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 반려 사유 모달 -->
+                <div id="reasonModal" class="modal" style="display:none;">
+                    <div class="modal-content">
+                        <span class="close" style="cursor:pointer;">&times;</span>
+                        <h3>반려 사유</h3>
+                        <div id="rejectionReason" style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 5px; border-left: 4px solid #e74c3c;">
+                            <!-- 여기에 반려 사유가 동적으로 들어갑니다 -->
+                        </div>
+                        <div style="display: flex; justify-content: center;">
+                            <button id="closeReasonBtn" type="button" style="padding: 8px 15px; background-color: #e9e9e9; border: none; border-radius: 4px; cursor: pointer;">
+                                <i class="fas fa-times"></i> 닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
 
 
 
@@ -254,7 +288,8 @@
         <div class="modal-content">
             <span class="close" style="cursor:pointer;">&times;</span>
             <h3>결재 선택</h3>
-            <p>승인 또는 반려를 선택하세요.</p>
+            <p>이 문서에 대한 결재 의견을 입력해주세요.</p>
+            <input type="text" class="modal-reason" placeholder="사유를 입력해주세요">
             <button id="approveBtn" data-status="승인">승인</button>
             <button id="rejectBtn" data-status="반려">반려</button>
         </div>
@@ -380,13 +415,58 @@
                 success: function(response) {
                     // 서버에서 리다이렉트 대신 성공 메시지를 반환하도록 수정 필요
                     alert('결재 상태가 "' + newStatus + '"로 변경되었습니다.');
-                    location.href = "/edsmDetail/cashDisbuVoucher/" + documentId;
+                    location.href = "/edsmDetail/overtimesDetail/" + documentId;
                 },
                 error: function() {
                     alert('결재 상태 업데이트에 실패했습니다.');
                 }
             });
         });
+
+
+        // 사유보기 버튼 클릭 시 모달 열기
+        $('.approval-stamp.rejected-stamp').on('click', function() {
+            // 버튼에 저장된 문서ID와 결재번호를 모달에 data 속성으로 저장
+            let documentId = $(this).data('document-id');
+            let approverId = $(this).data('approver-id');
+
+
+            // AJAX를 통해 반려 사유 가져오기
+            $.ajax({
+                url: '/edsmDetail/getRejectionReason',
+                type: 'GET',
+                data: {
+                    documentId: documentId,
+                    approverId: approverId
+                },
+                success: function(response) {
+                    // 서버에서 반환된 반려 사유를 모달에 표시
+                    console.log(response);
+                    $('#rejectionReason').text(response || '반려 사유가 없습니다.');
+                    // 모달 열기
+                    $('#reasonModal').fadeIn();
+                },
+                error: function() {
+                    alert('반려 사유를 불러오는데 실패했습니다.');
+                }
+            });
+        });
+
+// 반려 사유 모달 닫기 (X 버튼 클릭 시)
+        $('#reasonModal .close, #closeReasonBtn').on('click', function() {
+            $('#reasonModal').fadeOut();
+        });
+
+// 모달 바깥 영역 클릭 시 모달 닫기 (선택적)
+        $(window).on('click', function(event) {
+            if ($(event.target).is('#reasonModal')) {
+                $('#reasonModal').fadeOut();
+            }
+            if ($(event.target).is('#approvalModal')) {
+                $('#approvalModal').fadeOut();
+            }
+        });
+
 
         // form select 변경 이벤트
         $("#documentType").on("change", function() {

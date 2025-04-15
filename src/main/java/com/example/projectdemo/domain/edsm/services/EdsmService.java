@@ -61,6 +61,123 @@ public class EdsmService {
         return edao.selectByAllApprovalFromIdExpected(empNum);
     }
 
-    //
+
+    //--------------------------------------------------------------------------------//
+    //나의 기안문서 보기(전체 - 업무연락)
+    public List<EdsmDocumentDTO> selectByAllMyWrittenDocumentBc(String empNum) {
+
+
+        return edao.selectByAllMyWrittenDocumentBc(empNum);
+    }
+
+    //나의 기안문서 보기(전체 - 지출결의서)
+    public List<EdsmDocumentDTO> selectByAllMyWrittenDocumentCdv(String empNum) {
+
+
+        return edao.selectByAllMyWrittenDocumentCdv(empNum);
+    }
+
+    //나의 기안문서 보기(전체 - 품의서)
+    public List<EdsmDocumentDTO> selectByAllMyWrittenDocumentLoa(String empNum) {
+
+
+        return edao.selectByAllMyWrittenDocumentLoa(empNum);
+    }
+    //나의 기안문서 보기(전체 - 휴가신청서)
+    public List<EdsmDocumentDTO> selectByAllMyWrittenDocumentLeaves(String empNum) {
+
+
+        return edao.selectByAllMyWrittenDocumentLeaves(empNum);
+    }
+
+    //나의 기안문서 보기(전체 - 연장근무신청서)
+    public List<EdsmDocumentDTO> selectByAllMyWrittenDocumentOvertime(String empNum) {
+
+
+        return edao.selectByAllMyWrittenDocumentOvertime(empNum);
+    }
+
+
+
+    //--------------------------//
+
+
+
+    //나의 기안문서 보기(승인 - 업무연락)
+    public List<EdsmDocumentDTO> selectByAllMyApprovalDocumentBc(String empNum) {
+
+
+        return edao.selectByAllMyApprovalDocumentBc(empNum);
+    }
+
+    //나의 기안문서 보기(승인 - 지출결의서)
+    public List<EdsmDocumentDTO> selectByAllMyApprovalDocumentCdv(String empNum) {
+
+
+        return edao.selectByAllMyApprovalDocumentCdv(empNum);
+    }
+
+    //나의 기안문서 보기(승인 - 품의서)
+    public List<EdsmDocumentDTO> selectByAllMyApprovalDocumentLoa(String empNum) {
+
+
+        return edao.selectByAllMyApprovalDocumentLoa(empNum);
+    }
+    //나의 기안문서 보기(승인 - 휴가신청서)
+    public List<EdsmDocumentDTO> selectByAllMyApprovalDocumentLeaves(String empNum) {
+
+
+        return edao.selectByAllMyApprovalDocumentLeaves(empNum);
+    }
+
+    //나의 기안문서 보기(승인 - 연장근무신청서)
+    public List<EdsmDocumentDTO> selectByAllMyApprovalDocumentOvertime(String empNum) {
+
+
+        return edao.selectByAllMyApprovalDocumentOvertime(empNum);
+    }
+
+
+
+    //------------------------------------------//
+//나의 기안문서 보기(반려 - 업무연락)
+    public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentBc(String empNum) {
+
+
+        return edao.selectByAllMyRejectedDocumentBc(empNum);
+    }
+
+    //나의 기안문서 보기(반려 - 지출결의서)
+    public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentCdv(String empNum) {
+
+
+        return edao.selectByAllMyRejectedDocumentCdv(empNum);
+    }
+
+    //나의 기안문서 보기(반려 - 품의서)
+    public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentLoa(String empNum) {
+
+
+        return edao.selectByAllMyRejectedDocumentLoa(empNum);
+    }
+    //나의 기안문서 보기(반려 - 휴가신청서)
+    public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentLeaves(String empNum) {
+
+
+        return edao.selectByAllMyRejectedDocumentLeaves(empNum);
+    }
+
+    //나의 기안문서 보기(반려 - 연장근무신청서)
+    public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentOvertime(String empNum) {
+
+
+        return edao.selectByAllMyRejectedDocumentOvertime(empNum);
+    }
+
+
+
+
+
+
 
 }
