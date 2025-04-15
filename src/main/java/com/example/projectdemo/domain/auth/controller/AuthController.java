@@ -263,8 +263,7 @@ public class AuthController {
     @PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> register(
             @RequestPart("userData") @Valid SignupDTO userData,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-            HttpServletRequest request) {
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
 
         try {
             // 필수 파라미터 검증
@@ -303,7 +302,6 @@ public class AuthController {
                     userData.getGender()
             );
 
-            System.out.println(userData.getEmpNum());
             leavesService.initializeEmployeeLeave(userData.getEmpNum());
 
             return ResponseEntity.ok(Map.of(
@@ -311,10 +309,11 @@ public class AuthController {
             ));
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", e.getMessage()
-            ));
+            logger.error("회원가입 처리 중 예외 발생", e);
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "회원가입 중 알 수 없는 오류가 발생했습니다.";
+            return ResponseEntity.badRequest().body(Map.of("message", errorMessage));
         }
+
     }
 
     @PostMapping("/change-password")

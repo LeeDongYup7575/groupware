@@ -40,11 +40,11 @@
         <div class="profile-card">
           <div class="profile-header">
             <div class="profile-image">
-              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="프로필 이미지">
+              <img th:src="${employee.profileImgUrl}" alt="프로필 이미지">
             </div>
             <div class="profile-name">
-              <h3>이미르 대리</h3>
-              <p>개발팀</p>
+              <h3 th:text="${employee.name + ' ' + employee.positionTitle}"></h3>
+              <p th:text="${employee.departmentName}"></p>
             </div>
           </div>
 
@@ -101,7 +101,7 @@
     <div class="dashboard-row">
       <div class="dashboard-section section-left">
         <h4 class="card-title">근태관리</h4>
-        <p class="date-info" th:text="${formattedDate}">2025년 03월 26일 (화) 10:56:43</p>
+        <p class="date-info" id="current-time">2025년 03월 26일 (화) 10:56:43</p>
 
         <div class="attendance-info">
           <div class="attendance-row">
@@ -283,6 +283,23 @@
     });
 
   });
+
+  function updateTime() {
+    var currentDate = new Date();
+    var year = currentDate.getFullYear();
+    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    var date = currentDate.getDate().toString().padStart(2, '0');
+    var day = currentDate.toLocaleString('ko-KR', { weekday: 'long' });
+    var hours = currentDate.getHours().toString().padStart(2, '0');
+    var minutes = currentDate.getMinutes().toString().padStart(2, '0');
+    var seconds = currentDate.getSeconds().toString().padStart(2, '0');
+
+    var formattedTime = `${year}년 ${month}월 ${date}일 (${day}) ${hours}:${minutes}:${seconds}`;
+    document.getElementById('current-time').textContent = formattedTime;
+  }
+
+  // 1초마다 updateTime 함수 실행
+  setInterval(updateTime, 1000);
 </script>
 
 <!-- 헤더 관련 스크립트 포함 -->

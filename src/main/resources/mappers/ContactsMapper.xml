@@ -129,4 +129,22 @@
     </select>
 
 
+    <!-- 사원 연락처 정보 roundcube 공유 주소록에 추가 -->
+    <insert id="insertSharedContact" parameterType="com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO">
+        INSERT INTO roundcube.contacts (
+            changed, del, name, email, firstname, vcard, words, user_id
+        )
+        SELECT
+            NOW(),
+            0,
+            #{name},
+            #{email},
+            #{firstname},
+            #{vcard},
+            #{words},
+            u.user_id
+        FROM roundcube.users u
+        WHERE u.username = 'global_addressbook@techx.kro.kr'
+    </insert>
+
 </mapper>

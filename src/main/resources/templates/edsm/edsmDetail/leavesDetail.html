@@ -5,23 +5,20 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/assets/css/edsm/edsmLeavesDetail.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>전자결재</title>
+    <title>전자결재 - 휴가신청서 상세</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Font Awesome 아이콘 사용 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
+    <!-- 사이드바 스타일 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 </head>
 <body>
 
-
-
-
-
-
 <!-- 헤더 -->
-<div class="header">
-    <div class="logo">TECH X</div>
-    <div class="title">전자결재</div>
-</div>
+<div th:replace="fragments/header :: header"></div>
 
 <div class="container">
     <!-- 좌측 사이드바 -->
@@ -56,15 +53,15 @@
                 나의 문서함
             </div>
             <div class="menu-items">
-                <div class="menu-item">
+                <div class="menu-item" id="myWritten">
                     <i class="fas fa-pen"></i>
                     기안
                 </div>
-                <div class="menu-item">
+                <div class="menu-item" id="approval">
                     <i class="fas fa-file-signature"></i>
                     승인
                 </div>
-                <div class="menu-item">
+                <div class="menu-item" id="rejected">
                     <i class="fas fa-undo"></i>
                     반려
                 </div>
@@ -72,25 +69,15 @@
         </div>
     </div>
 
-
-
-
-
-
-
     <!-- 결재 컨테이너 -->
     <div class="main-container">
         <div class="total">
-
-
             <!-- 기본설정 영역 -->
             <div class="form-section">
-                <h3 class="form-header">휴가 신청 결재</h3>
+                <h3 class="form-header">휴가신청서 상세 정보</h3>
                 <div class="form-row">
-
                     <!-- 문서 양식 종류 -->
                     <div class="form-label">문서 종류</div>
-
                     <div class="form-input">
                         <select id="documentType" name="documentType" th:each="doc : ${edsmDocumentList}" disabled>
                             <option th:if="${doc.edsmFormId == 1001}" th:text="업무연락"></option>
@@ -109,27 +96,24 @@
                     -->
 
                     <!-- 작성자 (서버에서 세팅된 변수 사용- 타임리프문을 이용해서 가져옴) -->
-                    <div class="form-label" style="margin-left: 20px;">작성자</div> <!-- 작성자(기안자) = drafter -->
-
+                    <div class="form-label" style="margin-left: 20px;">작성자</div>
                     <div class="form-input">
-                <span id="drafterInfo"
-                      th:each="doc : ${edsmDocumentList}"
-                      th:text="${doc.drafterPosition} + ' ' + ${doc.drafterName}">
-                      <!--
-                      <속성값 설명>
-                      drafterId = 기안자 사번
-                      drafterposition = 기안자 직급
-                      draftername = 기안자 이름
-                      -->
-                </span>
+                        <span id="drafterInfo"
+                              th:each="doc : ${edsmDocumentList}"
+                              th:text="${doc.drafterPosition} + ' ' + ${doc.drafterName}">
+                          <!--
+                          <속성값 설명>
+                          drafterId = 기안자 사번
+                          drafterposition = 기안자 직급
+                          draftername = 기안자 이름
+                          -->
+                        </span>
                         <!-- 기안자 정보를 form으로 보내기위해 히든 입력창 생성 -->
                         <input type="hidden" name="drafterId" th:value="${employee.empNum}" />
                         <input type="hidden" name="drafterPosition" th:value="${employee.positionTitle}" />
                         <input type="hidden" name="drafterName" th:value="${employee.name}" />
                     </div>
                 </div>
-
-
 
                 <div class="form-row">
                     <!-- 보존 연한 -->
@@ -139,8 +123,6 @@
                             <option th:text="${doc.retentionPeriod}"></option>
                         </select>
                     </div>
-
-
 
                     <!-- 보안 등급 -->
                     <div class="form-label" style="margin-left: 20px;">보안 등급</div>
@@ -155,53 +137,32 @@
                 </div>
             </div>
 
-
-
-
             <!-- 결재선 영역 -->
-            <div class="form-section"  >
+            <div class="form-section">
                 <div class="form-row" style="display:none">
                     <div class="form-label">결재라인</div>
-
-
                     <!-- 결재라인은 모달로 설정한 후, hidden 필드에 JSON 또는 구분자로 저장 -->
                     <button type="button" class="button" id="approvalSettingButton" style="margin-left: 10px; background-color: #e9f2ff; border-color: #4a90e2; color: #4a90e2;">결재선 설정</button>
                 </div>
 
-                <!-- 신청 라인 (기안자 정보 사용) -->
+                <!-- 결재 흐름도 -->
                 <div class="approval-container">
                     <div class="approval-line">
                         <div class="approval-header">신청</div>
                         <div class="approval-body">
                             <div class="approval-body-cell">
-                                <div class="drafter-stamp" style="
-                      width: 60px;
-                      height: 60px;
-                      border: 2px solid green;
-                      border-radius: 50%;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      color: green;
-                      font-weight: bold;
-                      transform: rotate(-15deg);">신청</div>
-
-                                <div class="drafter-name" style="margin: 5px 0;font-weight: bold;"
-                                     th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
-                                <div class="drafter-date" style="font-size: 12px;color: #777;" th:each="doc : ${edsmDocumentList}" th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></div>
+                                <div class="drafter-stamp">신청</div>
+                                <div class="drafter-name" th:text="${employee.positionTitle} + ' ' + ${employee.name}"></div>
+                                <div class="drafter-date" th:each="doc : ${edsmDocumentList}" th:text="${#dates.format(doc.drafterDate, 'yyyy-MM-dd')}"></div>
                             </div>
-
                         </div>
                     </div>
-
 
                     <!-- 결재 라인 (모달에서 동적 추가) -->
                     <div class="approval-line approval-line-2">
                         <div class="approval-header approval-header-2">
-                            <div class="approval-header-cell approval-header-cell-2">결재 라인</div>
-
+                            <div class="approval-header-cell approval-header-cell-2">결재</div>
                         </div>
-
 
                         <div class="approval-body approval-body-2">
                             <div class="approval-body-cell approval-body-cell-2" th:each="appList : ${approvalLineList}">
@@ -221,15 +182,9 @@
                     </div>
                 </div>
 
-
-
-                <!-- 결재라인 정보를 hidden 필드로 폼에 포함
-                     스크립트에서 동적으로 추가 될거임.
-                 -->
-
+                <!-- 결재라인 정보를 hidden 필드로 폼에 포함 -->
                 <input type="hidden" name="approvalLine" id="approvalLine" value="" />
             </div>
-
 
             <!-- 본문 입력 영역 -->
             <div class="main2-contents" th:each="leave : ${leavesList}">
@@ -240,7 +195,7 @@
                 <div class="form-group">
                     <div style="margin-bottom: 20px;">
                         <label for="accountingDate">휴가 신청일</label>
-                        <input type="text" id="accountingDate" th:value="${leave.leaveType}+' '+${leave.startDate}" style="width: 200px;" readonly="readonly">
+                        <input type="text" id="accountingDate" th:value="${leave.leaveType}+' '+${leave.startDate}" readonly="readonly">
                     </div>
                 </div>
 
@@ -249,10 +204,9 @@
                     <textarea id="content" class="label-textarea" th:text="${leave.reason}" readonly="readonly"></textarea>
                 </div>
 
-
-                <!-- 파일첨부 영역 -->
+                <!-- 첨부파일 영역 -->
                 <div class="attachment-section">
-                    <span>첨부파일</span>
+                    <span><i class="fas fa-paperclip"></i> 첨부파일</span>
                     <div class="attachment-drop-area">
                         <!-- 첨부파일이 있을 경우 목록을 출력 -->
                         <ul>
@@ -270,11 +224,7 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
-
-
         </div>
     </div>
 
@@ -282,10 +232,16 @@
     <div id="approvalModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="close" style="cursor:pointer;">&times;</span>
-            <h3>결재 선택</h3>
-            <p>승인 또는 반려를 선택하세요.</p>
-            <button id="approveBtn" data-status="승인">승인</button>
-            <button id="rejectBtn" data-status="반려">반려</button>
+            <h3>결재 진행</h3>
+            <p>이 문서에 대한 결재 의견을 선택해주세요.</p>
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <button id="approveBtn" data-status="승인">
+                    <i class="fas fa-check-circle"></i> 승인
+                </button>
+                <button id="rejectBtn" data-status="반려">
+                    <i class="fas fa-times-circle"></i> 반려
+                </button>
+            </div>
         </div>
     </div>
 
@@ -293,7 +249,7 @@
     <div id="employeeModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h3>결재라인 선택</h3><br/>
+            <h3>결재라인 선택</h3>
             <!-- 부서 선택 요소 추가 -->
             <div class="department-selection">
                 <label for="departmentSelect">부서 선택:</label>
@@ -357,6 +313,20 @@
         });
 
 
+        // 나의 문서함
+        // 기안 버튼
+        $("#myWritten").on("click", function () {
+            location.href = "/edsm/myWritten";
+        });
+        // 승인버튼
+        $("#approval").on("click", function () {
+            location.href = "/edsm/approval";
+        });
+        // 반려버튼
+        $("#rejected").on("click", function () {
+            location.href = "/edsm/rejected";
+        });
+
         // 결재하기 버튼 클릭 시 모달 열기
         $('.approvalBtn').on('click', function() {
             // 버튼에 저장된 문서ID와 결재번호를 모달에 data 속성으로 저장
@@ -381,7 +351,7 @@
             let documentId = $('#approvalModal').data('document-id');
             let approverId = $('#approvalModal').data('approver-id');
             let approvalNo = $('#approvalModal').data('approval-no');
-            // AJAX 요청을 통해 서버의 상태 업데이트 API 호출 (예시 URL: /edsm/updateApprovalStatus)
+            // AJAX 요청을 통해 서버의 상태 업데이트 API 호출
             $.ajax({
                 url: '/edsmDetail/updateApprovalStatus',
                 type: 'POST',
@@ -395,7 +365,7 @@
                 success: function(response) {
                     // 서버에서 리다이렉트 대신 성공 메시지를 반환하도록 수정 필요
                     alert('결재 상태가 "' + newStatus + '"로 변경되었습니다.');
-                    location.href = "/edsmDetail/cashDisbuVoucher/" + documentId;
+                    location.href = "/edsmDetail/leaves/" + documentId;
                 },
                 error: function() {
                     alert('결재 상태 업데이트에 실패했습니다.');
@@ -426,7 +396,6 @@
             // 선택된 li들의 순서를 재할당 (1부터 시작)
             $(".employee-list li.selected").each(function(index) {
                 $(this).attr("data-order", index + 1);
-
             });
         });
 
@@ -447,9 +416,6 @@
         $("#saveApprovalLine").on("click", function () {
             let selectedEmployees = [];
 
-
-
-
             // 모달에서 선택된 사원들의 정보를 1번 순서부터 추가
             $(".employee-list li.selected").each(function(index) {
                 let order = index + 1;  // 작성자가 1번이므로 2부터 시작
@@ -462,7 +428,7 @@
                     approvalNo: order,
                     position: approverPosition,
                     name: approverName,
-                    status: '' // 기본 상태를 필요에 따라 지정 (예: 대기)
+                    status: '대기' // 기본 상태
                 });
             });
 
@@ -485,5 +451,9 @@
         });
     });
 </script>
+<!-- 헤더 관련 스크립트 포함 -->
+<div th:replace="fragments/header :: headerScripts"></div>
+<!-- 공통 사이드바 스크립트 포함 -->
+<script th:src="@{/assets/js/fragments/sidebar-common.js}"></script>
 </body>
 </html>

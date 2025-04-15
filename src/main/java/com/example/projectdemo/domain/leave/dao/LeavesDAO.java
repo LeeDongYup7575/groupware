@@ -59,7 +59,7 @@ public class LeavesDAO {
         params.put("empId", empId);
         params.put("grantType", grantType);
         params.put("leaveCount", leaveCount);
-        mybatis.insert("com.example.projectdemo.domain.leave.dao.LeavesDAO.insertLeaveGrantWithDate", params);
+        mybatis.insert("com.example.projectdemo.domain.leave.dao.LeavesDAO.insertLeaveGrant", params);
     }
 
     // 특정 직원의 leave_grants 기록 전체 삭제

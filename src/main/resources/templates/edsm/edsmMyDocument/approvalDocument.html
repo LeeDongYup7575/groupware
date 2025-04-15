@@ -71,7 +71,7 @@
 
 <!-- 메인 콘텐츠 영역 -->
 <div class="main-content">
-    <span>나의 결재 상태</span>
+    <span>나의 기안 문서(승인)</span>
 
     <!-- 상단에 문서 유형 선택 셀렉트 박스 -->
     <div class="document-type-select">
@@ -88,7 +88,7 @@
 
     <!-- 업무연락 문서 목록 -->
     <div class="doc-table-container" data-doc-type="업무연락">
-        <h4>업무연락 결재 상태</h4>
+        <h4>업무연락서</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -101,10 +101,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(allBusinessDocument)}">
+            <tr th:if="${#lists.isEmpty(myApprovalDocumentBc)}">
                 <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
             </tr>
-            <tr th:each="doc : ${allBusinessDocument}" th:if="${doc.status == '진행'}">
+            <tr th:each="doc : ${myApprovalDocumentBc}">
                 <td th:text="${doc.id}"></td>
                 <td>
                     <a th:href="@{'/edsmDetail/businessContact/' + ${doc.id}}" th:text="${doc.title}"></a>
@@ -118,11 +118,11 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.approvalStatus}"
-                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                    : ((doc.approvalStatus == '승인') ? 'color:green;'
-                    : ((doc.approvalStatus == '반려') ? 'color:red;'
-                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '예정') ? 'color:black;'
+                    : ((doc.status == '승인') ? 'color:green;'
+                    : ((doc.status == '반려') ? 'color:red;'
+                    : ((doc.status == '대기') ? 'color:blue;'
                     : '')))}"></td>
             </tr>
             </tbody>
@@ -133,7 +133,7 @@
 
     <!-- 지출결의서 문서 목록 -->
     <div class="doc-table-container" data-doc-type="지출결의서">
-        <h4>지출결의서 결재 상태</h4>
+        <h4>지출결의서</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -146,10 +146,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(allCashDocument)}">
+            <tr th:if="${#lists.isEmpty(myApprovalDocumentCdv)}">
                 <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
             </tr>
-            <tr th:each="doc : ${allCashDocument}" th:if="${doc.status == '진행'}">
+            <tr th:each="doc : ${myApprovalDocumentCdv}">
                 <td th:text="${doc.id}"></td>
                 <td>
                     <a th:href="@{'/edsmDetail/cashDisbuVoucher/' + ${doc.id}}" th:text="${doc.title}"></a>
@@ -163,11 +163,11 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.approvalStatus}"
-                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                    : ((doc.approvalStatus == '승인') ? 'color:green;'
-                    : ((doc.approvalStatus == '반려') ? 'color:red;'
-                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '예정') ? 'color:black;'
+                    : ((doc.status == '승인') ? 'color:green;'
+                    : ((doc.status == '반려') ? 'color:red;'
+                    : ((doc.status == '대기') ? 'color:blue;'
                     : '')))}"></td>
             </tr>
             </tbody>
@@ -178,7 +178,7 @@
 
     <!-- 품의서 결재 상황 -->
     <div class="doc-table-container" data-doc-type="품의서">
-        <h4>품의서 결재 상태</h4>
+        <h4>품의서</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -191,10 +191,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(allLetterDocument)}">
+            <tr th:if="${#lists.isEmpty(myApprovalDocumentLoa)}">
                 <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
             </tr>
-            <tr th:each="doc : ${allLetterDocument}" th:if="${doc.status == '진행'}">
+            <tr th:each="doc : ${myApprovalDocumentLoa}">
                 <td th:text="${doc.id}"></td>
                 <td>
                     <a th:href="@{'/edsmDetail/letterOfApproval/' + ${doc.id}}" th:text="${doc.title}"></a>
@@ -208,11 +208,11 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.approvalStatus}"
-                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                    : ((doc.approvalStatus == '승인') ? 'color:green;'
-                    : ((doc.approvalStatus == '반려') ? 'color:red;'
-                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '예정') ? 'color:black;'
+                    : ((doc.status == '승인') ? 'color:green;'
+                    : ((doc.status == '반려') ? 'color:red;'
+                    : ((doc.status == '대기') ? 'color:blue;'
                     : '')))}"></td>
             </tr>
             </tbody>
@@ -223,7 +223,7 @@
 
     <!-- 휴가신청 결재 상황 -->
     <div class="doc-table-container" data-doc-type="휴가신청서">
-        <h4>휴가신청 결재 상태</h4>
+        <h4>휴가신청서</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -236,10 +236,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(allLeavesDocument)}">
+            <tr th:if="${#lists.isEmpty(myApprovalDocumentLeaves)}">
                 <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
             </tr>
-            <tr th:each="doc : ${allLeavesDocument}" th:if="${doc.status == '진행'}">
+            <tr th:each="doc : ${myApprovalDocumentLeaves}">
                 <td th:text="${doc.id}"></td>
                 <td>
                     <a th:href="@{'/edsmDetail/leavesDetail/' + ${doc.id}}" th:text="${doc.title}"></a>
@@ -253,11 +253,11 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.approvalStatus}"
-                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                    : ((doc.approvalStatus == '승인') ? 'color:green;'
-                    : ((doc.approvalStatus == '반려') ? 'color:red;'
-                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '예정') ? 'color:black;'
+                    : ((doc.status == '승인') ? 'color:green;'
+                    : ((doc.status == '반려') ? 'color:red;'
+                    : ((doc.status == '대기') ? 'color:blue;'
                     : '')))}"></td>
             </tr>
             </tbody>
@@ -268,7 +268,7 @@
 
     <!-- 연장근무신청 결재 상황 -->
     <div class="doc-table-container" data-doc-type="연장근무신청서">
-        <h4>연장근무신청 결재 상태</h4>
+        <h4>연장근무신청서</h4>
         <table class="document-table">
             <thead>
             <tr>
@@ -281,10 +281,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:if="${#lists.isEmpty(allOvertimeDocument)}">
+            <tr th:if="${#lists.isEmpty(myApprovalDocumentOvertime)}">
                 <td colspan="6" style="text-align:center; padding:20px; color:#999; font-style:italic;">문서가 없습니다.</td>
             </tr>
-            <tr th:each="doc : ${allOvertimeDocument}" th:if="${doc.status == '진행'}">
+            <tr th:each="doc : ${myApprovalDocumentOvertime}">
                 <td th:text="${doc.id}"></td>
                 <td>
                     <a th:href="@{'/edsmDetail/overtimesDetail/' + ${doc.id}}" th:text="${doc.title}"></a>
@@ -298,11 +298,11 @@
                     <p th:case="1004">휴가신청</p>
                     <p th:case="1005">연장근무</p>
                 </td>
-                <td th:text="${doc.approvalStatus}"
-                    th:style="${(doc.approvalStatus == '예정') ? 'color:black;'
-                    : ((doc.approvalStatus == '승인') ? 'color:green;'
-                    : ((doc.approvalStatus == '반려') ? 'color:red;'
-                    : ((doc.approvalStatus == '대기') ? 'color:blue;'
+                <td th:text="${doc.status}"
+                    th:style="${(doc.status == '예정') ? 'color:black;'
+                    : ((doc.status == '승인') ? 'color:green;'
+                    : ((doc.status == '반려') ? 'color:red;'
+                    : ((doc.status == '대기') ? 'color:blue;'
                     : '')))}"></td>
             </tr>
             </tbody>

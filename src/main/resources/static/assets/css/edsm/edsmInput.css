@@ -49,6 +49,12 @@ body {
     padding: 20px 0;
     border-right: 1px solid #e5e5e5;
     flex-shrink: 0;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+    z-index: 100;
 }
 
 .total {
@@ -58,26 +64,31 @@ body {
 }
 
 .create-button {
-    background-color: #4a90e2;
+    background: linear-gradient(135deg, #4a90e2 0%, #3a80d2 100%);
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 0 15px 20px;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 20px 15px 20px;
     width: calc(100% - 30px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
 }
 
 .create-button i {
-    margin-right: 5px;
+    margin-right: 8px;
 }
 
 .create-button:hover {
-    background-color: #3a80d2;
+    background: linear-gradient(135deg, #3a80d2 0%, #2d70c3 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(74, 144, 226, 0.25);
 }
 
 /* 메뉴 스타일 */
@@ -89,14 +100,15 @@ body {
     display: flex;
     align-items: center;
     padding: 10px 15px;
-    color: #333;
-    font-weight: 500;
+    color: #2c5282;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .menu-header i {
-    margin-right: 8px;
+    margin-right: 10px;
+    color: #4a90e2;
 }
 
 .menu-header:hover {
@@ -110,27 +122,31 @@ body {
 .menu-item {
     display: flex;
     align-items: center;
-    padding: 8px 10px 8px 25px;
-    color: #333;
+    padding: 10px 10px 10px 25px;
+    color: #4a5568;
     font-size: 14px;
     cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
 }
 
 .menu-item:hover {
     background-color: #e6f0fb;
+    color: #2c5282;
 }
 
 .menu-item.active {
-    background-color: #e6f0fb;
-    color: #4a90e2;
+    background-color: #ebf4ff;
+    color: #2c5282;
     font-weight: 500;
+    border-left: 3px solid #4a90e2;
 }
 
 .menu-item i {
-    margin-right: 8px;
+    margin-right: 10px;
     width: 18px;
     text-align: center;
-    color: #666;
+    color: #4a90e2;
 }
 
 /* 메인 콘텐츠 영역 - 수정된 부분 */

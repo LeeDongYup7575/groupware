@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.contact.mapper;
 
 import com.example.projectdemo.domain.contact.dto.EmployeeContactDTO;
 import com.example.projectdemo.domain.contact.dto.PersonalContactDTO;
+import com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,5 +34,8 @@ public interface ContactMapper {
     // 개인 주소록 검색 (로그인한 사원의 개인 주소록)
     List<PersonalContactDTO> searchPersonalContacts(@Param("empId") Integer empId,
                                                     @Param("queryPattern") String queryPattern);
+
+    // 사원 연락처 정보 roundcube 공유 주소록에 추가
+    int insertSharedContact(RoundcubeContactDTO contact); // prefix 안 줌
 
 }

@@ -232,10 +232,6 @@ public class WebController {
         LocalDateTime now = LocalDateTime.now();
         model.addAttribute("currentDate", now);
 
-        // 현재 날짜를 포맷팅하여 추가 (화면에 표시할 용도)
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 (E) HH:mm:ss");
-        model.addAttribute("formattedDate", now.format(dateFormatter));
-
         // 회의실 유틸리티 추가
         model.addAttribute("bookingUtils", new BookingTimeUtils());
 

@@ -108,12 +108,11 @@
                 <th>휴가 일수</th>
                 <th>기간</th>
                 <th>상태</th>
-                <th>상세</th>
             </tr>
             </thead>
             <tbody>
             <tr th:if="${leavesList.isEmpty()}">
-                <td colspan="7" class="no-data">데이터가 없습니다.</td>
+                <td colspan="6" class="no-data">데이터가 없습니다.</td>
             </tr>
             <tr th:each="leave : ${leavesList}">
                 <td th:text="${leave.id}">1</td>
@@ -122,7 +121,6 @@
                 <td th:text="${leave.leaveType == '반차' ? 0.5 : (leave.leaveType == '연차' ? 1 : 0)}">휴가일수</td>
                 <td th:text="${leave.startDate} + ' ~ ' + ${leave.endDate}">기간</td>
                 <td th:text="${leave.status}">상태</td>
-                <td><button class="detail-button" th:attr="data-reason=${leave.reason}">상세</button></td>
             </tr>
             </tbody>
         </table>
@@ -148,14 +146,6 @@
             location.href = "/leaves/leavesForm";
         };
 
-        // 상세보기 버튼
-        const detailButtons = document.querySelectorAll('.detail-button');
-        detailButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const reason = this.getAttribute('data-reason');
-                alert('사유: ' + reason);
-            });
-        });
 
         // 드롭다운 토글
         document.querySelector('.dropdown-header').addEventListener('click', function () {
