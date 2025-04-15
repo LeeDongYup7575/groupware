@@ -316,65 +316,15 @@ body {
     text-overflow: ellipsis;
 }
 
-/* 캘린더 */
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+.calendar-wrapper {
+    max-width: 100%;
+    margin: auto;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-.calendar-header h5 {
+.fc .fc-toolbar-title {
     font-size: 18px;
     font-weight: 600;
-    margin: 0;
-}
-
-.calendar-header button {
-    background: none;
-    border: none;
-    color: var(--text-light);
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    transition: color 0.2s;
-}
-
-.calendar-header button:hover {
-    color: var(--primary-color);
-}
-
-.calendar-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.calendar-table th, .calendar-table td {
-    text-align: center;
-    padding: 0.5rem;
-    border: 1px solid #eee;
-}
-
-.calendar-table th {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.calendar-table .current-day {
-    background-color: var(--primary-light);
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.calendar-info {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    text-align: center;
-    margin-top: 1rem;
-}
-
-.calendar-info > div{
-    display: flex;
-    justify-content: space-between;
 }
 
 /* 알림 메시지 */
