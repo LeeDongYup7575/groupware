@@ -112,13 +112,9 @@ public class ContactApiController {
      * 개인 주소록 연락처 수정
      */
     @PutMapping("/personal/{id}")
-    public ResponseEntity<Void> updatePersonalContact(
-            @PathVariable int id,
-            @RequestBody PersonalContactDTO dto
-    ) {
+    public ResponseEntity<Void> updatePersonalContact(@PathVariable int id, @RequestBody PersonalContactDTO dto) {
         try {
-            dto.setId(id); // id 바인딩
-            contactService.updatePersonalContact(dto);
+            contactService.updatePersonalContact(id, dto); // id 별도 전달
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

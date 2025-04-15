@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.projectdemo.domain.contact.mapper.ContactMapper">
+
+    <!-- 주소록 id로 roundcube_contact_id 조회 -->
+    <select id="findRoundcubeContactIdById" resultType="int">
+        SELECT roundcube_contact_id
+        FROM personal_contacts
+        WHERE id = #{id}
+    </select>
+
     <!-- 모든 사원의 연락처 정보 조회 -->
     <select id="findAllEmpContacts" resultType="com.example.projectdemo.domain.contact.dto.EmployeeContactDTO">
         SELECT
@@ -117,11 +125,23 @@
     <update id="updatePersonalContact" parameterType="com.example.projectdemo.domain.contact.dto.PersonalContactDTO">
         UPDATE personal_contacts
         SET
-            name = #{contact.name},
-            email = #{contact.email},
-            phone = #{contact.phone},
-            memo = #{contact.memo}
-        WHERE id = #{contact.id}
+            name = #{name},
+            email = #{email},
+            phone = #{phone},
+            memo = #{memo}
+        WHERE id = #{id}
+    </update>
+
+    <!-- roundcube 연락처 수정 -->
+    <update id="updateRoundcubeContact" parameterType="com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO">
+        UPDATE roundcube.contacts
+        SET name = #{name},
+            email = #{email},
+            firstname = #{firstname},
+            vcard = #{vcard},
+            words = #{words},
+            changed = NOW()
+        WHERE contact_id = #{contactId}
     </update>
 
     <!-- 공유 주소록 검색: 이름, 내부 이메일, 전화번호, 부서명을 대상으로 LIKE 검색 -->

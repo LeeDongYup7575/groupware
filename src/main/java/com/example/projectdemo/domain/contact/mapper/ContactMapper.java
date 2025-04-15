@@ -10,6 +10,9 @@ import java.util.List;
 
 @Mapper
 public interface ContactMapper {
+    // 주소록 id로 roundcube_contact_id 조회
+    Integer findRoundcubeContactIdById(@Param("id") int id);
+
     // 모든 사원의 연락처 정보 조회
     List<EmployeeContactDTO> findAllEmpContacts();
 
@@ -35,7 +38,10 @@ public interface ContactMapper {
     void deleteContactsByIds(@Param("ids") List<Integer> ids);
 
     // 개인주소록 연락처 수정
-    void updatePersonalContact(@Param("contact") PersonalContactDTO dto);
+    void updatePersonalContact(PersonalContactDTO contact);
+
+    // roundcube 연락처 수정
+    void updateRoundcubeContact(RoundcubeContactDTO contact);
 
     // 공유 주소록(사원 연락처) 검색
     List<EmployeeContactDTO> searchSharedContacts(@Param("queryPattern") String queryPattern);

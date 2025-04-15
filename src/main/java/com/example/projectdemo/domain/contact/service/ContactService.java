@@ -111,8 +111,52 @@ public class ContactService {
     /**
      * 개인 주소록 연락처 수정
      */
-    public void updatePersonalContact(PersonalContactDTO dto) {
-        contactMapper.updatePersonalContact(dto);
+    @Transactional
+    public void updatePersonalContact(int id, PersonalContactDTO contact) {
+
+        contact.setId(id);
+
+        // roundcube_contact_id 보완
+        Integer rcid = contactMapper.findRoundcubeContactIdById(id);
+        contact.setRoundcubeContactId(rcid);
+
+        // 그룹웨어 DB 업데이트
+        contactMapper.updatePersonalContact(contact);
+
+        // 3. Roundcube 연동 업데이트
+        RoundcubeContactDTO rcContact = toRoundcubeDTO(contact);
+        contactMapper.updateRoundcubeContact(rcContact);
+
+    }
+
+    /**
+     * 연락처 dto roundcube dto로 가공
+     */
+    private RoundcubeContactDTO toRoundcubeDTO(PersonalContactDTO dto) {
+        String vcard = String.join("\n",
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                "N:;" + dto.getName() + ";;;",
+                "FN:" + dto.getName(),
+                dto.getEmail() != null ? "EMAIL:" + dto.getEmail() : null,
+                dto.getPhone() != null ? "TEL:" + dto.getPhone() : null,
+                dto.getMemo() != null ? "NOTE:" + dto.getMemo() : null,
+                "END:VCARD"
+        ).replaceAll("(?m)^null\\n?", "");
+
+        String words = dto.getName() + " " +
+                (dto.getEmail() != null ? dto.getEmail() : "") + " " +
+                (dto.getPhone() != null ? dto.getPhone().replace("-", "") : "");
+
+
+        return RoundcubeContactDTO.builder()
+                .contactId(dto.getRoundcubeContactId())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .firstname(dto.getName())
+                .vcard(vcard)
+                .words(words.trim())
+                .build();
     }
 
     /**
