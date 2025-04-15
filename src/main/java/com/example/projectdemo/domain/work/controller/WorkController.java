@@ -92,6 +92,8 @@ public class WorkController {
         // 연도 내 각 월별 연장/휴일근무시간 데이터를 가져온다.
         List<Map<String, Object>> overtimeHoursList = workService.getMonthlyOvertimeHours(empId, year);
 
+        List<Map<String, Object>> statisticsByMonth = attendService.getMonthlyAttendanceStatisticsThisMonth(empId);
+
         // 현재 월의 총합을 계산
         double currentMonthTotalOvertime = 0;
         for (Map<String, Object> data : overtimeHoursList) {
@@ -118,6 +120,7 @@ public class WorkController {
         model.addAttribute("employee", employee);
         model.addAttribute("today", today);
         model.addAttribute("currentMonthTotalOvertime", currentMonthTotalOvertime);
+        model.addAttribute("statisticsByMonth", statisticsByMonth);
 
         return "/work/overTimeForm";
     }
