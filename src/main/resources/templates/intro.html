@@ -224,23 +224,16 @@
             <div class="col-lg-10 hero-content text-center">
                 <h1 class="hero-title">TechX <br/>GROUPWARE</h1>
                 <p class="hero-subtitle">
-                    업무 효율성을 높이는 스마트 그룹웨어입니다.
+                    TechX 직원들을 위한 스마트 업무 포털입니다.<br/>
+                    하나의 시스템에서 커뮤니케이션과 업무를 효율적으로 처리하세요.
                 </p>
+
                 <!-- 로그인 되지 않은 사용자를 위한 버튼 (기본 표시) -->
                 <div class="d-flex flex-wrap gap-3 justify-content-center mb-3" id="hero-buttons">
-                    <a href="/auth/agreement" class="btn btn-primary" id="signup-button">시작하기</a>
+                    <a href="/auth/agreement" class="btn btn-primary" id="signup-button">회원가입</a>
                     <a href="/auth/login" class="btn btn-outline" id="hero-login-button">로그인</a>
                 </div>
-                <!-- 로그인된 사용자를 위한 대체 버튼 (기본 숨김) -->
-                <div class="d-flex flex-wrap gap-3 justify-content-center" id="logged-in-buttons"
-                     style="display: none;">
-                    <a th:href="@{/main}" class="btn btn-primary">그룹웨어</a>
-                    <a href="/mypage" class="btn btn-outline">마이페이지</a>
-                </div>
             </div>
-            <!--            <div class="col-lg-6 mt-5 mt-lg-0">-->
-            <!--                <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&q=80&w=2070" alt="Dashboard Preview" class="img-fluid hero-image">-->
-            <!--            </div>-->
         </div>
     </div>
 
@@ -249,26 +242,23 @@
         <div class="row g-4">
             <div class="col-md-4">
                 <div class="feature-box">
-                    <h4 class="feature-box-title">런칭 이벤트</h4>
-                    <h3 class="feature-box-subtitle">최대 70%할인 이벤트</h3>
-                    <p>효율적인 비용으로 서비스를 이용하세요.</p>
-                    <a href="#" class="feature-box-link">자세히 보기 →</a>
+                    <h4 class="feature-box-title">전자결재</h4>
+                    <h3 class="feature-box-subtitle">전자결재를 간편하게</h3>
+                    <p>휴가 신청부터 지출 결의까지, 클릭 몇 번이면 끝!</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="feature-box">
-                    <h4 class="feature-box-title">서비스 안내</h4>
-                    <h3 class="feature-box-subtitle">그룹웨어 구축하기</h3>
-                    <p>쉽고 간편하게 그룹웨어를 구축하고 관리하세요.</p>
-                    <a href="#" class="feature-box-link">자세히 보기 →</a>
+                    <h4 class="feature-box-title">메일 & 메시지</h4>
+                    <h3 class="feature-box-subtitle">TechX 내부 커뮤니케이션 허브</h3>
+                    <p>메일과 메시지를 간편하게 확인하고 소통하세요.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="feature-box">
-                    <h4 class="feature-box-title">부가서비스</h4>
-                    <h3 class="feature-box-subtitle">직무교육 오픈 이벤트</h3>
-                    <p>직원들의 역량 강화를 위한 다양한 교육 서비스를 확인하세요.</p>
-                    <a href="#" class="feature-box-link">자세히 보기 →</a>
+                    <h4 class="feature-box-title">업무 관리</h4>
+                    <h3 class="feature-box-subtitle">할 일과 프로젝트, 일정을 한눈에  </h3>
+                    <p>업무 등록, 공유, 진행 상황까지 체계적으로 관리하세요.</p>
                 </div>
             </div>
         </div>
@@ -280,8 +270,8 @@
     <div class="container">
         <div class="row justify-content-center mb-5">
             <div class="col-lg-8 text-center">
-                <h2 class="section-title">프로들이 만들고 프로들이 사용하는</h2>
-                <p class="product-subtitle">올인원 업무 플랫폼, TechX</p>
+                <h2 class="section-title">메일, 메시지, 근무관리, 전자결재까지 한 곳에서</h2>
+                <p class="product-subtitle">TechX 구성원을 위한 올인원 업무 포털</p>
             </div>
         </div>
 
@@ -295,7 +285,7 @@
                             <span class="product-name">오피스</span>
                         </div>
                         <h3 class="product-title">그룹웨어 <i class="fas fa-arrow-right fa-sm"></i></h3>
-                        <p class="product-description">메일, 메신저, 근무관리, 전자결재까지 오피스 업무 구축을 TechX 하나로 한 번에</p>
+                        <p class="product-description">메일과 메시지, 근무 관리부터 전자결재까지 TechX에서 모든 업무를 간편하게 처리하세요.</p>
                     </div>
                 </div>
                 <div class="col-md-8">
@@ -313,14 +303,14 @@
                 <div class="product-card product-card-purple">
                     <div class="product-info">
                         <div class="product-logo">
-                            <span class="product-icon product-icon-purple">인</span>
-                            <span class="product-name">인사/회계</span>
+                            <span class="product-icon product-icon-purple">r</span>
+                            <span class="product-name">운영지원</span>
                         </div>
-                        <h3 class="product-title">경비지출관리 <i class="fas fa-arrow-right fa-sm"></i></h3>
-                        <p class="product-description">재무 데이터 연동부터 분석까지 확실하게</p>
+                        <h3 class="product-title">예약 <i class="fas fa-arrow-right fa-sm"></i></h3>
+                        <p class="product-description">필요한 자원을 미리 예약하고 효율적으로 사용하세요</p>
                     </div>
                     <div class="product-image mt-4">
-                        <img src="/assets/images/expense-preview.jpg" alt="경비지출관리 미리보기" class="img-fluid">
+                        <img src="/assets/images/booking-preview.jpg" alt="예약 미리보기" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -333,11 +323,11 @@
                             <span class="product-icon product-icon-purple">인</span>
                             <span class="product-name">인사/회계</span>
                         </div>
-                        <h3 class="product-title">근무관리(+전자결재) <i class="fas fa-arrow-right fa-sm"></i></h3>
-                        <p class="product-description">다양한 근무 타입, 조직도, 구성원 정보도 문제없이</p>
+                        <h3 class="product-title">전자결재 <i class="fas fa-arrow-right fa-sm"></i></h3>
+                        <p class="product-description">사내 결재, 더 빠르고 투명하게 처리하세요</p>
                     </div>
                     <div class="product-image mt-4 position-relative">
-                        <img src="/assets/images/work-preview.jpg" alt="근무관리 미리보기" class="img-fluid">
+                        <img src="/assets/images/edsm-preview.jpg" alt="전자결재 미리보기" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -348,13 +338,13 @@
 <!-- 제품 필요성 섹션 -->
 <section class="features-update-section">
     <div class="container">
-        <h2 class="section-title">왜 TechX를 선택할까?</h2>
+        <h2 class="section-title">스마트한 하루를 시작하세요</h2>
         <p class="section-subtitle">
-            사용자 편의성을 지속적으로<br>
-            개선해 나갑니다.
+            업무는 더 간편하게,<br>
+            협업은 더 가까이
         </p>
         <p class="section-description">
-            사용자 시선에서 깊이 공감하고 더 나은 해답을 찾는 그룹웨어
+            TechX의 그룹웨어는 업무 효율과 협업을 위한 최적의 환경을 제공합니다.
         </p>
 
         <div class="row g-4 mt-5">
