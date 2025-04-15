@@ -69,9 +69,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const phone = document.getElementById('phoneInput').value;
         const memo = document.getElementById('memoInput').value;
 
+        const phonePattern = /^010-\d{4}-\d{4}$/;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
         if(!name) {
             alert('이름은 필수 입력 항목입니다.');
             document.getElementById('nameInput').focus();
+            return;
+        }
+
+        if (email && !emailPattern.test(email)) {
+            alert('이메일 형식이 올바르지 않습니다.');
+            return;
+        }
+
+        if (phone && !phonePattern.test(phone)) {
+            alert('전화번호는 010-XXXX-XXXX 형식으로 입력해주세요.');
             return;
         }
 
