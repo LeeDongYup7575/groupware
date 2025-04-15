@@ -20,6 +20,11 @@
   <!-- 사이드바 스타일 포함 -->
   <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 
+  <script src="https://unpkg.com/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.8/index.global.min.js"></script>
+
+
+
 </head>
 <body>
 
@@ -166,87 +171,10 @@
     <!-- 캘린더 -->
     <div class="dashboard-row">
       <div class="dashboard-section section-left">
-        <div class="calendar-header">
-          <button><i class="fas fa-chevron-left"></i></button>
-          <h5>2025년 3월</h5>
-          <button><i class="fas fa-chevron-right"></i></button>
+        <div class="calendar-wrapper">
+          <div id='calendar'></div>
         </div>
-        <table class="calendar-table">
-          <thead>
-          <tr>
-            <th>일</th>
-            <th>월</th>
-            <th>화</th>
-            <th>수</th>
-            <th>목</th>
-            <th>금</th>
-            <th>토</th>
-          </tr>
-          </thead>
-          <tbody>
-          <!-- 달력 날짜들 -->
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>1</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-            <td>7</td>
-            <td>8</td>
-          </tr>
-          <tr>
-            <td>9</td>
-            <td>10</td>
-            <td>11</td>
-            <td>12</td>
-            <td>13</td>
-            <td>14</td>
-            <td>15</td>
-          </tr>
-          <tr>
-            <td>16</td>
-            <td>17</td>
-            <td>18</td>
-            <td>19</td>
-            <td>20</td>
-            <td>21</td>
-            <td>22</td>
-          </tr>
-          <tr>
-            <td>23</td>
-            <td>24</td>
-            <td>25</td>
-            <td class="current-day">26</td>
-            <td>27</td>
-            <td>28</td>
-            <td>29</td>
-          </tr>
-          <tr>
-            <td>30</td>
-            <td>31</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          </tbody>
-        </table>
-        <div class="calendar-info">
-          <div>
-            <p>2025-03-27</p>
-            <p>일정 없음</p>
-          </div>
-        </div>
+
       </div>
       <!-- 프로필 및 게시판 섹션 -->
 <!--      <div class="profile-stats">-->
@@ -282,6 +210,28 @@
       });
     });
 
+      var calendarEl = document.getElementById('calendar');
+
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        googleCalendarApiKey: 'AIzaSyAmxOp9PrC83LxO6JmGFH3_rfhvpzOXiy8',
+        initialView: 'dayGridMonth',
+        locale: 'ko', // 한국어 설정
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,listMonth'
+        },eventSources: [{
+          googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
+          className: 'korean-holiday'
+        }],
+
+        eventClick: function(info) {
+          alert(info.event.title + "\n" + (info.event.extendedProps.description || ""));
+        }
+      });
+
+      calendar.render();
+
   });
 
   function updateTime() {
@@ -300,6 +250,8 @@
 
   // 1초마다 updateTime 함수 실행
   setInterval(updateTime, 1000);
+
+
 </script>
 
 <!-- 헤더 관련 스크립트 포함 -->
