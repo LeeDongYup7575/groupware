@@ -389,20 +389,42 @@ function renderContacts(data, tab) {
                 ${tab === 'personal' ? `<input type="checkbox" class="contact-checkbox">` : ''}
             </td>
             <td class="name-col">${contact.name}</td>
-            <td>${tab === 'shared' ? contact.internalEmail : contact.email || ''}</td>
+            <td>
+                <a href="#" class="email-link" onclick="openMailComposePopup('${tab === 'shared' ? contact.internalEmail : contact.email || ''}')">
+                    ${tab === 'shared' ? contact.internalEmail : contact.email || ''}
+                </a>
+            </td>
             <td>${contact.phone}</td>
             <td class="info-col">${tab === 'shared' ? contact.depName : contact.memo || ''}</td>
         `;
 
         // 연락처 행 클릭 감시 (상세 보기 모달 띄우기 위해)
         tr.addEventListener('click', function (e) {
-            // 체크박스 누를 땐 무시
-            if (e.target.classList.contains('contact-checkbox')) return;
+            if (e.target.classList.contains('contact-checkbox') ||
+                e.target.tagName === 'A'
+            ) return; // 체크박스 또는 이메일 링크 클릭은 무시
+
             openDetailModal(contact, tab);
         });
 
         tbody.appendChild(tr);
     });
+}
+
+// 메일 전송 팝업
+function openMailComposePopup(email) {
+    if (!email) return;
+
+    const width = 600;
+    const height = 600;
+
+    // 현재 창의 화면 크기 기준 위치 계산
+    const left = window.screenX + window.outerWidth - width - 20;  // 오른쪽에서 20px 띄움
+    const top = window.screenY + window.outerHeight - height - 40; // 아래에서 40px 띄움
+
+    const url = `http://techx.kro.kr:8081/roundcube/?_task=mail&_action=compose&_to=${encodeURIComponent(email)}`;
+    window.open(url, 'composeMail',
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
 }
 
 // active 클래스 토글 전용 함수
@@ -719,7 +741,8 @@ function createSearchSection(title, results, tab) {
 
             // 이메일
             const tdEmail = document.createElement("td");
-            tdEmail.textContent = (tab === "shared") ? contact.internalEmail : (contact.email || '');
+            const email = (tab === "shared") ? contact.internalEmail : (contact.email || '');
+            tdEmail.innerHTML = `<a href="#" class="email-link" onclick="openMailComposePopup('${email}')">${email}</a>`;
             tr.appendChild(tdEmail);
 
             // 전화번호
