@@ -93,8 +93,9 @@ public class ContactApiController {
      * 개인 주소록 연락처 삭제
      */
     @DeleteMapping("/personal/delete")
-    public ResponseEntity<Void> deletePersonalContacts(@RequestBody List<Integer> ids) {
+    public ResponseEntity<Void> deletePersonalContacts(@RequestBody List<Integer> ids, HttpServletRequest request) {
         try {
+            Integer empId = (Integer) request.getAttribute("id");
             if (ids == null || ids.isEmpty()) {
                 return ResponseEntity.badRequest().build(); // 잘못된 요청
             }

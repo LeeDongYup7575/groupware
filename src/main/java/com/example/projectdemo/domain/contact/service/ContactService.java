@@ -54,17 +54,24 @@ public class ContactService {
     @Transactional
     public void addPersonalContact(Integer empId, PersonalContactDTO contact) {
         contact.setEmpId(empId);
+
+        // 1. Roundcube 등록
+        RoundcubeContactDTO contactDTO = createRoundcubeDTOFrom(contact); // dto 변환
+        contactDTO.setEmpId(empId);
+        contactMapper.insertPersonalRoundcubeContact(contactDTO);
+
+        // 2. 반환된 contact_id 저장
+        contact.setRoundcubeContactId(contactDTO.getContactId());
+
+        // 3. personal_contacts에 insert
         contactMapper.insertPersonalContact(contact);
 
-        // Roundcube 주소록에도 등록 (이름만 필수, 나머지는 선택)
-        registerToPersonalRoundcubeAddressBook(contact);
     }
 
     /**
-     * Roundcube 개인 주소록에 추가
+     * Roundcube contact dto 생성
      */
-    public void registerToPersonalRoundcubeAddressBook(PersonalContactDTO dto) {
-
+    private RoundcubeContactDTO createRoundcubeDTOFrom(PersonalContactDTO dto) {
         String vcard = String.join("\n",
                 "BEGIN:VCARD",
                 "VERSION:3.0",
@@ -74,32 +81,31 @@ public class ContactService {
                 dto.getPhone() != null ? "TEL:" + dto.getPhone() : null,
                 dto.getMemo() != null ? "NOTE:" + dto.getMemo() : null,
                 "END:VCARD"
-        ).replaceAll("(?m)^null\\n?", ""); // null 줄 제거
+        ).replaceAll("(?m)^null\\n?", "");
 
         String words = dto.getName() + " " +
                 (dto.getEmail() != null ? dto.getEmail() : "") + " " +
                 (dto.getPhone() != null ? dto.getPhone().replace("-", "") : "");
 
-        RoundcubeContactDTO contactDTO = RoundcubeContactDTO.builder()
-                    .name(dto.getName())
-                    .email(dto.getEmail() != null ? dto.getEmail() : "")
-                    .firstname(dto.getName())
-                    .vcard(vcard)
-                    .words(words.trim())
-                    .empId(dto.getEmpId()) // 그룹웨어 사용자 ID
-                    .build();
-
-        contactMapper.insertPersonalRoundcubeContact(contactDTO);
-
-
+        return RoundcubeContactDTO.builder()
+                .name(dto.getName())
+                .email(dto.getEmail() != null ? dto.getEmail() : "")
+                .firstname(dto.getName())
+                .vcard(vcard)
+                .words(words.trim())
+                .build();
     }
-
 
     /**
      * 개인 주소록 연락처 삭제
      */
     public void deletePersonalContacts(List<Integer> ids) {
-        contactMapper.deleteContactsByIds(ids);
+        List<Integer> rcContactIds = contactMapper.findRoundcubeContactIdsByPersonalIds(ids);
+
+        if (!rcContactIds.isEmpty()) {
+            contactMapper.deleteRoundcubeContactsByIds(rcContactIds);
+            // personal_contacts는 자동 삭제됨 (외래키 CASCADE)
+        }
     }
 
     /**

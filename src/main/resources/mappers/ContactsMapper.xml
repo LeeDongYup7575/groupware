@@ -56,26 +56,20 @@
 
     <!-- 개인주소록에 연락처 추가 -->
     <insert id="insertPersonalContact">
-        INSERT INTO
-            personal_contacts (emp_id, name, email, phone, memo)
-        VALUES
-            (#{contact.empId}, #{contact.name}, #{contact.email}, #{contact.phone}, #{contact.memo})
+        INSERT INTO personal_contacts (emp_id, name, email, phone, memo, roundcube_contact_id)
+        VALUES (#{contact.empId}, #{contact.name}, #{contact.email}, #{contact.phone}, #{contact.memo}, #{contact.roundcubeContactId})
     </insert>
 
     <!-- 개인 주소록에 추가된 연락처 roundcube 주소록에 추가 -->
-    <insert id="insertPersonalRoundcubeContact" parameterType="com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO">
+    <insert id="insertPersonalRoundcubeContact"
+            parameterType="com.example.projectdemo.domain.contact.dto.RoundcubeContactDTO"
+            useGeneratedKeys="true"
+            keyProperty="contactId">
         INSERT INTO roundcube.contacts (
             changed, del, name, email, firstname, vcard, words, user_id
         )
         SELECT
-            NOW(),
-            0,
-            #{name},
-            #{email},
-            #{firstname},
-            #{vcard},
-            #{words},
-            u.user_id
+            NOW(), 0, #{name}, #{email}, #{firstname}, #{vcard}, #{words}, u.user_id
         FROM employees e
                  JOIN roundcube.users u ON u.username = e.internal_email
         WHERE e.id = #{empId}
@@ -88,6 +82,26 @@
         FROM personal_contacts
         WHERE emp_id = #{empId}
     </select>
+
+
+    <!-- personal_contacts → roundcube_contact_id 조회 -->
+    <select id="findRoundcubeContactIdsByPersonalIds" resultType="int">
+        SELECT roundcube_contact_id
+        FROM personal_contacts
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- roundcube.contacts에서 삭제 -->
+    <delete id="deleteRoundcubeContactsByIds">
+        DELETE FROM roundcube.contacts
+        WHERE contact_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <!-- 개인주소록 연락처 삭제 -->
     <delete id="deleteContactsByIds">

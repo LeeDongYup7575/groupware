@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoundcubeContactDTO {
+    private Integer contactId;
     private String name;
     private String email;
     private String firstname;
