@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.board.mapper;
 
 import com.example.projectdemo.domain.board.dto.PostsDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -33,4 +34,9 @@ public interface PostsMapper {
     // 하드 삭제 (실제 데이터베이스에서 삭제)
     int deletePost(int id);
 
+    // 내가 쓴 글 조회
+    List<PostsDTO> findPostsByEmpId(@Param("empId") Integer empId);
+
+    // 게시글 다중 삭제
+    void deletePostsByIds(@Param("list") List<Integer> ids);
 }

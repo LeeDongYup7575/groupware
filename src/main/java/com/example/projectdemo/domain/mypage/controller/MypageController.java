@@ -20,6 +20,4 @@ public class MypageController {
     @GetMapping
     public String mypage() {return "mypage/mypage";}
 
-
-//    @GetMapping("/activities/{menu}")
 }

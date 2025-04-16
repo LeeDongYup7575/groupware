@@ -2,18 +2,23 @@ package com.example.projectdemo.domain.mypage.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.ProfileUploadService;
+import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.service.PostsService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,34 +29,64 @@ public class MypageApiController {
     private final JwtTokenUtil jwtTokenUtil;
     private final EmployeesService employeesService;
     private final ProfileUploadService profileUploadService;
+    private final PostsService postsService;
 
     @Autowired
     public MypageApiController(JwtTokenUtil jwtTokenUtil,
                                EmployeesService employeesService,
-                               ProfileUploadService profileUploadService) {
+                               ProfileUploadService profileUploadService,
+                               PostsService postsService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeesService = employeesService;
         this.profileUploadService = profileUploadService;
+        this.postsService = postsService;
     }
 
+    /**
+     * 내 정보 조회
+     */
     @GetMapping("/info")
     public ResponseEntity<EmployeesDTO> info(HttpServletRequest request) {
-        String empNum = (String)request.getAttribute("empNum");
+        try {
+            String empNum = (String)request.getAttribute("empNum");
+            if (empNum == null || empNum.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
-        EmployeesDTO employee = employeesService.findByEmpNum(empNum);
+            EmployeesDTO employee = employeesService.findByEmpNum(empNum);
 
-        return ResponseEntity.ok(employee);
+            return ResponseEntity.ok(employee);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
+    /**
+     * 마지막 활동 시간 조회
+     */
     @GetMapping("/security")
     public ResponseEntity<Map<String, String>> security(HttpServletRequest request) {
-        String empNum = (String)request.getAttribute("empNum");
+        try{
+            String empNum = (String)request.getAttribute("empNum");
+            if (empNum == null || empNum.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
 
-        Map<String, String> response = employeesService.selectLastLogin(empNum);
+            Map<String, String> response = employeesService.selectLastLogin(empNum);
+            if (response == null || response.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
+    /**
+     * 내 정보 수정
+     */
     @PatchMapping("/update")
     public ResponseEntity<?> update(HttpServletRequest request,
                                     @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
@@ -81,5 +116,23 @@ public class MypageApiController {
         return ResponseEntity.ok(Collections.singletonMap("message", "업데이트 성공"));
     }
 
-//    @GetMapping("/activities/{menu}")
+    /**
+     * 내 게시글 조회
+     */
+    @GetMapping("/activities/mypost")
+    public ResponseEntity<List<PostsDTO>> getMyPosts(HttpServletRequest request) {
+        try{
+            Integer empId = (Integer) request.getAttribute("id");
+
+            if (empId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            List<PostsDTO> myPosts = postsService.getMyPosts(empId);
+            return ResponseEntity.ok(myPosts);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

@@ -139,7 +139,6 @@ public class ContactApiController {
             Map<String, Object> result = contactService.searchContacts(empId, query);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -238,13 +238,6 @@ table {
     color: gray;
 }
 
-/*thead tr {*/
-/*    background-color: #f9f9f9;*/
-/*}*/
-
-tbody tr:hover {
-    background-color: #f1f1f1;
-}
 
 /* 체크박스 스타일 */
 input[type="checkbox"] {
@@ -273,8 +266,20 @@ input[type="checkbox"] {
 tbody .title-col{
     text-align: left;
     font-size: 15px;
-    color: black;
     padding-left: 60px;
+}
+
+/* 게시글 제목 링크 기본 스타일 */
+tbody .title-col a {
+    color: black;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+/* 게시글 제목 링크 호버 스타일 */
+tbody .title-col a:hover {
+    color: #007bff;
+    text-decoration: underline;
 }
 
 
@@ -292,4 +297,66 @@ tbody .title-col{
 
 .delete-btn:hover {
     background-color: #005fa3;
+}
+
+
+
+.table-footer {
+    display: flex;
+    justify-content: space-between; /* 좌-중앙-우 정렬 */
+    align-items: center;
+    margin-top: 20px;
+    padding: 0 10px;
+}
+
+.footer-left,
+.footer-center,
+.footer-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.footer-left {
+    justify-content: flex-start;
+    gap: 6px;
+}
+
+.footer-center {
+    justify-content: center;
+}
+
+.footer-right {
+    justify-content: flex-end;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #333;
+    border: none;
+    text-decoration: none;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: #f0f0f0;
+}
+
+.page-link.active {
+    color: #007bff;
+    cursor: default;
+}
+
+.mypage-sidebar-icon i{
+    color: #4a90e2;
 }
