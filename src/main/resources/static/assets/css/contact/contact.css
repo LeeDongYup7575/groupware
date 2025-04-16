@@ -304,3 +304,7 @@ main {
 .contact-table tbody tr {
     cursor: pointer;
 }
+
+.contact-sidebar i {
+    color: #4a90e2;
+}
