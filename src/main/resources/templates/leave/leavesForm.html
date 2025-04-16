@@ -720,10 +720,10 @@
             }
 
             // 잔여 휴가 체크
-            const leaves = parseInt($(".form-section .form-row .form-input[data-leaves]").data("leaves"));
+            const leaves = parseFloat($(".form-section .form-row .form-input[data-leaves]").data("leaves"));
             const totalRequestedDays = calculateTotalRequestedDays();
 
-            if (leaves <= 0) {
+            if (leaves < 0.5) {
                 alert("잔여 휴가가 없습니다. 휴가를 신청할 수 없습니다.");
                 return false;
             }
