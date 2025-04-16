@@ -146,7 +146,7 @@ body {
     margin-right: 10px;
     width: 18px;
     text-align: center;
-    color: #4a90e2;
+    color: #4a5568;
 }
 
 /* 메인 콘텐츠 영역 */
@@ -603,7 +603,7 @@ select:disabled {
     margin: 8% auto;
     padding: 30px;
     border: 1px solid #e2e8f0;
-    width: 500px;
+    width: 400px;
     max-width: 90%;
     position: relative;
     border-radius: 12px;
@@ -642,16 +642,18 @@ select:disabled {
     font-size: 18px;
     margin-bottom: 15px;
     font-weight: 600;
+    text-align: center;
 }
 
 #approvalModal p {
     color: #4a5568;
     margin-bottom: 10px;
+    text-align: center;
 }
 .modal-reason{
     width: 100%;
     padding: 12px;
-    margin-bottom: 20px;
+    margin-top: 20px;
     border: 1px solid #d1e0ef;
     border-radius: 6px;
     font-size: 14px;
@@ -694,6 +696,46 @@ select:disabled {
 #rejectBtn:hover {
     background-color: #c53030;
 }
+
+
+/* 로딩 스피너 스타일 */
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4a90e2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+.loading-spinner p {
+    color: #333;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
 
 .department-selection {
     margin-bottom: 15px;

@@ -263,20 +263,26 @@
         </div>
     </div>
 
-    <!-- 결재 선택 모달 (초기에는 숨김 처리) -->
+    <!-- 결재 선택 모달에 로딩 스피너 추가 -->
     <div id="approvalModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="close" style="cursor:pointer;">&times;</span>
             <h3>결재 진행</h3>
             <p>이 문서에 대한 결재 의견을 입력해주세요.</p>
-            <input type="text" class="modal-reason" placeholder="사유를 입력해주세요">
-            <div style="display: flex; justify-content: center; gap: 15px;">
+
+            <div style="display: flex; justify-content: center; gap: 50px;">
                 <button id="approveBtn" data-status="승인">
                     <i class="fas fa-check-circle"></i> 승인
                 </button>
                 <button id="rejectBtn" data-status="반려">
                     <i class="fas fa-times-circle"></i> 반려
                 </button>
+            </div>
+            <input type="text" class="modal-reason" placeholder="반려 시 사유를 입력해주세요">
+            <!-- 로딩 스피너 추가 -->
+            <div id="loadingSpinner" class="loading-spinner" style="display:none;">
+                <div class="spinner"></div>
+                <p>처리 중입니다...</p>
             </div>
         </div>
     </div>
@@ -387,6 +393,13 @@
             let documentId = $('#approvalModal').data('document-id');
             let approverId = $('#approvalModal').data('approver-id');
             let approvalNo = $('#approvalModal').data('approval-no');
+            let reason = $('#approvalModal .modal-reason').val();
+
+            // 로딩 스피너 표시
+            $('#loadingSpinner').fadeIn();
+
+            // 버튼 비활성화
+            $('#approveBtn, #rejectBtn').prop('disabled', true);
             // AJAX 요청을 통해 서버의 상태 업데이트 API 호출
             $.ajax({
                 url: '/edsmDetail/updateApprovalStatus',
@@ -396,14 +409,27 @@
                     documentId: documentId,
                     approverId: approverId,
                     approvalNo: approvalNo,
-                    status: newStatus
+                    status: newStatus,
+                    reason: reason
                 },
                 success: function(response) {
+
+                    // 로딩 스피너 숨기기
+                    $('#loadingSpinner').fadeOut();
+
+                    // 버튼 활성화
+                    $('#approveBtn, #rejectBtn').prop('disabled', false);
                     // 서버에서 리다이렉트 대신 성공 메시지를 반환하도록 수정 필요
                     alert('결재 상태가 "' + newStatus + '"로 변경되었습니다.');
                     location.href = "/edsmDetail/leavesDetail/" + documentId;
                 },
                 error: function() {
+
+                    // 로딩 스피너 숨기기
+                    $('#loadingSpinner').fadeOut();
+
+                    // 버튼 활성화
+                    $('#approveBtn, #rejectBtn').prop('disabled', false);
                     alert('결재 상태 업데이트에 실패했습니다.');
                 }
             });

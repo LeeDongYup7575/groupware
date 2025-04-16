@@ -14,6 +14,234 @@
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
     <!-- 사이드바 스타일 포함 -->
     <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+
+    <!-- 날짜 필터 스타일 -->
+    <style>
+        /* 테이블 헤더 영역 스타일 수정 */
+        .table-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .table-header-container h4 {
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        /* 날짜 필터 컨테이너 스타일 */
+        .document-filter-container {
+            flex-grow: 1;
+            text-align: right;
+            padding: 0 10px;
+            margin: 0;
+        }
+
+        /* 필터 컨테이너 스타일 */
+        .date-filter-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 필터 토글 버튼 */
+        .filter-toggle-btn {
+            padding: 6px 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            color:#2c5282;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .filter-toggle-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        .filter-toggle-btn.active {
+            background-color: #4dabf7;
+            color: white;
+            border-color: #4dabf7;
+        }
+
+        .filter-text {
+            margin-left: 5px;
+        }
+
+        /* 필터 패널 */
+        .filter-panel {
+            position: absolute;
+            right: 0;
+            top: 38px;
+            width: 320px;
+            padding: 15px;
+            background: white;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        /* 애니메이션 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 날짜 필터 요소 스타일 */
+        .date-filter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .date-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-filter label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .date-filter-start, .date-filter-end {
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .filter-btn {
+            width: 126px;
+            height: 40px;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
+        }
+
+        .apply-date-filter {
+            background-color: #4dabf7;
+            color: white;
+            flex: 1;
+            margin-right: 5px;
+        }
+
+        .apply-date-filter:hover {
+            background-color: #3a8fd9;
+        }
+
+        .reset-date-filter {
+            background-color: #6c757d;
+            color: white;
+            flex: 1;
+            margin-left: 5px;
+        }
+
+        .reset-date-filter:hover {
+            background-color: #5a6268;
+        }
+
+        /* 활성화된 필터 표시 */
+        .active-filter-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #fa5252;
+            color: white;
+            width: 18px;
+            height: 18px;
+            font-size: 0.75em;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* 활성화된 필터 정보 */
+        .active-filters {
+            margin: 5px 0 0 auto !important;
+            padding: 4px 8px !important;
+            font-size: 0.85em !important;
+            background-color: #e2f0fd;
+            border-left: 4px solid #4dabf7;
+            border-radius: 2px;
+            color: #495057;
+            width: fit-content;
+        }
+
+        /* 필터링된 결과가 없을 때 메시지 스타일 */
+        .no-results-message {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-style: italic;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 768px) {
+            .table-header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .document-filter-container {
+                margin-top: 10px;
+                width: 100%;
+                text-align: left;
+                padding: 0;
+            }
+
+            .filter-panel {
+                width: 280px;
+                right: -70px;
+            }
+
+            .date-inputs {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .date-inputs span {
+                text-align: center;
+                margin: 5px 0;
+            }
+
+            .active-filters {
+                margin: 5px 0 0 0 !important;
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 <!-- 헤더 -->
@@ -32,7 +260,7 @@
             결재 상태
         </div>
         <div class="menu-items">
-            <div class="menu-item active" id="main">
+            <div class="menu-item" id="main">
                 <i class="fas fa-folder"></i>
                 전체
             </div>
@@ -53,7 +281,7 @@
             나의 문서함
         </div>
         <div class="menu-items">
-            <div class="menu-item" id="myWritten">
+            <div class="menu-item active" id="myWritten">
                 <i class="fas fa-pen"></i>
                 기안
             </div>
@@ -330,9 +558,6 @@
 
 <script>
     $(document).ready(function() {
-        // 현재 페이지 메뉴 아이템에 active 클래스 추가
-        $("#main").addClass("active");
-
         // 네비게이션 클릭 이벤트
         // 작성하기 버튼
         $("#create-button").on("click", function () {
@@ -407,16 +632,16 @@
             });
         }
 
-// 페이지 로드 시 실행
+        // 페이지 로드 시 실행
         showEmptyTableMessage();
 
-// 필터링 시에도 메시지 갱신
+        // 필터링 시에도 메시지 갱신
         $("#docTypeSelect").on("change", function() {
             // 애니메이션 후 메시지 표시 (타이밍 조정)
             setTimeout(showEmptyTableMessage, 350);
         });
 
-// 페이지네이션 이벤트 후에도 메시지 확인
+        // 페이지네이션 이벤트 후에도 메시지 확인
         $(".pagination").on("click", "a.page-link", function() {
             setTimeout(showEmptyTableMessage, 300);
         });
@@ -524,7 +749,7 @@
             }
         });
 
-// select 요소에 변경 이벤트 추가
+        // select 요소에 변경 이벤트 추가
         $("#select").on("change", function() {
             const selectedValue = $(this).val();
 
@@ -550,7 +775,401 @@
                     break;
             }
         });
+
+        // 날짜 필터 토글 템플릿
+        const dateFilterToggleTemplate = `
+        <div class="date-filter-container">
+            <button class="filter-toggle-btn">
+                <i class="fas fa-filter"></i>
+                <span class="filter-text">날짜 필터</span>
+            </button>
+            <div class="filter-panel">
+                <div class="date-filter" data-filter-for="{docType}">
+                    <label><i class="fas fa-calendar-alt"></i> 기간 선택</label>
+                    <div class="date-inputs">
+                        <input type="date" class="date-filter-start" placeholder="시작일">
+                        <span>~</span>
+                        <input type="date" class="date-filter-end" placeholder="종료일">
+                    </div>
+                    <div class="filter-actions">
+                        <button class="apply-date-filter filter-btn">
+                            <i class="fas fa-search"></i> 적용
+                        </button>
+                        <button class="reset-date-filter filter-btn">
+                            <i class="fas fa-undo"></i> 초기화
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        // 페이지 로드 완료 후 필터 컴포넌트를 각 테이블 제목 옆으로 이동시키는 함수
+        function setupTableHeadersWithFilters() {
+            // 각 테이블 컨테이너에 필터 추가
+            $(".doc-table-container").each(function() {
+                const $container = $(this);
+                const docType = $container.data("doc-type");
+
+                // 제목(h4)을 찾아서 컨테이너로 감싸기
+                const $heading = $container.find("h4").first();
+                if ($heading.length) {
+                    // h4를 컨테이너로 감싸기 (이미 감싸져 있지 않은 경우)
+                    if (!$heading.parent().hasClass("table-header-container")) {
+                        $heading.wrap('<div class="table-header-container"></div>');
+                    }
+
+                    // 새 컨테이너 참조
+                    const $headerContainer = $heading.parent();
+
+                    // 기존 필터를 제거 (이중 추가 방지)
+                    $headerContainer.find(".document-filter-container").remove();
+
+                    // 템플릿에서 필터 생성
+                    const filterHtml = dateFilterToggleTemplate.replace('{docType}', docType);
+
+                    // 필터 컨테이너 생성 및 추가
+                    const $filterContainer = $('<div class="document-filter-container"></div>')
+                        .attr('data-filter-for', docType)
+                        .html(filterHtml);
+
+                    // 헤더 컨테이너에 필터 추가
+                    $headerContainer.append($filterContainer);
+                }
+            });
+
+            // 필터 이벤트 바인딩
+            bindFilterEvents();
+        }
+
+        // 필터 이벤트 바인딩 함수
+        function bindFilterEvents() {
+            // 필터 패널 토글
+            $(document).on('click', '.filter-toggle-btn', function(e) {
+                e.stopPropagation();
+                const $panel = $(this).siblings('.filter-panel');
+
+                if ($panel.is(':visible')) {
+                    $panel.fadeOut(200);
+                    $(this).removeClass('active');
+                } else {
+                    // 다른 열린 패널 닫기
+                    $('.filter-panel').fadeOut(200);
+                    $('.filter-toggle-btn').removeClass('active');
+
+                    // 현재 패널 열기
+                    $panel.fadeIn(200);
+                    $(this).addClass('active');
+                }
+            });
+
+            // 패널 외부 클릭 시 패널 닫기
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.date-filter-container').length) {
+                    $('.filter-panel').fadeOut(200);
+                    $('.filter-toggle-btn').removeClass('active');
+                }
+            });
+
+            // 각 테이블별 날짜 필터링 기능
+            $(document).on("click", ".apply-date-filter", function() {
+                const $filterContainer = $(this).closest(".date-filter-container");
+                const $dateFilter = $(this).closest(".date-filter");
+                const docType = $dateFilter.data("filter-for");
+                const $targetContainer = $(".doc-table-container[data-doc-type='" + docType + "']");
+                const $toggleBtn = $filterContainer.find('.filter-toggle-btn');
+
+                // 날짜 필터 적용
+                applyDateFilters($dateFilter, $targetContainer);
+
+                // 필터 패널 닫기
+                $filterContainer.find('.filter-panel').fadeOut(200);
+            });
+
+            // 날짜 필터 초기화
+            $(document).on("click", ".reset-date-filter", function() {
+                const $filterContainer = $(this).closest(".date-filter-container");
+                const $dateFilter = $(this).closest(".date-filter");
+                const docType = $dateFilter.data("filter-for");
+                const $targetContainer = $(".doc-table-container[data-doc-type='" + docType + "']");
+                const $toggleBtn = $filterContainer.find('.filter-toggle-btn');
+
+                // 필터 초기화
+                resetDateFilters($dateFilter, $targetContainer);
+
+                // 필터 패널 닫기
+                $filterContainer.find('.filter-panel').fadeOut(200);
+                $toggleBtn.removeClass('active');
+            });
+
+            // 엔터 키 이벤트
+            $(document).on("keypress", ".date-filter-start, .date-filter-end", function(e) {
+                if (e.which === 13) { // Enter key
+                    const $filterContainer = $(this).closest(".date-filter-container");
+                    const $dateFilter = $(this).closest(".date-filter");
+                    const docType = $dateFilter.data("filter-for");
+                    const $targetContainer = $(".doc-table-container[data-doc-type='" + docType + "']");
+
+                    // 날짜 필터 적용
+                    applyDateFilters($dateFilter, $targetContainer);
+
+                    // 필터 패널 닫기
+                    $filterContainer.find('.filter-panel').fadeOut(200);
+                    e.preventDefault();
+                }
+            });
+        }
+
+        // 날짜 필터 적용 함수
+        function applyDateFilters($dateFilter, $targetContainer) {
+            const startDate = $dateFilter.find(".date-filter-start").val();
+            const endDate = $dateFilter.find(".date-filter-end").val();
+            const $filterContainer = $dateFilter.closest(".date-filter-container");
+            const $toggleBtn = $filterContainer.find('.filter-toggle-btn');
+
+            // 날짜 유효성 검사
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert("시작일은 종료일보다 앞선 날짜여야 합니다.");
+                return;
+            }
+
+            const $table = $targetContainer.find("table.document-table");
+            const $rows = $table.find("tbody tr").not(".empty-message");
+
+            let visibleRowCount = 0;
+
+            // 모든 행 숨기기
+            $rows.hide();
+
+            // 각 행 검사
+            $rows.each(function() {
+                const $row = $(this);
+                const dateCell = $row.find("td:nth-child(4)").text().trim(); // 기안일 열
+
+                if (!dateCell) return true; // 날짜 셀 없으면 건너뛰기
+
+                try {
+                    const rowDate = new Date(dateCell);
+                    const startDateObj = startDate ? new Date(startDate) : null;
+                    const endDateObj = endDate ? new Date(endDate) : null;
+
+                    // 날짜 범위 검사
+                    let dateMatch = true;
+
+                    if (startDateObj && endDateObj) {
+                        // 시작일과 종료일 둘 다 있는 경우
+                        // 시간 정보를 제거하고 날짜만 비교하기 위해 날짜 재설정
+                        startDateObj.setHours(0, 0, 0, 0);
+                        endDateObj.setHours(23, 59, 59, 999);
+                        rowDate.setHours(12, 0, 0, 0); // 정오로 설정하여 날짜 비교 오류 방지
+
+                        dateMatch = rowDate >= startDateObj && rowDate <= endDateObj;
+                    } else if (startDateObj) {
+                        // 시작일만 있는 경우
+                        startDateObj.setHours(0, 0, 0, 0);
+                        rowDate.setHours(12, 0, 0, 0);
+                        dateMatch = rowDate >= startDateObj;
+                    } else if (endDateObj) {
+                        // 종료일만 있는 경우
+                        endDateObj.setHours(23, 59, 59, 999);
+                        rowDate.setHours(12, 0, 0, 0);
+                        dateMatch = rowDate <= endDateObj;
+                    }
+
+                    // 필터 조건에 맞으면 표시
+                    if (dateMatch) {
+                        $row.show();
+                        visibleRowCount++;
+                    }
+                } catch (e) {
+                    // 날짜 파싱 오류 시 해당 행은 숨김 상태 유지
+                    console.warn("날짜 파싱 오류:", e, "날짜:", dateCell);
+                }
+            });
+
+            // 필터링 결과 없음 메시지 처리
+            const $emptyMessage = $table.find("tr.empty-message");
+            if (visibleRowCount === 0) {
+                if ($emptyMessage.length === 0) {
+                    $table.find("tbody").append('<tr class="empty-message"><td colspan="6" style="text-align:center; padding:20px; color:#6c757d; font-style:italic;">검색 결과가 없습니다.</td></tr>');
+                } else {
+                    $emptyMessage.show().find("td").text("검색 결과가 없습니다.");
+                }
+            } else {
+                $emptyMessage.hide();
+            }
+
+            // 페이지네이션 업데이트
+            updatePagination($targetContainer);
+
+            // 필터가 적용되었음을 시각적으로 표시
+            if (startDate || endDate) {
+                // 이미 있는 뱃지 제거
+                $toggleBtn.find('.active-filter-badge').remove();
+
+                // 새 뱃지 추가
+                $toggleBtn.append('<span class="active-filter-badge">✓</span>');
+                $toggleBtn.addClass('active');
+
+                // 필터 관련 정보 표시
+                displayActiveFilters($filterContainer, startDate, endDate);
+            } else {
+                resetDateFilters($dateFilter, $targetContainer);
+            }
+        }
+
+        // 날짜 필터 초기화 함수
+        function resetDateFilters($dateFilter, $targetContainer) {
+            const $filterContainer = $dateFilter.closest(".date-filter-container");
+            const $toggleBtn = $filterContainer.find('.filter-toggle-btn');
+
+            // 입력 필드 초기화
+            $dateFilter.find(".date-filter-start, .date-filter-end").val("");
+
+            const $table = $targetContainer.find("table.document-table");
+            const $rows = $table.find("tbody tr").not(".empty-message");
+
+            // 모든 행 다시 표시
+            $rows.show();
+
+            // 빈 결과 메시지 제거
+            $table.find("tr.empty-message").hide();
+
+            // 페이지네이션 재설정
+            updatePagination($targetContainer);
+
+            // 필터 시각적 표시 제거
+            $toggleBtn.find('.active-filter-badge').remove();
+            $toggleBtn.removeClass('active');
+            $filterContainer.find(".active-filters").remove();
+        }
+
+        // 페이지네이션 업데이트 함수
+        function updatePagination($container) {
+            const recordsPerPage = 5;
+            const naviCountPerPage = 5;
+
+            const $table = $container.find("table.document-table");
+            const $rows = $table.find("tbody tr:visible").not(".empty-message");
+            const totalRecords = $rows.length;
+            const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+            // 페이지네이션 컨테이너
+            let $pagination = $container.find(".pagination");
+
+            // 페이지네이션 필요 여부 확인
+            if (totalRecords > recordsPerPage) {
+                if ($pagination.length === 0) {
+                    $pagination = $('<div class="pagination"></div>');
+                    $container.append($pagination);
+                }
+
+                // 현재 페이지 번호 (필터링 후에는 첫 페이지로)
+                let currentPage = 1;
+
+                // 페이지네이션 렌더링
+                renderPagination($pagination, currentPage, totalPages, naviCountPerPage);
+
+                // 첫 페이지 표시
+                showPageContent($rows, currentPage, recordsPerPage);
+
+                // 페이지네이션 이벤트 재설정
+                $pagination.off("click").on("click", "a.page-link", function(e) {
+                    e.preventDefault();
+                    const targetPage = $(this).data("page");
+                    renderPagination($pagination, targetPage, totalPages, naviCountPerPage);
+                    showPageContent($rows, targetPage, recordsPerPage);
+
+                    // 스크롤 처리
+                    $('html, body').animate({
+                        scrollTop: $container.offset().top - 100
+                    }, 300);
+                });
+
+                // 페이지네이션 표시
+                $pagination.show();
+            } else {
+                // 페이지네이션 불필요
+                $rows.show();
+                $pagination.hide();
+            }
+        }
+
+        // 페이지네이션 렌더링 함수
+        function renderPagination($pagination, currentPage, totalPages, naviCountPerPage) {
+            $pagination.empty();
+
+            // 페이지 그룹 계산
+            const groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+            const startPage = groupIndex * naviCountPerPage + 1;
+            const endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+            // 이전 그룹 버튼
+            if (startPage > 1) {
+                $pagination.append('<a href="#" class="page-link prev-group" data-page="' + (startPage - 1) + '"><i class="fas fa-angle-left"></i></a>');
+            }
+
+            // 페이지 번호 버튼
+            for (let i = startPage; i <= endPage; i++) {
+                $pagination.append('<a href="#" class="page-link" data-page="' + i + '">' + i + '</a>');
+            }
+
+            // 다음 그룹 버튼
+            if (endPage < totalPages) {
+                $pagination.append('<a href="#" class="page-link next-group" data-page="' + (endPage + 1) + '"><i class="fas fa-angle-right"></i></a>');
+            }
+
+            // 현재 페이지 버튼 활성화
+            $pagination.find("a.page-link").removeClass("active");
+            $pagination.find('a.page-link[data-page="' + currentPage + '"]').addClass("active");
+        }
+
+        // 페이지 내용 표시 함수
+        function showPageContent($rows, page, recordsPerPage) {
+            const start = (page - 1) * recordsPerPage;
+            const end = start + recordsPerPage;
+
+            $rows.hide();
+            $rows.slice(start, end).show();
+        }
+
+        // 활성화된 필터 표시 함수
+        function displayActiveFilters($filterContainer, startDate, endDate) {
+            // 기존 필터 표시 제거
+            $filterContainer.find(".active-filters").remove();
+
+            if (!startDate && !endDate) return;
+
+            // 날짜 형식 변환 함수
+            function formatDate(dateStr) {
+                if (!dateStr) return "";
+                const date = new Date(dateStr);
+                return date.getFullYear() + '-' +
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(date.getDate()).padStart(2, '0');
+            }
+
+            // 필터 정보 텍스트
+            let filterText = '적용된 날짜 필터: ';
+
+            if (startDate && endDate) {
+                filterText += formatDate(startDate) + ' ~ ' + formatDate(endDate);
+            } else if (startDate) {
+                filterText += formatDate(startDate) + ' 이후';
+            } else if (endDate) {
+                filterText += formatDate(endDate) + ' 이전';
+            }
+
+            // 필터 정보 표시 요소 추가
+            const $filterInfo = $('<div class="active-filters">' + filterText + '</div>');
+
+            // 필터 정보 DOM에 추가
+            $filterContainer.append($filterInfo);
+        }
+
+        // 페이지 로드 시 필터 컴포넌트 위치 조정
+        setupTableHeadersWithFilters();
     });
 </script>
+
 </body>
 </html>
