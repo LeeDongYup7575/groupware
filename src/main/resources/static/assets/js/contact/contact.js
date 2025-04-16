@@ -830,11 +830,16 @@ function createSearchSection(title, results, tab) {
             tdInfo.textContent = (tab === "shared") ? contact.depName : (contact.memo || '');
             tr.appendChild(tdInfo);
 
-            // 행 클릭 시 모달 열기 (체크박스 클릭은 제외)
+            // 행 클릭 시 모달 열기 (이메일 클릭 시 제외)
             tr.addEventListener("click", function(e) {
-                if (e.target.classList.contains("contact-checkbox")) return;
+                if (
+                    e.target.classList.contains("contact-checkbox") ||
+                    e.target.tagName === 'A'
+                ) return;
+
                 openDetailModal(contact, tab);
             });
+
             tbody.appendChild(tr);
         });
     }

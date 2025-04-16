@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.board.mapper;
 
 import com.example.projectdemo.domain.board.entity.Comments;
+import com.example.projectdemo.domain.mypage.dto.MyCommentDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -27,5 +28,11 @@ public interface CommentsMapper {
 
     // 댓글 삭제 (논리적 삭제 - is_deleted 플래그 사용)
     int deleteComment(int id);
-    
+
+    // 내 댓글 조회
+    List<MyCommentDTO> findCommentsByEmpId(@Param("empId") Integer empId);
+
+    // 댓글 다중 삭제
+    void deleteByIds(@Param("ids") List<Integer> ids);
+
 }

@@ -2,6 +2,7 @@ package com.example.projectdemo.domain.board.service;
 
 import com.example.projectdemo.domain.board.entity.Comments;
 import com.example.projectdemo.domain.board.mapper.CommentsMapper;
+import com.example.projectdemo.domain.mypage.dto.MyCommentDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,5 +89,18 @@ public class CommentsService {
         return commentsMapper.deleteComment(id) > 0;
     }
 
+    /**
+     * 내 댓글 조회
+     */
+    public List<MyCommentDTO> getCommentsByEmpId(Integer empId) {
+        return commentsMapper.findCommentsByEmpId(empId);
+    }
+
+    /**
+     * 댓글 다중 삭제
+     */
+    public void deleteCommentsByIds(List<Integer> commentIds) {
+        commentsMapper.deleteByIds(commentIds);
+    }
 
 }

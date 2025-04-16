@@ -396,3 +396,14 @@ tbody .title-col a:hover {
     font-size: 13px;
     color: #555;
 }
+
+.comment-info-col a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.comment-info-col a:hover {
+    text-decoration: underline;
+}
+
