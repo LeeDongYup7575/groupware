@@ -10,7 +10,7 @@
     <div class="gw-container">
         <div class="gw-navbar-left">
             <a class="gw-navbar-brand" href="/">
-                <span>GROUP<span class="gw-accent-color">WARE</span></span>
+                <span><img src="/assets/images/bigLogo.png" alt="TechX 로고" class="logo-img"></span>
             </a>
 
             <!-- 현재 페이지 및 전체 메뉴 -->
@@ -31,7 +31,7 @@
                         <a class="gw-nav-link" href="/">홈</a>
                     </li>
                     <li class="gw-nav-item">
-                        <a class="gw-nav-link" href="#contact">문의</a>
+                        <a class="gw-nav-link" href="/faq">문의</a>
                     </li>
                     <!-- 로그인 안된 상태일 때 보이는 버튼 -->
                     <li class="gw-nav-item" id="login-button">
@@ -126,6 +126,10 @@
             color: var(--gw-primary-color);
             text-decoration: none;
             margin-right: 1rem;
+        }
+        .logo-img{
+            height: 50px;
+            vertical-align: bottom;
         }
 
         .gw-accent-color {
@@ -566,7 +570,13 @@
                 }
 
                 if(currentPageToggle){
-                    currentPageToggle.style.cssText = 'display: block !important;';
+                    const path = window.location.pathname;
+
+                    if (path === '/main') {
+                        currentPageToggle.style.display = 'none';
+                    } else {
+                        currentPageToggle.style.display = 'block';
+                    }
                 }
             }
 
@@ -653,22 +663,14 @@
                 let pageTitle = '홈';
 
                 // URL 경로에 따라 페이지 제목 설정
-                if (path.includes('/mail')) {
-                    pageTitle = '이메일';
-                } else if (path.includes('/board')) {
+                if (path.includes('/board')) {
                     pageTitle = '게시판';
-                } else if (path.includes('/chat')) {
-                    pageTitle = '메시지';
-                } else if (path.includes('/calendar')) {
-                    pageTitle = '일정';
-                } else if (path.includes('/shared-mail')) {
-                    pageTitle = '공용 메일';
-                } else if (path.includes('/address')) {
+                } else if (path.includes('/contact')) {
                     pageTitle = '주소록';
                 } else if (path.includes('/booking')) {
                     pageTitle = '예약';
-                } else if (path.includes('/documents')) {
-                    pageTitle = '문서 관리';
+                } else if (path.includes('/workmanagement')) {
+                    pageTitle = '업무 관리';
                 } else if (path.includes('/attend')) {
                     pageTitle = '근태휴가';
                 } else if (path.includes('/works')) {
