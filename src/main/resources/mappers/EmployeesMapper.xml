@@ -44,7 +44,7 @@
 
 
     <select id="findAllEmployeeIds" resultType="int">
-        SELECT emp_id FROM employees
+        SELECT id FROM employees
     </select>
 
 
@@ -260,7 +260,6 @@
         ORDER BY name
     </select>
 
-    <!-- 직원 추가 -->
     <!-- 직원 추가 -->
     <insert id="insertEmployee" parameterType="com.example.projectdemo.domain.employees.dto.EmployeesDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO employees (
