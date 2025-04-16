@@ -360,3 +360,39 @@ tbody .title-col a:hover {
 .mypage-sidebar-icon i{
     color: #4a90e2;
 }
+
+.comment-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.comment-th {
+    text-align: center !important;
+}
+.comment-table th,
+.comment-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.comment-td input[type="checkbox"] {
+    transform: scale(1.1);
+}
+
+.comment-content {
+    font-size: 15px;
+    color: #222;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.comment-date {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 2px;
+}
+
+.comment-post-title {
+    font-size: 13px;
+    color: #555;
+}

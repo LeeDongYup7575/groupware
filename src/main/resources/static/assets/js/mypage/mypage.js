@@ -232,7 +232,62 @@ function generateContent(contentName, data) {
 
         `;
     }else if (contentName === 'mycomment'){
-        content = `<h2>작성댓글</h2>`;
+        content = `<table class="comment-table">
+    <thead>
+        <tr>
+            <th class="checkbox-col comment-th"></th>
+            <th class="comment-info-col comment-th">댓글</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="checkbox-col comment-td">
+                <input type="checkbox" data-comment-id="1">
+            </td>
+            <td class="comment-info-col comment-td">
+                <div class="comment-content">네 그 김대리님 말하는 거 맞습니다</div>
+                <div class="comment-date">2025.03.28 14:37</div>
+                <div class="comment-post-title">개발팀 김대리님께 고백합니다</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="checkbox-col comment-td">
+                <input type="checkbox" data-comment-id="2">
+            </td>
+            <td class="comment-info-col comment-td">
+                <div class="comment-content">댓글 내용입니다!!!</div>
+                <div class="comment-date">2025.03.25 11:37</div>
+                <div class="comment-post-title">게시글 제목입니다</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="checkbox-col comment-td">
+                <input type="checkbox" data-comment-id="3">
+            </td>
+            <td class="comment-info-col comment-td">
+                <div class="comment-content">댓글 내용입니다!!!</div>
+                <div class="comment-date">2025.03.25 11:37</div>
+                <div class="comment-post-title">게시글 제목입니다</div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="table-footer">
+    <div class="footer-left">
+        <input type="checkbox" id="selectAllComments">
+        <label for="selectAllComments">전체선택</label>
+    </div>    
+
+    <div class="footer-center">
+        <div class="pagination"></div>
+    </div>
+
+    <div class="footer-right">
+        <button class="comment-delete-btn delete-btn" id="commentDeleteBtn">삭제</button>
+    </div>
+</div>
+`;
     }
     return content;
 }
