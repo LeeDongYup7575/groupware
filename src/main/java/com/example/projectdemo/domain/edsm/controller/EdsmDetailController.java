@@ -1,6 +1,5 @@
 package com.example.projectdemo.domain.edsm.controller;
 
-
 import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
 import com.example.projectdemo.domain.edsm.dto.*;
 import com.example.projectdemo.domain.edsm.services.EdsmDetailService;
@@ -24,207 +23,151 @@ import java.util.List;
 @RequestMapping("/edsmDetail")
 public class EdsmDetailController {
 
-
     @Autowired
-    EdsmDAO edao;
+    private EdsmDAO edao;
 
     @Autowired
     private EmployeesService employeeService;
+
     @Autowired
     private EdsmDetailService edsmDetailService;
+
     @Autowired
     private EdsmFilesService edsmFilesService;
+
     @Autowired
     private WorkService workService;
+
     @Autowired
     private LeavesService leavesService;
 
+    /**
+     * 유효한 직원 정보를 확인하고 모델에 추가하는 공통 메서드
+     * @param model 모델 객체
+     * @param request HTTP 요청 객체
+     * @return 유효하지 않은 경우 리다이렉트 경로, 유효한 경우 null
+     */
+    private String validateEmployeeAndAddToModel(Model model, HttpServletRequest request) {
+        // JWT 필터에서 설정한 사원번호 추출
+        String empNum = (String) request.getAttribute("empNum");
+
+        if (empNum == null) {
+            return "redirect:/edsm/main";
+        }
+
+        // 사원번호로 직원 정보 조회
+        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+
+        if (employee == null) {
+            return "redirect:/edsm/main";
+        }
+
+        model.addAttribute("employee", employee);
+        return null;
+    }
+
+    /**
+     * 공통 문서 정보를 모델에 추가하는 메서드
+     * @param model 모델 객체
+     * @param id 문서 ID
+     */
+    private void addCommonDocumentData(Model model, int id) {
+        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
+        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
+        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
+
+        model.addAttribute("edsmDocumentList", edsmDocumentList);
+        model.addAttribute("approvalLineList", approvalLineList);
+
+        if (!edsmFilesDTOList.isEmpty()) {
+            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
+        }
+    }
 
     //업무연락 상세페이지
     @GetMapping("/businessContact/{id}")
     public String businessContactDetail(@PathVariable("id") int id, Model model, HttpServletRequest request) {
-
-        // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String) request.getAttribute("empNum");
-
-        if (empNum == null) { // 예외 처리
-            return "redirect:/edsm/main";
+        String redirectPath = validateEmployeeAndAddToModel(model, request);
+        if (redirectPath != null) {
+            return redirectPath;
         }
 
-        // 사원번호로 직원 정보 조회
-        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+        addCommonDocumentData(model, id);
 
-        if (employee == null) { // 예외 처리
-            return "redirect:/edsm/main";
-        }
-
-        model.addAttribute("employee", employee);
-
-        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
         List<EdsmBusinessContactDTO> edsmBusinessContactDTOList = edsmDetailService.getEdsmBusinessContactListFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
-        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
-        model.addAttribute("edsmDocumentList", edsmDocumentList);
-        model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("edsmBusinessContactDTOList", edsmBusinessContactDTOList);
-        if(!edsmFilesDTOList.isEmpty()){
-            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
-        }
 
-        return "edsm/edsmDetail/businessContactDetail"; // 상세 페이지 템플릿 이름
+        return "edsm/edsmDetail/businessContactDetail";
     }
-
 
     //지출결의서 상세 페이지
     @GetMapping("/cashDisbuVoucher/{id}")
     public String cashDisbuVoucherDetail(@PathVariable("id") int id, Model model, HttpServletRequest request) {
-
-        // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String) request.getAttribute("empNum");
-
-        if (empNum == null) { // 예외 처리
-            return "redirect:/edsm/main";
+        String redirectPath = validateEmployeeAndAddToModel(model, request);
+        if (redirectPath != null) {
+            return redirectPath;
         }
 
-        // 사원번호로 직원 정보 조회
-        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
+        addCommonDocumentData(model, id);
 
-        if (employee == null) { // 예외 처리
-            return "redirect:/edsm/main";
-        }
-
-        model.addAttribute("employee", employee);
-
-        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
         List<EdsmCashDisbuVoucherDTO> edsmCashDisbuVoucherDTOList = edsmDetailService.getEdsmCashDisbuVoucherListFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
-        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
-        model.addAttribute("edsmDocumentList", edsmDocumentList);
-        model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("edsmCashDisbuVoucherDTOList", edsmCashDisbuVoucherDTOList);
-        if(!edsmFilesDTOList.isEmpty()){
-            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
-        }
-        return "edsm/edsmDetail/cashDisbuVoucherDetail"; // 상세 페이지 템플릿 이름
-    }
 
+        return "edsm/edsmDetail/cashDisbuVoucherDetail";
+    }
 
     //품의서 상세 페이지
     @GetMapping("/letterOfApproval/{id}")
     public String letterOfApprovalDetail(@PathVariable("id") int id, Model model, HttpServletRequest request) {
-
-        // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String) request.getAttribute("empNum");
-
-        if (empNum == null) { // 예외 처리
-            return "redirect:/edsm/main";
+        String redirectPath = validateEmployeeAndAddToModel(model, request);
+        if (redirectPath != null) {
+            return redirectPath;
         }
 
-        // 사원번호로 직원 정보 조회
-        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
-
-        if (employee == null) { // 예외 처리
-            return "redirect:/edsm/main";
-        }
-
-        model.addAttribute("employee", employee);
+        addCommonDocumentData(model, id);
 
         List<EdsmLetterOfApprovalDTO> edsmLetterOfApprovalDTOList = edsmDetailService.getEdsmLetterOfApprovalListFromDocId(id);
-
-
-        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
-        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
-        model.addAttribute("edsmDocumentList", edsmDocumentList);
-        model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("edsmLetterOfApprovalDTOList", edsmLetterOfApprovalDTOList);
-        if(!edsmFilesDTOList.isEmpty()){
-            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
-        }
 
-
-        return "edsm/edsmDetail/letterOfApprovalDetail"; // 상세 페이지 템플릿 이름
+        return "edsm/edsmDetail/letterOfApprovalDetail";
     }
-
 
     //휴가신청서 Detail
     @GetMapping("/leavesDetail/{id}")
     public String leavesDetail(@PathVariable("id") int id, Model model, HttpServletRequest request) {
-        // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String) request.getAttribute("empNum");
-
-        if (empNum == null) { // 예외 처리
-            return "redirect:/edsm/main";
+        String redirectPath = validateEmployeeAndAddToModel(model, request);
+        if (redirectPath != null) {
+            return redirectPath;
         }
 
-        // 사원번호로 직원 정보 조회
-        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
-
-        if (employee == null) { // 예외 처리
-            return "redirect:/edsm/main";
-        }
-
-        model.addAttribute("employee", employee);
-
-
+        addCommonDocumentData(model, id);
 
         List<LeavesDTO> leavesList = leavesService.getLeavesDTOListByDocId(id);
-        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
-        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
-        model.addAttribute("edsmDocumentList", edsmDocumentList);
-        model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("leavesList", leavesList);
-        if(!edsmFilesDTOList.isEmpty()){
-            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
-        }
 
-
-        return "edsm/edsmDetail/leavesDetail"; // 상세 페이지 템플릿 위치 이름
+        return "edsm/edsmDetail/leavesDetail";
     }
 
     //연장근무신청서 Detail
     @GetMapping("/overtimesDetail/{id}")
     public String overtimesDetail(@PathVariable("id") int id, Model model, HttpServletRequest request) {
-        // JWT 필터에서 설정한 사원번호 추출
-        String empNum = (String) request.getAttribute("empNum");
-
-        if (empNum == null) { // 예외 처리
-            return "redirect:/edsm/main";
+        String redirectPath = validateEmployeeAndAddToModel(model, request);
+        if (redirectPath != null) {
+            return redirectPath;
         }
 
-        // 사원번호로 직원 정보 조회
-        EmployeesDTO employee = employeeService.findByEmpNum(empNum);
-
-        if (employee == null) { // 예외 처리
-            return "redirect:/edsm/main";
-        }
-
-        model.addAttribute("employee", employee);
-
+        addCommonDocumentData(model, id);
 
         List<OverTimeDTO> overtimesList = workService.getOvertimeDTOListByDocId(id);
-        List<EdsmDocumentDTO> edsmDocumentList = edsmDetailService.getEdsmDocumentListFromDocId(id);
-        List<ApprovalLineDTO> approvalLineList = edsmDetailService.getEdsmApprovalLineListFromDocId(id);
-        List<EdsmFilesDTO> edsmFilesDTOList = edsmFilesService.getFilesSelectFromDocId(id);
-        model.addAttribute("edsmDocumentList", edsmDocumentList);
-        model.addAttribute("approvalLineList", approvalLineList);
         model.addAttribute("overtimesList", overtimesList);
 
-        if(!edsmFilesDTOList.isEmpty()){
-            model.addAttribute("edsmFilesDTOList", edsmFilesDTOList);
-        }
-
-
-        return "edsm/edsmDetail/overtimeDetail"; // 상세 페이지 템플릿 위치 이름
+        return "edsm/edsmDetail/overtimeDetail";
     }
-
 
     // 결재권자의 결재 상태 업데이트
     @ResponseBody
     @PostMapping(value = "updateApprovalStatus", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String updateApprovalStatus(ApprovalLineDTO approvalLineDTO, HttpServletRequest request, Model model) {
-
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String) request.getAttribute("empNum");
         if (empNum == null) {
@@ -237,19 +180,13 @@ public class EdsmDetailController {
         }
         model.addAttribute("employee", employee);
 
-       boolean result = edsmDetailService.updateApprovalStatus(approvalLineDTO);
-
-       if(result) {
-           return "success";
-       }
-        return "false";
+        boolean result = edsmDetailService.updateApprovalStatus(approvalLineDTO);
+        return result ? "success" : "false";
     }
-
 
     @ResponseBody
     @GetMapping("/getRejectionReason")
-    public String getRejectionReason(ApprovalLineDTO approvalLineDTO,HttpServletRequest request){
-
+    public String getRejectionReason(ApprovalLineDTO approvalLineDTO, HttpServletRequest request) {
         // JWT 필터에서 설정한 사원번호 추출
         String empNum = (String) request.getAttribute("empNum");
         if (empNum == null) {
@@ -261,19 +198,6 @@ public class EdsmDetailController {
             return "edsm/main";
         }
 
-        System.out.println("승인자 아이디: " + approvalLineDTO.getApproverId());
-        System.out.println("문서 번호: " + approvalLineDTO.getDocumentId());
-        String result = edsmDetailService.getRejectionReason(approvalLineDTO);
-
-
-        return result;
-
-
-
-
-
-
-
+        return edsmDetailService.getRejectionReason(approvalLineDTO);
     }
-
 }
