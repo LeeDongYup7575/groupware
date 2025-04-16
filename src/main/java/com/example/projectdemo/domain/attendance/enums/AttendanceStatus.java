@@ -7,7 +7,7 @@ public enum AttendanceStatus {
     EARLY_LEAVE("조퇴"),
     ABSENT("결근"),
     ANNUAL_LEAVE("연차"),
-    SICK_LEAVE("병가"),
+    HALF_LEAVE("반차"),
     BEFORE_WORK("미출근");
 
     private final String status;
