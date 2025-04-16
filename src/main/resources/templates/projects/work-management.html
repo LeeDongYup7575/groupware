@@ -1557,9 +1557,12 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5>업무 목록</h5>
                     <div>
-                    <button class="btn btn-sm btn-success" id="add-task-btn" data-project-id="${project.id}">
-                          <i class="fas fa-plus"></i> 새 업무 추가
-                    </button>
+                   ${project.status !== '완료' ? `
+                        <button class="btn btn-sm btn-success" id="add-task-btn" data-project-id="${project.id}">
+                            <i class="fas fa-plus"></i> 새 업무 추가
+                        </button>
+                    ` : ''}
+
                         <button class="btn btn-sm btn-primary" id="load-tasks-btn" data-project-id="${project.id}">
                             업무 불러오기
                         </button>
