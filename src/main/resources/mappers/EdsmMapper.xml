@@ -189,7 +189,14 @@
 
     <!-- 문서번호를 통한 지출결의서 Detail 가져오기 -->
     <select id="SelectByCashDisbuVoucherFromDocId" resultType="com.example.projectdemo.domain.edsm.dto.EdsmCashDisbuVoucherDTO">
-        SELECT * FROM groupware.cash_voucher where  edsm_document_id = #{id}
+        SELECT
+               c.*,
+               e.name AS spenderName,
+               p.title AS spenderPosition
+        FROM groupware.cash_voucher c
+            JOIN groupware.employees e ON c.spender_id = e.emp_num
+            JOIN groupware.positions p ON e.pos_id = p.id
+                 where  c.edsm_document_id = #{id}
     </select>
 
     <!-- 문서번호를 통한 품의서 Detail 가져오기 -->

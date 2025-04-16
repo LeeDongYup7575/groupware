@@ -14,6 +14,8 @@ public class EdsmCashDisbuVoucherDTO {
     private String content;
     private String accountingDate;
     private String spenderId;
+    private String spenderName;
+    private String spenderPosition;
     private String bank;
     private String bankAccount;
 
