@@ -100,11 +100,13 @@
 }
 
 .sidebar-menu li .submenu {
-    /*display: none;*/
+    display: none;
     padding-left: 25px;
+
 }
 
-.sidebar-menu li .submenu.active {
+.sidebar-menu li .submenu.active,
+.sidebar-menu li .submenu.open {
     display: block;
 }
 
