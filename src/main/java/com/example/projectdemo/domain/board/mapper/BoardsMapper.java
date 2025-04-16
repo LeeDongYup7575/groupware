@@ -28,7 +28,7 @@ public interface BoardsMapper {
     void updateBoard(BoardsDTO board);
 
     // 게시판 삭제 (실제로는 is_active = 0으로 설정)
-    void deleteBoard(Integer id);
+    int deleteBoard(Integer id);
 
     // 게시판 정렬 순서 업데이트
     void updateBoardSortOrder(Integer id, Integer sortOrder);

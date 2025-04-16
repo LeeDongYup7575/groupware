@@ -104,13 +104,12 @@
                         <th>종류</th>
                         <th>게시판 이름</th>
                         <th>게시글 수 (전체)</th>
-                        <th>사용 여부</th>
                         <th>만든 날짜</th>
                         <th>관리</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="board : ${boards}">
+                    <tr th:each="board : ${boards}" th:data-board-id="${board.id}">
                         <td><input type="checkbox" class="board-checkbox" th:value="${board.id}"></td>
                         <td>
                                 <span class="type-badge"
@@ -121,16 +120,13 @@
                             <a th:href="@{/board/{id}(id=${board.id})}" th:text="${board.name}">게시판명</a>
                         </td>
                         <td th:text="${board.totalPosts}">0</td>
-                        <td>
-                                <span th:class="${board.isActive} ? 'status-active' : 'status-inactive'"
-                                      th:text="${board.isActive} ? '사용' : '중지'">사용</span>
-                        </td>
                         <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd')}">2025-04-15</td>
+                        <!-- 관리 버튼 부분 -->
                         <td>
                             <div class="manage-buttons">
                                 <a th:href="@{/board/edit/{id}(id=${board.id})}" class="btn btn-sm btn-primary">수정</a>
                                 <button class="btn btn-sm btn-danger"
-                                        th:onclick="'confirmDelete(' + ${board.id} + ')'">삭제
+                                        th:onclick="'deleteBoard(' + ${board.id} + ')'">삭제
                                 </button>
                             </div>
                         </td>
@@ -192,38 +188,32 @@
         });
     });
 
-    // 게시판 삭제 확인
-    function confirmDelete(boardId) {
-        if (confirm('정말로 이 게시판을 삭제하시겠습니까?')) {
-            deleteBoard(boardId);
-        }
-    }
-
-    // 게시판 삭제 API 호출
+    // 게시판 삭제
     function deleteBoard(boardId) {
-        const token = localStorage.getItem('accessToken');
+        if (confirm('정말로 이 게시판을 삭제하시겠습니까?')) {
+            const token = localStorage.getItem('accessToken');
 
-        fetch(`/api/board/${boardId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('게시판 삭제 중 오류가 발생했습니다.');
+            fetch(`/api/board/${boardId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
                 }
-                return response.json();
             })
-            .then(data => {
-                alert('게시판이 삭제되었습니다.');
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('삭제 오류:', error);
-                alert(error.message);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+
+                        // 페이지 새로고침으로 간단히 해결
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('삭제 오류:', error);
+                    alert('게시판 삭제 중 오류가 발생했습니다.');
+                });
+        }
     }
 
     // 게시판 일괄 삭제 API 호출

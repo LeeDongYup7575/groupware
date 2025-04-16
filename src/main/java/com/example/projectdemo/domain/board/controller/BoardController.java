@@ -132,7 +132,8 @@ public class BoardController {
         return "board/create"; // 게시판 만들기
     }
 
-    @PostMapping("/create") // 게시판 만들기
+    // 게시판 만들기
+    @PostMapping("/create")
     public String createBoard(BoardsDTO requestDTO,
                               HttpServletRequest request,
                               RedirectAttributes redirectAttributes,
@@ -224,11 +225,9 @@ public class BoardController {
         }
     }
 
+    //게시판 관리
     @GetMapping("/manage")
     public String manageBoards(HttpServletRequest request, Model model) {
-        // 요청에서 사용자 ID와 역할 가져오기
-        int empId = (int) request.getAttribute("id");
-        String role = (String) request.getAttribute("role");
 
         // 모든 게시판 정보 가져오기
         List<BoardsDTO> allBoards = boardsService.getAllBoards();
@@ -299,7 +298,7 @@ public class BoardController {
         }
     }
 
-    //게시글 삭제
+    // 게시글 삭제
     @PostMapping("/delete/{id}")
     public String deletePost(@PathVariable int id, RedirectAttributes redirectAttributes) {
         try {

@@ -61,15 +61,6 @@ public class BoardApiController {
                                          @RequestBody BoardsDTO requestDTO,
                                          HttpServletRequest request) {
         try {
-            int empId = (int) request.getAttribute("id");
-
-            // 관리 권한 확인
-            if (!boardsService.hasManagePermission(empId, boardId)) {
-                Map<String, String> error = new HashMap<>();
-                error.put("message", "해당 게시판을 관리할 권한이 없습니다.");
-                return ResponseEntity.status(403).body(error);
-            }
-
             BoardsDTO updatedBoard = boardsService.updateBoard(boardId, requestDTO);
             return ResponseEntity.ok(updatedBoard);
         } catch (Exception e) {
@@ -85,17 +76,7 @@ public class BoardApiController {
     @DeleteMapping("/{boardId}")
     public ResponseEntity<?> deleteBoard(@PathVariable Integer boardId, HttpServletRequest request) {
         try {
-            int empId = (int) request.getAttribute("id");
-
-            // 관리 권한 확인
-            if (!boardsService.hasManagePermission(empId, boardId)) {
-                Map<String, String> error = new HashMap<>();
-                error.put("message", "해당 게시판을 관리할 권한이 없습니다.");
-                return ResponseEntity.status(403).body(error);
-            }
-
             boardsService.deleteBoard(boardId);
-
             Map<String, String> success = new HashMap<>();
             success.put("message", "게시판이 성공적으로 삭제되었습니다.");
             return ResponseEntity.ok(success);

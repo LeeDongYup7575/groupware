@@ -208,7 +208,12 @@ public class BoardsService {
 
     // 게시판 삭제 (비활성화)
     @Transactional
-    public void deleteBoard(Integer boardId) {
-        boardsMapper.deleteBoard(boardId);
+    public boolean deleteBoard(Integer boardId) {
+        try {
+            int result = boardsMapper.deleteBoard(boardId);
+            return result > 0;
+        } catch (Exception e) {
+            throw new RuntimeException("게시판 삭제 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 }
