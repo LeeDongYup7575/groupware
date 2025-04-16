@@ -30,10 +30,11 @@
                 <label for="boardId">게시판 유형</label>
                 <select id="boardId" name="boardId" class="select-control" required>
                     <option value="">선택하세요</option>
-                    <option value="1">사내공지</option>
-                    <option value="2">자유게시판</option>
-                    <option value="3">축구동호회</option>
-                    <option value="4">영화동호회</option>
+                    <option th:each="board : ${accessibleBoards}"
+                            th:if="${board.isActive}"
+                            th:value="${board.id}"
+                            th:text="${board.name}">게시판명
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -99,6 +100,43 @@
                 }
             }
         });
+
+        // 게시판 목록을 불러오는 함수
+        function loadBoardList() {
+            $.ajax({
+                url: '/api/boards',  // 게시판 목록 API 엔드포인트
+                type: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                },
+                success: function (data) {
+                    // 게시판 목록 셀렉트 박스에 옵션 추가
+                    const boardSelect = $('#boardId');
+
+                    // 기존의 "선택하세요" 옵션 제외한 나머지 옵션 삭제
+                    boardSelect.find('option:not(:first)').remove();
+
+                    // 서버에서 받은 게시판 목록을 기반으로 옵션 생성
+                    data.forEach(function (board) {
+                        // 활성화된 게시판만 표시
+                        if (board.isActive) {
+                            boardSelect.append(
+                                $('<option>', {
+                                    value: board.id,
+                                    text: board.name,
+                                    // 필요한 경우 데이터 속성 추가
+                                    'data-is-global': board.isGlobal
+                                })
+                            );
+                        }
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error('게시판 목록을 불러오는 데 실패했습니다:', errorThrown);
+                    alert('게시판 목록을 불러오는 데 실패했습니다. 페이지를 새로고침 해주세요.');
+                }
+            });
+        }
 
         // 이미지 업로드 함수
         function uploadSummernoteImage(file, editor) {
