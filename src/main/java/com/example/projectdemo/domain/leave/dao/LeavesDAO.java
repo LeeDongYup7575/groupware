@@ -40,6 +40,10 @@ public class LeavesDAO {
         return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.selectAllLeaves", empId);
     }
 
+    public List<LeavesDTO> getLeavesByEmpId(int empId){
+        return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.getLeavesByEmpId", empId);
+    }
+
     // ✅ 연차 부여를 위한 직원 조회
     public List<EmployeesDTO> selectEmployeesForLeaveGrant() {
         return mybatis.selectList("com.example.projectdemo.domain.leave.dao.LeavesDAO.selectEmployeesForLeaveGrant");

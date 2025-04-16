@@ -230,7 +230,7 @@
                 <div class="form-group">
                     <div style="margin-bottom: 20px;">
                         <label for="accountingDate">휴가 신청일</label>
-                        <input type="text" id="accountingDate" th:value="${leave.leaveType}+' '+${leave.startDate}" readonly="readonly">
+                        <input type="text" id="accountingDate" th:value="${leave.leaveType}+' '+${leave.startDate}+' ~ '+${leave.endDate}" readonly="readonly">
                     </div>
                 </div>
 

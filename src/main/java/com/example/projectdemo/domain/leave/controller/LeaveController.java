@@ -57,6 +57,9 @@ public class LeaveController {
     public String leavesForm(Model model, HttpServletRequest request) {
 
         String empNum = (String)request.getAttribute("empNum");
+        int empId = (int) request.getAttribute("id");
+
+        if (empId == 0) return "redirect:/auth/login";
 
         if (empNum == null) { //예외처리
             return "redirect:/attend/main";
@@ -74,9 +77,10 @@ public class LeaveController {
 
         BigDecimal canUseLeaves = totalLeave.subtract(usedLeave);
 
-
+        List<LeavesDTO> usedLeaveList = leavesService.getLeavesByEmpId(empId);
 
         List<EmployeesDTO> empAllList = employeeMapper.selectEmpAll();
+
         List<EmployeesDTO> empList = new ArrayList<>();
         for(int i = 0; empAllList.size()>i; i++) {
             String empNum1 = empAllList.get(i).getEmpNum();
@@ -90,6 +94,7 @@ public class LeaveController {
         model.addAttribute("employee", employee);
         model.addAttribute("canUseLeaves", canUseLeaves);
         model.addAttribute("today", today);
+        model.addAttribute("usedLeaveList",usedLeaveList);
 
         return "/leave/leavesForm";
     }
@@ -154,31 +159,32 @@ public class LeaveController {
     @PostMapping("/submitLeave")
     public String submitLeave(
             @RequestParam("drafterId") String drafterId,
-            @RequestParam("leaveStartDate[]") List<String> leaveStartDates,
-            @RequestParam("leaveEndDate[]") List<String> leaveEndDates,
-            @RequestParam("leaveType[]") List<String> leaveTypes,
-            @RequestParam("leaveHours[]") List<String> leaveHours,
+            @RequestParam("leaveStartDate") String leaveStartDate,
+            @RequestParam("leaveEndDate") String leaveEndDate,
+            @RequestParam("leaveType") String leaveType,
+            @RequestParam("leaveHours") String leaveHours,
+            @RequestParam("totalLeaveDays") String totalLeaveDays,
             @RequestParam("reason") String content,
             @RequestParam("approvalLine") String approvalLine,
-            @RequestParam("fileAttachment") MultipartFile[] fileAttachment,
+            @RequestParam(value = "fileAttachment", required = false) MultipartFile[] fileAttachment,
             HttpServletRequest request,
-            Model model)  throws Exception{
+            Model model) throws Exception {
 
         EdsmBusinessContactDTO bcdto = new EdsmBusinessContactDTO();
 
-        String empNum = (String)request.getAttribute("empNum");
+        String empNum = (String) request.getAttribute("empNum");
         int empId = (int) request.getAttribute("id");
 
         if (empId == 0) return "redirect:/auth/login";
 
-        if (empNum == null) { //예외처리
+        if (empNum == null) { // 예외처리
             return "redirect:/attend/main";
         }
 
         // 사원번호로 직원 정보 조회
         EmployeesDTO employee = employeeService.findByEmpNum(empNum);
 
-        if (employee == null) { //예외처리
+        if (employee == null) { // 예외처리
             return "redirect:/attend/main";
         }
 
@@ -186,24 +192,24 @@ public class LeaveController {
         bcdto.setContent(content); // 기안 문서 사유 내용
         bcdto.setDrafterId(drafterId); // 기안자 사원번호
 
+        // 결재 문서 생성
         int edsmDocId = leavesService.insertByEdsm(bcdto);
 
-        edsmFilesService.getFilesInsert(edsmDocId,1004,fileAttachment);
-
-        for (int i = 0; i < leaveStartDates.size(); i++) {
-            LeavesDTO leavesdto = new LeavesDTO();
-
-            leavesdto.setEmpId(empId);
-            leavesdto.setStartDate(leaveStartDates.get(i));
-            leavesdto.setEndDate(leaveEndDates.get(i));
-            String leaveTypeValue = leaveTypes.get(i).replace("[", "").replace("]", "");
-            leavesdto.setLeaveType(leaveTypeValue);
-            leavesdto.setReason(content);
-            leavesdto.setEdsmDocId(edsmDocId);
-
-
-            leavesService.insertByLeaves(leavesdto);
+        // 첨부 파일 처리
+        if (fileAttachment != null && fileAttachment.length > 0 && !fileAttachment[0].isEmpty()) {
+            edsmFilesService.getFilesInsert(edsmDocId, 1004, fileAttachment);
         }
+
+        // 휴가 정보 처리 - 단일 휴가 신청
+        LeavesDTO leavesDto = new LeavesDTO();
+        leavesDto.setEmpId(empId);
+        leavesDto.setStartDate(leaveStartDate);
+        leavesDto.setEndDate(leaveEndDate);
+        leavesDto.setLeaveType(leaveType);
+        leavesDto.setReason(content);
+        leavesDto.setEdsmDocId(edsmDocId);
+
+        leavesService.insertByLeaves(leavesDto);
 
         // 결재라인 리스트 준비 :
         // 1) 기안자(작성자)는 결재라인의 첫번째에 추가하며, approvalNo는 1, status는 무조건 "승인"
@@ -226,8 +232,6 @@ public class LeaveController {
                 dto.setDocumentId(edsmDocId);
                 dto.setDrafterId(drafterId);
                 dto.setApprovalNo(seq++);
-                // 추가 결재자는 기본적으로 "대기" 상태로 둘 수 있으며,
-                // 필요에 따라 여기서 status 값을 변경할 수 있습니다.
                 dto.setStatus(ApprovalStatus.PENDING.getLabel());
                 finalApprovalList.add(dto);
             }

@@ -37,6 +37,10 @@ public class LeavesService {
         return leavesDAO.selectByLeaves(empId);
     }
 
+    public List<LeavesDTO> getLeavesByEmpId(int empId){
+        return leavesDAO.getLeavesByEmpId(empId);
+    }
+
     public void updateByLeaves() {
         List<EmployeesDTO> targetEmployees = leavesDAO.selectEmployeesForLeaveGrant();
 
