@@ -117,7 +117,14 @@ public class BoardController {
     }
 
     @GetMapping("/write")
-    public String showWriteForm(Model model) {
+    public String showWriteForm(HttpServletRequest request, Model model) {
+        // 현재 로그인한 사용자 정보 가져오기
+        int empId = (int) request.getAttribute("id");
+
+        // 사용자가 접근 가능한 게시판 목록 조회
+        List<BoardsDTO> accessibleBoards = boardsService.getAccessibleBoards(empId);
+        model.addAttribute("accessibleBoards", accessibleBoards);
+
         model.addAttribute("PostsDTO", new PostsDTO());
         return "board/write";  // 글쓰기 페이지
     }
