@@ -61,12 +61,9 @@ function submitComment(parentId) {
             return response.json();
         })
         .then(data => {
-            console.log('응답 데이터:', data);  // 디버깅용
-            alert(parentId ? '답글이 등록되었습니다.' : '댓글이 등록되었습니다.');
             location.reload(); // 페이지 새로고침으로 댓글 목록 업데이트
         })
         .catch(error => {
-            console.error('댓글 요청 오류:', error);
             alert(error.message || (parentId ? '답글 등록에 실패했습니다.' : '댓글 등록에 실패했습니다.'));
         });
 }
@@ -192,8 +189,6 @@ function updateComment(commentId) {
         content: editedContent
     };
 
-    console.log('댓글 수정 요청 데이터:', updateData);
-
     // AJAX로 댓글 수정 요청
     fetch('/api/comments/' + commentId, {
         method: 'PUT',
@@ -204,15 +199,12 @@ function updateComment(commentId) {
         body: JSON.stringify(updateData)
     })
         .then(response => {
-            console.log('서버 응답:', response.status);
             if (!response.ok) {
                 throw new Error('댓글 수정에 실패했습니다.');
             }
             return response.json();
         })
         .then(data => {
-            console.log('서버 응답 데이터:', data);
-
             // 서버에서 업데이트된 데이터를 반영
             document.getElementById('comment-content-' + commentId).textContent = data.content;
 
@@ -223,7 +215,6 @@ function updateComment(commentId) {
             alert('댓글이 수정되었습니다.');
         })
         .catch(error => {
-            console.error('댓글 수정 오류:', error);
             alert(error.message || '댓글 수정 중 오류가 발생했습니다.');
         });
 }
