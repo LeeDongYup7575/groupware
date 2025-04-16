@@ -66,4 +66,29 @@
         SET is_deleted = 1
         WHERE id = #{id}
     </update>
+
+    <!-- 내 댓글 조회 -->
+    <select id="findCommentsByEmpId" resultType="com.example.projectdemo.domain.mypage.dto.MyCommentDTO">
+        SELECT
+            comments.id,
+            comments.post_id,
+            comments.content,
+            comments.created_at,
+            posts.title AS postTitle
+        FROM comments
+                 JOIN posts ON comments.post_id = posts.id
+        WHERE comments.emp_id = #{empId}
+          AND comments.is_deleted = 0
+        ORDER BY comments.created_at DESC
+    </select>
+
+    <update id="deleteByIds">
+        UPDATE comments
+        SET is_deleted = 1
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
 </mapper>

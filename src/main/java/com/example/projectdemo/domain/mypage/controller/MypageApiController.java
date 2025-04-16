@@ -3,9 +3,11 @@ package com.example.projectdemo.domain.mypage.controller;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
+import com.example.projectdemo.domain.mypage.dto.MyCommentDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +32,19 @@ public class MypageApiController {
     private final EmployeesService employeesService;
     private final ProfileUploadService profileUploadService;
     private final PostsService postsService;
+    private final CommentsService commentsService;
 
     @Autowired
     public MypageApiController(JwtTokenUtil jwtTokenUtil,
                                EmployeesService employeesService,
                                ProfileUploadService profileUploadService,
-                               PostsService postsService) {
+                               PostsService postsService,
+                               CommentsService commentsService) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.employeesService = employeesService;
         this.profileUploadService = profileUploadService;
         this.postsService = postsService;
+        this.commentsService = commentsService;
     }
 
     /**
@@ -130,6 +135,26 @@ public class MypageApiController {
 
             List<PostsDTO> myPosts = postsService.getMyPosts(empId);
             return ResponseEntity.ok(myPosts);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 내 댓글 조회
+     */
+    @GetMapping("/activities/mycomment")
+    public ResponseEntity<List<MyCommentDTO>> getMyComments(HttpServletRequest request) {
+        try{
+            Integer empId = (Integer) request.getAttribute("id"); // 로그인 사용자 식별자
+
+            if (empId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            List<MyCommentDTO> comments = commentsService.getCommentsByEmpId(empId);
+            return ResponseEntity.ok(comments);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

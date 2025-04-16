@@ -57,8 +57,11 @@ function loadMenuContent(menuName) {
         .then(data => {
             document.getElementById('tableContainer').innerHTML = generateContent(menuName, data);
             if (menuName === 'mypost') {
-                setupPagination();
-                setupPostDelete(); // 게시글 삭제 이벤트
+                setupPostPagination();
+                setupPostDelete();
+            }else if (menuName === 'mycomment') {
+                setupCommentPagination();
+                setupCommentDelete();
             }
         })
         .catch(error => {
@@ -200,7 +203,7 @@ function generateContent(contentName, data) {
         });
 
         content = `
-            <table>
+            <table class="post-table">
             <thead>
                 <tr>
                <th class="checkbox-col post-th"></th>
@@ -232,72 +235,83 @@ function generateContent(contentName, data) {
 
         `;
     }else if (contentName === 'mycomment'){
-        content = `<table class="comment-table">
-    <thead>
-        <tr>
-            <th class="checkbox-col comment-th"></th>
-            <th class="comment-info-col comment-th">댓글</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td class="checkbox-col comment-td">
-                <input type="checkbox" data-comment-id="1">
-            </td>
-            <td class="comment-info-col comment-td">
-                <div class="comment-content">네 그 김대리님 말하는 거 맞습니다</div>
-                <div class="comment-date">2025.03.28 14:37</div>
-                <div class="comment-post-title">개발팀 김대리님께 고백합니다</div>
-            </td>
-        </tr>
-        <tr>
-            <td class="checkbox-col comment-td">
-                <input type="checkbox" data-comment-id="2">
-            </td>
-            <td class="comment-info-col comment-td">
-                <div class="comment-content">댓글 내용입니다!!!</div>
-                <div class="comment-date">2025.03.25 11:37</div>
-                <div class="comment-post-title">게시글 제목입니다</div>
-            </td>
-        </tr>
-        <tr>
-            <td class="checkbox-col comment-td">
-                <input type="checkbox" data-comment-id="3">
-            </td>
-            <td class="comment-info-col comment-td">
-                <div class="comment-content">댓글 내용입니다!!!</div>
-                <div class="comment-date">2025.03.25 11:37</div>
-                <div class="comment-post-title">게시글 제목입니다</div>
-            </td>
-        </tr>
-    </tbody>
-</table>
+        let rows = '';
 
-<div class="table-footer">
-    <div class="footer-left">
-        <input type="checkbox" id="selectAllComments">
-        <label for="selectAllComments">전체선택</label>
-    </div>    
+        if (data.length === 0) {
+            rows = `
+            <tr>
+                <td colspan="2" class="comment-td no-data">작성한 댓글이 없습니다.</td>
+            </tr>
+        `;
+        } else {
+            data.forEach(comment => {
+                rows += `
+            <tr>
+                <td class="checkbox-col comment-td">
+                    <input type="checkbox" data-comment-id="${comment.id}">
+                </td>
+                <td class="comment-info-col comment-td">
+                    <a href="/board/post/${comment.postId}#commentSection">
+                        <div class="comment-content">${comment.content}</div>
+                        <div class="comment-date">${formatDateTime(comment.createdAt)}</div>
+                        <div class="comment-post-title">${comment.postTitle}</div>
+                    </a>
+                </td>
+            </tr>
+            `;
+            });
+        }
 
-    <div class="footer-center">
-        <div class="pagination"></div>
+        content = `
+    <table class="comment-table">
+        <thead>
+            <tr>
+                <th class="checkbox-col comment-th"></th>
+                <th class="comment-info-col comment-th">댓글</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${rows}
+        </tbody>
+    </table>
+
+    <div class="table-footer">
+        <div class="footer-left">
+            <input type="checkbox" id="selectAllComments">
+            <label for="selectAllComments">전체선택</label>
+        </div>    
+
+        <div class="footer-center">
+            <div class="pagination"></div>
+        </div>
+
+        <div class="footer-right">
+            <button class="comment-delete-btn delete-btn" id="commentDeleteBtn">삭제</button>
+        </div>
     </div>
-
-    <div class="footer-right">
-        <button class="comment-delete-btn delete-btn" id="commentDeleteBtn">삭제</button>
-    </div>
-</div>
-`;
+    `;
     }
     return content;
 }
 
+// 날짜 변환
 function formatDate(dateStr) {
     const date = new Date(dateStr);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}.${month}.${day}`;
+}
+
+// 날짜 시간 변환
+function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}.${month}.${day} ${hours}:${minutes}`;
 }
 
 // 카메라 아이콘 클릭 시 파일 선택 창 열기
@@ -398,11 +412,13 @@ function updateInfo() {
         });
 }
 
-function setupPagination() {
+
+// 게시글 페이지네이션
+function setupPostPagination() {
     const recordsPerPage = 5;
     const naviCountPerPage = 5;
 
-    const table = document.querySelector("table"); // 생성된 테이블
+    const table = document.querySelector(".post-table");
     if (!table) return;
 
     const rows = Array.from(table.querySelectorAll("tbody tr"));
@@ -411,71 +427,16 @@ function setupPagination() {
 
     const footer = document.querySelector(".table-footer");
     const pagination = footer.querySelector(".pagination");
-
-    const selectAllCheckbox = footer.querySelector("#selectAll");
-
-    if (totalRecords <= recordsPerPage) {
-        rows.forEach(row => row.style.display = "");
-        pagination.innerHTML = "";
-        return;
-    }
+    const selectAllCheckbox = document.getElementById("selectAll");
 
     let currentPage = 1;
 
-    function renderPagination(page) {
-        currentPage = page;
-        pagination.innerHTML = "";
-
-        const groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
-        const startPage = groupIndex * naviCountPerPage + 1;
-        const endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
-
-        if (startPage > 1) {
-            pagination.appendChild(createPageLink(startPage - 1, "prev"));
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            pagination.appendChild(createPageLink(i, i.toString(), i === currentPage));
-        }
-
-        if (endPage < totalPages) {
-            pagination.appendChild(createPageLink(endPage + 1, "next"));
-        }
-    }
-
-    function createPageLink(page, label, isActive = false) {
-        const a = document.createElement("a");
-        a.href = "#";
-        a.className = "page-link";
-        a.dataset.page = page;
-        a.textContent = label === "prev" ? "<" : label === "next" ? ">" : label;
-        if (isActive) a.classList.add("active");
-        return a;
-    }
-
-    function showPage(page) {
-        const start = (page - 1) * recordsPerPage;
-        const end = start + recordsPerPage;
-        rows.forEach((row, index) => {
-            if (index >= start && index < end) {
-                row.style.display = "";
-                // ✅ 체크박스도 초기화
-                const checkbox = row.querySelector('input[type="checkbox"]');
-                if (checkbox) checkbox.checked = false;
-            } else {
-                row.style.display = "none";
-            }
-        });
-
-        // 전체선택도 해제
-        selectAllCheckbox.checked = false;
-
-        // 현재 페이지 체크박스 이벤트 연결
+    function syncCheckboxEvents() {
         const visibleRows = rows.filter(row => row.style.display !== "none");
         visibleRows.forEach(row => {
-            const checkbox = row.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-                checkbox.addEventListener("change", () => {
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (cb) {
+                cb.addEventListener("change", () => {
                     const allChecked = visibleRows.every(r => {
                         const cb = r.querySelector('input[type="checkbox"]');
                         return cb && cb.checked;
@@ -486,41 +447,83 @@ function setupPagination() {
         });
     }
 
-    pagination.addEventListener("click", function (e) {
-        const link = e.target.closest("a.page-link");
-        if (!link) return;
-        e.preventDefault();
-        const targetPage = parseInt(link.dataset.page);
-        renderPagination(targetPage);
-        showPage(targetPage);
+    function showPage(page) {
+        const start = (page - 1) * recordsPerPage;
+        const end = start + recordsPerPage;
 
-        window.scrollTo({
-            top: table.offsetTop - 100,
-            behavior: "smooth"
+        rows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? "" : "none";
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = false;
         });
-    });
 
-    renderPagination(1);
-    showPage(1);
+        selectAllCheckbox.checked = false;
+        syncCheckboxEvents();
+    }
 
-    // 전체선택 체크박스 이벤트
+    pagination.innerHTML = "";
+
+    if (totalRecords > recordsPerPage) {
+        function renderPagination(page) {
+            currentPage = page;
+            pagination.innerHTML = "";
+
+            const groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+            const startPage = groupIndex * naviCountPerPage + 1;
+            const endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+            if (startPage > 1)
+                pagination.appendChild(createPageLink(startPage - 1, "prev"));
+
+            for (let i = startPage; i <= endPage; i++) {
+                pagination.appendChild(createPageLink(i, i.toString(), i === currentPage));
+            }
+
+            if (endPage < totalPages)
+                pagination.appendChild(createPageLink(endPage + 1, "next"));
+        }
+
+        function createPageLink(page, label, isActive = false) {
+            const a = document.createElement("a");
+            a.href = "#";
+            a.className = "page-link";
+            a.dataset.page = page;
+            a.textContent = label === "prev" ? "<" : label === "next" ? ">" : label;
+            if (isActive) a.classList.add("active");
+            return a;
+        }
+
+        pagination.addEventListener("click", function (e) {
+            const link = e.target.closest("a.page-link");
+            if (!link) return;
+            e.preventDefault();
+            const page = parseInt(link.dataset.page);
+            renderPagination(page);
+            showPage(page);
+            window.scrollTo({ top: table.offsetTop - 100, behavior: "smooth" });
+        });
+
+        renderPagination(1);
+    }
+
+    showPage(1); // 무조건 호출해서 이벤트 연결
     selectAllCheckbox.addEventListener("change", function () {
         const visibleRows = rows.filter(row => row.style.display !== "none");
         visibleRows.forEach(row => {
-            const checkbox = row.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-                checkbox.checked = selectAllCheckbox.checked;
-            }
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = selectAllCheckbox.checked;
         });
     });
 }
 
+
+// 게시글 삭제
 function setupPostDelete() {
     const deleteBtn = document.getElementById('postDeleteBtn');
     if (!deleteBtn) return;
 
     deleteBtn.addEventListener('click', () => {
-        const visibleRows = Array.from(document.querySelectorAll('tbody tr'))
+        const visibleRows = Array.from(document.querySelectorAll('.post-table tbody tr'))
             .filter(row => row.style.display !== 'none');
 
         const checkedIds = visibleRows
@@ -544,8 +547,144 @@ function setupPostDelete() {
                 if (!res.ok) throw new Error('삭제 실패');
                 loadMenuContent('mypost');
             })
-            .catch(err => {
-                alert('오류 발생');
-            });
+            .catch(() => alert('오류 발생'));
+    });
+}
+
+// 댓글 페이지네이션
+function setupCommentPagination() {
+    const recordsPerPage = 5;
+    const naviCountPerPage = 5;
+
+    const table = document.querySelector(".comment-table");
+    if (!table) return;
+
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const totalRecords = rows.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    const footer = document.querySelector(".table-footer");
+    const pagination = footer.querySelector(".pagination");
+    const selectAllCheckbox = footer.querySelector("#selectAllComments");
+
+    let currentPage = 1;
+
+    function syncCheckboxEvents() {
+        const visibleRows = rows.filter(row => row.style.display !== "none");
+        visibleRows.forEach(row => {
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (cb) {
+                cb.addEventListener("change", () => {
+                    const allChecked = visibleRows.every(r => {
+                        const cb = r.querySelector('input[type="checkbox"]');
+                        return cb && cb.checked;
+                    });
+                    selectAllCheckbox.checked = allChecked;
+                });
+            }
+        });
+    }
+
+    function showPage(page) {
+        const start = (page - 1) * recordsPerPage;
+        const end = start + recordsPerPage;
+
+        rows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? "" : "none";
+            const cb = row.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = false;
+        });
+
+        selectAllCheckbox.checked = false;
+        syncCheckboxEvents(); // 무조건 체크박스 이벤트 연결
+    }
+
+    pagination.innerHTML = "";
+
+    if (totalRecords > recordsPerPage) {
+        function renderPagination(page) {
+            currentPage = page;
+            pagination.innerHTML = "";
+
+            const groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+            const startPage = groupIndex * naviCountPerPage + 1;
+            const endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+            if (startPage > 1)
+                pagination.appendChild(createPageLink(startPage - 1, "prev"));
+
+            for (let i = startPage; i <= endPage; i++) {
+                pagination.appendChild(createPageLink(i, i.toString(), i === currentPage));
+            }
+
+            if (endPage < totalPages)
+                pagination.appendChild(createPageLink(endPage + 1, "next"));
+        }
+
+        function createPageLink(page, label, isActive = false) {
+            const a = document.createElement("a");
+            a.href = "#";
+            a.className = "page-link";
+            a.dataset.page = page;
+            a.textContent = label === "prev" ? "<" : label === "next" ? ">" : label;
+            if (isActive) a.classList.add("active");
+            return a;
+        }
+
+        pagination.addEventListener("click", function (e) {
+            const link = e.target.closest("a.page-link");
+            if (!link) return;
+            e.preventDefault();
+            const page = parseInt(link.dataset.page);
+            renderPagination(page);
+            showPage(page);
+            window.scrollTo({ top: table.offsetTop - 100, behavior: "smooth" });
+        });
+
+        renderPagination(1);
+    }
+
+    showPage(1); // 데이터 수 상관없이 항상 실행
+    selectAllCheckbox.addEventListener("change", function () {
+        const visibleRows = rows.filter(row => row.style.display !== "none");
+        visibleRows.forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = selectAllCheckbox.checked;
+        });
+    });
+}
+
+
+// 댓글 삭제
+function setupCommentDelete() {
+    const deleteBtn = document.getElementById('commentDeleteBtn');
+    if (!deleteBtn) return;
+
+    deleteBtn.addEventListener('click', () => {
+        const visibleRows = Array.from(document.querySelectorAll('.comment-table tbody tr'))
+            .filter(row => row.style.display !== 'none');
+
+        const checkedIds = visibleRows
+            .map(row => row.querySelector('input[type="checkbox"]'))
+            .filter(cb => cb && cb.checked)
+            .map(cb => parseInt(cb.dataset.commentId));
+
+        if (checkedIds.length === 0) {
+            alert('삭제할 댓글을 선택해주세요.');
+            return;
+        }
+
+        if (!confirm('선택한 댓글을 삭제하시겠습니까?')) return;
+
+        fetch('/api/comments/delete', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(checkedIds)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('삭제 실패');
+                loadMenuContent('mycomment');
+            })
+            .catch(() => alert('오류 발생'));
     });
 }

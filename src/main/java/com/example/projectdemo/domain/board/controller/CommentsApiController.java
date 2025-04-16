@@ -4,6 +4,7 @@ import com.example.projectdemo.domain.board.dto.CommentsDTO;
 import com.example.projectdemo.domain.board.entity.Comments;
 import com.example.projectdemo.domain.board.service.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -93,5 +94,16 @@ public class CommentsApiController {
         return ResponseEntity.ok(response);
     }
 
-
+    /**
+     * 댓글 다중 삭제
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteComments(@RequestBody List<Integer> commentIds) {
+        try{
+            commentsService.deleteCommentsByIds(commentIds);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
