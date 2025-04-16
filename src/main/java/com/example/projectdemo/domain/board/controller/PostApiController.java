@@ -213,5 +213,12 @@ public class PostApiController {
         }
     }
 
-
+    /**
+     * 게시글 다중 삭제
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deletePosts(@RequestBody List<Integer> ids) {
+        postsService.deletePostsByIds(ids);
+        return ResponseEntity.ok().build();
+    }
 }

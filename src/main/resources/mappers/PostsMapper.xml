@@ -116,4 +116,32 @@
         WHERE id = #{id}
     </delete>
 
+    <!-- 내 게시글 조회 -->
+    <select id="findPostsByEmpId" resultType="com.example.projectdemo.domain.board.dto.PostsDTO">
+        SELECT
+            posts.id,
+            posts.emp_id AS empId,
+            posts.title,
+            posts.content,
+            posts.views,
+            posts.created_at AS createdAt,
+            posts.board_id AS boardId,
+            boards.name AS boardName
+        FROM
+            posts
+                JOIN boards ON posts.board_id = boards.id
+        WHERE
+            posts.emp_id = #{empId}
+        ORDER BY
+            posts.created_at DESC
+    </select>
+
+    <!-- 게시글 다중 삭제 -->
+    <delete id="deletePostsByIds">
+        DELETE FROM posts
+        WHERE id IN
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

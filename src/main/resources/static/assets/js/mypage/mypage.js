@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loadTabContent(tab); // 탭에 맞는 내용 로드
+
 });
 
 function loadTabContent(tabName) {
@@ -55,6 +56,10 @@ function loadMenuContent(menuName) {
         .then(response => response.json())
         .then(data => {
             document.getElementById('tableContainer').innerHTML = generateContent(menuName, data);
+            if (menuName === 'mypost') {
+                setupPagination();
+                setupPostDelete(); // 게시글 삭제 이벤트
+            }
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -152,7 +157,6 @@ function generateContent(contentName, data) {
     <div class="menu-container">
       <div class="menu-item active" id="mypost" onclick="loadMenuContent('mypost')">작성글</div>
       <div class="menu-item" id="mycomment" onclick="loadMenuContent('mycomment')">작성댓글</div>
-      <div class="menu-item" id="starredpost" onclick="loadMenuContent('starredpost')">중요게시글</div>
     </div>
     
     <div class="table-container" id="tableContainer">
@@ -179,73 +183,67 @@ function generateContent(contentName, data) {
     
 `;
     } else if (contentName === 'mypost') {
+        let rows = '';
+
+        data.forEach(post => {
+            rows += `
+        <tr>
+          <td class="checkbox-col post-td"><input type="checkbox" data-post-id="${post.id}"></td>
+          <td class="board-col post-td">${post.boardName}</td>
+          <td class="title-col post-td">
+            <a href="/board/post/${post.id}">${post.title}</a>
+          </td>
+          <td class="created-at-col post-td">${formatDate(post.createdAt)}</td>
+          <td class="views-col post-td">${post.views}</td>
+        </tr>
+        `;
+        });
+
         content = `
-    <table>
-      <thead>
-      <tr>
-        <th class="checkbox-col post-th"></th>
-        <th class="board-col post-th">게시판</th>
-        <th class="title-col post-th">제목</th>
-        <th class="created-at-col post-th">작성일</th>
-        <th class="views-col post-th">조회수</th>
-      </tr>
-      </thead>
-      
-      <tbody>
-      <tr>
-        <td class="checkbox-col post-td"><input type="checkbox"></td>
-        <td class="board-col post-td">자유게시판</td>
-        <td class="title-col post-td">제목입니다!!!!!</td>
-        <td class="created-at-col post-td">2025.03.28</td>
-        <td class="views-col post-td">26</td>
-      </tr>
-      <tr>
-        <td class="checkbox-col post-td"><input type="checkbox"></td>
-        <td class="board-col post-td">자유게시판</td>
-        <td class="title-col post-td">제목입니다!!!!!</td>
-        <td class="created-at-col post-td">2025.03.28</td>
-        <td class="views-col post-td">26</td>
-      </tr>
-      <tr>
-        <td class="checkbox-col post-td"><input type="checkbox"></td>
-        <td class="board-col post-td">자유게시판</td>
-        <td class="title-col post-td">제목입니다!!!!!</td>
-        <td class="created-at-col post-td">2025.03.28</td>
-        <td class="views-col post-td">26</td>
-      </tr>
-      <tr>
-        <td class="checkbox-col post-td"><input type="checkbox"></td>
-        <td class="board-col post-td">자유게시판</td>
-        <td class="title-col post-td">제목입니다!!!!!</td>
-        <td class="created-at-col post-td">2025.03.28</td>
-        <td class="views-col post-td">26</td>
-      </tr>
-      <tr>
-        <td class="checkbox-col post-td"><input type="checkbox"></td>
-        <td class="board-col post-td">자유게시판</td>
-        <td class="title-col post-td">제목입니다!!!!!</td>
-        <td class="created-at-col post-td">2025.03.28</td>
-        <td class="views-col post-td">26</td>
-      </tr>
+            <table>
+            <thead>
+                <tr>
+               <th class="checkbox-col post-th"></th>
+                   <th class="board-col post-th">게시판</th>
+                 <th class="title-col post-th">제목</th>
+                <th class="created-at-col post-th">작성일</th>
+                 <th class="views-col post-th">조회수</th>
+               </tr>
+             </thead>
+            <tbody>
+               ${rows}
+             </tbody>
+            </table>
 
-      </tbody>
-    </table>
+            <div class="table-footer">
+                <div class="footer-left">
+                    <input type="checkbox" id="selectAll">
+                    <label for="selectAll">전체선택</label>
+                </div>    
 
-    <div style="margin-top: 20px;">
-      <input type="checkbox" id="selectAll">
-      <label for="selectAll">전체선택</label>
-      <button class="delete-btn">삭제</button>
-    </div>        
+                <div class="footer-center">
+                    <div class="pagination"></div>
+                </div>
+
+                <div class="footer-right">
+                    <button class="post-delete-btn delete-btn" id="postDeleteBtn">삭제</button>
+                </div>
+            </div>
+
         `;
     }else if (contentName === 'mycomment'){
         content = `<h2>작성댓글</h2>`;
-    }else if (contentName === 'starredpost'){
-        content = `<h2>중요게시글</h2>`;
     }
     return content;
 }
 
-
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+}
 
 // 카메라 아이콘 클릭 시 파일 선택 창 열기
 function openImageSelector() {
@@ -343,4 +341,156 @@ function updateInfo() {
             alert('정보 업데이트 중 오류가 발생했습니다.');
             console.error(error); // 오류 로그 출력
         });
+}
+
+function setupPagination() {
+    const recordsPerPage = 5;
+    const naviCountPerPage = 5;
+
+    const table = document.querySelector("table"); // 생성된 테이블
+    if (!table) return;
+
+    const rows = Array.from(table.querySelectorAll("tbody tr"));
+    const totalRecords = rows.length;
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+    const footer = document.querySelector(".table-footer");
+    const pagination = footer.querySelector(".pagination");
+
+    const selectAllCheckbox = footer.querySelector("#selectAll");
+
+    if (totalRecords <= recordsPerPage) {
+        rows.forEach(row => row.style.display = "");
+        pagination.innerHTML = "";
+        return;
+    }
+
+    let currentPage = 1;
+
+    function renderPagination(page) {
+        currentPage = page;
+        pagination.innerHTML = "";
+
+        const groupIndex = Math.floor((currentPage - 1) / naviCountPerPage);
+        const startPage = groupIndex * naviCountPerPage + 1;
+        const endPage = Math.min(startPage + naviCountPerPage - 1, totalPages);
+
+        if (startPage > 1) {
+            pagination.appendChild(createPageLink(startPage - 1, "prev"));
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pagination.appendChild(createPageLink(i, i.toString(), i === currentPage));
+        }
+
+        if (endPage < totalPages) {
+            pagination.appendChild(createPageLink(endPage + 1, "next"));
+        }
+    }
+
+    function createPageLink(page, label, isActive = false) {
+        const a = document.createElement("a");
+        a.href = "#";
+        a.className = "page-link";
+        a.dataset.page = page;
+        a.textContent = label === "prev" ? "<" : label === "next" ? ">" : label;
+        if (isActive) a.classList.add("active");
+        return a;
+    }
+
+    function showPage(page) {
+        const start = (page - 1) * recordsPerPage;
+        const end = start + recordsPerPage;
+        rows.forEach((row, index) => {
+            if (index >= start && index < end) {
+                row.style.display = "";
+                // ✅ 체크박스도 초기화
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox) checkbox.checked = false;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // 전체선택도 해제
+        selectAllCheckbox.checked = false;
+
+        // 현재 페이지 체크박스 이벤트 연결
+        const visibleRows = rows.filter(row => row.style.display !== "none");
+        visibleRows.forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.addEventListener("change", () => {
+                    const allChecked = visibleRows.every(r => {
+                        const cb = r.querySelector('input[type="checkbox"]');
+                        return cb && cb.checked;
+                    });
+                    selectAllCheckbox.checked = allChecked;
+                });
+            }
+        });
+    }
+
+    pagination.addEventListener("click", function (e) {
+        const link = e.target.closest("a.page-link");
+        if (!link) return;
+        e.preventDefault();
+        const targetPage = parseInt(link.dataset.page);
+        renderPagination(targetPage);
+        showPage(targetPage);
+
+        window.scrollTo({
+            top: table.offsetTop - 100,
+            behavior: "smooth"
+        });
+    });
+
+    renderPagination(1);
+    showPage(1);
+
+    // 전체선택 체크박스 이벤트
+    selectAllCheckbox.addEventListener("change", function () {
+        const visibleRows = rows.filter(row => row.style.display !== "none");
+        visibleRows.forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = selectAllCheckbox.checked;
+            }
+        });
+    });
+}
+
+function setupPostDelete() {
+    const deleteBtn = document.getElementById('postDeleteBtn');
+    if (!deleteBtn) return;
+
+    deleteBtn.addEventListener('click', () => {
+        const visibleRows = Array.from(document.querySelectorAll('tbody tr'))
+            .filter(row => row.style.display !== 'none');
+
+        const checkedIds = visibleRows
+            .map(row => row.querySelector('input[type="checkbox"]'))
+            .filter(cb => cb && cb.checked)
+            .map(cb => parseInt(cb.dataset.postId));
+
+        if (checkedIds.length === 0) {
+            alert('삭제할 게시글을 선택해주세요.');
+            return;
+        }
+
+        if (!confirm('선택한 게시글을 삭제하시겠습니까?')) return;
+
+        fetch('/api/posts/delete', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(checkedIds)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('삭제 실패');
+                loadMenuContent('mypost');
+            })
+            .catch(err => {
+                alert('오류 발생');
+            });
+    });
 }

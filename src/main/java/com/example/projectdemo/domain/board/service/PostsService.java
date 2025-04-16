@@ -91,6 +91,19 @@ public class PostsService {
         return result > 0;
     }
 
+    /**
+     * 내 게시글 조회
+     */
+    public List<PostsDTO> getMyPosts(Integer empId) {
 
+        return postsMapper.findPostsByEmpId(empId);
+    }
+
+    /**
+     * 게시글 다중 삭제
+     */
+    public void deletePostsByIds(List<Integer> ids) {
+        postsMapper.deletePostsByIds(ids);
+    }
 
 }
