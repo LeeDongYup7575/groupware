@@ -36,11 +36,11 @@
 
             <!-- 전사 게시판 그룹 (is_global = 1) -->
             <li class="toggle-menu">
-                <a href="" >
+                <a href="javascript:void(0)">
                     <span class="sidebar-icon">📢</span> 전사 게시판 &nbsp;
                     <i class="fas fa-chevron-down"></i>
                 </a>
-                <ul id="all-menu" class="submenu">
+                <ul id="all-menu" class="submenu open">
                     <li th:each="board : ${accessibleBoards}" th:if="${board.isActive && board.isGlobal}">
                         <a th:href="@{/board/{id}(id=${board.id})}">
                             <span class="sidebar-icon">📄</span>
@@ -52,11 +52,11 @@
 
             <!-- 그룹 게시판 (is_global = 0) -->
             <li class="toggle-menu" th:if="${!#lists.isEmpty(accessibleBoards.?[isActive and !isGlobal])}">
-                <a href="">
+                <a href="javascript:void(0)">
                     <span class="sidebar-icon">👥</span> 그룹 게시판 &nbsp;
                     <i class="fas fa-chevron-down"></i>
                 </a>
-                <ul id="group-menu" class="submenu">
+                <ul id="group-menu" class="submenu open">
                     <li th:each="board : ${accessibleBoards}" th:if="${board.isActive && !board.isGlobal}">
                         <a th:href="@{/board/{id}(id=${board.id})}">
                             <span class="sidebar-icon">📁</span>
