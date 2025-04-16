@@ -254,6 +254,7 @@
         document.getElementById('start-time-minute').addEventListener('change', updateStartTime);
         document.getElementById('end-time-hour').addEventListener('change', updateEndTime);
         document.getElementById('end-time-minute').addEventListener('change', updateEndTime);
+        document.getElementById('end-time-hour').addEventListener('change', handleEndHourChange);
 
         // 시작 시간 업데이트 함수
         function updateStartTime() {
@@ -332,6 +333,17 @@
                 }
             }
 
+            // 6시(18시)가 선택된 경우 00분만 선택 가능하도록 설정
+            if (endHourSelect.value === '18') {
+                for (let i = 1; i < endMinuteSelect.options.length; i++) {
+                    if (endMinuteSelect.options[i].value !== '00') {
+                        endMinuteSelect.options[i].disabled = true;
+                    }
+                }
+                // 00분으로 자동 선택
+                endMinuteSelect.value = '00';
+            }
+
             // 현재 선택된 값이 무효하면 리셋
             if (endHourSelect.selectedIndex > 0 && endHourSelect.options[endHourSelect.selectedIndex].disabled) {
                 endHourSelect.selectedIndex = 0;
@@ -342,6 +354,31 @@
             }
 
             // 시간 입력값 업데이트
+            updateEndTime();
+        }
+
+// 종료 시간 시 선택 처리 함수 (이 함수는 updateEndTimeOptions 함수 외부에 있어야 함)
+        function handleEndHourChange() {
+            const endTimeHour = document.getElementById('end-time-hour');
+            const endTimeMinute = document.getElementById('end-time-minute');
+            const selectedHour = endTimeHour.value;
+
+            // 모든 분 옵션 초기화 및 활성화
+            for (let i = 1; i < endTimeMinute.options.length; i++) {
+                endTimeMinute.options[i].disabled = false;
+            }
+
+            // 6시(18시)가 선택된 경우 00분만 선택 가능하도록 설정
+            if (selectedHour === '18') {
+                for (let i = 1; i < endTimeMinute.options.length; i++) {
+                    if (endTimeMinute.options[i].value !== '00') {
+                        endTimeMinute.options[i].disabled = true;
+                    }
+                }
+                // 00분으로 자동 선택
+                endTimeMinute.value = '00';
+            }
+
             updateEndTime();
         }
 

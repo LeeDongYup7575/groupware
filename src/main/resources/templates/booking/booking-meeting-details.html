@@ -174,6 +174,7 @@
                     <option value="15">15시</option>
                     <option value="16">16시</option>
                     <option value="17">17시</option>
+                    <option value="18">18시</option>
                 </select>
                 <select id="start-time-minute" style="flex: 1;">
                     <option value="" disabled selected>분</option>
@@ -242,17 +243,67 @@
         const successMessage = document.getElementById('success-message');
         const checkAvailabilityBtn = document.getElementById('check-availability');
         const submitBookingBtn = document.getElementById('submit-booking');
+        const startTimeHour = document.getElementById('start-time-hour');
+        const startTimeMinute = document.getElementById('start-time-minute');
+        const endTimeHour = document.getElementById('end-time-hour');
+        const endTimeMinute = document.getElementById('end-time-minute');
 
         // 시간 드롭다운 이벤트 리스너 추가
-        document.getElementById('start-time-hour').addEventListener('change', updateStartTime);
-        document.getElementById('start-time-minute').addEventListener('change', updateStartTime);
-        document.getElementById('end-time-hour').addEventListener('change', updateEndTime);
-        document.getElementById('end-time-minute').addEventListener('change', updateEndTime);
+        startTimeHour.addEventListener('change', handleStartHourChange);
+        startTimeMinute.addEventListener('change', updateStartTime);
+        endTimeHour.addEventListener('change', handleEndHourChange);
+        endTimeMinute.addEventListener('change', updateEndTime);
+
+        // 시작 시간 시 선택 처리
+        function handleStartHourChange() {
+            const selectedHour = startTimeHour.value;
+
+            // 모든 분 옵션 초기화 및 활성화
+            for (let i = 1; i < startTimeMinute.options.length; i++) {
+                startTimeMinute.options[i].disabled = false;
+            }
+
+            // 6시(18시)가 선택된 경우 00분만 선택 가능하도록 설정
+            if (selectedHour === '18') {
+                for (let i = 1; i < startTimeMinute.options.length; i++) {
+                    if (startTimeMinute.options[i].value !== '00') {
+                        startTimeMinute.options[i].disabled = true;
+                    }
+                }
+                // 00분으로 자동 선택
+                startTimeMinute.value = '00';
+            }
+
+            updateStartTime();
+        }
+
+        // 종료 시간 시 선택 처리
+        function handleEndHourChange() {
+            const selectedHour = endTimeHour.value;
+
+            // 모든 분 옵션 초기화 및 활성화
+            for (let i = 1; i < endTimeMinute.options.length; i++) {
+                endTimeMinute.options[i].disabled = false;
+            }
+
+            // 6시(18시)가 선택된 경우 00분만 선택 가능하도록 설정
+            if (selectedHour === '18') {
+                for (let i = 1; i < endTimeMinute.options.length; i++) {
+                    if (endTimeMinute.options[i].value !== '00') {
+                        endTimeMinute.options[i].disabled = true;
+                    }
+                }
+                // 00분으로 자동 선택
+                endTimeMinute.value = '00';
+            }
+
+            updateEndTime();
+        }
 
         // 시작 시간 업데이트 함수
         function updateStartTime() {
-            const hour = document.getElementById('start-time-hour').value;
-            const minute = document.getElementById('start-time-minute').value;
+            const hour = startTimeHour.value;
+            const minute = startTimeMinute.value;
 
             if (hour && minute) {
                 document.getElementById('start-time').value = `${hour}:${minute}`;
@@ -263,8 +314,8 @@
 
         // 종료 시간 업데이트 함수
         function updateEndTime() {
-            const hour = document.getElementById('end-time-hour').value;
-            const minute = document.getElementById('end-time-minute').value;
+            const hour = endTimeHour.value;
+            const minute = endTimeMinute.value;
 
             if (hour && minute) {
                 document.getElementById('end-time').value = `${hour}:${minute}`;
@@ -274,30 +325,27 @@
 
         // 종료 시간 옵션 업데이트 (최소 1시간 이후)
         function updateEndTimeOptions() {
-            const startHour = document.getElementById('start-time-hour').value;
-            const startMinute = document.getElementById('start-time-minute').value;
+            const startHour = startTimeHour.value;
+            const startMinute = startTimeMinute.value;
 
             if (!startHour || !startMinute) return;
 
-            const endHourSelect = document.getElementById('end-time-hour');
-            const endMinuteSelect = document.getElementById('end-time-minute');
-
             // 모든 옵션 초기화
-            for (let i = 0; i < endHourSelect.options.length; i++) {
-                endHourSelect.options[i].disabled = false;
+            for (let i = 1; i < endTimeHour.options.length; i++) {
+                endTimeHour.options[i].disabled = false;
             }
 
-            for (let i = 0; i < endMinuteSelect.options.length; i++) {
-                endMinuteSelect.options[i].disabled = false;
+            for (let i = 1; i < endTimeMinute.options.length; i++) {
+                endTimeMinute.options[i].disabled = false;
             }
 
             // 시작 시간보다 이전 시간 비활성화
             const startHourNum = parseInt(startHour);
 
-            for (let i = 1; i < endHourSelect.options.length; i++) {
-                const hourValue = endHourSelect.options[i].value;
+            for (let i = 1; i < endTimeHour.options.length; i++) {
+                const hourValue = endTimeHour.options[i].value;
                 if (hourValue && parseInt(hourValue) < startHourNum) {
-                    endHourSelect.options[i].disabled = true;
+                    endTimeHour.options[i].disabled = true;
                 }
             }
 
@@ -310,29 +358,40 @@
             const minEndMinute = minEndTime.getMinutes().toString().padStart(2, '0');
 
             // 같은 시간대의 경우, 최소 1시간 이상 차이나는 분만 선택 가능하도록
-            for (let i = 1; i < endHourSelect.options.length; i++) {
-                const hourValue = endHourSelect.options[i].value;
+            for (let i = 1; i < endTimeHour.options.length; i++) {
+                const hourValue = endTimeHour.options[i].value;
                 if (hourValue && parseInt(hourValue) < parseInt(minEndHour)) {
-                    endHourSelect.options[i].disabled = true;
+                    endTimeHour.options[i].disabled = true;
                 }
             }
 
-            if (endHourSelect.value === startHour || (parseInt(endHourSelect.value) === parseInt(minEndHour))) {
-                for (let i = 1; i < endMinuteSelect.options.length; i++) {
-                    const minuteValue = endMinuteSelect.options[i].value;
+            if (endTimeHour.value === startHour || (parseInt(endTimeHour.value) === parseInt(minEndHour))) {
+                for (let i = 1; i < endTimeMinute.options.length; i++) {
+                    const minuteValue = endTimeMinute.options[i].value;
                     if (minuteValue && parseInt(minuteValue) < parseInt(minEndMinute)) {
-                        endMinuteSelect.options[i].disabled = true;
+                        endTimeMinute.options[i].disabled = true;
                     }
                 }
             }
 
-            // 현재 선택된 값이 무효하면 리셋
-            if (endHourSelect.selectedIndex > 0 && endHourSelect.options[endHourSelect.selectedIndex].disabled) {
-                endHourSelect.selectedIndex = 0;
+            // 6시(18시)가 선택된 경우 00분만 선택 가능하도록 추가 설정
+            if (endTimeHour.value === '18') {
+                for (let i = 1; i < endTimeMinute.options.length; i++) {
+                    if (endTimeMinute.options[i].value !== '00') {
+                        endTimeMinute.options[i].disabled = true;
+                    }
+                }
+                // 00분으로 자동 선택
+                endTimeMinute.value = '00';
             }
 
-            if (endMinuteSelect.selectedIndex > 0 && endMinuteSelect.options[endMinuteSelect.selectedIndex].disabled) {
-                endMinuteSelect.selectedIndex = 0;
+            // 현재 선택된 값이 무효하면 리셋
+            if (endTimeHour.selectedIndex > 0 && endTimeHour.options[endTimeHour.selectedIndex].disabled) {
+                endTimeHour.selectedIndex = 0;
+            }
+
+            if (endTimeMinute.selectedIndex > 0 && endTimeMinute.options[endTimeMinute.selectedIndex].disabled) {
+                endTimeMinute.selectedIndex = 0;
             }
 
             // 시간 입력값 업데이트
