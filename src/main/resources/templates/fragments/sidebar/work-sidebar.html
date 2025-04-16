@@ -6,64 +6,227 @@
 </head>
 <body>
 <!-- 업무 관리 사이드바 fragment -->
-<div th:fragment="work-sidebar" class="col-md-2 work-sidebar">
-  <div class="nav flex-column">
-    <a th:href="@{/workmanagement}" class="nav-link" >
-      <i class="fas fa-tasks"></i> 업무
-    </a>
-    <a th:href="@{/workmanagement/register}" class="nav-link">
-      <i class="fas fa-plus-circle"></i> 등록
-    </a>
-    <a th:href="@{/workmanagement/schedule}" class="nav-link" >
-      <i class="fas fa-calendar-alt"></i> 일정
-    </a>
+<div th:fragment="work-sidebar" class="sidebar">
+  <a th:href="@{/workmanagement/register}" class="create-button">
+    <i class="fas fa-plus"></i>
+    작성하기
+  </a>
+
+  <div class="sidebar-menu">
+    <ul>
+      <li class="active">
+        <a th:href="@{/workmanagement}">
+          <i class="fas fa-tasks sidebar-icon"></i> 업무
+        </a>
+      </li>
+      <!-- 필요한 경우 여기에 더 많은 메뉴 항목을 추가할 수 있습니다 -->
+    </ul>
   </div>
 </div>
 
 <!-- 사이드바 스타일시트 -->
 <th:block th:fragment="sidebar-styles">
   <style>
-    .work-sidebar {
-      background-color: #f8f9fa;
+    /* 사이드바 */
+    :root {
+      --primary-color: #0183D4;
+      --primary-light: #DDF6FF;
+      --primary-dark: #0066a8;
+      --secondary-color: #f3f4f6;
+      --sidebar-bg: #f3f7fb;
+      --sidebar-hover: #e8f0f8;
+      --sidebar-active: #e1ebf5;
+      --sidebar-active-border: #0078d4;
+      --text-color: #1f2937;
+      --text-light: #6b7280;
+      --text-primary: #333;
+      --text-secondary: #666;
+      --sidebar-width: 250px;
+      --header-height: 80px;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--sidebar-bg);
+      /*position: fixed;*/
+      /*top: 0;*/
+      /*left: 0;*/
+      /*height: 100vh;*/
+      /*overflow-y: auto;*/
+      /*padding-top: var(--header-height);*/
+      /*transition: transform 0.3s ease;*/
+      /*z-index: 990;*/
       border-right: 1px solid #dee2e6;
       min-height: calc(100vh - 56px);
-      padding-top: 20px;
+      /*padding-top: 20px;*/
+      border-right: 1px solid #e5e5e5;
     }
 
-    .work-sidebar .nav-link {
-      color: #495057;
-      padding: 0.5rem 1rem;
-      margin-bottom: 5px;
-      border-radius: 5px;
-      transition: all 0.3s;
-    }
-
-    .work-sidebar .nav-link:hover {
-      background-color: #e9ecef;
-    }
-
-    .work-sidebar .nav-link.active {
-      background-color: #007bff;
+    /* 작성하기 버튼 스타일 */
+    .create-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px auto;
+      padding: 10px 10px;
+      width: 80%;
+      background-color: var(--primary-color);
       color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
     }
 
-    .work-sidebar .nav-link i {
+    .create-button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .create-button i {
+      margin-right: 8px;
+    }
+
+    .sidebar-menu {
+      padding: 10px 0;
+    }
+
+    .sidebar-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 5px;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 14px;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: var(--sidebar-hover);
+    }
+
+    .sidebar-menu li.active a {
+      background-color: var(--sidebar-active);
+      border-left: 4px solid var(--sidebar-active-border);
+      padding-left: 16px;
+      color: var(--sidebar-active-border);
+      font-weight: 500;
+    }
+
+    .sidebar-menu li:not(.active) a {
+      border-left: 4px solid transparent;
+      padding-left: 16px;
+    }
+
+    .sidebar-icon {
       margin-right: 10px;
-      width: 20px;
+      font-size: 18px;
+      display: inline-block;
+      width: 24px;
       text-align: center;
     }
 
-    @media (max-width: 768px) {
-      .work-sidebar {
-        position: fixed;
-        z-index: 100;
-        width: 250px;
+    .sidebar-toggle {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 40px;
+      height: 40px;
+      background-color: white;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--text-color);
+    }
+
+    /* 메뉴 섹션 스타일 (옵션) */
+    .menu-section {
+      margin-bottom: 20px;
+    }
+
+    .menu-header {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      color: var(--text-light);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .menu-header i {
+      margin-right: 8px;
+      font-size: 12px;
+    }
+
+    .menu-items {
+      padding-left: 15px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      color: var(--text-color);
+      font-size: 14px;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: background-color 0.3s;
+    }
+
+    .menu-item:hover {
+      background-color: var(--sidebar-hover);
+    }
+
+    .menu-item.active {
+      background-color: var(--sidebar-active);
+      border-left: 4px solid var(--sidebar-active-border);
+      color: var(--sidebar-active-border);
+      font-weight: 500;
+    }
+
+    .menu-item i {
+      margin-right: 10px;
+      width: 18px;
+      text-align: center;
+    }
+
+    /* 반응형 스타일 */
+    @media (max-width: 1200px) {
+      .sidebar {
         transform: translateX(-100%);
-        transition: transform 0.3s;
       }
 
-      .work-sidebar.show {
+      .sidebar.open {
         transform: translateX(0);
+      }
+
+      .sidebar-toggle {
+        display: flex;
+      }
+
+      .main-content {
+        margin-left: 0;
       }
     }
   </style>
@@ -75,19 +238,21 @@
     $(document).ready(function() {
       // 현재 URL에 따라 사이드바 메뉴 활성화
       const path = window.location.pathname;
-      $('.work-sidebar .nav-link').removeClass('active');
+      $('.sidebar-menu li').removeClass('active');
 
-      if (path.endsWith('/register')) {
-        $('.work-sidebar .nav-link[href$="/register"]').addClass('active');
-      } else if (path.endsWith('/schedule')) {
-        $('.work-sidebar .nav-link[href$="/schedule"]').addClass('active');
-      } else if (path.endsWith('/workmanagement')) {
-        $('.work-sidebar .nav-link[href$="/workmanagement"]').addClass('active');
+      if (path.endsWith('/workmanagement')) {
+        $('.sidebar-menu li a[href$="/workmanagement"]').parent().addClass('active');
       }
 
-      // 모바일 토글 버튼 (필요시 추가)
+      // 모바일 토글 버튼 (필요시)
       $('#sidebar-toggle').on('click', function() {
-        $('.work-sidebar').toggleClass('show');
+        $('.sidebar').toggleClass('open');
+      });
+
+      // 메뉴 섹션 토글 (옵션)
+      $('.menu-header').on('click', function() {
+        $(this).next('.menu-items').slideToggle();
+        $(this).find('i').toggleClass('fa-chevron-down fa-chevron-right');
       });
     });
   </script>
