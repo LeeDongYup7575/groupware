@@ -88,4 +88,12 @@ public interface EmployeesMapper {
     // 활성화된 직원 목록 가져오기
     List<EmployeesDTO> getAllActiveEmployees();
 
+
+    /**
+     * 직원 추가
+     * @param employeeDTO 추가할 직원 정보
+     * @return 성공 시 1, 실패 시 0
+     */
+    int insertEmployee(EmployeesDTO employeeDTO);
+
 }

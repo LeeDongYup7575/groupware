@@ -147,5 +147,55 @@ public class AdminEmpApiController {
         }
     }
 
+    @PostMapping("/add")
+    public ResponseEntity<?> addEmployee(
+            @RequestBody EmployeesDTO employeeDTO,
+            HttpServletRequest request) {
+
+        // 권한 확인
+        String role = (String) request.getAttribute("role");
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "관리자 권한이 필요합니다.", "success", false));
+        }
+
+        try {
+            // 필수 필드 검증
+            if (employeeDTO.getName() == null || employeeDTO.getName().trim().isEmpty() ||
+                    employeeDTO.getEmpNum() == null || employeeDTO.getEmpNum().trim().isEmpty() ||
+                    employeeDTO.getEmail() == null || employeeDTO.getEmail().trim().isEmpty() ||
+                    employeeDTO.getSsn() == null || employeeDTO.getSsn().trim().isEmpty() ||
+                    employeeDTO.getDepId() == null || employeeDTO.getPosId() == null ||
+                    employeeDTO.getGender() == null || employeeDTO.getGender().trim().isEmpty()) {
+
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "필수 항목이 누락되었습니다.", "success", false));
+            }
+
+            // 사원번호 중복 확인
+            EmployeesDTO existingEmployee = employeesService.findByEmpNum(employeeDTO.getEmpNum());
+            if (existingEmployee != null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "이미 존재하는 사원번호입니다.", "success", false));
+            }
+
+            // 기본값 설정
+            employeeDTO.setRegistered(false);
+            employeeDTO.setEnabled(true);
+
+            // 서비스를 통해 직원 추가 (서비스에 해당 메서드 추가 필요)
+            EmployeesDTO addedEmployee = employeesService.addEmployee(employeeDTO);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "직원이 성공적으로 추가되었습니다.",
+                    "employee", addedEmployee
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage(), "success", false));
+        }
+    }
+
 
 }

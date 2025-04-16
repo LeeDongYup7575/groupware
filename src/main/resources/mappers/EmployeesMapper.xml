@@ -44,7 +44,7 @@
 
 
     <select id="findAllEmployeeIds" resultType="int">
-        SELECT emp_id FROM employees
+        SELECT id FROM employees
     </select>
 
 
@@ -259,5 +259,52 @@
         WHERE enabled = 1
         ORDER BY name
     </select>
+
+    <!-- 직원 추가 -->
+    <insert id="insertEmployee" parameterType="com.example.projectdemo.domain.employees.dto.EmployeesDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO employees (
+            emp_num,
+            password,
+            name,
+            gender,
+            phone,
+            email,
+            profile_img_url,
+            ssn,
+            dep_id,
+            pos_id,
+            hire_date,
+            retirement_id,
+            attend_status,
+            salary,
+            enabled,
+            role,
+            registered,
+            temp_password,
+            total_leave,
+            used_leave
+        ) VALUES (
+                     #{empNum},
+                     #{password},
+                     #{name},
+                     #{gender},
+                     #{phone},
+                     #{email},
+                     #{profileImgUrl},
+                     #{ssn},
+                     #{depId},
+                     #{posId},
+                     #{hireDate},
+                     #{retirementId},
+                     #{attendStatus},
+                     #{salary},
+                     #{enabled},
+                     #{role},
+                     #{registered},
+                     #{temp_password},
+                     #{totalLeave},
+                     #{usedLeave}
+                 )
+    </insert>
 
 </mapper>

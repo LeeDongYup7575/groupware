@@ -79,7 +79,7 @@
             <tbody>
             <!-- 동적으로 연장근무 신청 목록 표시 -->
             <tr th:each="overtime : ${overTimeRequestsList}">
-                <td th:text="${#dates.format(overtime.createdAt, 'yyyy-MM-dd a hh:mm')}"></td>
+                <td th:text="${overtime.createdAt != null ? #temporals.format(overtime.createdAt.toLocalDateTime(), 'yyyy-MM-dd a hh:mm') : '-'}"></td>
                 <td colspan="2" th:text="'연장근무 신청서 - ' + ${overtime.workDate} + '(' + ${employee.name} + ')'"></td>
                 <td th:text="${employee.name}"></td>
                 <td th:text="${overtime.status}">결재 완료</td>
