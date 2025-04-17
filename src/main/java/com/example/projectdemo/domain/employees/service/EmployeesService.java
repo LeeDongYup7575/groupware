@@ -339,9 +339,15 @@ public class EmployeesService {
     /**
      * 마이페이지 사용자 정보(프로필이미지, 전화번호, 개인이메일) 업데이트
      */
+    @Transactional
     public void updateEmpInfo(String empNum, String phone, String email, String profileImgUrl){
         EmployeesInfoUpdateDTO updatedEmp = new EmployeesInfoUpdateDTO(empNum, phone, email, profileImgUrl);
         employeeMapper.updateEmpInfo(updatedEmp);
+
+        // 공유주소록 사원 주소록 업데이트
+        EmployeesDTO employee = employeeMapper.findByEmpNum(empNum);
+        enrichEmployeeData(employee);
+        contactService.updateSharedAddressBook(employee);
     }
 
     /**
