@@ -8,7 +8,8 @@
         ~{::script}
       )}">
 <head>
-    <link th:remove="all"></link>
+    <title>통합게시판 목록</title>
+    <link th:remove="all">
 
     <style>
         /* 페이지별 추가 스타일 */
@@ -34,9 +35,6 @@
         <tbody>
         <tr th:each="post : ${posts}">
             <td th:text="${post.id}">1</td>
-            <td>
-                <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
-            </td>
             <td>
                 <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
                 <span class="comment-count" th:if="${post.commentCount > 0}"
