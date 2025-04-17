@@ -4,10 +4,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!tab) {
         tab = 'info'; // 기본값 설정
-        window.history.replaceState({}, '', `?tab=${tab}`); // URL 업데이트
+        window.history.pushState  ({}, '', `?tab=${tab}`); // URL 업데이트
     }
 
     loadTabContent(tab); // 탭에 맞는 내용 로드
+
+    // 사이드바 아닌 곳 클릭 시 닫기.
+    document.getElementById('sidebarOverlay').addEventListener('click', () => {
+        document.getElementById('mypageSidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+    });
+
+    window.addEventListener('resize', () => {
+        const sidebar = document.getElementById('mypageSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        if (window.innerWidth >= 1200) {
+            // 데스크탑으로 전환되면 모바일 사이드바는 강제 닫기
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+    });
+
+    // 브라우저 뒤로/앞으로 버튼 클릭 시 URL 파라미터에 맞춰 탭·메뉴 다시 로드
+    window.addEventListener('popstate', () => {
+        const params = new URLSearchParams(window.location.search);
+        const tab  = params.get('tab')  || 'info';
+        const menu = params.get('menu') || 'mypost';
+
+        loadTabContent(tab);
+        if (tab === 'activities') {
+            loadMenuContent(menu);
+        }
+    });
+
 });
 
 function loadTabContent(tabName) {
@@ -39,11 +69,13 @@ function loadTabContent(tabName) {
     // URL 업데이트
     if (tabName === "activities") {
         const currentMenu = new URLSearchParams(window.location.search).get('menu') || 'mypost';
-        window.history.replaceState({}, '', `?tab=${tabName}&menu=${currentMenu}`);
+        window.history.pushState({}, '', `?tab=${tabName}&menu=${currentMenu}`);
     } else {
-        window.history.replaceState({}, '', `?tab=${tabName}`);
+        window.history.pushState({}, '', `?tab=${tabName}`);
     }
 
+    // 사이드바 닫기
+    closeSidebarIfOpen();
 }
 
 function loadMenuContent(menuName) {
@@ -695,5 +727,18 @@ function setupCommentDelete() {
 
 function toggleSidebar() {
     const sidebar = document.getElementById('mypageSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
     sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+}
+
+function closeSidebarIfOpen() {
+    const sidebar = document.getElementById('mypageSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+    }
 }
