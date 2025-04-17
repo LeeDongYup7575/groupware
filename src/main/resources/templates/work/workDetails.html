@@ -80,8 +80,10 @@
             <!-- 동적으로 연장근무 신청 목록 표시 -->
             <tr th:each="overtime : ${overTimeRequestsList}">
                 <td th:text="${overtime.createdAt != null ? #temporals.format(overtime.createdAt.toLocalDateTime(), 'yyyy-MM-dd a hh:mm') : '-'}"></td>
-                <td colspan="2" th:text="'연장근무 신청서 - ' + ${overtime.workDate} + '(' + ${employee.name} + ')'"></td>
-                <td th:text="${employee.name}"></td>
+                <td colspan="2" th:text="'연장근무 신청서 - ' + ${overtime.workDate} + '(' + (${employee != null ? employee.name : '이름없음'}) + ')'"></td>
+
+                <td th:text="${employee != null ? employee.name : '이름없음'}"></td>
+
                 <td th:text="${overtime.status}">결재 완료</td>
             </tr>
             <!-- 결과가 없을 경우 -->
@@ -91,8 +93,8 @@
             </tbody>
         </table>
 
-        <div class="summary" th:text="'문서수: ' + ${overTimeRequestsList.size()}">
-            문서수: 0
+        <div class="summary" th:text="${overTimeRequestsList != null ? '문서수: ' + overTimeRequestsList.size() : '문서수: 0'}">
+        문서수: 0
         </div>
     </div>
 </div>
