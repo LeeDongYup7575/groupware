@@ -17,5 +17,6 @@ public class VideoRoomParticipant {
     private String empNum;
     private LocalDateTime joinedAt;
     private LocalDateTime leftAt;
+    private LocalDateTime lastHeartbeat; // 하트비트 필드 추가
     private boolean isActive;
 }

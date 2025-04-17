@@ -1,5 +1,6 @@
 package com.example.projectdemo.domain.videoconf.listener;
 
+import com.example.projectdemo.domain.videoconf.dto.VideoRoomParticipantDTO;
 import com.example.projectdemo.domain.videoconf.dto.WebRTCMessageDTO;
 import com.example.projectdemo.domain.videoconf.service.VideoConfService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -22,38 +25,41 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
+        // 세션 속성 가져오기
         String username = (String) headerAccessor.getSessionAttributes().get("username");
         String empNum = (String) headerAccessor.getSessionAttributes().get("empNum");
         String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
 
-        log.info("WebSocket 연결 종료 이벤트: username={}, empNum={}, roomId={}", username, empNum, roomId);
+        log.info("WebSocket 연결 종료: username={}, empNum={}, roomId={}", username, empNum, roomId);
 
-        // 모든 필요한 정보가 있는지 확인
         if (roomId != null && empNum != null) {
-            log.info("참가자 퇴장 처리: username={}, empNum={}, roomId={}", username, empNum, roomId);
-
             try {
-                // DB에서 참가자 상태 업데이트
+                // 참가자 퇴장 처리 (DB 업데이트)
                 videoConfService.leaveRoom(roomId, empNum);
 
-                // 다른 참가자들에게 퇴장 알림
-                // 사용자 이름이 없는 경우 "알 수 없는 사용자"로 표시
-                String displayName = username != null ? username : "알 수 없는 사용자";
-
-                WebRTCMessageDTO message = new WebRTCMessageDTO();
-                message.setType("leave");
-                message.setFrom(displayName);
-                message.setEmpNum(empNum);
-                message.setRoomId(roomId);
+                // 모든 클라이언트에게 퇴장 알림
+                WebRTCMessageDTO message = WebRTCMessageDTO.builder()
+                        .type("leave")
+                        .from(username != null ? username : "알 수 없음")
+                        .empNum(empNum)
+                        .roomId(roomId)
+                        .build();
 
                 messagingTemplate.convertAndSend("/topic/videochat", message);
-                log.info("퇴장 메시지 발송 완료: from={}, empNum={}, roomId={}", displayName, empNum, roomId);
+
+                // 방 정보 업데이트를 모든 클라이언트에게 전송
+                List<VideoRoomParticipantDTO> participants = videoConfService.findActiveParticipants(roomId);
+
+                WebRTCMessageDTO participantsUpdate = WebRTCMessageDTO.builder()
+                        .type("participants-update")
+                        .roomId(roomId)
+                        .payload(participants)
+                        .build();
+
+                messagingTemplate.convertAndSend("/topic/videochat", participantsUpdate);
             } catch (Exception e) {
-                log.error("WebSocket 연결 종료 처리 중 오류 발생: {}", e.getMessage(), e);
+                log.error("WebSocket 연결 종료 처리 중 오류: {}", e.getMessage(), e);
             }
-        } else {
-            log.warn("세션 속성에서 필요한 정보를 찾을 수 없습니다: username={}, empNum={}, roomId={}",
-                    username, empNum, roomId);
         }
     }
 }
