@@ -409,6 +409,7 @@ public class EmployeesService {
             }
 
             // roundcube 공유 주소록 업데이트
+            employeeDTO.setInternalEmail(existingEmployee.getInternalEmail());
             enrichEmployeeData(employeeDTO);
             contactService.updateSharedAddressBook(employeeDTO);
 
