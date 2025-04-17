@@ -98,7 +98,19 @@
                         uploadSummernoteImage(files[i], this);
                     }
                 }
-            }
+            },
+            // 아래 옵션들을 추가합니다
+            popover: {
+                image: [
+                    ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+                    ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                    ['remove', ['removeMedia']]
+                ]
+            },
+            tabsize: 2,
+            dialogsInBody: true,
+            dialogsFade: true,
+            disableDragAndDrop: false
         });
 
         // 게시판 목록을 불러오는 함수
