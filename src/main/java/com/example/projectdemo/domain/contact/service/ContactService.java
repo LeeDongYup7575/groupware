@@ -205,6 +205,39 @@ public class ContactService {
                 .build();
 
         contactMapper.insertSharedContact(contact);
-
     }
+
+    /**
+     * 사원정보 변경 시 Roundcube 글로벌 주소록을 업데이트
+     */
+    public void updateSharedAddressBook(EmployeesDTO employee) {
+        String internalEmail = employee.getInternalEmail(); // Roundcube contacts.email과 매칭
+
+        String vcard = String.join("\n",
+                "BEGIN:VCARD",
+                "VERSION:3.0",
+                "N:;" + employee.getName() + ";;;",
+                "FN:" + employee.getName(),
+                "EMAIL;TYPE=work:" + internalEmail,
+                employee.getPhone() != null ? "TEL;TYPE=cell:" + employee.getPhone() : null,
+                employee.getPositionTitle() != null ? "TITLE:" + employee.getPositionTitle() : null,
+                employee.getDepartmentName() != null ? "X-DEPARTMENT:" + employee.getDepartmentName() : null,
+                "END:VCARD"
+        ).replaceAll("(?m)^null\\n?", "");
+
+        String words = employee.getName() + " " + internalEmail + " " +
+                (employee.getPhone() != null ? employee.getPhone().replace("-", "") : "");
+
+        RoundcubeContactDTO contact = RoundcubeContactDTO.builder()
+                .name(employee.getName())
+                .email(internalEmail)
+                .firstname(employee.getName())
+                .vcard(vcard)
+                .words(words.trim())
+                .build();
+
+        contactMapper.updateSharedContact(contact); // userId 없이 호출
+    }
+
+
 }

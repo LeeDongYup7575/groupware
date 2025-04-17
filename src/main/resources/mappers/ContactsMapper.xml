@@ -201,4 +201,16 @@
         WHERE u.username = 'global_addressbook@techx.kro.kr'
     </insert>
 
+    <!-- 사원정보 변경 시 Roundcube 글로벌 주소록을 업데이트 -->
+    <update id="updateSharedContact">
+        UPDATE roundcube.contacts
+        SET
+            name = #{name},
+            firstname = #{firstname},
+            vcard = #{vcard},
+            words = #{words}
+        WHERE email = #{email}
+          AND user_id = (SELECT user_id FROM roundcube.users WHERE username = 'global_addressbook@techx.kro.kr')
+    </update>
+
 </mapper>

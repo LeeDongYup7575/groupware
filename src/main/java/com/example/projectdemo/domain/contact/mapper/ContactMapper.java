@@ -51,6 +51,9 @@ public interface ContactMapper {
                                                     @Param("queryPattern") String queryPattern);
 
     // 사원 연락처 정보 roundcube 공유 주소록에 추가
-    int insertSharedContact(RoundcubeContactDTO contact); // prefix 안 줌
+    int insertSharedContact(RoundcubeContactDTO contact);
+
+    // 사원정보 변경 시 Roundcube 글로벌 주소록을 업데이트
+    void updateSharedContact(RoundcubeContactDTO contact);
 
 }
