@@ -59,6 +59,11 @@
           AND work_date = #{workDate}
     </select>
 
+    <select id="getAttendanceListByEmployeeAndDate" resultType="com.example.projectdemo.domain.attendance.entity.Attendance">
+        SELECT * FROM attendance
+        WHERE emp_id = #{empId} AND work_date = #{today}
+    </select>
+
     <!-- 직원 ID별 출석 기록 내역 조회 -->
     <select id="getAttendanceHistoryByEmployeeId" resultMap="AttendanceResultMap">
         SELECT * FROM attendance

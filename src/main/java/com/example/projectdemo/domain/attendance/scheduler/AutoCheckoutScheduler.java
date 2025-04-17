@@ -34,6 +34,8 @@ public class AutoCheckoutScheduler {
      * 출근했지만 퇴근 기록이 없는 직원들에게 자동으로 퇴근 처리
      */
     @Scheduled(cron = "0 5 18 * * ?")
+    // 예: 현재 시간으로부터 1분 후로 설정
+//    @Scheduled(fixedDelay = 60000)  // 60초 마다 실행 (테스트용)
     @Transactional
     public void processAutoCheckout() {
         log.info("자동 퇴근 처리 작업 시작");
