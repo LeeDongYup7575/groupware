@@ -22,21 +22,21 @@
 <main>
   <!-- 사이드바 -->
   <div class="contact-sidebar">
-    <button class="add-contact-btn">+ 주소 추가</button>
+    <button class="add-contact-btn"><span><i class="fas fa-plus"></i></span> 연락처 추가</button>
     <h3><i class="fa-solid fa-address-book"></i> 공유 주소록</h3>
     <div id="shared-tab-container">
       <div class="contact-sidebar-item active" data-tab="shared" data-dept="all" onclick="handleSidebarClick('shared', 'all')">전체</div>
     </div>
     <br/>
     <h3><i class="fa-solid fa-address-book"></i> 개인 주소록</h3>
-    <div class="contact-sidebar-item" data-tab="personal" data-dept="all" onclick="handleSidebarClick('personal', 'all')">전체</div>
+    <div class="contact-sidebar-item" data-tab="personal" data-dept="all" onclick="handleSidebarClick('personal', 'all')"><i class="fa-solid fa-users"></i> 전체</div>
   </div>
 
   <!-- 메인 콘텐츠 -->
   <section class="contact-main">
     <!-- 검색창 -->
     <div class="search-container">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
       <input type="text" id="searchInput" placeholder="이름, 이메일, 전화번호, 부서, 메모 검색">
       <button class="search-input-del-button" id="searchInputDelBtn">×</button>
     </div>

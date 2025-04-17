@@ -20,7 +20,6 @@ function loadTabContent(tabName) {
     // 클릭한 요소에 active 클래스 추가
     document.getElementById(tabName).classList.add('active');
 
-
     // 탭 내용 가져오기
     fetch(`/api/mypage/${tabName}`)
         .then(response => response.json())
@@ -39,7 +38,13 @@ function loadTabContent(tabName) {
         });
 
     // URL 업데이트
-    window.history.pushState({}, '', `?tab=${tabName}`);
+    if (tabName === "activities") {
+        const currentMenu = new URLSearchParams(window.location.search).get('menu') || 'mypost';
+        window.history.replaceState({}, '', `?tab=${tabName}&menu=${currentMenu}`);
+    } else {
+        window.history.replaceState({}, '', `?tab=${tabName}`);
+    }
+
 }
 
 function loadMenuContent(menuName) {
@@ -194,7 +199,7 @@ function generateContent(contentName, data) {
           <td class="checkbox-col post-td"><input type="checkbox" data-post-id="${post.id}"></td>
           <td class="board-col post-td">${post.boardName}</td>
           <td class="title-col post-td">
-            <a href="/board/post/${post.id}">${post.title}</a>
+            <a href="/board/post/${post.id}" target="_blank">${post.title}</a>
           </td>
           <td class="created-at-col post-td">${formatDate(post.createdAt)}</td>
           <td class="views-col post-td">${post.views}</td>
@@ -251,7 +256,7 @@ function generateContent(contentName, data) {
                     <input type="checkbox" data-comment-id="${comment.id}">
                 </td>
                 <td class="comment-info-col comment-td">
-                    <a href="/board/post/${comment.postId}#commentSection">
+                    <a href="/board/post/${comment.postId}#commentSection" target="_blank">
                         <div class="comment-content">${comment.content}</div>
                         <div class="comment-date">${formatDateTime(comment.createdAt)}</div>
                         <div class="comment-post-title">${comment.postTitle}</div>

@@ -319,20 +319,20 @@ function fetchDepartments() {
             const container = document.getElementById('shared-tab-container');
             container.innerHTML = "";
 
-            // ✅ "전체" 항목 먼저 추가
+            // "전체" 항목 먼저 추가
             const allDiv = document.createElement('div');
             allDiv.className = 'contact-sidebar-item';
-            allDiv.textContent = '전체';
+            allDiv.innerHTML = '<i class="fa-solid fa-users"></i> 전체';
             allDiv.setAttribute('data-tab', 'shared');
             allDiv.setAttribute('data-dept', 'all');
             allDiv.setAttribute('onclick', `handleSidebarClick('shared', 'all')`);
             container.appendChild(allDiv);
 
-            // ✅ 부서들 추가
+            // 부서들 추가
             departments.forEach(dept => {
                 const div = document.createElement('div');
                 div.className = 'contact-sidebar-item';
-                div.textContent = dept.name;
+                div.innerHTML = `<i class="fa-solid fa-building-user"></i> ${dept.name}`;
                 div.setAttribute('data-tab', 'shared');
                 div.setAttribute('data-dept', dept.name);
                 div.setAttribute('onclick', `handleSidebarClick('shared', '${dept.name}')`);
