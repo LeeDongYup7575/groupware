@@ -59,17 +59,24 @@
             <div class="tab-content" id="workTabsContent">
                 <!-- Projects Tab -->
                 <div class="tab-pane fade show active" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                    <!-- Projects Tab의 검색 부분 코드 변경 -->
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <div class="input-group">
-                                <input type="text" id="project-search" class="form-control" placeholder="프로젝트 검색...">
-                                <button class="btn btn-outline-primary" type="button">검색</button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="input-group" style="max-width: 70%;">
+                                    <input type="text" id="project-search" class="form-control" placeholder="프로젝트 검색...">
+                                    <button class="btn btn-outline-primary" type="button">검색</button>
+                                </div>
+                                <!-- 완료된 프로젝트 숨기기 토글을 오른쪽에 배치 -->
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="hide-completed-projects">
+                                    <label class="form-check-label" for="hide-completed-projects">완료된 프로젝트 숨기기</label>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="project-cards">
-                        <!-- Project cards will be rendered here -->
                         <div class="col" th:each="project : ${projects}">
                             <div class="card project-card" th:data-project-id="${project.id}">
                                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -381,12 +388,60 @@
         loadCurrentUserInfo();
         // 현재 페이지에 따라 사이드바 활성화
         highlightActiveSidebar();
-
         // Task logs Ajax loading
         loadTaskLogs();
-
         // 프로젝트 카드 클릭 이벤트
         initProjectCardEvents();
+
+        // 완료된 프로젝트 숨기기 토글 이벤트
+        const initHideCompletedProjects = function() {
+            const hideCompleted = localStorage.getItem('hideCompletedProjects') === 'true';
+
+            // 체크박스 상태 설정
+            $('#hide-completed-projects').prop('checked', hideCompleted);
+
+            // 초기 상태에 따라 프로젝트 필터링 적용
+            if (hideCompleted) {
+                $('.project-card').each(function() {
+                    const status = $(this).find('.card-header .badge').text();
+                    if (status === '완료') {
+                        $(this).closest('.col').hide();
+                    }
+                });
+            }
+        };
+
+        // 초기 설정 로드
+        initHideCompletedProjects();
+
+
+        // 내 업무 삭제 버튼 이벤트
+        $(document).on('click', '.delete-task-btn', function(e) {
+            e.stopPropagation(); // 상위 요소로 이벤트 전파 방지
+            const taskId = $(this).closest('.task-list-item').data('task-id');
+            deleteTask(taskId);
+        });
+
+        // 업무 삭제 기능
+        function deleteTask(taskId) {
+            if (!confirm('정말로 이 업무를 삭제하시겠습니까?')) {
+                return;
+            }
+
+            $.ajax({
+                url: `/api/tasks/${taskId}`,
+                method: 'DELETE',
+                success: function() {
+                    // 해당 업무 행 제거
+                    $(`.task-list-item[data-task-id="${taskId}"]`).remove();
+                    alert('업무가 삭제되었습니다.');
+                },
+                error: function(xhr, status, error) {
+                    console.error('업무 삭제 실패:', error);
+                    alert('업무 삭제에 실패했습니다: ' + error);
+                }
+            });
+        }
 
         // Todo checkbox click
         $(document).on('change', '.todo-checkbox', function(e) {
@@ -422,6 +477,8 @@
                 deleteTodo(todoId);
             }
         });
+
+
 
         // Save todo button click
         $('#save-todo-btn').on('click', function() {
@@ -466,6 +523,7 @@
                 // 로그 탭이 활성화되면 최신 로그 로드
                 loadTaskLogs();
             }
+
         });
 
 
@@ -502,11 +560,19 @@
 
         // 프로젝트 탭이 활성화될 때 프로젝트 정보 새로고침
         $('#workTabs button[data-bs-target="#projects"]').on('shown.bs.tab', function() {
-            refreshUserProjects()
+            initHideCompletedProjects();
         });
+
 
         // 내 업무 탭이 활성화될 때 업무 목록 불러오기
         $('#workTabs button[data-bs-target="#my-tasks"]').on('shown.bs.tab', function() {
+            // 모든 탭 컨텐츠를 비활성화
+            $('.tab-pane').removeClass('show active');
+
+            // 내 업무 탭만 활성화
+            $('#my-tasks').addClass('show active');
+
+            // 내 업무 로드
             loadMyTasks();
         });
 
@@ -524,6 +590,48 @@
         $('#my-task-search').on('keyup', function() {
             const searchText = $(this).val().toLowerCase();
             searchMyTasks(searchText);
+        });
+
+        // 2. 완료된 프로젝트 숨기기 토글 이벤트
+        $('#hide-completed-projects').on('change', function() {
+            const hideCompleted = $(this).prop('checked');
+
+            // 로컬스토리지에 설정 저장
+            localStorage.setItem('hideCompletedProjects', hideCompleted);
+
+            if (hideCompleted) {
+                $('.project-card').each(function() {
+                    const status = $(this).find('.card-header .badge').text();
+                    if (status === '완료') {
+                        $(this).closest('.col').hide();
+                    }
+                });
+            } else {
+                $('.project-card').closest('.col').show();
+                // 검색어가 있으면 검색 필터 재적용
+                const searchText = $('#project-search').val().toLowerCase();
+                if (searchText) {
+                    searchProjects(searchText);
+                }
+            }
+        });
+
+        // 탭 전환 이벤트를 명시적으로 처리
+        $('#my-tasks-tab').on('click', function(e) {
+            e.preventDefault();
+
+            // 모든 탭 버튼에서 active 클래스 제거
+            $('#workTabs button').removeClass('active');
+            $(this).addClass('active');
+
+            // 모든 탭 컨텐츠를 비활성화
+            $('.tab-pane').removeClass('show active');
+
+            // 내 업무 탭만 활성화
+            $('#my-tasks').addClass('show active');
+
+            // 내 업무 로드
+            loadMyTasks();
         });
 
     });
@@ -634,6 +742,7 @@
                         <th>우선순위</th>
                         <th>진행률</th>
                         <th>마감일</th>
+                        <th>액션</th> <!-- 액션 열 추가 -->
                     </tr>
                 </thead>
                 <tbody>
@@ -686,6 +795,11 @@
                     </div>
                 </td>
                 <td class="${dueDateClass}">${dueDateDisplay}</td>
+                <td>
+                    <button class="btn btn-sm btn-danger delete-task-btn">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
             </tr>
         `;
         });
@@ -698,10 +812,13 @@
 
         $('#my-tasks-container').html(html);
 
-        // 업무 행 클릭 이벤트 등록
-        $('.task-list-item').on('click', function() {
-            const taskId = $(this).data('task-id');
-            openTaskDetailModal(taskId);
+        // 업무 행 클릭 이벤트 등록 (삭제 버튼 제외)
+        $('.task-list-item').on('click', function(e) {
+            // 삭제 버튼 클릭이 아닌 경우에만 모달 열기
+            if (!$(e.target).hasClass('delete-task-btn') && !$(e.target).hasClass('fa-trash')) {
+                const taskId = $(this).data('task-id');
+                openTaskDetailModal(taskId);
+            }
         });
     }
 
@@ -1052,6 +1169,7 @@
     }
 
     // 업무 진행도 업데이트 후 프로젝트 정보 새로고침
+    // 업무 진행도 업데이트 후 프로젝트 정보 새로고침
     function updateTaskProgress(taskId, progress) {
         $.ajax({
             url: `/api/tasks/${taskId}/progress`,
@@ -1089,8 +1207,19 @@
                     .text(newStatusText);
 
                 // 관련 프로젝트 정보 새로고침
-                if (updatedTask.projectId) {
+                if (updatedTask && updatedTask.projectId) {
                     refreshProjectInfo(updatedTask.projectId);
+                } else if (taskId) {
+                    // 만약 updatedTask가 제대로 반환되지 않았다면, 작업 정보를 조회해서 처리
+                    $.ajax({
+                        url: `/api/tasks/${taskId}`,
+                        method: 'GET',
+                        success: function(task) {
+                            if (task && task.projectId) {
+                                refreshProjectInfo(task.projectId);
+                            }
+                        }
+                    });
                 }
 
                 // 알림 표시
@@ -1541,17 +1670,6 @@
                             ${project.progress}%
                         </div>
                     </div>
-
-                    <!-- 프로젝트 상태 변경 버튼 (완료 상태가 아닌 경우만 표시) -->
-                    ${project.status !== '완료' ? `
-                    <div class="mt-3">
-                        <div class="btn-group w-100">
-                            <button class="btn btn-sm btn-outline-secondary change-status-btn" data-status="준비중">준비중</button>
-                            <button class="btn btn-sm btn-outline-primary change-status-btn" data-status="진행중">진행중</button>
-                            <button class="btn btn-sm btn-outline-success change-status-btn" data-status="완료">완료</button>
-                        </div>
-                    </div>
-                    ` : ''}
                 </div>
             </div>
         </div>
@@ -2065,30 +2183,7 @@
         });
     }
 
-    // 업무 상세 모달 열기 (수정된 함수)
-    // function openTaskDetailModal(taskId) {
-    //     $.ajax({
-    //         url: `/api/tasks/${taskId}`,
-    //         method: 'GET',
-    //         success: function(task) {
-    //             $('#task-progress-modal-title').text(`${task.title} - 진행도 업데이트`);
-    //             $('#task-progress-slider').val(task.progress);
-    //             $('#task-progress-value').text(`${task.progress}%`);
-    //             $('#task-id-for-progress').val(taskId);
-    //
-    //             // 업무 내용 표시
-    //             $('#task-detail-content').html(`
-    //             <h6 class="mt-3">업무 내용</h6>
-    //             <p>${task.content ? task.content : '내용이 없습니다.'}</p>
-    //         `);
-    //
-    //             $('#taskProgressModal').modal('show');
-    //         },
-    //         error: function(xhr, status, error) {
-    //             alert('업무 정보를 불러오는데 실패했습니다: ' + error);
-    //         }
-    //     });
-    // }
+
     function openTaskDetailModal(taskId) {
         $.ajax({
             url: `/api/tasks/${taskId}`,
