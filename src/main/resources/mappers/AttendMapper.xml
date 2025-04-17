@@ -48,7 +48,7 @@
             SUM(CASE WHEN status = '지각' THEN 1 ELSE 0 END) AS tardyCount,
             SUM(CASE WHEN status = '조퇴' THEN 1 ELSE 0 END) AS earlyLeaveCount,
             SUM(CASE WHEN status = '결근' THEN 1 ELSE 0 END) AS absenteeismCount,
-            SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS vacationCount,
+            CAST(SUM(CASE WHEN status = '연차' THEN 1 ELSE 0 END) AS DECIMAL(3,1)) AS vacationCount,
             SUM(work_hours) AS workHours,
             COUNT(DISTINCT CASE WHEN status != '결근' THEN work_date END) AS workDays
         FROM attendance
@@ -57,6 +57,7 @@
         GROUP BY EXTRACT(MONTH FROM work_date)
         ORDER BY month
     </select>
+
 
     <select id="getMonthlyAttendanceStatisticsThisMonth" parameterType="map" resultMap="attendanceStatsResultMap">
         SELECT

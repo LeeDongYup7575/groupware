@@ -88,6 +88,8 @@ public interface EmployeesMapper {
     // 활성화된 직원 목록 가져오기
     List<EmployeesDTO> getAllActiveEmployees();
 
+    int updateProfileImgUrl(@Param("empNum") String empNum, @Param("profileImgUrl") String profileImgUrl);
+
 
     /**
      * 직원 추가

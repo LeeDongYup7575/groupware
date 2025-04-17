@@ -4,14 +4,15 @@ import com.example.projectdemo.domain.auth.dto.*;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.EmailService;
 import com.example.projectdemo.domain.auth.service.LogoutService;
-import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.leave.service.LeavesService;
+import com.example.projectdemo.domain.s3.service.ProfileUploadService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -264,7 +266,8 @@ public class AuthController {
     @PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> register(
             @RequestPart("userData") @Valid SignupDTO userData,
-            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            HttpServletRequest request) {
 
         try {
             // 필수 파라미터 검증
@@ -281,40 +284,70 @@ public class AuthController {
                 ));
             }
 
-            // 프로필 이미지 처리 - 로컬 파일 시스템에 저장
-            String profileImgUrl = "/assets/images/default-profile.png";  // 기본 이미지
+            // 중복 요청 방지를 위한 키 생성 (사원번호 + 요청 시간)
+            String requestId = userData.getEmpNum() + "_" + System.currentTimeMillis();
 
-            if (profileImage != null && !profileImage.isEmpty()) {
-                try {
-                    // 로컬 파일 시스템에 업로드
-                    profileImgUrl = profileUploadService.uploadProfileImage(profileImage);
-                    logger.info("프로필 이미지가 로컬에 성공적으로 업로드되었습니다: {}", profileImgUrl);
-                } catch (IOException e) {
-                    // 업로드 실패 시 기본 이미지 사용 (로그만 남기고 계속 진행)
-                    logger.warn("프로필 이미지 업로드 실패, 기본 이미지 사용: {}", e.getMessage());
-                }
+            // 세션에 이미 해당 사원의 업로드 요청이 처리 중인지 확인
+            HttpSession session = request.getSession();
+            if (session.getAttribute("uploading_" + userData.getEmpNum()) != null) {
+                logger.warn("중복 업로드 요청 감지: {}", userData.getEmpNum());
+                return ResponseEntity.badRequest().body(Map.of(
+                        "message", "이미 처리 중인 요청이 있습니다. 잠시 후 다시 시도해주세요."
+                ));
             }
 
-            // 회원가입 처리 및 임시 비밀번호 생성
-            String tempPassword = employeeService.register(
-                    userData.getEmpNum(),
-                    profileImgUrl,
-                    userData.getPhone(),
-                    userData.getGender()
-            );
+            // 업로드 처리 중 표시
+            session.setAttribute("uploading_" + userData.getEmpNum(), requestId);
 
-            leavesService.initializeEmployeeLeave(userData.getEmpNum());
+            try {
+                // 프로필 이미지 처리 - 로컬 및 S3에 저장
+                String profileImgUrl = "/assets/images/default-profile.png";  // 기본 이미지
 
-            return ResponseEntity.ok(Map.of(
-                    "message", "회원가입이 완료되었습니다. 임시 비밀번호가 이메일로 발송되었습니다."
-            ));
+                if (profileImage != null && !profileImage.isEmpty()) {
+                    try {
+                        // 파일 확장자 검증
+                        String originalFilename = profileImage.getOriginalFilename();
+                        if (originalFilename != null) {
+                            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+                            if (!Arrays.asList(".jpg", ".jpeg", ".png", ".gif").contains(fileExtension)) {
+                                return ResponseEntity.badRequest().body(Map.of(
+                                        "message", "지원하지 않는 파일 형식입니다. JPG, PNG, GIF 파일만 업로드 가능합니다."
+                                ));
+                            }
+                        }
+
+                        // 중복 업로드 방지를 위해 요청 ID를 포함한 고유한 파일명 생성
+                        profileImgUrl = profileUploadService.uploadProfileImageWithRequestId(profileImage, requestId);
+                        logger.info("프로필 이미지가 성공적으로 업로드되었습니다: {}", profileImgUrl);
+                    } catch (IOException e) {
+                        // 업로드 실패 시 기본 이미지 사용 (로그만 남기고 계속 진행)
+                        logger.warn("프로필 이미지 업로드 실패, 기본 이미지 사용: {}", e.getMessage());
+                    }
+                }
+
+                // 회원가입 처리 및 임시 비밀번호 생성
+                String tempPassword = employeeService.register(
+                        userData.getEmpNum(),
+                        profileImgUrl,
+                        userData.getPhone(),
+                        userData.getGender()
+                );
+
+                leavesService.initializeEmployeeLeave(userData.getEmpNum());
+
+                return ResponseEntity.ok(Map.of(
+                        "message", "회원가입이 완료되었습니다. 임시 비밀번호가 이메일로 발송되었습니다."
+                ));
+            } finally {
+                // 처리 완료 후 세션에서 업로드 중 표시 제거
+                session.removeAttribute("uploading_" + userData.getEmpNum());
+            }
 
         } catch (Exception e) {
             logger.error("회원가입 처리 중 예외 발생", e);
             String errorMessage = e.getMessage() != null ? e.getMessage() : "회원가입 중 알 수 없는 오류가 발생했습니다.";
             return ResponseEntity.badRequest().body(Map.of("message", errorMessage));
         }
-
     }
 
     @PostMapping("/change-password")

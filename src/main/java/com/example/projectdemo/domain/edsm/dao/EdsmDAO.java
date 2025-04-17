@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +44,15 @@ public class EdsmDAO {
         return mybatis.insert("Edsm.InsertByBcApproval", aldto);
 
     }
+    //프로시즈
+    public void callUpdateDocumentStatusProcedure(int documentId, String status) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("documentId", documentId);
+        params.put("status", status);
 
-
+        // 절차적으로 MyBatis를 통해 저장 프로시저 호출
+        mybatis.update("Edsm.callUpdateDocumentStatusProcedure", params);
+    }
 
 
 

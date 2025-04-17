@@ -584,4 +584,10 @@
     </select>
 
 
+
+    <update id="callUpdateDocumentStatusProcedure" parameterType="map" statementType="CALLABLE">
+        {CALL update_document_status_after_update(#{documentId, mode=IN, jdbcType=INTEGER}, #{status, mode=IN, jdbcType=VARCHAR})}
+    </update>
+
+
 </mapper>
