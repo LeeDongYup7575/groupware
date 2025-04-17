@@ -107,6 +107,12 @@
                 // 검색어가 없으면 전체 직원 표시
                 document.getElementById('allEmployees').classList.remove('hidden');
                 document.getElementById('deptEmployees').classList.add('hidden');
+
+                // 검색 전 원래 상태로 복원
+                document.querySelectorAll('.dept-name').forEach(d => {
+                    d.classList.remove('active');
+                });
+                document.querySelector('.dept-name[data-dept-id="0"]').classList.add('active');
             }
         });
     });
