@@ -327,6 +327,12 @@ body {
     font-weight: 600;
 }
 
+.company-anniversary {
+    background-color: #ff5252 !important;
+    color: black !important;
+    font-weight: bold;
+    border: 0;
+}
 /* 알림 메시지 */
 .alert {
     background-color: #f8f9fa;

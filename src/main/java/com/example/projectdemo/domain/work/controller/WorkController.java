@@ -327,6 +327,7 @@ public class WorkController {
             leaveEvent.put("title", leave.getLeaveType() + " 휴가"); // 예: 연차 휴가, 반차 휴가
             leaveEvent.put("start", leave.getStartDate()); // "2025-04-10"
 
+
             // 반차는 end를 start와 동일하게, 전일휴가는 end 포함 다음날로 설정
             if ("반차".equals(leave.getLeaveType())) {
                 leaveEvent.put("end", leave.getStartDate());
