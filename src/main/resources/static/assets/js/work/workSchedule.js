@@ -60,8 +60,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                     event.title = '🌴 ' + item.title;
                                     event.backgroundColor = item.color || '#edd67a';
                                     event.textColor = '#fff';
+                                    event.allDay = true;
+
+                                    // 날짜 포맷 확인해서 endDate 하루 더하기
+                                    const endDate = new Date(item.end);
+                                    endDate.setDate(endDate.getDate() + 1);
+                                    event.end = endDate.toISOString().split('T')[0]; // YYYY-MM-DD 형태로
+
                                     event.extendedProps.type = 'leave';
-                                } else if (item.type === 'overtime' || item.title.includes('연장 근무')) {
+                                }
+                                else if (item.type === 'overtime' || item.title.includes('연장 근무')) {
                                     event.title = '⏱️ ' + item.title;
                                     event.backgroundColor = item.color || '#6f42c1';
                                     event.textColor = '#fff';
@@ -101,12 +109,12 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClick: function (info) {
             info.jsEvent.preventDefault();
             // ✅ 공휴일 이벤트는 모달 띄우지 않음
-            if (
-                info.event.classNames.includes('korean-holiday') ||
-                (info.event.extendedProps.description && info.event.extendedProps.description.includes('기념일을 숨기려면'))
-            ) {
-                return;
-            }
+            // if (
+            //     info.event.classNames.includes('korean-holiday') ||
+            //     (info.event.extendedProps.description && info.event.extendedProps.description.includes('기념일을 숨기려면'))
+            // ) {
+            //     return;
+            // }
             const { title, extendedProps, start, end } = info.event;
             const modalTitle = document.getElementById('modalTitle');
             const modalTime = document.getElementById('modalTime');
@@ -134,9 +142,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-                if (extendedProps.description) {
-                    modalReason.innerHTML = `<i class="fas fa-comment"></i> ${extendedProps.description}`;
-                }
+                // if (extendedProps.description) {
+                //     modalReason.innerHTML = `<i class="fas fa-comment"></i> ${extendedProps.description}`;
+                // }
             } else if (extendedProps.type === 'overtime') {
                 // 연장 근무 이벤트
                 if (start && end) {
@@ -166,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 if (extendedProps.description) {
-                    modalReason.innerHTML = `<i class="fas fa-info-circle"></i> ${extendedProps.description}`;
+                    // modalReason.innerHTML = `<i class="fas fa-info-circle"></i> ${extendedProps.description}`;
                 }
             }
 
