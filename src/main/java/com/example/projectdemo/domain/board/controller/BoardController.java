@@ -9,7 +9,6 @@ import com.example.projectdemo.domain.board.service.BoardsService;
 import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -80,9 +79,9 @@ public class BoardController {
 
     // 게시글 상세 보기
     @GetMapping("/post/{id}")
-    public String viewPost(@PathVariable("id") int id, Model model,
-                           @SessionAttribute(name = "empId", required = false) Integer empId,
-                           HttpServletRequest request, HttpServletResponse response) {
+    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model) {
+
+        int empId = (int) request.getAttribute("id");
 
         // 게시글 정보 가져오기
         PostsDTO post = postsService.getPostById(id);
@@ -140,8 +139,7 @@ public class BoardController {
     @PostMapping("/create")
     public String createBoard(BoardsDTO requestDTO,
                               HttpServletRequest request,
-                              RedirectAttributes redirectAttributes,
-                              Model model) {
+                              RedirectAttributes redirectAttributes) {
 
         // isActive 값 확인 및 설정
         String isActiveParam = request.getParameter("isActive");
@@ -231,7 +229,7 @@ public class BoardController {
 
     //게시판 관리
     @GetMapping("/manage")
-    public String manageBoards(HttpServletRequest request, Model model) {
+    public String manageBoards(Model model) {
 
         // 모든 게시판 정보 가져오기
         List<BoardsDTO> allBoards = boardsService.getAllBoards();
