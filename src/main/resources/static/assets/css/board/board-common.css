@@ -42,6 +42,7 @@ body {
     flex: 1;
     margin: 100px 30px 50px calc(var(--sidebar-width) + 30px);
     padding: 30px;
+    max-width: calc(100vw - var(--sidebar-width));
     min-height: calc(100vh - var(--header-height));
     background-color: #ffffff;
     border-radius: 16px;
@@ -976,6 +977,12 @@ textarea.form-control {
 
 .search-button:hover {
     background: linear-gradient(135deg, #0169A8 0%, #015280 100%);
+}
+
+/*썸머노트*/
+.note-editable img {
+    max-width: 100%;
+    height: auto;
 }
 
 /*썸머노트 모달*/
