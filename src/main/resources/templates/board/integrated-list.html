@@ -37,6 +37,11 @@
             <td>
                 <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
             </td>
+            <td>
+                <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
+                <span class="comment-count" th:if="${post.commentCount > 0}"
+                      th:text="'[' + ${post.commentCount} + ']'"></span>
+            </td>
             <td th:text="${post.author}">작성자</td>
             <td th:text="${post.boardName}">게시판명</td>
             <td th:text="${post.createdAt != null ? #temporals.format(post.createdAt, 'yyyy-MM-dd') : '-'}">날짜</td>

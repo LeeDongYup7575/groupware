@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.board.service;
 
 import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.mapper.CommentsMapper;
 import com.example.projectdemo.domain.board.mapper.PostsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ public class PostsService {
 
     @Autowired
     private AttachmentsService attachmentsService;
+
+    @Autowired
+    private CommentsMapper commentsMapper;
 
     // 게시글 작성
     @Transactional
@@ -39,12 +43,32 @@ public class PostsService {
 
     // 통합 게시판 - 사용자가 접근 가능한 모든 게시판의 게시글 조회
     public List<PostsDTO> getAccessiblePosts(Integer empId) {
-        return postsMapper.getAccessiblePostsByEmpId(empId);
+        // 해당 사용자가 접근 가능한 게시글 목록을 가져옴
+        List<PostsDTO> posts = postsMapper.getAccessiblePostsByEmpId(empId);
+
+        // 각 게시글에 댓글 수 설정
+        for (PostsDTO post : posts) {
+            // 해당 게시글의 댓글 수 조회
+            int commentCount = commentsMapper.countByPostId(post.getId());
+            // 게시글 DTO에 댓글 수 설정
+            post.setCommentCount(commentCount);
+        }
+        return posts;
     }
 
     // 특정 게시판의 게시글 목록 조회
     public List<PostsDTO> getPostsByBoardId(Integer boardId) {
-        return postsMapper.getPostsByBoardId(boardId);
+        // 해당 게시판의 모든 게시글을 조회
+        List<PostsDTO> posts = postsMapper.getPostsByBoardId(boardId);
+
+        // 각 게시글에 댓글 수 설정
+        for (PostsDTO post : posts) {
+            // 해당 게시글의 댓글 수 조회
+            int commentCount = commentsMapper.countByPostId(post.getId());
+            // 게시글 DTO에 댓글 수 설정
+            post.setCommentCount(commentCount);
+        }
+        return posts;
     }
 
     // 게시판 ID로 게시글 수 조회

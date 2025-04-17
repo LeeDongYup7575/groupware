@@ -990,6 +990,14 @@ textarea.form-control {
     box-sizing: content-box;
 }
 
+/*게시판 목록 댓글 갯수*/
+.comment-count {
+    color: #2563eb;
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+
 /* 반응형 설정 */
 @media screen and (max-width: 1200px) {
     .main-content {

@@ -25,4 +25,7 @@ public class PostsDTO {
     private String author;
     // 게시판 이름 필드 추가
     private String boardName;
+    // 댓글 수 필드 추가
+    private int commentCount;
+
 }
