@@ -6,6 +6,18 @@
   <title>TECH X - 예약시스템</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+
+    /* 헤더 수정 - 고정 너비 제거 및 여백 조정 */
+    .gw-navbar .gw-container {
+      max-width: 100%;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    .gw-navbar-right {
+      margin-left: auto;
+      padding-right: 10px; /* 오른쪽 여백 추가 */
+    }
     /* 중요: 헤더 스타일과 충돌하지 않도록 명시적 범위 지정 */
     .container .sidebar {
       position: fixed;
@@ -294,6 +306,8 @@
     .cancel-btn:hover {
       background-color: #bd2130;
     }
+
+
   </style>
 </head>
 
