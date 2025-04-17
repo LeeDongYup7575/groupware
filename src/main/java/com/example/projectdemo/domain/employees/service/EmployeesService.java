@@ -344,7 +344,7 @@ public class EmployeesService {
         EmployeesInfoUpdateDTO updatedEmp = new EmployeesInfoUpdateDTO(empNum, phone, email, profileImgUrl);
         employeeMapper.updateEmpInfo(updatedEmp);
 
-        // 공유주소록 사원 주소록 업데이트
+        // roundcube 공유 주소록 업데이트
         EmployeesDTO employee = employeeMapper.findByEmpNum(empNum);
         enrichEmployeeData(employee);
         contactService.updateSharedAddressBook(employee);
@@ -407,6 +407,10 @@ public class EmployeesService {
             if (result <= 0) {
                 throw new RuntimeException("직원 정보 업데이트에 실패했습니다.");
             }
+
+            // roundcube 공유 주소록 업데이트
+            enrichEmployeeData(employeeDTO);
+            contactService.updateSharedAddressBook(employeeDTO);
 
             // 업데이트된 정보 반환
             return findById(employeeDTO.getId());
