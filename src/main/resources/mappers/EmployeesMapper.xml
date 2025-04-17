@@ -312,5 +312,12 @@
                      #{usedLeave}
                  )
     </insert>
+    <update id="updateByDepId" parameterType="int">
+        UPDATE employees
+        SET dep_id = (SELECT id FROM departments WHERE name = '이동중')
+        WHERE dep_id = #{id}
+    </update>
+
+
 
 </mapper>

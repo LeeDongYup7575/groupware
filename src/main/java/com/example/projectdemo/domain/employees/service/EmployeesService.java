@@ -473,6 +473,10 @@ public class EmployeesService {
         return employees;
     }
 
+    public int updateByDepId(int id){
+        return employeeMapper.updateByDepId(id);
+    }
+
 //    /**
 //     * 직원 추가 (관리자용)
 //     */

@@ -97,5 +97,5 @@ public interface EmployeesMapper {
      * @return 성공 시 1, 실패 시 0
      */
     int insertEmployee(EmployeesDTO employeeDTO);
-
+    int updateByDepId(Integer depId);
 }
