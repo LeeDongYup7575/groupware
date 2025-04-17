@@ -12,16 +12,15 @@
 
 <!-- 조직도 사이드바 -->
 <div th:fragment="sidebar" id="sidebar" class="sidebar">
-    <div class="sidebar-menu">
-        <ul id="deptTree">
-            <!-- 회사 -->
-            <li class="toggle-menu">
-                <a href="/org"><span class="sidebar-icon">📢</span>전체 &nbsp;<i class="fas fa-chevron-down"></i></a>
-                <ul id="departmentList" class="submenu open">
-                    <!-- 부서 목록이 동적으로 추가됨 -->
-                </ul>
-            </li>
-        </ul>
+
+    <div class="menu-section">
+        <div class="menu-header">
+            <i class="fas fa-chevron-down"></i>
+            부서 목록
+        </div>
+        <div class="menu-items" id="departmentList">
+            <!-- 부서 목록이 동적으로 추가됨 -->
+        </div>
     </div>
 </div>
 
