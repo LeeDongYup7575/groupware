@@ -106,9 +106,9 @@ public class BoardController {
         model.addAttribute("attachments", attachments);
 
         // 댓글 목록 조회
-        List<Comments> comments = commentsService.getCommentsByPostId(id);
-
-        model.addAttribute("comments", comments);
+        // 게시글의 계층 구조 댓글을 한 번에 가져옵니다.
+        List<Comments> hierarchicalComments = commentsService.getHierarchicalCommentsByPostId(id);
+        model.addAttribute("comments", hierarchicalComments);
 
         // 로그인한 사용자 ID를 모델에 추가
         model.addAttribute("empId", empId);

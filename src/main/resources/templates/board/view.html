@@ -13,136 +13,28 @@
 
     <title th:text="${post.title} + ' - 게시판'">게시글 제목 - 게시판</title>
     <style>
-        /* 페이지별 추가 스타일 */
-        /* 답글 관련 스타일 */
-        .reply-actions {
-            margin-top: 8px;
-        }
-
-        .btn-reply {
-            background: none;
-            border: none;
-            color: #2563eb;
-            cursor: pointer;
-            font-size: 0.85rem;
-            padding: 0;
-            margin-right: 10px;
-        }
-
-        .btn-reply:hover {
-            text-decoration: underline;
-        }
-
-        .reply-form-container {
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-
-        .reply-form {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .reply-textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        .reply-form-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 8px;
-        }
-
-        .reply-cancel-btn, .reply-submit-btn {
-            padding: 5px 12px;
-            margin-left: 8px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .reply-cancel-btn {
-            background-color: #f2f2f2;
-            color: #333;
-        }
-
-        .reply-submit-btn {
-            background-color: #2563eb;
-            color: white;
-        }
-
-        /* 대댓글 목록 스타일 */
-        .replies-container {
-            margin-top: 15px;
-            margin-left: 25px;
-            border-left: 2px solid #e5e7eb;
-            padding-left: 15px;
-        }
-
-        .reply {
-            margin-bottom: 15px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-            padding: 10px;
-        }
-
-        .reply-header {
+        /* 페이지 특정 스타일만 여기에 남겨두고 나머지는 board-common.css에 옮깁니다 */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 20px;
         }
 
-        .reply-author-info {
-            display: flex;
-            align-items: center;
+        .back-button {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: var(--transition);
         }
 
-        .reply-author-info img {
-            margin-right: 8px;
+        .back-button:hover {
+            background-color: #e5e7eb;
         }
-
-        .reply-date {
-            font-size: 0.8rem;
-            color: #6b7280;
-            margin-left: 10px;
-        }
-
-        .reply-body {
-            padding-left: 32px;
-        }
-
-        .reply-content {
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-        }
-
-        .reply-actions {
-            display: flex;
-        }
-
-        .reply-actions button {
-            background: none;
-            border: none;
-            color: #6b7280;
-            cursor: pointer;
-            font-size: 0.85rem;
-            padding: 0;
-            margin-right: 10px;
-        }
-
-        .reply-actions button:hover {
-            color: #2563eb;
-        }
-
-        /* 페이지별 추가 스타일 */
     </style>
 </head>
 <body>
@@ -195,7 +87,7 @@
                     <textarea id="comment-content" name="content" placeholder="댓글을 작성해주세요." required></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="submitComment(null)">댓글 작성</button>
+                    <button type="button" class="btn btn-secondary" onclick="submitComment(null)">댓글 작성</button>
                 </div>
             </div>
 
@@ -314,9 +206,9 @@
                                         <div class="comment-edit-container"
                                              th:id="'comment-edit-container-' + ${reply.id}"
                                              style="display: none;">
-                                    <textarea class="comment-edit-textarea"
-                                              th:id="'comment-edit-textarea-' + ${reply.id}"
-                                              rows="2" th:text="${reply.content}"></textarea>
+                                            <textarea class="comment-edit-textarea"
+                                                      th:id="'comment-edit-textarea-' + ${reply.id}"
+                                                      rows="2" th:text="${reply.content}"></textarea>
                                             <div class="comment-edit-actions">
                                                 <button type="button" class="comment-edit-cancel-btn"
                                                         th:onclick="'cancelEdit(' + ${reply.id} + ')'">취소
