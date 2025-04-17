@@ -24,6 +24,7 @@ public class BoardsDTO {
     private LocalDateTime createdAt;
     private Integer totalPosts;  // 전체 게시글 수
     private Integer adminId;    // 관리자 ID
+    private List<Integer> ids; // 삭제할 게시판 ID들의 목록
 
     // 그룹 게시판일 경우 권한 설정을 위한 필드
     private List<Integer> memberIds; // 멤버 ID 목록
