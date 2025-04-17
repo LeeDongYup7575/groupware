@@ -26,9 +26,7 @@ public class TaskDTO {
     private String assigneeName;  // JOIN 결과
     private LocalDate startDate;
     private LocalDate dueDate;
-    private LocalDate completedDate;  // completedAt 대신 completedDate로 변경
-    private Integer estimatedHours;
-    private Integer actualHours;
+    private LocalDate completedDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

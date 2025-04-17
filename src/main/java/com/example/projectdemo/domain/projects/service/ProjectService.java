@@ -374,8 +374,6 @@ public class ProjectService {
         }
 
         if (projectMapper.updateProjectStatus(id, status) > 0) {
-            // 진행률은 enrichProjectData에서 동적으로 계산됨
-            // 더 이상 DB에 저장하지 않음
 
             // 약간의 지연을 주어 DB 업데이트가 확실히 반영되도록 함
             try {

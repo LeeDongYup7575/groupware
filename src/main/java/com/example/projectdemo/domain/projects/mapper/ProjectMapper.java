@@ -115,7 +115,6 @@ public interface ProjectMapper {
     int updateProjectMemberRole(@Param("projectId") Integer projectId,
                                 @Param("empNum") String empNum,
                                 @Param("role") String role);
-
     /**
      * 프로젝트 멤버 제거
      */

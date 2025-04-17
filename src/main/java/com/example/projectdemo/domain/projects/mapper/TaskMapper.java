@@ -6,7 +6,6 @@ import com.example.projectdemo.domain.projects.dto.TaskLogDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -20,10 +19,6 @@ public interface TaskMapper {
     List<TaskDTO> getTasksByCreator(@Param("empNum") String empNum);
     List<TaskDTO> getRecentTasks(@Param("limit") int limit);
     List<TaskDTO> getRecentTasksByEmpNum(@Param("empNum") String empNum, @Param("limit") int limit);
-    List<TaskDTO> getTasksByStatus(@Param("projectId") Integer projectId, @Param("status") String status);
-    List<TaskDTO> getTasksByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-    List<TaskDTO> getTasksByPriority(@Param("priority") String priority);
-    List<TaskDTO> getOverdueTasks(); // 기한이 지난 업무
 
     int insertTask(TaskDTO task);
     int updateTask(TaskDTO task);
@@ -43,9 +38,4 @@ public interface TaskMapper {
     List<TaskLogDTO> getTaskLogs(@Param("taskId") Integer taskId);
     int insertTaskLog(TaskLogDTO log);
 
-    // 통계 관련 메서드
-    int countTasksByStatus(@Param("status") String status);
-    int countTasksByPriority(@Param("priority") String priority);
-    int countTasksByEmployee(@Param("empNum") String empNum);
-    int countOverdueTasks();
 }

@@ -22,8 +22,6 @@ public class Tasks {
     private LocalDate startDate;        // 시작일
     private LocalDate dueDate;          // 마감일
     private LocalDate completedDate;    // 완료일
-    private Integer estimatedHours;     // 예상 소요 시간
-    private Integer actualHours;        // 실제 소요 시간
     private LocalDateTime createdAt;    // 생성일시
     private LocalDateTime updatedAt;    // 수정일시
 }

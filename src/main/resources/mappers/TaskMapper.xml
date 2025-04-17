@@ -19,11 +19,9 @@
         <result property="assigneeName" column="assignee_name" />
         <result property="startDate" column="start_date" />
         <result property="dueDate" column="due_date" />
-        <result property="estimatedHours" column="estimated_hours" />
-        <result property="actualHours" column="actual_hours" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
-        <result property="completedDate" column="completed_date" />  <!-- completedAt -> completedDate로 수정 -->
+        <result property="completedDate" column="completed_date" />
     </resultMap>
 
     <!-- 하위 업무 기본 결과 매핑 -->
@@ -165,12 +163,10 @@
     <insert id="insertTask" parameterType="com.example.projectdemo.domain.projects.dto.TaskDTO" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tasks (
             project_id, title, description, status, progress, priority,
-            reporter_emp_num, assignee_emp_num, start_date, due_date,
-            estimated_hours, actual_hours, created_at
+            reporter_emp_num, assignee_emp_num, start_date, due_date,created_at
         ) VALUES (
                      #{projectId}, #{title}, #{description}, #{status}, #{progress}, #{priority},
-                     #{reporterEmpNum}, #{assigneeEmpNum}, #{startDate}, #{dueDate},
-                     #{estimatedHours}, #{actualHours}, NOW()
+                     #{reporterEmpNum}, #{assigneeEmpNum}, #{startDate}, #{dueDate}, NOW()
                  )
     </insert>
 
@@ -186,8 +182,6 @@
         assignee_emp_num = #{assigneeEmpNum},
         start_date = #{startDate},
         due_date = #{dueDate},
-        estimated_hours = #{estimatedHours},
-        actual_hours = #{actualHours},
         updated_at = NOW(),
         completed_date = #{completedDate}  <!-- completedAt -> completedDate로 변경 -->
         WHERE id = #{id}

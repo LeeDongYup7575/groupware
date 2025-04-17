@@ -34,8 +34,4 @@ public interface TodoMapper {
             @Param("completed") boolean completed);
     int deleteTodo(@Param("id") Integer id);
 
-    // 통계 관련 메서드
-    int countTodosByEmployee(@Param("empNum") String empNum);
-    int countCompletedTodosByEmployee(@Param("empNum") String empNum);
-    int countOverdueTodosByEmployee(@Param("empNum") String empNum);
 }
