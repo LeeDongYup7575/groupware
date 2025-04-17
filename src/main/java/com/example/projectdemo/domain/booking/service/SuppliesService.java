@@ -46,8 +46,9 @@ public class SuppliesService {
 
     // 특정 사원의 비품 예약 조회
     public List<SuppliesBookingDTO> getBookingsByEmpNum(String empNum) {
+        LocalDateTime now = LocalDateTime.now();
         return suppliesMapper.findSuppliesBookingsByEmpNum(empNum).stream()
-                .map(this::convertToBookingDto)
+                .map(this::convertToBookingDto).filter(dto -> dto.getStart() != null && dto.getStart().isAfter(now))
                 .collect(Collectors.toList());
     }
 

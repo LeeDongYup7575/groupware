@@ -4,9 +4,15 @@ import com.example.projectdemo.domain.attend.dto.AttendDTO;
 import com.example.projectdemo.domain.attend.service.AttendService;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.LogoutService;
+import com.example.projectdemo.domain.board.dto.PostsDTO;
+import com.example.projectdemo.domain.board.service.PostsService;
 import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
+import com.example.projectdemo.domain.booking.dto.SuppliesBookingDTO;
 import com.example.projectdemo.domain.booking.service.MeetingRoomService;
+import com.example.projectdemo.domain.booking.service.SuppliesService;
 import com.example.projectdemo.domain.booking.util.BookingTimeUtils;
+import com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO;
+import com.example.projectdemo.domain.edsm.services.EdsmService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
@@ -36,6 +42,9 @@ public class WebController {
     private final LogoutService logoutService;
     private final MeetingRoomService meetingRoomService;
     private final AttendService attendService;
+    private final SuppliesService suppliesService;
+    private final EdsmService edsmService;
+    private final PostsService postsService;
 
     // 메모리 캐시
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
@@ -45,13 +54,16 @@ public class WebController {
     @Autowired
     public WebController(EmployeesService employeesService, JwtTokenUtil jwtTokenUtil, NoticeCrawler noticeCrawler,
                          LogoutService logoutService, MeetingRoomService meetingRoomService,
-                         AttendService attendService) {
+                         AttendService attendService, SuppliesService suppliesService, EdsmService edsmService, PostsService postsService) {
         this.employeesService = employeesService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.noticeCrawler = noticeCrawler;
         this.logoutService = logoutService;
         this.meetingRoomService = meetingRoomService;
         this.attendService = attendService;
+        this.suppliesService = suppliesService;
+        this.edsmService = edsmService;
+        this.postsService = postsService;
     }
 
     /**
@@ -210,6 +222,9 @@ public class WebController {
         List<Notice> notices = getCachedNotices();
         model.addAttribute("notices", notices);
 
+        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
+        model.addAttribute("publicList", publicList);
+
         // 오늘 날짜의 예약 정보 조회
         LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
@@ -224,8 +239,13 @@ public class WebController {
                 meetingRoomService.getBookingsByEmpNum(empNum);
         model.addAttribute("myMeetingRoomBookings", myMeetingRoomBookings);
 
+        // 내 비품 예약 목록
+        List<SuppliesBookingDTO> mySuppliesBookings = suppliesService.getBookingsByEmpNum(empNum);
+        int mySuppliesCount = mySuppliesBookings.size();
+        System.out.println(mySuppliesCount + " : 비품예약 개수" + myMeetingRoomBookings.size() + " : 룸예약현황");
+
         // 내 예약 개수 계산
-        int myBookingsCount = myMeetingRoomBookings.size();
+        int myBookingsCount = myMeetingRoomBookings.size() + mySuppliesCount;
         model.addAttribute("myBookingsCount", myBookingsCount);
 
         // 현재 날짜 정보 추가
@@ -236,14 +256,17 @@ public class WebController {
         model.addAttribute("bookingUtils", new BookingTimeUtils());
 
         // 근태관리 출 퇴근 시간 추가
-        int empId = (int)request.getAttribute("id");
+        int empId = (int) request.getAttribute("id");
         if (empId == 0) { //예외처리
             return "redirect:/auth/login";
         }
-        List<AttendDTO>attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
+        List<AttendDTO> attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
         model.addAttribute("attendanceListByDate", attendanceListByDate);
 
-        return "/main";
+        List<EdsmDocumentDTO> edsmList = edsmService.selectByAllApprovalFromIdWait(empNum);
+        int edsmCount = edsmList.size();
+        model.addAttribute("edsmCount", edsmCount);
+        return "main";
     }
 
     /**
