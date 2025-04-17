@@ -22,6 +22,11 @@ main {
     background-color: #f3f7fb;
     padding: 20px 0;
     border-right: 1px solid #e5e5e5;
+
+    position: fixed;
+    top: 80px;
+    left: 0;
+    z-index: 999;
 }
 
 .mypage-sidebar-item {
@@ -60,7 +65,8 @@ main {
 }
 
 .main-section {
-    padding: 0 40px;
+    padding: 20px 40px 0 40px;
+    margin-left: 250px;
     width: 1200px;
 }
 .title-container h1 {
@@ -195,7 +201,7 @@ input[type="text"], input[type="email"] {
 .menu-container {
     display: flex;
     border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .menu-item {
@@ -233,7 +239,7 @@ table {
 }
 
 .post-th{
-    font-size: 13px;
+    font-size: 14px;
 }
 .post-td{
     font-size: 14px;
@@ -365,6 +371,7 @@ tbody .title-col a:hover {
 }
 .comment-th {
     text-align: center !important;
+    font-size: 14px;
 }
 .comment-table th,
 .comment-table td {
@@ -405,7 +412,41 @@ tbody .title-col a:hover {
     text-decoration: underline;
 }
 
+#sidebarOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 998; /* 사이드바보다 아래 */
+    display: none;
+}
 
+/* 사이드바가 열렸을 때 오버레이도 보여주기 */
+#sidebarOverlay.show {
+    display: block;
+}
+
+#sidebarToggleBtn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    font-size: 15px;
+    line-height: 1;
+    z-index: 1100;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: grid;
+    place-items: center;
+}
 
 /* 반응형 스타일 */
 @media (max-width: 1200px) {
@@ -432,27 +473,20 @@ tbody .title-col a:hover {
         max-width: 100%;
         margin: 0 auto;
     }
-
-    #sidebarToggleBtn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        background-color: #4a90e2;
-        color: white;
-        display: block;
-        justify-content: center;
-        align-items: center;
-        font-size: 24px;
-        z-index: 1100;
-        cursor: pointer;
-    }
 }
 
 /* 1200px 이상일 때만 숨김 */
 @media (min-width: 1201px) {
     #sidebarToggleBtn {
+        display: none;
+    }
+}
+
+@media (max-width: 768px){
+    .post-table th.board-col,
+    .post-table td.board-col,
+    .post-table th.views-col,
+    .post-table td.views-col {
         display: none;
     }
 }
