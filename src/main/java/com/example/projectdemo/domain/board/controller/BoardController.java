@@ -8,7 +8,6 @@ import com.example.projectdemo.domain.board.service.AttachmentsService;
 import com.example.projectdemo.domain.board.service.BoardsService;
 import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
-import com.example.projectdemo.domain.employees.service.EmployeesService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,9 +34,6 @@ public class BoardController {
 
     @Autowired
     private CommentsService commentsService;
-
-    @Autowired
-    private EmployeesService employeesService;
 
     // 통합 게시판 - 모든 권한 있는 게시판의 게시글 보기
     @GetMapping("")
@@ -116,6 +112,7 @@ public class BoardController {
         return "board/view";
     }
 
+    //현재 로그인한 사용자가 접근할 수 있는 게시판 목록을 조회하여, 글쓰기 페이지에 전달
     @GetMapping("/write")
     public String showWriteForm(HttpServletRequest request, Model model) {
         // 현재 로그인한 사용자 정보 가져오기
@@ -127,11 +124,6 @@ public class BoardController {
 
         model.addAttribute("PostsDTO", new PostsDTO());
         return "board/write";  // 글쓰기 페이지
-    }
-
-    @GetMapping("/important")
-    public String importantPosts() {
-        return "board/important"; // 중요 게시물 페이지
     }
 
     @GetMapping("/create")

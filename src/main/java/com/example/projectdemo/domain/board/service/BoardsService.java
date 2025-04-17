@@ -216,4 +216,22 @@ public class BoardsService {
             throw new RuntimeException("게시판 삭제 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
     }
+
+    // 여러 게시판을 일괄 삭제 (비활성화)
+    public int batchDeleteBoards(List<Integer> boardIds) {
+        int deletedCount = 0;
+
+        for (Integer boardId : boardIds) {
+            try {
+                deleteBoard(boardId); // 기존 단일 삭제 메서드 재사용
+                deletedCount++;
+            } catch (Exception e) {
+                // 삭제 실패한 게시판은 건너뛰고 계속 진행
+                // 로그 기록이 필요하다면 여기에 추가
+                System.err.println("게시판 ID " + boardId + " 삭제 실패: " + e.getMessage());
+            }
+        }
+
+        return deletedCount;
+    }
 }

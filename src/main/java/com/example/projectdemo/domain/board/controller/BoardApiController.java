@@ -86,4 +86,25 @@ public class BoardApiController {
             return ResponseEntity.badRequest().body(error);
         }
     }
+
+    /**
+     * 여러 게시판 일괄 삭제 API
+     */
+    @PostMapping("/batch-delete")
+    public ResponseEntity<?> batchDeleteBoards(@RequestBody BoardsDTO requestDTO,
+                                               HttpServletRequest request) {
+        try {
+            int deletedCount = boardsService.batchDeleteBoards(requestDTO.getIds());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", deletedCount + "개의 게시판이 성공적으로 삭제되었습니다.");
+            response.put("deletedCount", deletedCount);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
 }
