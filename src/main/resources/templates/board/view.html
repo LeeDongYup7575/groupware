@@ -52,6 +52,9 @@
             <span>
                 <strong>작성일:</strong> <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01</span>
             </span>
+            <span>
+                <strong>조회수:</strong> <span th:text="${post.views}">조회수</span>
+            </span>
         </div>
 
         <div class="post-content" th:utext="${post.content}">

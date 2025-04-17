@@ -47,7 +47,6 @@ public class PostsService {
         return postsMapper.getPostsByBoardId(boardId);
     }
 
-
     // 게시판 ID로 게시글 수 조회
     public int countPostsByBoardId(Integer boardId) {
         return postsMapper.countPostsByBoardId(boardId);
@@ -104,6 +103,11 @@ public class PostsService {
      */
     public void deletePostsByIds(List<Integer> ids) {
         postsMapper.deletePostsByIds(ids);
+    }
+
+    // 조회수 증가 메소드 (단순히 조회수만 증가)
+    public void incrementViewCount(int postId) {
+        postsMapper.incrementViewCount(postId);
     }
 
 }

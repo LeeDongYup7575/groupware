@@ -39,4 +39,8 @@ public interface PostsMapper {
 
     // 게시글 다중 삭제
     void deletePostsByIds(@Param("list") List<Integer> ids);
+
+    // 조회수 증가 메소드 추가
+    void incrementViewCount(@Param("postId") int postId);
+
 }

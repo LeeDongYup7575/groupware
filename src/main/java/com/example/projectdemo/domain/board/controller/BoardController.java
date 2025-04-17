@@ -9,13 +9,13 @@ import com.example.projectdemo.domain.board.service.BoardsService;
 import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,9 +80,9 @@ public class BoardController {
 
     // 게시글 상세 보기
     @GetMapping("/post/{id}")
-    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model, Principal principal) {
-
-        int empId = (int)request.getAttribute("id");
+    public String viewPost(@PathVariable("id") int id, Model model,
+                           @SessionAttribute(name = "empId", required = false) Integer empId,
+                           HttpServletRequest request, HttpServletResponse response) {
 
         // 게시글 정보 가져오기
         PostsDTO post = postsService.getPostById(id);
@@ -92,6 +92,11 @@ public class BoardController {
         if (!boardsService.hasAccess(empId, board.getId())) {
             return "board/integrated-list";
         }
+
+        postsService.incrementViewCount(id);
+
+        // 증가된 조회수가 반영된 게시글 정보를 다시 가져옴
+        post = postsService.getPostById(id);
 
         // 첨부파일 목록 가져오기
         List<AttachmentsDTO> attachments = attachmentsService.selectAttachmentsByPostId(id);
