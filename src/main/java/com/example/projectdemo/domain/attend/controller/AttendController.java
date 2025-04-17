@@ -128,7 +128,7 @@ public class AttendController {
         model.addAttribute("attendListJson", attendListJson);
         model.addAttribute("overtimesList", overtimesList);
 
-        return "/attend/attendMain";
+        return "attend/attendMain";
     }
 
     @RequestMapping("/annualStatistics")
@@ -243,6 +243,6 @@ public class AttendController {
         model.addAttribute("totalWorkDays", totalWorkDays);
         model.addAttribute("correctedWorkTimeList", correctedWorkTimeList); // ✅ 추가
 
-        return "/attend/attendAnnualStatistics";
+        return "attend/attendAnnualStatistics";
     }
 }

@@ -17,6 +17,8 @@ import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
 import com.example.projectdemo.domain.notification.model.Notice;
+import com.example.projectdemo.main.MainPageData;
+import com.example.projectdemo.main.MainPageFacade;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,10 +53,13 @@ public class WebController {
     // 캐시 유효 시간 (1시간 = 3600000ms)
     private static final long CACHE_EXPIRY_TIME_MS = 3600000;
 
+    private final MainPageFacade mainPageFacade;
+
     @Autowired
     public WebController(EmployeesService employeesService, JwtTokenUtil jwtTokenUtil, NoticeCrawler noticeCrawler,
                          LogoutService logoutService, MeetingRoomService meetingRoomService,
-                         AttendService attendService, SuppliesService suppliesService, EdsmService edsmService, PostsService postsService) {
+                         AttendService attendService, SuppliesService suppliesService, EdsmService edsmService, PostsService postsService,
+                         MainPageFacade mainPageFacade) {
         this.employeesService = employeesService;
         this.jwtTokenUtil = jwtTokenUtil;
         this.noticeCrawler = noticeCrawler;
@@ -64,6 +69,7 @@ public class WebController {
         this.suppliesService = suppliesService;
         this.edsmService = edsmService;
         this.postsService = postsService;
+        this.mainPageFacade = mainPageFacade;
     }
 
     /**
@@ -146,126 +152,35 @@ public class WebController {
 
     /**
      * 로그인 후 페이지
-     * facade 패턴으로 바꿀 예정이니 다들 print할 내용에 대해 로직 추가해주시면
-     * 리팩토링 갈기겠습니다 - 미르
+     * Facade 패턴을 적용하여 리팩토링 완료
      */
     @GetMapping("/main")
     public String mainPage(HttpServletRequest request,
                            @RequestParam(required = false) String token,
                            Model model) {
-        String empNum = null;
-        String accessToken = null;
 
-        // 1. 헤더에서 토큰 확인
-        String authHeader = request.getHeader("Authorization");
-        System.out.println("Authorization 헤더: " + (authHeader != null ? "존재함" : "없음"));
+        MainPageData mainPageData = mainPageFacade.prepareMainPageData(request, token);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            accessToken = authHeader.substring(7);
-            if (jwtTokenUtil.validateToken(accessToken)) {
-                empNum = jwtTokenUtil.getEmpNumFromToken(accessToken);
-                System.out.println("헤더에서 유효한 토큰 확인: " + empNum);
-            } else {
-                System.out.println("헤더에 토큰이 있지만 유효하지 않음");
-            }
-        }
-
-        // 2. 쿼리 파라미터에서 토큰 확인
-        if (empNum == null && token != null) {
-            if (jwtTokenUtil.validateToken(token)) {
-                accessToken = token;
-                empNum = jwtTokenUtil.getEmpNumFromToken(token);
-                System.out.println("쿼리 파라미터에서 유효한 토큰 확인: " + empNum);
-            } else {
-                System.out.println("쿼리 파라미터에 토큰이 있지만 유효하지 않음");
-            }
-        }
-
-        // 3. 쿠키에서 토큰 확인
-        if (empNum == null) {
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("accessToken".equals(cookie.getName())) {
-                        accessToken = cookie.getValue();
-                        if (jwtTokenUtil.validateToken(accessToken)) {
-                            empNum = jwtTokenUtil.getEmpNumFromToken(accessToken);
-                            System.out.println("쿠키에서 유효한 토큰 확인: " + empNum);
-                        } else {
-                            System.out.println("쿠키에 토큰이 있지만 유효하지 않음");
-                        }
-                        break;
-                    }
-                }
-            } else {
-                System.out.println("쿠키가 없음");
-            }
-        }
-
-        // 토큰이 없거나 유효하지 않은 경우
-        if (empNum == null) {
-            System.out.println("유효한 토큰을 찾을 수 없어 로그인 페이지로 리다이렉트");
+        // 인증 실패 또는 사용자 정보를 찾을 수 없는 경우
+        if (mainPageData == null) {
+            System.out.println("유효한 토큰을 찾을 수 없거나 사용자 정보를 찾을 수 없어 로그인 페이지로 리다이렉트");
             return "redirect:/auth/login";
         }
 
-        // 토큰에서 추가 정보 추출 또는 DB에서 사용자 정보 로드
-        EmployeesDTO employee = employeesService.findByEmpNum(empNum);
-        if (employee == null) {
-            System.out.println("사용자 정보를 찾을 수 없음: " + empNum);
-            return "redirect:/auth/login";
-        }
-
-        // 사용자 정보를 모델에 추가
-        model.addAttribute("employee", employee);
-
-        // 공지사항 데이터 로드 및 모델에 추가
-        List<Notice> notices = getCachedNotices();
-        model.addAttribute("notices", notices);
-
-        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
-        model.addAttribute("publicList", publicList);
-
-        // 오늘 날짜의 예약 정보 조회
-        LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
-        LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
-
-        // 오늘의 회의실 예약 목록
-        List<MeetingRoomBookingDTO> meetingRoomBookings =
-                meetingRoomService.getBookingsByDateRange(startOfDay, endOfDay);
-        model.addAttribute("meetingRoomBookings", meetingRoomBookings);
-
-        // 내 회의실 예약 목록
-        List<MeetingRoomBookingDTO> myMeetingRoomBookings =
-                meetingRoomService.getBookingsByEmpNum(empNum);
-        model.addAttribute("myMeetingRoomBookings", myMeetingRoomBookings);
-
-        // 내 비품 예약 목록
-        List<SuppliesBookingDTO> mySuppliesBookings = suppliesService.getBookingsByEmpNum(empNum);
-        int mySuppliesCount = mySuppliesBookings.size();
-        System.out.println(mySuppliesCount + " : 비품예약 개수" + myMeetingRoomBookings.size() + " : 룸예약현황");
-
-        // 내 예약 개수 계산
-        int myBookingsCount = myMeetingRoomBookings.size() + mySuppliesCount;
-        model.addAttribute("myBookingsCount", myBookingsCount);
-
-        // 현재 날짜 정보 추가
-        LocalDateTime now = LocalDateTime.now();
-        model.addAttribute("currentDate", now);
+        // 모델에 데이터 추가
+        model.addAttribute("employee", mainPageData.getEmployee());
+        model.addAttribute("notices", mainPageData.getNotices());
+        model.addAttribute("publicList", mainPageData.getPublicList());
+        model.addAttribute("meetingRoomBookings", mainPageData.getMeetingRoomBookings());
+        model.addAttribute("myMeetingRoomBookings", mainPageData.getMyMeetingRoomBookings());
+        model.addAttribute("myBookingsCount", mainPageData.getMyBookingsCount());
+        model.addAttribute("currentDate", mainPageData.getCurrentDate());
+        model.addAttribute("attendanceListByDate", mainPageData.getAttendanceListByDate());
+        model.addAttribute("edsmCount", mainPageData.getEdsmCount());
 
         // 회의실 유틸리티 추가
         model.addAttribute("bookingUtils", new BookingTimeUtils());
 
-        // 근태관리 출 퇴근 시간 추가
-        int empId = (int) request.getAttribute("id");
-        if (empId == 0) { //예외처리
-            return "redirect:/auth/login";
-        }
-        List<AttendDTO> attendanceListByDate = attendService.selectByEmpIdAndDate(empId);
-        model.addAttribute("attendanceListByDate", attendanceListByDate);
-
-        List<EdsmDocumentDTO> edsmList = edsmService.selectByAllApprovalFromIdWait(empNum);
-        int edsmCount = edsmList.size();
-        model.addAttribute("edsmCount", edsmCount);
         return "main";
     }
 

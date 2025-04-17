@@ -2,19 +2,20 @@ package com.example.projectdemo.domain.notification.crawler;
 
 import com.example.projectdemo.domain.notification.model.Notice;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class NoticeCrawler {
@@ -23,9 +24,16 @@ public class NoticeCrawler {
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
     private static final long CACHE_EXPIRY_TIME_MS = 3600000; // 1시간(밀리초)
 
-    @Value("${webdriver.chrome.driver}")
-    private String webDriverPath;
+    @Value("${notice.url:https://www.hrdit.co.kr/renew_community/notice/list.php}")
+    private String noticeUrl;
 
+    // 공지사항 URL 기본값
+    private static final String NOTICE_BASE_URL = "https://www.hrdit.co.kr/renew_community/notice/view.php?id=";
+
+    // ID 추출을 위한 정규식 패턴
+    private static final Pattern ID_PATTERN = Pattern.compile("javascript:view\\('(\\d+)'\\)");
+
+    @Cacheable("notices")
     public List<Notice> getNotices() {
         String cacheKey = "notices";
 
@@ -49,79 +57,89 @@ public class NoticeCrawler {
     }
 
     /**
-     * 실제 크롤링을 수행하는 메소드 - try-finally 패턴 적용
+     * JSoup을 사용하여 공지사항을 크롤링하는 메소드
      */
     public List<Notice> crawlNotices() {
         List<Notice> noticeList = new ArrayList<>();
-        WebDriver driver = null;
 
         System.out.println("===== 공지사항 크롤링 시작 =====");
 
         try {
-            // WebDriver 경로 설정
-            System.setProperty("webdriver.chrome.driver", webDriverPath);
-
-            // Chrome 옵션 설정
-            System.out.println("Chrome 옵션 설정 중...");
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless"); // headless 모드로 실행
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--remote-allow-origins=*");
-
-            // ChromeDriver 객체 생성
-            System.out.println("ChromeDriver 객체 생성 시도...");
-            driver = new ChromeDriver(options);
-            System.out.println("ChromeDriver 객체 생성 성공!");
-
-            // 공지사항 페이지로 이동
-            System.out.println("공지사항 페이지로 이동 중...");
-            driver.get("https://www.keduit.com/renew_community/notice/list.php");
+            // JSoup을 사용하여 페이지 로드
+            System.out.println("공지사항 페이지 로드 중...");
+            Document document = Jsoup.connect(noticeUrl)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
+                    .timeout(10000)  // 10초 타임아웃
+                    .get();
             System.out.println("페이지 로드 완료");
 
-            // 게시글 목록 찾기
-            System.out.println("게시글 목록 찾는 중...");
-            List<WebElement> posts = driver.findElements(By.cssSelector("a[href^='javascript:view']"));
-            System.out.println("찾은 게시글 수: " + posts.size());
+            // 테이블에서 모든 행(tr) 찾기 - tbody 내의 tr들을 찾음
+            Elements rows = document.select("tbody > tr");
+            System.out.println("찾은 행 수: " + rows.size());
 
-            // 각 게시글 클릭하여 정보 추출
+            // 각 행에서 공지사항 정보 추출
             int count = 0;
-            for (WebElement post : posts) {
-                if(count==4) break;
-                count++;
-                String postTitle = post.getText();
-                String postHref = post.getAttribute("href");
-                System.out.println("게시글 제목: " + postTitle);
-                System.out.println("게시글 href: " + postHref);
+            for (Element row : rows) {
+                // 첫 번째 헤더 행은 건너뛰기
+                if (row.select("th").size() > 0) {
+                    continue;
+                }
 
-                // 게시글 ID 추출
-                String postId = postHref.replaceAll("javascript:view\\('(\\d+)'\\)", "$1");
-                System.out.println("추출된 ID: " + postId);
+                Elements tds = row.select("td");
+                if (tds.size() < 4) continue; // 최소한 번호, 제목, 등록일, 조회수 열이 있어야 함
 
-                // 게시글 URL 생성
-                String postUrl = "https://www.keduit.com/renew_community/notice/view.php?id=" + postId;
-                System.out.println("생성된 URL: " + postUrl);
+                Element titleElement = row.select("td.subject a").first();
+                if (titleElement == null) continue;
 
-                // Notice 객체 생성하여 리스트에 추가
-                if (!postTitle.isEmpty() && !postUrl.isEmpty()) {
-                    noticeList.add(new Notice(postId, postTitle, postUrl));
-                    System.out.println("공지사항 객체 추가 완료");
+                String href = titleElement.attr("href");
+                String title = titleElement.text();
+
+                // 중요 공지사항 여부 확인 (스타일 속성에 color:#f66602 포함 여부)
+                boolean isHighlighted = titleElement.hasAttr("style") &&
+                        titleElement.attr("style").contains("color:#f66602");
+
+                // 강조된 공지사항만 수집하고 최대 4개로 제한
+                if (isHighlighted && count < 4) {
+                    // ID 추출
+                    Matcher matcher = ID_PATTERN.matcher(href);
+                    if (matcher.find()) {
+                        String id = matcher.group(1);
+                        String postUrl = NOTICE_BASE_URL + id;
+
+                        // 등록일 추출
+                        String dateStr = tds.get(2).text().trim();
+
+                        // 조회수 추출
+                        String viewCountStr = tds.get(3).text().trim();
+                        int viewCount = 0;
+                        try {
+                            viewCount = Integer.parseInt(viewCountStr);
+                        } catch (NumberFormatException e) {
+                            System.out.println("조회수 변환 실패: " + viewCountStr);
+                        }
+
+                        System.out.println("공지사항 ID: " + id);
+                        System.out.println("제목: " + title);
+                        System.out.println("URL: " + postUrl);
+                        System.out.println("등록일: " + dateStr);
+                        System.out.println("조회수: " + viewCount);
+                        System.out.println("강조 여부: " + isHighlighted);
+
+                        // 확장된 Notice 객체 생성 및 추가
+                        Notice notice = new Notice(id, title, postUrl, dateStr, viewCount, isHighlighted);
+                        noticeList.add(notice);
+                        count++;
+                    }
                 }
             }
-        } catch (Exception e) {
+
+        } catch (IOException e) {
             System.out.println("크롤링 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            // 웹 드라이버 안전하게 종료
-            if (driver != null) {
-                try {
-                    System.out.println("웹 드라이버 종료 중...");
-                    driver.quit();
-                    System.out.println("웹 드라이버 종료 완료");
-                } catch (Exception e) {
-                    System.out.println("웹 드라이버 종료 중 오류 발생: " + e.getMessage());
-                    e.printStackTrace();
-                }
+
+            // 오류 발생 시 빈 리스트 반환 대신 기본 공지사항 추가 (서비스 안정성)
+            if (noticeList.isEmpty()) {
+                noticeList.add(new Notice("0", "현재 공지사항을 불러올 수 없습니다.", "#", "2025-04-17", 0, false));
             }
         }
 

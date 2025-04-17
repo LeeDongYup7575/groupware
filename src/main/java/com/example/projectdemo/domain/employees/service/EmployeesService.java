@@ -477,58 +477,6 @@ public class EmployeesService {
         return employeeMapper.updateByDepId(id);
     }
 
-//    /**
-//     * 직원 추가 (관리자용)
-//     */
-//    @Transactional
-//    public EmployeesDTO addEmployee(EmployeesDTO employeeDTO) {
-//        try {
-//            // 임시 비밀번호 생성 (실제 비밀번호는 회원가입 시 설정)
-//            String tempPassword = generateTempPassword();
-//            String encodedPassword = passwordEncoder.encode(tempPassword);
-//            employeeDTO.setPassword(encodedPassword);
-//
-//            // 회원가입 상태 설정
-//            employeeDTO.setRegistered(false);
-//
-//            // 임시 비밀번호 상태 설정 (1=true, 0=false)
-//            employeeDTO.setTemp_password(1);
-//
-//            // 기본값 설정
-//            employeeDTO.setEnabled(true);
-//
-//            // 고용 상태 설정
-//            employeeDTO.setAttendStatus("");
-//
-//            // 역할 설정 (기본값: ROLE_USER)
-//            if (employeeDTO.getRole() == null || employeeDTO.getRole().trim().isEmpty()) {
-//                employeeDTO.setRole("ROLE_USER");
-//            }
-//
-//            // 입사일 설정 (제공되지 않은 경우 현재 날짜 사용)
-//            // 수정된 코드
-//            if (employeeDTO.getHireDate() == null) {
-//                employeeDTO.setHireDate(LocalDate.now());
-//            }
-//
-//            // 기본 휴가 설정
-//            employeeDTO.setTotalLeave(new BigDecimal(15));
-//            employeeDTO.setUsedLeave(new BigDecimal(0));
-//
-//            // 직원 추가 (employeeMapper에 해당 메서드 추가 필요)
-//            int result = employeeMapper.insertEmployee(employeeDTO);
-//
-//            if (result <= 0) {
-//                throw new RuntimeException("직원 추가에 실패했습니다.");
-//            }
-//
-//            // 삽입된 ID 반환
-//            return findByEmpNum(employeeDTO.getEmpNum());
-//        } catch (Exception e) {
-//            throw new RuntimeException("직원 추가 중 오류가 발생했습니다: " + e.getMessage(), e);
-//        }
-//    }
-
     /**
      * 직원 추가 (관리자용)
      */

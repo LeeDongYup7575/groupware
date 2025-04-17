@@ -96,7 +96,7 @@ public class LeaveController {
         model.addAttribute("today", today);
         model.addAttribute("usedLeaveList",usedLeaveList);
 
-        return "/leave/leavesForm";
+        return "leave/leavesForm";
     }
 
 
@@ -149,7 +149,7 @@ public class LeaveController {
         model.addAttribute("canUseLeaves", canUseLeaves);
         model.addAttribute("selectedYear", currentYear);
 
-        return "/attend/attendLeavesHistory";
+        return "attend/attendLeavesHistory";
     }
 
 
