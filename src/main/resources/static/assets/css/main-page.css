@@ -14,6 +14,10 @@
     --text-secondary: #666;
     --sidebar-width: 250px;
     --header-height: 80px;
+    --success-color: #4caf50;
+    --info-color: #2196f3;
+    --warning-color: #ff9800;
+    --danger-color: #f44336;
 }
 
 /* 리셋 및 기본 스타일 */
@@ -343,9 +347,307 @@ body {
     border: 1px solid #eee;
 }
 
+/* 새로 추가된 프로젝트 현황 스타일 */
+.project-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background-color: var(--primary-light);
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: scale(1.05);
+}
+
+.project-list {
+    margin-top: 1.5rem;
+}
+
+.project-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.project-name {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.project-progress {
+    display: flex;
+    align-items: center;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 4px;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+/* 업무 현황 도넛 차트 */
+.task-status {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.task-chart {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 도넛 차트 CSS */
+.donut-chart {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #f5f5f5; /* 기본 배경은 없어도 됨 */
+    margin: 0 auto;
+}
+
+
+.donut-chart::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1) inset;
+}
+
+/*.donut-segment {*/
+/*    position: absolute;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    border-radius: 50%;*/
+/*    clip: rect(0, 150px, 150px, 75px);*/
+/*}*/
+
+/*.donut-segment:before {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    border-radius: 50%;*/
+/*    clip: rect(0, 75px, 150px, 0);*/
+/*    transform: rotate(calc(var(--percentage) * 3.6deg));*/
+/*    background-color: var(--fill);*/
+/*}*/
+
+.task-legend {
+    flex: 1;
+    padding-left: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.legend-text {
+    flex: 1;
+    font-size: 0.9rem;
+}
+
+.legend-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.recent-tasks h5 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.task-list {
+    list-style: none;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-title {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.task-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.task-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.task-badge.completed {
+    background-color: rgba(76, 175, 80, 0.15);
+    color: var(--success-color);
+}
+
+.task-badge.in-progress {
+    background-color: rgba(33, 150, 243, 0.15);
+    color: var(--info-color);
+}
+
+.task-badge.pending {
+    background-color: rgba(255, 152, 0, 0.15);
+    color: var(--warning-color);
+}
+
+.task-badge.delayed {
+    background-color: rgba(244, 67, 54, 0.15);
+    color: var(--danger-color);
+}
+
+/* 할 일 목록 */
+.todo-container {
+    padding: 0.5rem 0;
+}
+
+.todo-input {
+    display: flex;
+    margin-bottom: 1.5rem;
+}
+
+.todo-input input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+.todo-input button {
+    padding: 0.75rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.todo-input button:hover {
+    background-color: var(--primary-dark);
+}
+
+.todo-list {
+    list-style: none;
+}
+
+.todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.todo-check {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.todo-check input {
+    margin-right: 0.5rem;
+}
+
+.todo-check label {
+    cursor: pointer;
+}
+
+.todo-check label.completed span {
+    text-decoration: line-through;
+    color: var(--text-light);
+}
+
+.todo-actions {
+    display: flex;
+    align-items: center;
+}
+
+.todo-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-right: 1rem;
+}
+
+.todo-delete {
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.todo-delete:hover {
+    color: var(--danger-color);
+}
+
+.no-data-message {
+    text-align: center;
+    color: var(--text-light);
+    padding: 1rem;
+    font-style: italic;
+}
+
 /* 반응형 스타일 */
 @media (max-width: 1200px) {
-
     .main-content {
         margin-left: 0;
     }
@@ -360,4 +662,323 @@ body {
     .dashboard-row {
         flex-direction: column;
     }
+}
+
+/* 회사 브랜드 스토리텔링 섹션 스타일 */
+.brand-storytelling {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8fbff 0%, #f0f5fa 100%);
+    padding: 2rem;
+    margin-bottom: 0;
+    border-radius: 10px;
+}
+
+/* 핵심 가치 캐러셀 */
+.brand-values-container {
+    position: relative;
+    margin: 2rem 0;
+}
+
+.values-carousel {
+    display: flex;
+    position: relative;
+    height: 220px;
+    overflow: hidden;
+}
+
+.value-item {
+    position: absolute;
+    width: 100%;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5rem;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.value-item.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.value-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.value-icon i {
+    font-size: 2rem;
+    color: white;
+}
+
+.value-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.value-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+/* 네비게이션 */
+.carousel-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--primary-color);
+}
+
+.navigation-dots {
+    display: flex;
+    align-items: center;
+    margin: 0 1rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot:hover {
+    background-color: #bbb;
+}
+
+.dot.active {
+    background-color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+/* 회사 미션 */
+.company-mission {
+    text-align: center;
+    margin: 3rem 0;
+    position: relative;
+}
+
+.mission-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--text-primary);
+    max-width: 80%;
+    margin: 0 auto;
+    position: relative;
+    padding: 0 2rem;
+}
+
+.mission-text::before,
+.mission-text::after {
+    content: '"';
+    font-size: 3rem;
+    position: absolute;
+    color: var(--primary-light);
+    opacity: 0.6;
+}
+
+.mission-text::before {
+    left: 0;
+    top: -1.5rem;
+}
+
+.mission-text::after {
+    right: 0;
+    bottom: -2rem;
+}
+
+.mission-graphic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.graphic-line {
+    height: 3px;
+    width: 80px;
+    background: linear-gradient(90deg, transparent, var(--primary-color));
+}
+
+.graphic-line:last-child {
+    background: linear-gradient(90deg, var(--primary-color), transparent);
+}
+
+.graphic-circle {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    margin: 0 10px;
+}
+
+/* 회사 마일스톤 */
+.company-milestones {
+    display: flex;
+    justify-content: space-between;
+    margin: 3rem 0;
+    position: relative;
+}
+
+.company-milestones::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #e1e8ed;
+    z-index: 0;
+}
+
+.milestone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.milestone-year {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.milestone:hover .milestone-year {
+    transform: scale(1.1);
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.milestone-content {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 120px;
+}
+
+/* 풋터 문구 */
+.footer-quote {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e1e8ed;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.footer-quote .highlight {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .values-carousel {
+        height: 280px;
+    }
+
+    .value-item {
+        height: 280px;
+    }
+
+    .value-description {
+        max-width: 95%;
+    }
+
+    .mission-text {
+        font-size: 1.2rem;
+        max-width: 95%;
+    }
+
+    .company-milestones {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+    }
+
+    .company-milestones::before {
+        display: none;
+    }
+}
+
+/* 로딩 인디케이터 */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.loading-indicator i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+/* 내용 없음 메시지 */
+.no-data-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
+    background-color: #f9fafc;
+    border-radius: 6px;
+    margin: 10px 0;
 }
