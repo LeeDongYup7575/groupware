@@ -95,6 +95,16 @@ public class MainPageFacadeImpl implements MainPageFacade {
         return data;
     }
 
+    private void loadNoticesAndPosts(MainPageData data) {
+        // 공지사항 데이터 로드
+        List<Notice> notices = noticeService.getCachedNotices();  // 변경된 부분
+        data.setNotices(notices);
+
+        // 공개 게시판 게시글 로드
+        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
+        data.setPublicList(publicList);
+    }
+
     private String authenticateUser(HttpServletRequest request, String tokenParam, MainPageData data) {
         String empNum = null;
         String accessToken = null;
@@ -161,16 +171,6 @@ public class MainPageFacadeImpl implements MainPageFacade {
         return employee;
     }
 
-    private void loadNoticesAndPosts(MainPageData data) {
-        // 공지사항 데이터 로드
-        List<Notice> notices = getCachedNotices();
-        data.setNotices(notices);
-
-        // 공개 게시판 게시글 로드
-        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
-        data.setPublicList(publicList);
-    }
-
     private List<Notice> getCachedNotices() {
         // 캐싱 로직 구현 (원본에서는 이 부분이 생략되어 있어 임시 구현)
         return new ArrayList<>(); // 실제 구현에서는 캐시된 공지사항을 반환
@@ -221,13 +221,5 @@ public class MainPageFacadeImpl implements MainPageFacade {
         data.setEdsmCount(edsmCount);
     }
 
-    private void loadNoticesAndPosts(MainPageData data) {
-        // 공지사항 데이터 로드
-        List<Notice> notices = noticeService.getCachedNotices();  // 변경된 부분
-        data.setNotices(notices);
 
-        // 공개 게시판 게시글 로드
-        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
-        data.setPublicList(publicList);
-    }
 }
