@@ -122,7 +122,7 @@ public class WorkController {
         model.addAttribute("currentMonthTotalOvertime", currentMonthTotalOvertime);
         model.addAttribute("statisticsByMonth", statisticsByMonth);
 
-        return "/work/overTimeForm";
+        return "work/overTimeForm";
     }
 
     @PostMapping("/submitOverTime")
@@ -226,8 +226,6 @@ public class WorkController {
 
         int empId = (int) request.getAttribute("id");
 
-        System.out.println("drafterId: " + drafterId);
-        System.out.println("empId: " + empId);
         if (empId == 0) {
             return "redirect:/auth/login";
         }
@@ -249,13 +247,13 @@ public class WorkController {
         model.addAttribute("year", year);
         model.addAttribute("month", month);
 
-        return "/work/workDetails";
+        return "work/workDetails";
     }
 
 
     @RequestMapping("/workSchedule")
     public String workSchedule(Model model) {
-        return "/work/workSchedule";
+        return "work/workSchedule";
     }
 
     @RequestMapping("/getWorkSchedule")
