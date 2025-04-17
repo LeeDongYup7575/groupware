@@ -39,6 +39,8 @@
                 <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
                 <span class="comment-count" th:if="${post.commentCount > 0}"
                       th:text="'[' + ${post.commentCount} + ']'"></span>
+                <!-- NEW 표시 -->
+                <span class="new-badge" th:if="${post.newPost}">NEW</span>
             </td>
             <td th:text="${post.author}">작성자</td>
             <td th:text="${post.boardName}">게시판명</td>

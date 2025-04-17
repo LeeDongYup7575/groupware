@@ -43,6 +43,9 @@ public class PostsService {
 
     // 통합 게시판 - 사용자가 접근 가능한 모든 게시판의 게시글 조회
     public List<PostsDTO> getAccessiblePosts(Integer empId) {
+        // 현재 시간
+        LocalDateTime now = LocalDateTime.now();
+
         // 해당 사용자가 접근 가능한 게시글 목록을 가져옴
         List<PostsDTO> posts = postsMapper.getAccessiblePostsByEmpId(empId);
 
@@ -52,6 +55,15 @@ public class PostsService {
             int commentCount = commentsMapper.countByPostId(post.getId());
             // 게시글 DTO에 댓글 수 설정
             post.setCommentCount(commentCount);
+
+            // NEW 표시 여부 확인 (24시간 이내 작성된 게시글)
+            LocalDateTime createdAt = post.getCreatedAt();
+            if (createdAt != null) {
+                // 24시간 이내에 작성된 게시글인지 확인
+                boolean isNew = createdAt.isAfter(now.minusHours(24));
+                // 여기를 setIsNew에서 setNewPost로 변경
+                post.setNewPost(isNew);
+            }
         }
         return posts;
     }

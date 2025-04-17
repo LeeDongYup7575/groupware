@@ -997,6 +997,19 @@ textarea.form-control {
     margin-left: 3px;
 }
 
+/* 새 게시글 배지 스타일 */
+.new-badge {
+    display: inline-block;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
 
 /* 반응형 설정 */
 @media screen and (max-width: 1200px) {
