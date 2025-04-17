@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.c  om/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- 메인 페이지 CSS -->
   <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
@@ -56,11 +56,11 @@
           <div class="profile-stats">
             <div class="stat-item">
               <div class="stat-label">결재할 문서</div>
-              <div class="stat-value">6</div>
+              <div class="stat-value" th:text="${edsmCount}"></div>
             </div>
             <div class="stat-item">
               <div class="stat-label">내 예약/대여 현황</div>
-              <div class="stat-value">1</div>
+              <div class="stat-value" th:text="${myBookingsCount}"></div>
             </div>
           </div>
         </div>
@@ -96,7 +96,25 @@
           </div>
 
           <div id="free" class="tab-content">
-            <p>자유게시판 내용이 여기에 표시됩니다.</p>
+            <div th:if="${!publicList.isEmpty()}">
+              <div class="list-group">
+                <a th:each="post : ${publicList}"
+                   th:href="@{/board/post/{id}(id=${post.id})}"
+                   class="list-group-item list-group-item-action"
+                   target="_blank"
+                   style="display: flex; justify-content: space-between; align-items: center;">
+
+                  <span th:text="${post.title}">제목</span>
+                  <span th:text="${post.author}" style="font-size: 0.85em; color: #666;">작성자</span>
+                </a>
+
+
+              </div>
+            </div>
+
+            <div th:if="${publicList.isEmpty()}" class="alert">
+              표시할 게시글이 없습니다.
+            </div>
           </div>
         </div>
       </div>
