@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class ChatUserDTO {
     private Integer id;
     private String name;
+    private String profileImgUrl;
 
 }

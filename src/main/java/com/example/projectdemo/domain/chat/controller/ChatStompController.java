@@ -78,7 +78,6 @@ public class ChatStompController {
     @GetMapping("/message/{roomId}")  // ✅ 채팅방의 과거 메시지 목록 조회 (GET /chat/message/{roomId})
     public List<ChatMessageDTO> getMessagesByRoom(@PathVariable int roomId) {
         List<ChatMessageDTO> list = chatMessageService.getMessagesByRoom(roomId);  // ✅ 채팅방 ID로 메시지 조회
-        System.out.println(list.get(0).getContent());
         if (!list.isEmpty()) {
             return list;  // ✅ 메시지가 있으면 리스트 반환
         } else {

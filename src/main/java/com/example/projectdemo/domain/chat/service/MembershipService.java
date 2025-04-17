@@ -5,7 +5,11 @@ import com.example.projectdemo.domain.chat.dto.ChatUserDTO;
 import com.example.projectdemo.domain.chat.dto.MemberShipDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
+import com.example.projectdemo.domain.mypage.controller.MypageApiController;
+import com.example.projectdemo.domain.s3.service.S3Service;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,12 @@ public class MembershipService {
 
     @Autowired
     private MembershipDAO membershipDAO; // ✅ DB 접근 (멤버십 테이블)
+
+    @Autowired
+    private S3Service s3Service;
+
+    private static final Logger logger = LoggerFactory.getLogger(MypageApiController.class);
+
 
     @Autowired
     private EmployeesMapper employeesMapper; // ✅ DB 접근 (직원 정보 테이블)
@@ -62,19 +72,61 @@ public class MembershipService {
 
     // ✅ 채팅방 참여자 리스트 조회
     public List<ChatUserDTO> getUserList(int userid, int roomid) {
-        List<MemberShipDTO> list = membershipDAO.getUserList(roomid); // 해당 방의 모든 멤버 조회
-        if (list.isEmpty()) {
-            return List.of(); // 참여자가 없으면 빈 리스트 리턴
-        }
+        List<MemberShipDTO> list = membershipDAO.getUserList(roomid);
+        if (list.isEmpty()) return List.of();
 
         List<ChatUserDTO> memberList = new ArrayList<>();
-        for (MemberShipDTO dto : list) { // 멤버십 정보를 순회
+
+        for (MemberShipDTO dto : list) {
             int id = dto.getEmpId();
-            EmployeesDTO emp = employeesMapper.findById(id); // 직원 상세 정보 조회
-            if (emp != null) { // 직원이 존재하면
-                memberList.add(new ChatUserDTO(id, emp.getName())); // 사용자 정보 리스트에 추가
+            EmployeesDTO employee = employeesMapper.findById(id);
+            if (employee == null) continue;
+
+            String profileImgUrl = employee.getProfileImgUrl();
+
+            // 기본 프로필로 fallback
+            if (profileImgUrl == null || profileImgUrl.equals("/assets/images/default-profile.png")) {
+                profileImgUrl = "/assets/images/default-profile.png";
             }
+
+            // 이미 S3 URL이면 그대로 사용
+            else if (profileImgUrl.contains("amazonaws.com")) {
+                // 그대로 사용
+            }
+
+            // S3 변환 시도 (업로드 경로 기반)
+            else {
+                String fileName = profileImgUrl.substring(profileImgUrl.lastIndexOf("/") + 1);
+                String s3Key = "profiles/" + fileName;
+
+                try {
+                    if (s3Service.doesObjectExist(s3Key)) {
+                        String s3Url = s3Service.getObjectUrl(s3Key);
+                        profileImgUrl = s3Url;
+
+                        // DB 업데이트
+                        employeesMapper.updateProfileImgUrl(employee.getEmpNum(), s3Url);
+                        logger.info("S3 URL로 업데이트됨: {}", s3Url);
+                    } else {
+                        logger.warn("❌ S3에 존재하지 않음: {}", s3Key);
+                        profileImgUrl = "/assets/images/default-profile.png";
+                    }
+                } catch (Exception e) {
+                    logger.warn("❌ S3 변환 실패: {}", e.getMessage());
+                    profileImgUrl = "/assets/images/default-profile.png";
+                }
+            }
+
+            // ✅ 최종적으로 무조건 리스트에 추가
+            memberList.add(new ChatUserDTO(employee.getId(), employee.getName(), profileImgUrl));
         }
-        return memberList; // 최종 참여자 리스트 반환
+
+        for (ChatUserDTO dto : memberList) {
+            System.out.println("🟢 사용자: " + dto.getName() + " | 이미지: " + dto.getProfileImgUrl());
+        }
+
+        return memberList;
     }
+
+
 }
