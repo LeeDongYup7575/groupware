@@ -58,14 +58,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            // CORS 프리플라이트 요청 처리 (기존 코드 유지)
-            response.setHeader("Access-Control-Allow-Origin", "https://techx-groupware.web.app");
-            response.setHeader("Access-Control-Allow-Origin", "http://10.10.55.57:3000");
+            String origin = request.getHeader("Origin");
+
+            List<String> allowedOrigins = List.of(
+                    "http://10.10.55.57:3000",
+                    "http://groupware.techx.kro.kr",
+                    "https://techx-groupware.web.app"
+            );
+
+            if (allowedOrigins.contains(origin)) {
+                response.setHeader("Access-Control-Allow-Origin", origin);  // 🔥 동적으로 반영
+            }
+
             response.setHeader("Access-Control-Allow-Credentials", "true");
             response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
             response.setHeader("Access-Control-Max-Age", "3600");
-
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }

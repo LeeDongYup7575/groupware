@@ -3,7 +3,7 @@
 
 <mapper namespace="AdminManageMapper">
     <select id="getDepartmentList" resultType="com.example.projectdemo.domain.employees.dto.DepartmentsDTO">
-        select * from departments;
+        select * from departments where name != '이동중';
     </select>
     <select id="getPositionList" resultType="com.example.projectdemo.domain.employees.dto.PositionsDTO">
         select * from positions;

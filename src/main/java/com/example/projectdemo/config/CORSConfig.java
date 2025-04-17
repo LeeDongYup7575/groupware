@@ -22,7 +22,8 @@ public class CORSConfig implements WebMvcConfigurer {
                         "http://10.10.55.57:3000",
                         "http://172.30.1.74:3000",
                         "http://10.10.55.7:3000",
-                        "https://techx-groupware.web.app"
+                        "https://techx-groupware.web.app",
+                        "http://groupware.techx.kro.kr"
                 )
                 .allowCredentials(true)
                 .allowedHeaders("*")
