@@ -183,6 +183,12 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateProfileImgUrl">
+        UPDATE employees
+        SET profile_img_url = #{profileImgUrl}
+        WHERE emp_num = #{empNum}
+    </update>
+
     <!-- 필터를 적용한 사원 조회 (페이지네이션 포함) -->
     <select id="selectEmployeesWithFilters" parameterType="java.util.Map" resultType="com.example.projectdemo.domain.employees.dto.EmployeesDTO">
         SELECT

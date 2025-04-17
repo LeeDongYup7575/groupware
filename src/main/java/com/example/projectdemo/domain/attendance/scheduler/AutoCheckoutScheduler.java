@@ -54,18 +54,25 @@ public class AutoCheckoutScheduler {
         }
 
         try {
-            // 전체 직원 ID 목록 가져오기
             List<Integer> allEmployeeIds = employeesMapper.findAllEmployeeIds();
 
             for (Integer empId : allEmployeeIds) {
-                // 오늘의 출근 기록 조회
                 List<Attendance> todayRecords = attendanceMapper.getAttendanceListByEmployeeAndDate(empId, today);
 
                 boolean hasCheckIn = todayRecords.stream().anyMatch(a -> a.getCheckIn() != null);
-                boolean hasCheckOut = todayRecords.stream().anyMatch(a -> a.getCheckOut() != null);
+                boolean hasCheckOutOrLeftEarly = todayRecords.stream().anyMatch(a ->
+                        a.getCheckOut() != null ||
+                                a.getStatus().equals(AttendanceStatus.EARLY_LEAVE.getStatus())
+                );
 
-                if (hasCheckIn && !hasCheckOut) {
-                    // 출근은 했지만 퇴근 안 한 경우 → 퇴근 기록 insert
+                if (hasCheckIn && hasCheckOutOrLeftEarly) {
+                    // 출근했고 이미 퇴근 또는 조퇴 처리된 경우 → 스킵
+                    log.debug("이미 퇴근 또는 조퇴 상태. 자동 퇴근 스킵: ID={}", empId);
+                    continue;
+                }
+
+                if (hasCheckIn) {
+                    // 출근은 했지만 퇴근 안 한 경우 → 자동 퇴근 처리
                     Attendance checkInRecord = todayRecords.stream()
                             .filter(a -> a.getCheckIn() != null)
                             .findFirst()
@@ -86,16 +93,14 @@ public class AutoCheckoutScheduler {
                         attendanceMapper.insertAttendance(checkoutRecord);
                         employeesMapper.updateAttendStatus(empId, AttendanceStatus.CHECKOUT.getStatus());
 
-                        log.debug("자동 퇴근 insert 완료: ID={}, 시간={}", empId, checkoutTime);
+                        log.debug("자동 퇴근 처리 완료: ID={}, 시간={}", empId, checkoutTime);
                     }
-                }
-
-                if (!hasCheckIn) {
-                    // 출근 기록 없음 → 결근 insert
+                } else {
+                    // 출근 기록 없음 → 결근 처리
                     Attendance absentRecord = Attendance.builder()
                             .empId(empId)
                             .workDate(today)
-                            .status(AttendanceStatus.ABSENT.getStatus()) // "결근"
+                            .status(AttendanceStatus.ABSENT.getStatus())
                             .workHours(BigDecimal.ZERO)
                             .build();
 
@@ -108,9 +113,8 @@ public class AutoCheckoutScheduler {
 
             log.info("자동 퇴근/결근 처리 완료");
         } catch (Exception e) {
-            log.error("자동 퇴근 처리 오류", e);
+            log.error("자동 퇴근 처리 중 오류 발생", e);
             throw e;
         }
     }
-
 }
