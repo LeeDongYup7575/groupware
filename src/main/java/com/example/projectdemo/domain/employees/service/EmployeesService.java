@@ -339,9 +339,15 @@ public class EmployeesService {
     /**
      * 마이페이지 사용자 정보(프로필이미지, 전화번호, 개인이메일) 업데이트
      */
+    @Transactional
     public void updateEmpInfo(String empNum, String phone, String email, String profileImgUrl){
         EmployeesInfoUpdateDTO updatedEmp = new EmployeesInfoUpdateDTO(empNum, phone, email, profileImgUrl);
         employeeMapper.updateEmpInfo(updatedEmp);
+
+        // roundcube 공유 주소록 업데이트
+        EmployeesDTO employee = employeeMapper.findByEmpNum(empNum);
+        enrichEmployeeData(employee);
+        contactService.updateSharedAddressBook(employee);
     }
 
     /**
@@ -401,6 +407,10 @@ public class EmployeesService {
             if (result <= 0) {
                 throw new RuntimeException("직원 정보 업데이트에 실패했습니다.");
             }
+
+            // roundcube 공유 주소록 업데이트
+            enrichEmployeeData(employeeDTO);
+            contactService.updateSharedAddressBook(employeeDTO);
 
             // 업데이트된 정보 반환
             return findById(employeeDTO.getId());

@@ -239,10 +239,22 @@
           left: 'prev,next today',
           center: 'title',
           right: 'dayGridMonth,listMonth'
-        },eventSources: [{
+        },eventSources: [
+                {
           googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
           className: 'korean-holiday'
-        }],
+        },
+          {
+            events: [
+              {
+                title: '회사창립일 🎉',
+                start: '2025-04-24', // 원하는 날짜 (YYYY-MM-DD)
+                allDay: true,
+                className: 'company-anniversary' // 원하는 스타일을 위해 클래스 추가 가능
+              }
+            ]
+          }
+        ],
 
         eventClick: function(info) {
           info.jsEvent.preventDefault();

@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     loadTabContent(tab); // 탭에 맞는 내용 로드
-
 });
 
 function loadTabContent(tabName) {
@@ -692,4 +691,9 @@ function setupCommentDelete() {
             })
             .catch(() => alert('오류 발생'));
     });
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('mypageSidebar');
+    sidebar.classList.toggle('open');
 }
