@@ -40,10 +40,18 @@
             <div class="menu-item" id="wait">
                 <i class="fas fa-spinner"></i>
                 대기
+                <div class="wait-count"
+                     th:if="${waitCount > 0}"
+                     th:text="'[' + ${waitCount} + ']'"
+                     style="color: red; margin-left: 3px;"></div>
             </div>
-            <div class="menu-item active" id="expected">
+            <div class="menu-item" id="expected">
                 <i class="fas fa-clock"></i>
                 예정
+                <div class="expected-count"
+                     th:if="${expectedCount > 0}"
+                     th:text="'[' + ${expectedCount} + ']'"
+                     style="color: red; margin-left: 3px;">(2)</div>
             </div>
         </div>
     </div>
@@ -84,6 +92,9 @@
             <option value="나의 문서함 (승인)">나의 문서함 (승인)</option>
             <option value="나의 문서함 (반려)">나의 문서함 (반려)</option>
         </select>
+        <button class="responsive-create-button" id="responsive-button">
+            작성하기
+        </button>
     </div>
     <table class="document-table">
         <thead>
@@ -158,6 +169,9 @@
         location.href = "/edsmForm/input";
     });
 
+    $("#responsive-button").on("click", function() {
+        location.href = "/edsmForm/input";
+    });
     // 나의 문서함
     // 기안 버튼
     $("#myWritten").on("click", function () {

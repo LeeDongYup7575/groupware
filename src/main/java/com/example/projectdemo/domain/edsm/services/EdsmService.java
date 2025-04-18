@@ -175,8 +175,16 @@ public class EdsmService {
     }
 
 
+    //결재 대기 문서 갯수 조회
+    public int selectByWaitCount(String empNum) {
+        return edao.selectByWaitCount(empNum);
+    }
 
 
+    //결재 예정 문서 갯수 조회
+    public int selectByExpectedCount(String empNum) {
+        return edao.selectByExpectedCount(empNum);
+    }
 
 
 

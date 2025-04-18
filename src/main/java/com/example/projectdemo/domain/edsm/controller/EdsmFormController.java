@@ -3,6 +3,7 @@ package com.example.projectdemo.domain.edsm.controller;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
 import com.example.projectdemo.domain.edsm.services.EdsmFormService;
+import com.example.projectdemo.domain.edsm.services.EdsmService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
@@ -41,6 +42,8 @@ public class EdsmFormController {
     @Autowired
     private EdsmFormService edsmFormService;
 
+    @Autowired
+    private EdsmService edsmService;
     /**
      * 유효한 직원 정보를 확인하고 모델에 추가하는 공통 메서드
      * @param model 모델 객체
@@ -91,6 +94,13 @@ public class EdsmFormController {
         if (redirectPath != null) {
             return redirectPath;
         }
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
 
         return "edsm/input";
     }
@@ -108,7 +118,13 @@ public class EdsmFormController {
         if (documentType == null) {
             documentType = "1001"; // 업무연락에 해당하는 값
         }
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         prepareFormCommonData(model, documentType);
 
         return "edsm/edsmForm/businessContact";
@@ -127,7 +143,13 @@ public class EdsmFormController {
         if (documentType == null) {
             documentType = "1002"; // 지출결의서에 해당하는 값
         }
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         prepareFormCommonData(model, documentType);
 
         return "edsm/edsmForm/cashDisbuVoucher";
@@ -146,7 +168,13 @@ public class EdsmFormController {
         if (documentType == null) {
             documentType = "1003"; // 품의서에 해당하는 값
         }
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         prepareFormCommonData(model, documentType);
 
         return "edsm/edsmForm/letterOfApproval";
