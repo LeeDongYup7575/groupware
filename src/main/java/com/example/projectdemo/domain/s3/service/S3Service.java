@@ -59,21 +59,18 @@ public class S3Service {
     }
 
     private String generateUniqueFileName(MultipartFile file) {
-        // Extract file extension
         String originalFileName = file.getOriginalFilename();
         String extension = "";
         if (originalFileName != null && originalFileName.contains(".")) {
             extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         }
 
-        // Generate UUID + timestamp to ensure uniqueness
         return UUID.randomUUID().toString() + "_" + System.currentTimeMillis() + extension;
     }
 
-    // Optional: Add a method to delete files if needed
+
     public void deleteFile(String fileUrl) {
         try {
-            // Extract key from URL
             String key = fileUrl;
             if (fileUrl.contains(bucketName)) {
                 key = fileUrl.substring(fileUrl.indexOf(bucketName) + bucketName.length() + 1);
