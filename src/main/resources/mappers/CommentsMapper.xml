@@ -53,6 +53,14 @@
         ORDER BY c.created_at ASC
     </select>
 
+    <!-- 게시글 ID별 댓글 수 조회 -->
+    <select id="countByPostId" resultType="int">
+        SELECT COUNT(*)
+        FROM comments
+        WHERE post_id = #{postId}
+          AND is_deleted = 0
+    </select>
+
     <!-- 댓글 수정 -->
     <update id="updateComments" parameterType="com.example.projectdemo.domain.board.entity.Comments">
         UPDATE comments
@@ -82,6 +90,7 @@
         ORDER BY comments.created_at DESC
     </select>
 
+    <!--  다중 댓글 삭제 (논리적 삭제)  -->
     <update id="deleteByIds">
         UPDATE comments
         SET is_deleted = 1

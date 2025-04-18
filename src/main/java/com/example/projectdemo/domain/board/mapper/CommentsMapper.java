@@ -23,6 +23,9 @@ public interface CommentsMapper {
     // 부모 댓글의 모든 대댓글 조회
     List<Comments> findByParentId(@Param("parentId") int parentId);
 
+    // 게시글 ID별 댓글 수 조회
+    int countByPostId(int postId);
+
     // 댓글 수정
     int updateComments(Comments comment);
 

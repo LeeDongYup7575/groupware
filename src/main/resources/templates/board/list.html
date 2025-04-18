@@ -8,7 +8,8 @@
         ~{::script}
       )}">
 <head>
-    <link th:remove="all"></link>
+    <title>게시판 목록</title>
+    <link th:remove="all">
     <style>
         /* 페이지별 추가 스타일 */
         /* 페이지별 추가 스타일 */
@@ -32,7 +33,13 @@
             <tbody>
             <tr th:each="post : ${posts}">
                 <td th:text="${post.id}">1</td>
-                <td><a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a></td>
+                <td>
+                    <a th:href="@{/board/post/{id}(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
+                    <span class="comment-count" th:if="${post.commentCount > 0}"
+                          th:text="'[' + ${post.commentCount} + ']'"></span>
+                    <!-- NEW 표시 -->
+                    <span class="new-badge" th:if="${post.newPost}">NEW</span>
+                </td>
                 <td th:text="${post.author}">작성자</td>
                 <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
                 <td th:text="${post.views}">조회수</td>

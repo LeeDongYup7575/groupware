@@ -291,13 +291,9 @@ public class BoardController {
         post.setBoardId(existingPost.getBoardId());
 
         // 게시글 수정
-        boolean updated = postsService.updatePost(post);
+        postsService.updatePost(post);
 
-        if (updated) {
-            return "redirect:/board/post/" + id + "?success=true";
-        } else {
-            return "redirect:/board/edit/" + id + "?error=failed";
-        }
+        return "redirect:/board/post/" + id;
     }
 
     // 게시글 삭제

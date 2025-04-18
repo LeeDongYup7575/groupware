@@ -10,6 +10,7 @@
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
     <!-- 사이드바 스타일 포함 -->
     <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sub-sidebar-common.css}">
     <!-- 조직도 스타일 포함-->
     <link rel="stylesheet" href="/assets/css/org/org.css">
 </head>
@@ -107,6 +108,12 @@
                 // 검색어가 없으면 전체 직원 표시
                 document.getElementById('allEmployees').classList.remove('hidden');
                 document.getElementById('deptEmployees').classList.add('hidden');
+
+                // 검색 전 원래 상태로 복원
+                document.querySelectorAll('.dept-name').forEach(d => {
+                    d.classList.remove('active');
+                });
+                document.querySelector('.dept-name[data-dept-id="0"]').classList.add('active');
             }
         });
     });
@@ -134,23 +141,36 @@
                 const departmentList = document.getElementById('departmentList');
                 departmentList.innerHTML = '';
 
+                // 전체 항목 먼저 추가
+                const allItem = document.createElement('div');
+                allItem.className = 'menu-item active';
+                allItem.setAttribute('data-dept-id', '0');
+                allItem.innerHTML = `
+  <i class="fas fa-folder"></i>
+  전체 <span class="dept-count">(${employees.length})</span>
+`;
+                departmentList.appendChild(allItem);
+
                 // 부서 ID 순으로 정렬
                 const deptIds = Object.keys(deptCounts).sort((a, b) => parseInt(a) - parseInt(b));
 
+                // 각 부서 항목 추가
                 deptIds.forEach(deptId => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-            <span class="dept-name" data-dept-id="${deptId}">${deptNames[deptId]} <span class="dept-count">(${deptCounts[deptId]})</span></span>
-          `;
-                    departmentList.appendChild(li);
+                    const menuItem = document.createElement('div');
+                    menuItem.className = 'menu-item dept-name';
+                    menuItem.setAttribute('data-dept-id', deptId);
+                    menuItem.innerHTML = `
+        <i class="fas fa-building"></i>
+        ${deptNames[deptId]} <span class="dept-count">(${deptCounts[deptId]})</span>
+    `;
+                    departmentList.appendChild(menuItem);
 
                     // 부서 클릭 이벤트
-                    const deptName = li.querySelector('.dept-name');
-                    deptName.addEventListener('click', function () {
+                    menuItem.addEventListener('click', function () {
                         const deptId = this.getAttribute('data-dept-id');
 
                         // 활성화 상태 업데이트
-                        document.querySelectorAll('.dept-name').forEach(d => {
+                        document.querySelectorAll('.menu-item').forEach(d => {
                             d.classList.remove('active');
                         });
                         this.classList.add('active');
@@ -158,6 +178,17 @@
                         // 부서별 직원 표시
                         loadDepartmentEmployees(deptId);
                     });
+                });
+
+                // 전체 항목 클릭 이벤트
+                allItem.addEventListener('click', function () {
+                    document.querySelectorAll('.menu-item').forEach(d => {
+                        d.classList.remove('active');
+                    });
+                    this.classList.add('active');
+
+                    document.getElementById('allEmployees').classList.remove('hidden');
+                    document.getElementById('deptEmployees').classList.add('hidden');
                 });
 
                 // 전체 직원 수 업데이트

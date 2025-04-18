@@ -25,4 +25,8 @@ public class PostsDTO {
     private String author;
     // 게시판 이름 필드 추가
     private String boardName;
+    // 댓글 수 필드 추가
+    private int commentCount;
+    //새 게시글 여부를 판단하는 필드 추가
+    private boolean newPost;
 }
