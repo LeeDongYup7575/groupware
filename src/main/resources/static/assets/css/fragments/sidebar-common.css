@@ -1,20 +1,30 @@
-
-/* 사이드바 */
 :root {
+    /* 기본 색상 유지 */
     --primary-color: #0183D4;
     --primary-light: #DDF6FF;
     --primary-dark: #0066a8;
-    --secondary-color: #f3f4f6;
-    --sidebar-bg: #f3f7fb;
-    --sidebar-hover: #e8f0f8;
-    --sidebar-active: #e1ebf5;
-    --sidebar-active-border: #0078d4;
-    --text-color: #1f2937;
-    --text-light: #6b7280;
-    --text-primary: #333;
-    --text-secondary: #666;
+
+    /* 글래스모피즘 개선을 위한 색상 조정 */
+    --sidebar-bg: rgba(255, 255, 255, 0.15);
+    --sidebar-hover: rgba(255, 255, 255, 0.25);
+    --sidebar-active: rgba(255, 255, 255, 0.3);
+    --sidebar-active-border: #0183D4;
+
+    /* 텍스트 색상 개선 */
+    --text-color: #2d3748;
+    --text-light: #718096;
+    --text-primary: #2c3e50;
+    --text-secondary: #64748b;
+
+    /* 사이즈 유지 */
     --sidebar-width: 250px;
     --header-height: 80px;
+
+    /* 새로운 요소를 위한 변수 */
+    --sidebar-border-radius: 0 20px 20px 0;
+    --menu-item-border-radius: 12px;
+    --transition-speed: 0.3s;
+    --icon-size: 20px;
 }
 
 .sidebar {
@@ -26,13 +36,30 @@
     height: 100vh;
     overflow-y: auto;
     padding-top: var(--header-height);
-    transition: transform 0.3s ease;
+    transition: all var(--transition-speed) ease;
     z-index: 990;
-    border-right: 1px solid #e5e5e5;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border-radius: var(--sidebar-border-radius);
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
 }
 
 .sidebar-menu {
-    padding: 20px 0;
+    padding: 15px 10px;
 }
 
 .sidebar-menu ul {
@@ -42,74 +69,125 @@
 }
 
 .sidebar-menu li {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    position: relative;
 }
 
 .sidebar-menu a {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
+    padding: 14px 18px;
     color: var(--text-color);
     text-decoration: none;
     font-size: 14px;
-    transition: background-color 0.3s;
+    font-weight: 500;
+    transition: all var(--transition-speed);
     cursor: pointer;
+    border-radius: var(--menu-item-border-radius);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.sidebar-menu a:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, var(--sidebar-hover), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+    z-index: -1;
+}
+
+.sidebar-menu a:hover:before {
+    transform: translateX(100%);
 }
 
 .sidebar-menu a:hover {
     background-color: var(--sidebar-hover);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(1, 131, 212, 0.1);
 }
 
 .sidebar-menu li.active a {
     background-color: var(--sidebar-active);
     border-left: 4px solid var(--sidebar-active-border);
-    padding-left: 16px;
-    color: var(--sidebar-active-border);
-    font-weight: 500;
+    padding-left: 14px;
+    color: var(--primary-color);
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(1, 131, 212, 0.2);
 }
 
 .sidebar-menu li:not(.active) a {
     border-left: 4px solid transparent;
-    padding-left: 16px;
+    padding-left: 14px;
 }
 
 .sidebar-icon {
-    margin-right: 10px;
-    font-size: 18px;
-    display: inline-block;
+    margin-right: 12px;
+    font-size: var(--icon-size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 24px;
+    height: 24px;
     text-align: center;
+    transition: transform var(--transition-speed);
+}
+
+.sidebar-menu a:hover .sidebar-icon {
+    transform: scale(1.2);
+    color: var(--primary-color);
 }
 
 .sidebar-toggle {
     display: none;
     position: fixed;
-    top: 10px;
-    left: 10px;
-    width: 40px;
-    height: 40px;
-    background-color: white;
-    border: 1px solid #eee;
-    border-radius: 4px;
+    top: 15px;
+    left: 15px;
+    width: 45px;
+    height: 45px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 12px;
     cursor: pointer;
     z-index: 1000;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     color: var(--text-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all var(--transition-speed);
+}
+
+.sidebar-toggle:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-color);
+    transform: rotate(90deg);
 }
 
 .sidebar-menu li .submenu {
     display: none;
     padding-left: 25px;
-
+    margin-top: 5px;
 }
 
 .sidebar-menu li .submenu.active,
 .sidebar-menu li .submenu.open {
     display: block;
+    animation: fadeIn 0.3s ease;
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 /* 반응형 스타일 */
 @media (max-width: 1200px) {
@@ -130,6 +208,41 @@
     }
 }
 
-.sidebar-menu i{
-    color: #4a5568;
+.sidebar-menu i {
+    color: var(--text-light);
+    transition: all var(--transition-speed);
+}
+
+.sidebar-menu a:hover i {
+    color: var(--primary-color);
+}
+
+/* 액티브 메뉴 아이콘 색상 */
+.sidebar-menu li.active i {
+    color: var(--primary-color);
+}
+
+/* 사이드바 상단 및 하단 그라데이션 효과 */
+.sidebar:after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100px;
+    background: linear-gradient(to top, var(--sidebar-bg), transparent);
+    pointer-events: none;
+    z-index: 991;
+}
+
+.sidebar:before {
+    content: '';
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: var(--sidebar-width);
+    height: 40px;
+    background: linear-gradient(to bottom, var(--sidebar-bg), transparent);
+    pointer-events: none;
+    z-index: 991;
 }
