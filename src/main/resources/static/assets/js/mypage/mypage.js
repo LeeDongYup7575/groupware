@@ -49,29 +49,31 @@ function loadTabContent(tabName) {
     // 클릭한 요소에 active 클래스 추가
     document.getElementById(tabName).classList.add('active');
 
-    // 탭 내용 가져오기
-    fetch(`/api/mypage/${tabName}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('mainSection').innerHTML = generateContent(tabName, data);
+    if (tabName === 'activities') {
+        // 데이터 요청 없이 직접 렌더링
+        document.getElementById('mainSection').innerHTML = generateContent('activities', null);
 
-            if (tabName === 'activities') {
-                const urlParams = new URLSearchParams(window.location.search);
-                let menu = urlParams.get('menu') || 'mypost'; // 기본값: 'mypost'
-                loadMenuContent(menu); // menu 로드
-            }
+        // 메뉴 초기 로드
+        const menu = new URLSearchParams(window.location.search).get('menu') || 'mypost';
+        loadMenuContent(menu);
 
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-
-    // URL 업데이트
-    if (tabName === "activities") {
-        const currentMenu = new URLSearchParams(window.location.search).get('menu') || 'mypost';
-        window.history.pushState({}, '', `?tab=${tabName}&menu=${currentMenu}`);
+        // URL 갱신
+        window.history.pushState({}, '', `?tab=activities&menu=${menu}`);
     } else {
-        window.history.pushState({}, '', `?tab=${tabName}`);
+        // 다른 탭은 서버에서 데이터 요청
+        fetch(`/api/mypage/${tabName}`)
+            .then(response => {
+                if (!response.ok) throw new Error('API 오류');
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('mainSection').innerHTML = generateContent(tabName, data);
+                window.history.pushState({}, '', `?tab=${tabName}`);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                alert('탭 데이터를 불러오는 중 오류가 발생했습니다.');
+            });
     }
 
     // 사이드바 닫기
@@ -200,7 +202,7 @@ function generateContent(contentName, data) {
     
     <div class="table-container" id="tableContainer">
 
-    </div class="table-container">      
+    </div>      
 `;
 
     } else if (contentName === 'security') {
