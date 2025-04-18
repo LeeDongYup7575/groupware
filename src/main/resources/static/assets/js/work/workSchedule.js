@@ -51,7 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     allDay: item.end && !item.start.includes('T'),
                                     extendedProps: {
                                         type: item.type || 'normal',
-                                        description: item.description
+                                        description: item.description,
+                                        originalEnd: item.end // 원래 종료일 저장
                                     }
                                 };
 
@@ -61,13 +62,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                     event.backgroundColor = item.color || '#edd67a';
                                     event.textColor = '#fff';
                                     event.allDay = true;
-
-                                    // 날짜 포맷 확인해서 endDate 하루 더하기
-                                    const endDate = new Date(item.end);
-                                    endDate.setDate(endDate.getDate() + 1);
-                                    event.end = endDate.toISOString().split('T')[0]; // YYYY-MM-DD 형태로
-
                                     event.extendedProps.type = 'leave';
+
+                                    // FullCalendar는 allDay 이벤트의 end date를 자동으로 다음날로 처리하므로
+                                    // 별도로 조정할 필요가 없습니다.
                                 }
                                 else if (item.type === 'overtime' || item.title.includes('연장 근무')) {
                                     event.title = '⏱️ ' + item.title;
@@ -130,21 +128,27 @@ document.addEventListener('DOMContentLoaded', function () {
             // 이벤트 유형에 따른 모달 내용 설정
             if (extendedProps.type === 'leave') {
                 // 휴가 이벤트
-                if (start && end) {
+                if (start) {
                     const formattedStart = start.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-                    let formattedEnd = '';
 
-                    if (end.getDate() !== start.getDate() || end.getMonth() !== start.getMonth() || end.getFullYear() !== start.getFullYear()) {
-                        formattedEnd = end.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
-                        modalTime.innerHTML = `<i class="fas fa-calendar-alt"></i> 기간: ${formattedStart} ~ ${formattedEnd}`;
+                    // end가 있고 start와 다른 경우에만 범위로 표시
+                    if (end && end.getTime() > start.getTime()) {
+                        // 종일 이벤트의 end는 exclusive이므로 하루를 빼서 표시해야 함
+                        const adjustedEnd = new Date(end);
+                        adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+                        const formattedEnd = adjustedEnd.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                        // start와 조정된 end가 같다면 하루짜리 휴가
+                        if (start.toDateString() === adjustedEnd.toDateString()) {
+                            modalTime.innerHTML = `<i class="fas fa-calendar-day"></i> 날짜: ${formattedStart}`;
+                        } else {
+                            modalTime.innerHTML = `<i class="fas fa-calendar-alt"></i> 기간: ${formattedStart} ~ ${formattedEnd}`;
+                        }
                     } else {
+                        // 하루짜리 휴가인 경우
                         modalTime.innerHTML = `<i class="fas fa-calendar-day"></i> 날짜: ${formattedStart}`;
                     }
                 }
-
-                // if (extendedProps.description) {
-                //     modalReason.innerHTML = `<i class="fas fa-comment"></i> ${extendedProps.description}`;
-                // }
             } else if (extendedProps.type === 'overtime') {
                 // 연장 근무 이벤트
                 if (start && end) {

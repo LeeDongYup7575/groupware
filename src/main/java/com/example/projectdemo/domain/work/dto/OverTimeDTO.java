@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 public class OverTimeDTO {
     private int id;
-    private String empId;
+    private int empId;
     private int edsmDocId;
     private String workDate;
     private String startTime;
