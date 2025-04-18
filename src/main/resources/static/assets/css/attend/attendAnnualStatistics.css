@@ -139,7 +139,7 @@ body {
     overflow: hidden;
     transition: max-height 0.3s ease;
     list-style: none;
-    background-color: #e6eef8; /* Lighter blue for submenu */
+    background-color: #f5f5f5; /* Lighter blue for submenu */
 }
 
 .dropdown.open .submenu {
