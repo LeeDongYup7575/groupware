@@ -5,6 +5,7 @@ import com.example.projectdemo.domain.board.dto.AttachmentsDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
 import com.example.projectdemo.domain.board.service.AttachmentsService;
 import com.example.projectdemo.domain.board.service.PostsService;
+import com.example.projectdemo.domain.s3.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ public class PostApiController {
 
     @Value("${board.image.upload-dir}")
     private String boardImageUploadDir;
+
+    @Autowired
+    private S3Service s3Service;
 
 
 

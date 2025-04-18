@@ -1,6 +1,7 @@
 package com.example.projectdemo.domain.mypage.controller;
 
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
+import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
 import com.example.projectdemo.domain.board.mapper.PostsMapper;
 import com.example.projectdemo.domain.board.service.CommentsService;
@@ -9,7 +10,6 @@ import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.mapper.EmployeesMapper;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.mypage.dto.MyCommentDTO;
-import com.example.projectdemo.domain.s3.service.ProfileUploadService;
 import com.example.projectdemo.domain.s3.service.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
