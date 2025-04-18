@@ -144,4 +144,12 @@
             #{id}
         </foreach>
     </delete>
+
+    <!-- 조회수 증가 -->
+    <update id="incrementViewCount">
+        UPDATE posts
+        SET views = views + 1
+        WHERE id = #{postId}
+    </update>
+
 </mapper>

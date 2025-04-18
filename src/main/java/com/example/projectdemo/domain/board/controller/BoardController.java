@@ -15,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,9 +79,9 @@ public class BoardController {
 
     // 게시글 상세 보기
     @GetMapping("/post/{id}")
-    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model, Principal principal) {
+    public String viewPost(@PathVariable Integer id, HttpServletRequest request, Model model) {
 
-        int empId = (int)request.getAttribute("id");
+        int empId = (int) request.getAttribute("id");
 
         // 게시글 정보 가져오기
         PostsDTO post = postsService.getPostById(id);
@@ -92,6 +91,11 @@ public class BoardController {
         if (!boardsService.hasAccess(empId, board.getId())) {
             return "board/integrated-list";
         }
+
+        postsService.incrementViewCount(id);
+
+        // 증가된 조회수가 반영된 게시글 정보를 다시 가져옴
+        post = postsService.getPostById(id);
 
         // 첨부파일 목록 가져오기
         List<AttachmentsDTO> attachments = attachmentsService.selectAttachmentsByPostId(id);
@@ -135,8 +139,7 @@ public class BoardController {
     @PostMapping("/create")
     public String createBoard(BoardsDTO requestDTO,
                               HttpServletRequest request,
-                              RedirectAttributes redirectAttributes,
-                              Model model) {
+                              RedirectAttributes redirectAttributes) {
 
         // isActive 값 확인 및 설정
         String isActiveParam = request.getParameter("isActive");
@@ -226,7 +229,7 @@ public class BoardController {
 
     //게시판 관리
     @GetMapping("/manage")
-    public String manageBoards(HttpServletRequest request, Model model) {
+    public String manageBoards(Model model) {
 
         // 모든 게시판 정보 가져오기
         List<BoardsDTO> allBoards = boardsService.getAllBoards();
