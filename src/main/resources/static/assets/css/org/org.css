@@ -14,6 +14,13 @@ body {
     background-color: #f8f9fa;
 }
 
+/* 기본 스타일 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+
 /*공통 CSS*/
 .main-container {
     display: flex;
@@ -306,8 +313,30 @@ body {
 }
 
 @media (max-width: 768px) {
+    /* 헤더 수정을 위한 추가 스타일 */
+    body {
+        overflow-x: hidden; /* 가로 스크롤 방지 */
+        width: 100%;
+        position: relative;
+    }
+
+    .gw-navbar .gw-container {
+        max-width: 100%;
+        padding: 0 10px; /* 좌우 패딩 줄임 */
+        box-sizing: border-box;
+    }
+
+    /* 토글 버튼 위치 조정 */
+    .gw-navbar-toggle-label {
+        position: relative;
+        right: 0;
+    }
+
     .main-content {
-        padding: calc(var(--header-height) + 2rem) 1rem 1rem;
+        margin-left: 0;
+        margin-right: 0;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     .employee-grid {
