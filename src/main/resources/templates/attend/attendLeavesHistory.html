@@ -114,11 +114,11 @@
             <tr th:if="${leavesList.isEmpty()}">
                 <td colspan="6" class="no-data">데이터가 없습니다.</td>
             </tr>
-            <tr th:each="leave : ${leavesList}">
+            <tr th:each="leave, iterStat : ${leavesList}">
                 <td th:text="${leave.id}">1</td>
                 <td th:text="${employee.name}">신청자</td>
                 <td th:text="${leave.leaveType}">휴가 종류</td>
-                <td th:text="${leave.leaveType == '반차' ? 0.5 : (leave.leaveType == '연차' ? 1 : 0)}">휴가일수</td>
+                <td th:text="${leaveDaysList[iterStat.index]}">휴가일수</td>
                 <td th:text="${leave.startDate} + ' ~ ' + ${leave.endDate}">기간</td>
                 <td th:text="${leave.status}">상태</td>
             </tr>

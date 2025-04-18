@@ -104,7 +104,6 @@ public class LeaveController {
     public String leavesHistory(@RequestParam(value = "year", required = false) Integer year,
                                 Model model, HttpServletRequest request) {
 
-
         int empId = (int) request.getAttribute("id");
         String drafterId = (String) request.getAttribute("empNum");
 
@@ -117,17 +116,16 @@ public class LeaveController {
         BigDecimal usedLeave = employee.getUsedLeave() != null ? employee.getUsedLeave() : BigDecimal.ZERO;
         BigDecimal canUseLeaves = totalLeave.subtract(usedLeave);
 
-
         LocalDate now = LocalDate.now();
         int currentYear = (year != null) ? year : now.getYear();
 
         // 연차 생성 내역 조회
-        List<LeaveGrantsDTO> allLeavesGrantList = leavesService.getLeaveGrantsByYear(empId,currentYear);
+        List<LeaveGrantsDTO> allLeavesGrantList = leavesService.getLeaveGrantsByYear(empId, currentYear);
 
-        // ✅ 연차 내역 전체 조회
+        // 연차 내역 전체 조회
         List<LeavesDTO> allLeavesList = leavesService.selectAllLeaves(empId);
 
-        // ✅ 해당 연도 필터링
+        // 해당 연도 필터링
         List<LeavesDTO> leavesList = allLeavesList.stream()
                 .filter(leave -> {
                     LocalDate startDate = LocalDate.parse(leave.getStartDate());
@@ -135,22 +133,37 @@ public class LeaveController {
                 })
                 .collect(Collectors.toList());
 
-        // ✅ 각 연차의 edsm status 값 조회 후 세팅
+        // 휴가 상태 및 일수 계산
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<Double> leaveDaysList = new ArrayList<>();
+
         for (LeavesDTO leave : leavesList) {
             int edsmDocId = leave.getEdsmDocId();
             String status = leavesService.selectByStatus(drafterId, edsmDocId);
-            leave.setStatus(status); // 해당 leave 객체에 상태 설정
+            leave.setStatus(status);
             leavesService.updateLeaveStatus(leave.getId(), status);
+
+            double leaveDays = 0;
+            if ("반차".equals(leave.getLeaveType())) {
+                leaveDays = 0.5;
+            } else {
+                LocalDate start = LocalDate.parse(leave.getStartDate(), formatter);
+                LocalDate end = LocalDate.parse(leave.getEndDate(), formatter);
+                leaveDays = ChronoUnit.DAYS.between(start, end) + 1;
+            }
+            leaveDaysList.add(leaveDays);
         }
 
         model.addAttribute("allLeavesGrantList", allLeavesGrantList);
         model.addAttribute("leavesList", leavesList);
+        model.addAttribute("leaveDaysList", leaveDaysList); // 💡 휴가일수 리스트 따로 전달
         model.addAttribute("employee", employee);
         model.addAttribute("canUseLeaves", canUseLeaves);
         model.addAttribute("selectedYear", currentYear);
 
         return "attend/attendLeavesHistory";
     }
+
 
 
 
