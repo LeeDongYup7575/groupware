@@ -14,6 +14,13 @@ body {
     background-color: #f8f9fa;
 }
 
+/* 기본 스타일 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+
 /*공통 CSS*/
 .main-container {
     display: flex;
@@ -22,12 +29,27 @@ body {
 
 .main-content {
     flex: 1;
-    margin-left: var(--sidebar-width);
-    padding: 2rem;
-    padding-top: calc(var(--header-height) + 4rem);
-    min-height: 100vh;
-    background-color: #fff;
+    margin: 100px 30px 50px calc(var(--sidebar-width) + 30px);
+    padding: 30px;
+    max-width: calc(100vw - var(--sidebar-width));
+    min-height: calc(100vh - var(--header-height));
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: var(--box-shadow);
+    animation: fadeIn 0.6s ease;
 }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 /* 검색창 스타일 */
 .search-container {
@@ -277,11 +299,46 @@ body {
 /* 반응형 스타일 */
 @media (max-width: 1200px) {
     .main-content {
+        max-width: none;
         margin-left: 0;
+        margin-right: 0;
+        border-radius: 0;
+        padding: 25px 20px;
+        box-shadow: none;
+    }
+
+    .search-container input {
+        width: auto;
     }
 }
 
 @media (max-width: 768px) {
+    /* 헤더 수정을 위한 추가 스타일 */
+    body {
+        overflow-x: hidden; /* 가로 스크롤 방지 */
+        width: 100%;
+        position: relative;
+    }
+
+    .gw-navbar .gw-container {
+        max-width: 100%;
+        padding: 0 10px; /* 좌우 패딩 줄임 */
+        box-sizing: border-box;
+    }
+
+    /* 토글 버튼 위치 조정 */
+    .gw-navbar-toggle-label {
+        position: relative;
+        right: 0;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-right: 0;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     .employee-grid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 15px;
@@ -304,7 +361,5 @@ body {
         max-width: 100%;
     }
 
-    .main-content {
-        padding: calc(var(--header-height) + 2rem) 1rem 1rem;
-    }
+
 }

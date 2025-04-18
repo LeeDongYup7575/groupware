@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>조직도</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
@@ -30,31 +30,35 @@
     <!-- 메인 콘텐츠 -->
     <div class="main-content">
 
-        <!-- 검색 기능 -->
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="orgSearchInput" placeholder="이름, 부서, 직급 검색">
-        </div>
+        <div id="contents">
 
-
-        <div class="org-section" id="allEmployees">
-            <h2>
-                전체 <span class="dept-count" id="totalCount">(0)</span>
-            </h2>
-
-            <div id="employeeGrid">
-                <!-- 직원 카드가 동적으로 추가됨 -->
+            <!-- 검색 기능 -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="orgSearchInput" placeholder="이름, 부서, 직급 검색">
             </div>
-        </div>
 
-        <div class="org-section hidden" id="deptEmployees">
-            <h2>
-                <span id="currentDeptName">부서명</span> <span class="dept-count" id="currentDeptCount">(0)</span>
-            </h2>
 
-            <div class="employee-grid" id="deptEmployeeGrid">
-                <!-- 부서별 직원 카드가 여기에 동적으로 추가됨 -->
+            <div class="org-section" id="allEmployees">
+                <h2>
+                    전체 <span class="dept-count" id="totalCount">(0)</span>
+                </h2>
+
+                <div id="employeeGrid">
+                    <!-- 직원 카드가 동적으로 추가됨 -->
+                </div>
             </div>
+
+            <div class="org-section hidden" id="deptEmployees">
+                <h2>
+                    <span id="currentDeptName">부서명</span> <span class="dept-count" id="currentDeptCount">(0)</span>
+                </h2>
+
+                <div class="employee-grid" id="deptEmployeeGrid">
+                    <!-- 부서별 직원 카드가 여기에 동적으로 추가됨 -->
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -146,7 +150,7 @@
                 allItem.className = 'menu-item active';
                 allItem.setAttribute('data-dept-id', '0');
                 allItem.innerHTML = `
-  <i class="fas fa-folder"></i>
+  <i class="fas fa-building"></i>
   전체 <span class="dept-count">(${employees.length})</span>
 `;
                 departmentList.appendChild(allItem);

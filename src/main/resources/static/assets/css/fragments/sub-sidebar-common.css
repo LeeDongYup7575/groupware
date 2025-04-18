@@ -16,16 +16,20 @@
 
 .sidebar {
     width: var(--sidebar-width);
-    background-color: var(--sidebar-bg);
-    padding: 20px 0;
+    padding-top: calc(var(--header-height) + 20px);
     border-right: 1px solid #e5e5e5;
     position: fixed;
-    top: var(--header-height);
+    top: 0;
     left: 0;
-    height: calc(100vh - var(--header-height));
+    height: 100vh;
     overflow-y: auto;
     z-index: 100;
     transition: transform 0.3s ease;
+    border-radius: 0 !important;
+}
+
+.sidebar::before {
+    height: 0;
 }
 
 /* 대표 버튼 (작성하기 등) */
