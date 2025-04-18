@@ -66,6 +66,23 @@ body {
     box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
 }
 
+#responsive-button{
+    background: linear-gradient(135deg, #4a90e2 0%, #2d70c3 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 20px 15px 20px;
+    width: calc(50% - 100px);
+    height: 50px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
 .create-button:hover {
     transform: translateY(-2px);
     background: linear-gradient(135deg, #3a80d2 0%, #1e5fa8 100%);
@@ -645,15 +662,20 @@ body {
     #select{
         display: none;
     }
+
 }
 
 @media (max-width: 768px) {
+
     .main-content {
         padding: 16px;
     }
 
     #select{
         display: block;
+    }
+    #responsive-button {
+        display: flex; /* 작은 화면에서는 flex로 표시 */
     }
 
     .document-type-select {
