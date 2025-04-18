@@ -7,7 +7,7 @@
 <body>
 <!-- 공통 사이드바 스타일 포함 -->
 <th:block th:fragment="sidebarAssets">
-    <link rel="stylesheet" th:href="@{/css/fragments/sidebar-common.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sub-sidebar-common.css}">
 </th:block>
 <script>
     function openChat() {
@@ -28,51 +28,77 @@
 </script>
 <!-- 게시판 사이드바 -->
 <div th:fragment="sidebar" id="sidebar" class="sidebar">
-    <div class="sidebar-menu">
-        <ul>
-            <li><a th:href="@{/board/write}"><span class="sidebar-icon">🖋️</span> 글쓰기</a></li>
-            <li><a th:href="@{/board}"><span class="sidebar-icon">📋</span> 통합 게시판</a></li>
-            <!--            <li><a th:href="@{/board/important}"><span class="sidebar-icon">⭐</span> 중요 게시물</a></li>-->
+    <!-- 글쓰기 버튼 -->
+    <a th:href="@{/board/write}" class="create-button">
+        <i class="fas fa-plus"></i>
+        글쓰기
+    </a>
 
-            <!-- 전사 게시판 그룹 (is_global = 1) -->
-            <li class="toggle-menu">
-                <a href="javascript:void(0)">
-                    <span class="sidebar-icon">📢</span> 전사 게시판 &nbsp;
-                    <i class="fas fa-chevron-down"></i>
+    <!-- 통합 게시판 메뉴 아이템 -->
+    <div class="menu-section">
+        <div class="menu-items">
+            <div class="menu-item">
+                <a th:href="@{/board}">
+                    <i class="fas fa-list"></i>
+                    통합 게시판
                 </a>
-                <ul id="all-menu" class="submenu open">
-                    <li th:each="board : ${accessibleBoards}" th:if="${board.isActive && board.isGlobal}">
-                        <a th:href="@{/board/{id}(id=${board.id})}">
-                            <span class="sidebar-icon">📄</span>
-                            <span th:text="${board.name}">게시판명</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            </div>
+        </div>
+    </div>
 
-            <!-- 그룹 게시판 (is_global = 0) -->
-            <li class="toggle-menu" th:if="${!#lists.isEmpty(accessibleBoards.?[isActive and !isGlobal])}">
-                <a href="javascript:void(0)">
-                    <span class="sidebar-icon">👥</span> 그룹 게시판 &nbsp;
-                    <i class="fas fa-chevron-down"></i>
+    <!-- 전사 게시판 섹션 -->
+    <div class="menu-section">
+        <div class="menu-header">
+            <i class="fas fa-chevron-down"></i>
+            전사 게시판
+            <!--            <i class="fas fa-chevron-down ml-auto"></i>-->
+        </div>
+        <div class="menu-items" id="all-menu">
+            <div class="menu-item" th:each="board : ${accessibleBoards}" th:if="${board.isActive && board.isGlobal}">
+                <a th:href="@{/board/{id}(id=${board.id})}">
+                    <i class="fas fa-file-alt"></i>
+                    <span th:text="${board.name}">게시판명</span>
                 </a>
-                <ul id="group-menu" class="submenu open">
-                    <li th:each="board : ${accessibleBoards}" th:if="${board.isActive && !board.isGlobal}">
-                        <a th:href="@{/board/{id}(id=${board.id})}">
-                            <span class="sidebar-icon">📁</span>
-                            <span th:text="${board.name}">게시판명</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            </div>
+        </div>
+    </div>
 
+    <!-- 그룹 게시판 섹션 -->
+    <div class="menu-section" th:if="${!#lists.isEmpty(accessibleBoards.?[isActive and !isGlobal])}">
+        <div class="menu-header">
+            <i class="fas fa-chevron-down"></i>
+            그룹 게시판
+            <!--            <i class="fas fa-chevron-down ml-auto"></i>-->
+        </div>
+        <div class="menu-items" id="group-menu">
+            <div class="menu-item" th:each="board : ${accessibleBoards}" th:if="${board.isActive && !board.isGlobal}">
+                <a th:href="@{/board/{id}(id=${board.id})}">
+                    <i class="fas fa-folder"></i>
+                    <span th:text="${board.name}">게시판명</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
-
-            <li><a th:href="@{/board/create}"><span class="sidebar-icon">➕</span> 게시판 만들기</a></li>
-            <li><a th:href="@{/board/manage}"><span class="sidebar-icon">🛠 </span> 게시판 관리</a></li>
-        </ul>
+    <!-- 게시판 관리 메뉴 -->
+    <div class="menu-section">
+        <div class="menu-items">
+            <div class="menu-item">
+                <a th:href="@{/board/create}">
+                    <i class="fas fa-plus-circle"></i>
+                    게시판 만들기
+                </a>
+            </div>
+            <div class="menu-item">
+                <a th:href="@{/board/manage}">
+                    <i class="fas fa-cog"></i>
+                    게시판 관리
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
 
 <!-- 공통 사이드바 스크립트 포함 -->
 <th:block th:fragment="sidebarScripts">

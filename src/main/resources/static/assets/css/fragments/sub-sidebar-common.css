@@ -44,6 +44,7 @@
     font-weight: 500;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+    text-decoration: none;
 }
 
 .create-button:hover {
@@ -96,6 +97,11 @@
     cursor: pointer;
     transition: all 0.2s;
     border-left: 3px solid transparent;
+    text-decoration: none;
+}
+
+.menu-item a {
+    color: var(--text-light);
     text-decoration: none;
 }
 
