@@ -128,7 +128,7 @@ public class WorkController {
     @PostMapping("/submitOverTime")
     public String submitOvertime(
             @RequestParam("drafterId") String drafterId,
-            @RequestParam("empId") String empId,
+            @RequestParam("empId") int empId,
             @RequestParam("workDate") String workDate,
             @RequestParam("startHour") String startHour,
             @RequestParam("startMinute") String startMinute,
