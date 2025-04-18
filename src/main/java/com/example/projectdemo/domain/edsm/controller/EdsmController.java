@@ -70,6 +70,14 @@ public class EdsmController {
         List<EdsmDocumentDTO> allLeavesDocument = edsmService.selectByAllLeavesDocument(empNum);
         List<EdsmDocumentDTO> allOvertimeDocument = edsmService.selectByAllOvertimeDocument(empNum);
 
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
+
+
         // 모델에 데이터 추가
         model.addAttribute("allDocumentList", allDocument);
         model.addAttribute("allBusinessDocument", allBusinessDocument);
@@ -91,6 +99,12 @@ public class EdsmController {
 
         String empNum = (String) request.getAttribute("empNum");
         model.addAttribute("wait", "대기");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
 
         List<EdsmDocumentDTO> waitDocument = edsmService.selectByAllApprovalFromIdWait(empNum);
         model.addAttribute("waitDocumentList", waitDocument);
@@ -109,6 +123,12 @@ public class EdsmController {
         String empNum = (String) request.getAttribute("empNum");
         model.addAttribute("expected", "예정");
 
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         List<EdsmDocumentDTO> expectedDocument = edsmService.selectByAllApprovalFromIdExpected(empNum);
         model.addAttribute("expectedDocumentList", expectedDocument);
 
@@ -125,6 +145,12 @@ public class EdsmController {
 
         String empNum = (String) request.getAttribute("empNum");
 
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         // 각 문서 유형별 기안 문서 조회
         List<EdsmDocumentDTO> myWrittenDocumentBc = edsmService.selectByAllMyWrittenDocumentBc(empNum);
         List<EdsmDocumentDTO> myWrittenDocumentCdv = edsmService.selectByAllMyWrittenDocumentCdv(empNum);
@@ -151,7 +177,12 @@ public class EdsmController {
         }
 
         String empNum = (String) request.getAttribute("empNum");
-
+//결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         // 각 문서 유형별 승인 문서 조회
         List<EdsmDocumentDTO> myApprovalDocumentBc = edsmService.selectByAllMyApprovalDocumentBc(empNum);
         List<EdsmDocumentDTO> myApprovalDocumentCdv = edsmService.selectByAllMyApprovalDocumentCdv(empNum);
@@ -178,7 +209,12 @@ public class EdsmController {
         }
 
         String empNum = (String) request.getAttribute("empNum");
-
+//결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         // 각 문서 유형별 반려 문서 조회
         List<EdsmDocumentDTO> myRejectedDocumentBc = edsmService.selectByAllMyRejectedDocumentBc(empNum);
         List<EdsmDocumentDTO> myRejectedDocumentCdv = edsmService.selectByAllMyRejectedDocumentCdv(empNum);

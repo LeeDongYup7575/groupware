@@ -262,5 +262,13 @@ public List<EdsmDocumentDTO> selectByAllMyRejectedDocumentBc(String empNum) {
 
     }
 
+    //결재 대기 문서 갯수 조회
+    public int selectByWaitCount(String empNum) {
+        return mybatis.selectOne("Edsm.SelectByWaitCount", empNum);
+    }
+    //결재 예정 문서 갯수 조회
+    public int selectByExpectedCount(String empNum) {
+        return mybatis.selectOne("Edsm.SelectByExpectedCount", empNum);
+    }
 
 }

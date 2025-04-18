@@ -4,6 +4,7 @@ import com.example.projectdemo.domain.edsm.dao.EdsmDAO;
 import com.example.projectdemo.domain.edsm.dto.*;
 import com.example.projectdemo.domain.edsm.services.EdsmDetailService;
 import com.example.projectdemo.domain.edsm.services.EdsmFilesService;
+import com.example.projectdemo.domain.edsm.services.EdsmService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
 import com.example.projectdemo.domain.leave.dto.LeavesDTO;
@@ -41,6 +42,8 @@ public class EdsmDetailController {
     @Autowired
     private LeavesService leavesService;
 
+    @Autowired
+    private EdsmService edsmService;
     /**
      * 유효한 직원 정보를 확인하고 모델에 추가하는 공통 메서드
      * @param model 모델 객체
@@ -93,7 +96,13 @@ public class EdsmDetailController {
         }
 
         addCommonDocumentData(model, id);
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         List<EdsmBusinessContactDTO> edsmBusinessContactDTOList = edsmDetailService.getEdsmBusinessContactListFromDocId(id);
         model.addAttribute("edsmBusinessContactDTOList", edsmBusinessContactDTOList);
 
@@ -109,7 +118,13 @@ public class EdsmDetailController {
         }
 
         addCommonDocumentData(model, id);
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         List<EdsmCashDisbuVoucherDTO> edsmCashDisbuVoucherDTOList = edsmDetailService.getEdsmCashDisbuVoucherListFromDocId(id);
         model.addAttribute("edsmCashDisbuVoucherDTOList", edsmCashDisbuVoucherDTOList);
 
@@ -125,7 +140,13 @@ public class EdsmDetailController {
         }
 
         addCommonDocumentData(model, id);
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         List<EdsmLetterOfApprovalDTO> edsmLetterOfApprovalDTOList = edsmDetailService.getEdsmLetterOfApprovalListFromDocId(id);
         model.addAttribute("edsmLetterOfApprovalDTOList", edsmLetterOfApprovalDTOList);
 
@@ -141,7 +162,13 @@ public class EdsmDetailController {
         }
 
         addCommonDocumentData(model, id);
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         List<LeavesDTO> leavesList = leavesService.getLeavesDTOListByDocId(id);
         model.addAttribute("leavesList", leavesList);
 
@@ -157,7 +184,13 @@ public class EdsmDetailController {
         }
 
         addCommonDocumentData(model, id);
-
+        String empNum = (String) request.getAttribute("empNum");
+        //결재 대기 갯수 조회
+        int waitCount = edsmService.selectByWaitCount(empNum);
+        model.addAttribute("waitCount", waitCount);
+        //결재 예정 갯수 조회
+        int expectedCount = edsmService.selectByExpectedCount(empNum);
+        model.addAttribute("expectedCount", expectedCount);
         List<OverTimeDTO> overtimesList = workService.getOvertimeDTOListByDocId(id);
         model.addAttribute("overtimesList", overtimesList);
 

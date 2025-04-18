@@ -589,5 +589,34 @@
         {CALL update_document_status_after_update(#{documentId, mode=IN, jdbcType=INTEGER}, #{status, mode=IN, jdbcType=VARCHAR})}
     </update>
 
+    <select id="SelectByWaitCount" resultType="int">
+        SELECT COUNT(*)
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum}
+          AND a.status = '대기'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM groupware.approval_line a2
+            WHERE a2.document_id = d.id
+              AND a2.status = '반려'
+        )
+    </select>
+
+    <select id="SelectByExpectedCount" resultType="int">
+        SELECT COUNT(*)
+        FROM groupware.edsm_document d
+                 JOIN groupware.approval_line a ON d.id = a.document_id
+                 JOIN groupware.employees e ON d.drafter_id = e.emp_num
+        WHERE a.approver_id = #{empNum}
+          AND a.status = '예정'
+          AND NOT EXISTS (
+            SELECT 1
+            FROM groupware.approval_line a2
+            WHERE a2.document_id = d.id
+              AND a2.status = '반려'
+        )
+    </select>
 
 </mapper>
