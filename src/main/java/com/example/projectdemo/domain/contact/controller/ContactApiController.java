@@ -37,10 +37,6 @@ public class ContactApiController {
                 sharedContacts = contactService.getSharedContacts();
             }
 
-            if (sharedContacts.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-            }
-
             return ResponseEntity.ok(sharedContacts);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

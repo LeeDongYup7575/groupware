@@ -1,288 +1,1038 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>그룹웨어 시스템 - 대시보드</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그룹웨어 시스템 - 대시보드</title>
 
-  <!-- 폰트 및 아이콘 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.c  om/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 폰트 및 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- 메인 페이지 CSS -->
-  <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
+    <!-- 메인 페이지 CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/main-page.css}">
 
-  <!-- 헤더 에셋 포함 -->
-  <th:block th:replace="fragments/header :: headerAssets"></th:block>
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
 
-  <!-- 사이드바 스타일 포함 -->
-  <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+    <!-- 사이드바 스타일 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 
-  <script src="https://unpkg.com/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.8/index.global.min.js"></script>
+    <script src="https://unpkg.com/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.8/index.global.min.js"></script>
 
 </head>
 <body>
-
-
 
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
 
 <div class="main-container">
-  <!-- 사이드바 -->
-  <div th:replace="fragments/sidebar/main-sidebar :: sidebar"></div>
+    <!-- 사이드바 -->
+    <div th:replace="fragments/sidebar/main-sidebar :: sidebar"></div>
 
-  <!-- 메인 콘텐츠 -->
-  <div class="main-content">
-    <!-- 프로필 및 게시판 섹션 -->
-    <div class="dashboard-row">
-      <div class="dashboard-section section-left">
-        <div class="profile-card">
-          <div class="profile-header">
-            <div class="profile-image">
-              <img th:src="${employee.profileImgUrl}" alt="프로필 이미지">
-            </div>
-            <div class="profile-name">
-              <h3 th:text="${employee.name + ' ' + employee.positionTitle}"></h3>
-              <p th:text="${employee.departmentName}"></p>
-            </div>
-          </div>
+    <!-- 메인 콘텐츠 -->
+    <div class="main-content">
+        <!-- 프로필 및 게시판 섹션 -->
+        <div class="dashboard-row">
+            <div class="dashboard-section section-left">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-image">
+                            <img th:src="${employee.profileImgUrl}" alt="프로필 이미지">
+                        </div>
+                        <div class="profile-name">
+                            <h3 th:text="${employee.name + ' ' + employee.positionTitle}"></h3>
+                            <p th:text="${employee.departmentName}"></p>
+                        </div>
+                    </div>
 
-          <div class="profile-stats">
-            <div class="stat-item">
-              <div class="stat-label">결재할 문서</div>
-              <div class="stat-value" th:text="${edsmCount}"></div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-label">내 예약/대여 현황</div>
-              <div class="stat-value" th:text="${myBookingsCount}"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="dashboard-section section-right">
-        <h4 class="card-title">게시판</h4>
-
-        <div class="tabs-container">
-          <div class="tabs-navigation">
-            <button class="tab-button active" data-tab="notice">사내공지</button>
-            <button class="tab-button" data-tab="free">자유게시판</button>
-          </div>
-
-          <div id="notice" class="tab-content active">
-            <!-- 공지사항이 있는 경우 -->
-            <div th:if="${!notices.isEmpty()}">
-              <div class="list-group">
-                <a th:each="notice, index : ${notices}"
-                   th:href="${notice.url}"
-                   th:text="${notice.title}"
-                   class="list-group-item list-group-item-action"
-                   target="_blank">
-                  공지사항 제목
-                </a>
-              </div>
-            </div>
-
-            <!-- 공지사항이 없는 경우 -->
-            <div th:if="${notices.isEmpty()}" class="alert">
-              표시할 공지사항이 없습니다.
-            </div>
-          </div>
-
-          <div id="free" class="tab-content">
-            <div th:if="${!publicList.isEmpty()}">
-              <div class="list-group">
-                <a th:each="post : ${publicList}"
-                   th:href="@{/board/post/{id}(id=${post.id})}"
-                   class="list-group-item list-group-item-action"
-                   target="_blank"
-                   style="display: flex; justify-content: space-between; align-items: center;">
-
-                  <span th:text="${post.title}">제목</span>
-                  <span th:text="${post.author}" style="font-size: 0.85em; color: #666;">작성자</span>
-                </a>
-
-
-              </div>
-            </div>
-
-            <div th:if="${publicList.isEmpty()}" class="alert">
-              표시할 게시글이 없습니다.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 근태 및 회의실 예약 섹션 -->
-    <div class="dashboard-row">
-      <div class="dashboard-section section-left">
-        <h4 class="card-title">근태관리</h4>
-        <p class="date-info" id="current-time">2025년 03월 26일 (화) 10:56:43</p>
-
-        <div class="attendance-info">
-          <div class="attendance-row">
-            <div class="attendance-label">출근시간</div>
-            <div class="attendance-value"
-                 th:each="attendance : ${attendanceListByDate}"
-                 th:if="${attendance.checkIn != null}" th:text="${attendance.checkIn}">
-            </div>
-          </div>
-          <div class="attendance-row">
-            <div class="attendance-label">퇴근시간</div>
-            <div class="attendance-value"
-                 th:each="attendance : ${attendanceListByDate}"
-                 th:if="${attendance.checkOut != null}" th:text="${attendance.checkOut}">
-            </div>
-          </div>
-        </div>
-
-
-      </div>
-
-      <div class="dashboard-section section-right">
-        <h4 class="card-title">회의실 예약 현황</h4>
-        <div class="timetable-container">
-          <table class="timetable">
-            <thead>
-            <tr>
-              <th></th>
-              <th>09:00</th>
-              <th>10:00</th>
-              <th>11:00</th>
-              <th>12:00</th>
-              <th>13:00</th>
-              <th>14:00</th>
-              <th>15:00</th>
-              <th>16:00</th>
-              <th>17:00</th>
-              <th>18:00</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- 회의실별 예약 현황 표시 -->
-            <tr th:each="roomNumber : ${#numbers.sequence(1, 4)}">
-              <td th:text="${'회의실'+roomNumber}">회의실</td>
-              <td colspan="6" style="position: relative;">
-                <!-- 해당 회의실의 예약만 필터링하여 표시 -->
-                <div th:each="booking : ${meetingRoomBookings}"
-                     th:if="${booking.roomId == roomNumber}"
-                     class="reservation-bar"
-                     th:style="${'width: ' + bookingUtils.calculateWidth(booking) + '%; left: ' + bookingUtils.calculatePosition(booking) + '%; background-color: ' + bookingUtils.getBookingColor(booking)}">
-                  <span th:text="${@stringUtils.removeFirstNChars(bookingUtils.formatBookingTime(booking), 3)}">예약 시간</span>
-
-
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">결재할 문서</div>
+                            <div class="stat-value" th:text="${edsmCount}"></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">내 예약/대여 현황</div>
+                            <div class="stat-value" th:text="${myBookingsCount}"></div>
+                        </div>
+                    </div>
                 </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+            </div>
 
-    <!-- 캘린더 -->
-    <div class="dashboard-row">
-      <div class="dashboard-section section-left">
-        <div class="calendar-wrapper">
-          <div id='calendar'></div>
+            <div class="dashboard-section section-right">
+                <h4 class="card-title">게시판</h4>
+
+                <div class="tabs-container">
+                    <div class="tabs-navigation">
+                        <button class="tab-button active" data-tab="notice">사내공지</button>
+                        <button class="tab-button" data-tab="free">자유게시판</button>
+                    </div>
+
+                    <div id="notice" class="tab-content active">
+                        <!-- 공지사항이 있는 경우 -->
+                        <div th:if="${!notices.isEmpty()}">
+                            <div class="list-group">
+                                <a th:each="notice, index : ${notices}"
+                                   th:href="${notice.url}"
+                                   th:text="${notice.title}"
+                                   class="list-group-item list-group-item-action"
+                                   target="_blank">
+                                    공지사항 제목
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 공지사항이 없는 경우 -->
+                        <div th:if="${notices.isEmpty()}" class="alert">
+                            표시할 공지사항이 없습니다.
+                        </div>
+                    </div>
+
+                    <div id="free" class="tab-content">
+                        <div th:if="${!publicList.isEmpty()}">
+                            <div class="list-group">
+                                <a th:each="post : ${publicList}"
+                                   th:href="@{/board/post/{id}(id=${post.id})}"
+                                   class="list-group-item list-group-item-action"
+                                   target="_blank"
+                                   style="display: flex; justify-content: space-between; align-items: center;">
+
+                                    <span th:text="${post.title}">제목</span>
+                                    <span th:text="${post.author}" style="font-size: 0.85em; color: #666;">작성자</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div th:if="${publicList.isEmpty()}" class="alert">
+                            표시할 게시글이 없습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-      </div>
-      <!-- 프로필 및 게시판 섹션 -->
-<!--      <div class="profile-stats">-->
-<!--        <div class="stat-item">-->
-<!--          <div class="stat-label">결재할 문서</div>-->
-<!--          <div class="stat-value" th:text="${pendingApprovals != null ? pendingApprovals : '0'}">6</div>-->
-<!--        </div>-->
-<!--        <div class="stat-item">-->
-<!--          <div class="stat-label">내 예약/대여 현황</div>-->
-<!--          <div class="stat-value" th:text="${myBookingsCount}">1</div>-->
-<!--        </div>-->
-<!--      </div>-->
+        <!-- 근태 및 회의실 예약 섹션 -->
+        <div class="dashboard-row">
+            <div class="dashboard-section section-left">
+                <h4 class="card-title">근태관리</h4>
+                <p class="date-info" id="current-time">2025년 03월 26일 (화) 10:56:43</p>
+
+                <div class="attendance-info">
+                    <div class="attendance-row">
+                        <div class="attendance-label">출근시간</div>
+                        <div class="attendance-value"
+                             th:each="attendance : ${attendanceListByDate}"
+                             th:if="${attendance.checkIn != null}" th:text="${attendance.checkIn}">
+                        </div>
+                    </div>
+                    <div class="attendance-row">
+                        <div class="attendance-label">퇴근시간</div>
+                        <div class="attendance-value"
+                             th:each="attendance : ${attendanceListByDate}"
+                             th:if="${attendance.checkOut != null}" th:text="${attendance.checkOut}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section section-right">
+                <h4 class="card-title">회의실 예약 현황</h4>
+                <div class="timetable-container">
+                    <table class="timetable">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>09:00</th>
+                            <th>10:00</th>
+                            <th>11:00</th>
+                            <th>12:00</th>
+                            <th>13:00</th>
+                            <th>14:00</th>
+                            <th>15:00</th>
+                            <th>16:00</th>
+                            <th>17:00</th>
+                            <th>18:00</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- 회의실별 예약 현황 표시 -->
+                        <tr th:each="roomNumber : ${#numbers.sequence(1, 4)}">
+                            <td th:text="${'회의실'+roomNumber}">회의실</td>
+                            <!-- 수정된 부분: colspan을 11로 변경하여 18:00까지 포함 -->
+                            <td colspan="10" style="position: relative;">
+                                <!-- 해당 회의실의 예약만 필터링하여 표시 -->
+                                <div th:each="booking : ${meetingRoomBookings}"
+                                     th:if="${booking.roomId == roomNumber}"
+                                     class="reservation-bar"
+                                     th:style="${'width: ' + bookingUtils.calculateWidth(booking) + '%; left: ' + bookingUtils.calculatePosition(booking) + '%; background-color: ' + bookingUtils.getBookingColor(booking)}">
+                                    <span th:text="${@stringUtils.removeFirstNChars(bookingUtils.formatBookingTime(booking), 3)}">예약 시간</span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 프로젝트 및 업무 현황 섹션 (기존 API 활용) -->
+        <div class="dashboard-row">
+            <div class="dashboard-section section-left" onclick="location.href='/workmanagement'" style="cursor: pointer;">
+                <h4 class="card-title">내 프로젝트 현황</h4>
+                <div class="project-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">진행중</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">준비중</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">지연</div>
+                    </div>
+                </div>
+                <div class="project-list">
+                    <!-- 프로젝트 아이템들은 JavaScript에서 동적으로 추가됨 -->
+                    <div class="loading-indicator">
+                        <i class="fas fa-spinner fa-spin"></i> 프로젝트 로딩 중...
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section section-right" onclick="location.href='/workmanagement'" style="cursor: pointer;">
+                <h4 class="card-title">업무 현황</h4>
+                <div class="task-status">
+                    <div class="task-chart">
+                        <div class="donut-chart" id="taskChart">
+                            <!-- 차트 세그먼트는 JavaScript에서 동적으로 추가됨 -->
+
+                        </div>
+                    </div>
+                    <div class="task-legend">
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #4caf50;"></span>
+                            <span class="legend-text">완료</span>
+                            <span class="legend-value">0</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #2196f3;"></span>
+                            <span class="legend-text">진행중</span>
+                            <span class="legend-value">0</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #ff9800;"></span>
+                            <span class="legend-text">대기중</span>
+                            <span class="legend-value">0</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color" style="background-color: #f44336;"></span>
+                            <span class="legend-text">지연</span>
+                            <span class="legend-value">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="recent-tasks">
+                    <h5>최근 업무</h5>
+                    <ul class="task-list">
+                        <!-- 업무 아이템들은 JavaScript에서 동적으로 추가됨 -->
+                        <li class="loading-indicator">
+                            <i class="fas fa-spinner fa-spin"></i> 업무 로딩 중...
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 할 일 목록 섹션 -->
+        <div class="dashboard-row">
+            <div class="dashboard-section section-full" style="cursor: pointer;">
+                <h4 class="card-title">내 할 일 목록</h4>
+                <div class="todo-container">
+                    <div class="todo-input">
+                        <input type="text" id="todoInput" placeholder="새로운 할 일을 입력하세요...">
+                        <button id="addTodoBtn"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <ul id="todoList" class="todo-list">
+                        <li th:each="todo : ${todos}" th:if="${todos != null && !todos.isEmpty()}" class="todo-item">
+                            <div class="todo-check">
+                                <input type="checkbox" th:id="${'todo-' + todo.id}" th:checked="${todo.completed}">
+                                <label th:for="${'todo-' + todo.id}" th:class="${todo.completed ? 'completed' : ''}">
+                                    <span th:text="${todo?.content ?: '주간 회의 준비자료 만들기'}">주간 회의 준비자료 만들기</span>
+                                </label>
+                            </div>
+                            <div class="todo-actions">
+                                <span class="todo-date" th:text="${todo?.date ?: '2025-04-18'}">2025-04-18</span>
+                                <button class="todo-delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </li>
+                        <!-- 할 일이 없는 경우 -->
+                        <li th:if="${todos == null || todos.isEmpty()}" class="no-data-message">
+                            할 일 목록이 비어있습니다. 새로운 할 일을 추가해보세요!
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 회사 브랜드 스토리텔링 섹션 -->
+        <div class="dashboard-row">
+            <div class="dashboard-section section-full brand-storytelling">
+                <h4 class="card-title">우리 회사의 핵심 가치</h4>
+
+                <div class="brand-values-container">
+                    <!-- 핵심 가치 캐러셀 -->
+                    <div class="values-carousel">
+                        <div class="value-item active" data-value="innovation">
+                            <div class="value-icon"><i class="fas fa-lightbulb"></i></div>
+                            <h3 class="value-title">혁신</h3>
+                            <p class="value-description">끊임없는 도전과 새로운 아이디어를 통해 산업의 표준을 재정의합니다.</p>
+                        </div>
+
+                        <div class="value-item" data-value="collaboration">
+                            <div class="value-icon"><i class="fas fa-users"></i></div>
+                            <h3 class="value-title">협업</h3>
+                            <p class="value-description">다양한 배경과 관점이 만나 시너지를 창출하는 환경을 만듭니다.</p>
+                        </div>
+
+                        <div class="value-item" data-value="integrity">
+                            <div class="value-icon"><i class="fas fa-shield-alt"></i></div>
+                            <h3 class="value-title">정직</h3>
+                            <p class="value-description">신뢰와 투명성을 바탕으로 모든 이해관계자와의 관계를 형성합니다.</p>
+                        </div>
+
+                        <div class="value-item" data-value="excellence">
+                            <div class="value-icon"><i class="fas fa-award"></i></div>
+                            <h3 class="value-title">탁월함</h3>
+                            <p class="value-description">최고 수준의 전문성과 품질을 통해 고객에게 가치를 전달합니다.</p>
+                        </div>
+
+                        <div class="value-item" data-value="responsibility">
+                            <div class="value-icon"><i class="fas fa-hands-helping"></i></div>
+                            <h3 class="value-title">책임</h3>
+                            <p class="value-description">사회와 환경에 대한 책임을 다하며 지속 가능한 성장을 추구합니다.</p>
+                        </div>
+                    </div>
+
+                    <!-- 네비게이션 버튼 -->
+                    <div class="carousel-navigation">
+                        <button class="nav-button prev"><i class="fas fa-chevron-left"></i></button>
+                        <div class="navigation-dots">
+                            <span class="dot active" data-index="0"></span>
+                            <span class="dot" data-index="1"></span>
+                            <span class="dot" data-index="2"></span>
+                            <span class="dot" data-index="3"></span>
+                            <span class="dot" data-index="4"></span>
+                        </div>
+                        <button class="nav-button next"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- 회사 미션 문구 -->
+                <div class="company-mission">
+                    <p class="mission-text">"혁신적인 기술과 인간 중심의 서비스로 더 나은 미래를 만들어갑니다"</p>
+                    <div class="mission-graphic">
+                        <div class="graphic-line"></div>
+                        <div class="graphic-circle"></div>
+                        <div class="graphic-line"></div>
+                    </div>
+                </div>
+
+                <!-- 회사 마일스톤 -->
+                <div class="company-milestones">
+                    <div class="milestone">
+                        <div class="milestone-year">2010</div>
+                        <div class="milestone-content">회사 설립</div>
+                    </div>
+                    <div class="milestone">
+                        <div class="milestone-year">2015</div>
+                        <div class="milestone-content">주요 제품 출시</div>
+                    </div>
+                    <div class="milestone">
+                        <div class="milestone-year">2020</div>
+                        <div class="milestone-content">글로벌 시장 진출</div>
+                    </div>
+                    <div class="milestone">
+                        <div class="milestone-year">2025</div>
+                        <div class="milestone-content">새로운 비전 선포</div>
+                    </div>
+                </div>
+
+                <!-- 풋터 문구 -->
+                <div class="footer-quote">
+                    <p>오늘도 함께 성장하는 <span class="highlight">TechX</span>가 되겠습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 캘린더 -->
+        <div class="dashboard-row">
+            <div class="dashboard-section section-full">
+                <div class="calendar-wrapper">
+                    <div id='calendar'></div>
+                </div>
+            </div>
+        </div>
+
     </div>
-  </div>
 </div>
 
 <!-- 페이지 스크립트 -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // 탭 전환 기능
-    const tabButtons = document.querySelectorAll('.tab-button');
+    document.addEventListener('DOMContentLoaded', function() {
 
-    tabButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        // 모든 탭 비활성화
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        loadProjectsAndTasks();
+        // 탭 전환 기능
+        const tabButtons = document.querySelectorAll('.tab-button');
 
-        // 클릭된 탭 활성화
-        this.classList.add('active');
-        const tabId = this.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
-      });
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // 모든 탭 비활성화
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // 클릭된 탭 활성화
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // FullCalendar 초기화
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            googleCalendarApiKey: 'AIzaSyAmxOp9PrC83LxO6JmGFH3_rfhvpzOXiy8',
+            initialView: 'dayGridMonth',
+            locale: 'ko', // 한국어 설정
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,listMonth'
+            },
+            eventSources: [
+                {
+                    googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
+                    className: 'korean-holiday'
+                },
+                {
+                    events: [
+                        {
+                            title: '회사창립일 🎉',
+                            start: '2025-04-24', // 원하는 날짜 (YYYY-MM-DD)
+                            allDay: true,
+                            className: 'company-anniversary' // 원하는 스타일을 위해 클래스 추가 가능
+                        }
+                    ]
+                }
+            ],
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                alert(info.event.title);
+            }
+        });
+        calendar.render();
+
+        // 할 일 목록 로컬 스토리지 관리 기능
+        const todoInput = document.getElementById('todoInput');
+        const addTodoBtn = document.getElementById('addTodoBtn');
+        const todoList = document.getElementById('todoList');
+
+        // 로컬 스토리지에서 할 일 불러오기
+        loadTodosFromLocalStorage();
+
+        addTodoBtn.addEventListener('click', addTodo);
+
+        todoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // 기존 할 일 아이템에 이벤트 리스너 추가
+        function attachEventListeners() {
+            document.querySelectorAll('.todo-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const todoItem = this.closest('.todo-item');
+                    deleteTodo(todoItem);
+                });
+            });
+
+            document.querySelectorAll('.todo-check input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const todoItem = this.closest('.todo-item');
+                    const todoId = todoItem.dataset.id;
+                    const label = this.nextElementSibling;
+
+                    if (this.checked) {
+                        label.classList.add('completed');
+                    } else {
+                        label.classList.remove('completed');
+                    }
+
+                    // 로컬 스토리지 업데이트
+                    updateTodoInLocalStorage(todoId, this.checked);
+                });
+            });
+        }
+
+        // 초기 이벤트 리스너 연결
+        attachEventListeners();
     });
 
-      var calendarEl = document.getElementById('calendar');
+    // 시간 업데이트 함수
+    function updateTime() {
+        var currentDate = new Date();
+        var year = currentDate.getFullYear();
+        var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        var date = currentDate.getDate().toString().padStart(2, '0');
+        var day = currentDate.toLocaleString('ko-KR', { weekday: 'long' });
+        var hours = currentDate.getHours().toString().padStart(2, '0');
+        var minutes = currentDate.getMinutes().toString().padStart(2, '0');
+        var seconds = currentDate.getSeconds().toString().padStart(2, '0');
 
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        googleCalendarApiKey: 'AIzaSyAmxOp9PrC83LxO6JmGFH3_rfhvpzOXiy8',
-        initialView: 'dayGridMonth',
-        locale: 'ko', // 한국어 설정
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,listMonth'
-        },eventSources: [
-                {
-          googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
-          className: 'korean-holiday'
-        },
-          {
-            events: [
-              {
-                title: '회사창립일 🎉',
-                start: '2025-04-24', // 원하는 날짜 (YYYY-MM-DD)
-                allDay: true,
-                className: 'company-anniversary' // 원하는 스타일을 위해 클래스 추가 가능
-              }
-            ]
-          }
-        ],
+        var formattedTime = `${year}년 ${month}월 ${date}일 (${day}) ${hours}:${minutes}:${seconds}`;
+        document.getElementById('current-time').textContent = formattedTime;
+    }
 
-        eventClick: function(info) {
-          info.jsEvent.preventDefault();
-          alert(info.event.title);
+    // 1초마다 updateTime 함수 실행
+    setInterval(updateTime, 1000);
+
+    // 로컬 스토리지에서 할 일 목록 불러오기
+    function loadTodosFromLocalStorage() {
+        const todoList = document.getElementById('todoList');
+        const todos = JSON.parse(localStorage.getItem('todos') || '[]');
+
+        // 할 일 목록 초기화
+        todoList.innerHTML = '';
+
+        if (todos.length === 0) {
+            const noDataMessage = document.createElement('li');
+            noDataMessage.className = 'no-data-message';
+            noDataMessage.textContent = '할 일 목록이 비어있습니다. 새로운 할 일을 추가해보세요!';
+            todoList.appendChild(noDataMessage);
+            return;
         }
-      });
 
-      calendar.render();
+        // 날짜 기준 내림차순 정렬 (최신순)
+        todos.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  });
+        // 할 일 목록 렌더링
+        todos.forEach(todo => {
+            addTodoToUI(todo);
+        });
+    }
 
-  function updateTime() {
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-    var month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    var date = currentDate.getDate().toString().padStart(2, '0');
-    var day = currentDate.toLocaleString('ko-KR', { weekday: 'long' });
-    var hours = currentDate.getHours().toString().padStart(2, '0');
-    var minutes = currentDate.getMinutes().toString().padStart(2, '0');
-    var seconds = currentDate.getSeconds().toString().padStart(2, '0');
+    // 할 일 추가 함수
+    function addTodo() {
+        const todoInput = document.getElementById('todoInput');
+        const todoText = todoInput.value.trim();
 
-    var formattedTime = `${year}년 ${month}월 ${date}일 (${day}) ${hours}:${minutes}:${seconds}`;
-    document.getElementById('current-time').textContent = formattedTime;
-  }
+        if (todoText === '') return;
 
-  // 1초마다 updateTime 함수 실행
-  setInterval(updateTime, 1000);
+        // 현재 날짜 가져오기
+        const today = new Date();
+        const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        // 새 할 일 생성
+        const newTodo = {
+            id: Date.now().toString(), // 고유 ID 생성
+            content: todoText,
+            completed: false,
+            date: formattedDate
+        };
+
+        // 로컬 스토리지에 저장
+        const todos = JSON.parse(localStorage.getItem('todos') || '[]');
+        todos.push(newTodo);
+        localStorage.setItem('todos', JSON.stringify(todos));
+
+        // UI에 추가
+        addTodoToUI(newTodo);
+        todoInput.value = '';
+    }
+
+    // UI에 할 일 추가
+    function addTodoToUI(todo) {
+        const todoList = document.getElementById('todoList');
+
+        // "할 일이 없습니다" 메시지 제거
+        const noDataMessage = todoList.querySelector('.no-data-message');
+        if (noDataMessage) {
+            todoList.removeChild(noDataMessage);
+        }
+
+        const li = document.createElement('li');
+        li.className = 'todo-item';
+        li.dataset.id = todo.id;
+
+        li.innerHTML = `
+      <div class="todo-check">
+        <input type="checkbox" id="todo-${todo.id}" ${todo.completed ? 'checked' : ''}>
+        <label for="todo-${todo.id}" class="${todo.completed ? 'completed' : ''}">
+          <span>${todo.content}</span>
+        </label>
+      </div>
+      <div class="todo-actions">
+        <span class="todo-date">${todo.date}</span>
+        <button class="todo-delete"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    `;
+
+        todoList.prepend(li);
+
+        // 이벤트 리스너 추가
+        const deleteBtn = li.querySelector('.todo-delete');
+        deleteBtn.addEventListener('click', function() {
+            deleteTodo(li);
+        });
+
+        const checkbox = li.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+            const label = this.nextElementSibling;
+            const todoId = li.dataset.id;
+
+            if (this.checked) {
+                label.classList.add('completed');
+            } else {
+                label.classList.remove('completed');
+            }
+
+            updateTodoInLocalStorage(todoId, this.checked);
+        });
+    }
+
+    // 할 일 삭제
+    function deleteTodo(todoItem) {
+        const todoId = todoItem.dataset.id;
+
+        // 로컬 스토리지에서 삭제
+        let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+        todos = todos.filter(todo => todo.id !== todoId);
+        localStorage.setItem('todos', JSON.stringify(todos));
+
+        // UI에서 삭제
+        todoItem.remove();
+
+        // 목록이 비었는지 확인
+        const todoList = document.getElementById('todoList');
+        if (todoList.children.length === 0) {
+            const noDataMessage = document.createElement('li');
+            noDataMessage.className = 'no-data-message';
+            noDataMessage.textContent = '할 일 목록이 비어있습니다. 새로운 할 일을 추가해보세요!';
+            todoList.appendChild(noDataMessage);
+        }
+    }
+
+    // 로컬 스토리지에서 할 일 상태 업데이트
+    function updateTodoInLocalStorage(todoId, completed) {
+        let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+        todos = todos.map(todo => {
+            if (todo.id === todoId) {
+                return { ...todo, completed: completed };
+            }
+            return todo;
+        });
+
+        localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    /**
+     * 프로젝트 및 업무 데이터 로드 함수
+     */
+    function loadProjectsAndTasks() {
+        // 프로젝트 로드
+        fetch('/api/projects/my-projects')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('프로젝트 데이터를 불러오는데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(projects => {
+                // 완료되지 않은 프로젝트만 필터링
+                const ongoingProjects = projects.filter(project => project.status !== '완료');
+
+                // 프로젝트 상태별 통계 계산
+                const projectStats = calculateProjectStats(ongoingProjects);
+
+                // 화면 업데이트
+                updateProjectStats(projectStats);
+                displayProjects(ongoingProjects);
+            })
+            .catch(error => {
+                console.error('프로젝트 데이터 로드 중 오류:', error);
+                // 오류 발생 시 대체 데이터 사용
+                const fallbackProjects = [
+                    { id: 1, name: '전사 마케팅 캠페인', progress: 65, status: '진행중' },
+                    { id: 2, name: '신규 서비스 출시', progress: 30, status: '진행중' },
+                    { id: 3, name: '웹사이트 리뉴얼', progress: 85, status: '진행중' }
+                ];
+
+                const fallbackStats = calculateProjectStats(fallbackProjects);
+                updateProjectStats(fallbackStats);
+                displayProjects(fallbackProjects);
+            });
+
+        // 업무 로드
+        fetch('/api/tasks/my-tasks')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('업무 데이터를 불러오는데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(tasks => {
+                // 업무 상태별 통계 계산
+                const taskStats = calculateTaskStats(tasks);
+
+                // 최근 업무 3개 추출 (미완료 & 마감일 순)
+                const recentTasks = tasks
+                    .filter(task => task.status !== '완료')
+                    .sort((a, b) => {
+                        if (!a.dueDate) return 1;
+                        if (!b.dueDate) return -1;
+                        return new Date(a.dueDate) - new Date(b.dueDate);
+                    })
+                    .slice(0, 3); // 최대 3개만 표시
+
+                // 화면 업데이트
+                updateTaskStats(taskStats);
+                displayRecentTasks(recentTasks);
+            })
+            .catch(error => {
+                console.error('업무 데이터 로드 중 오류:', error);
+                // 오류 발생 시 대체 데이터 사용
+                const fallbackTasks = [
+                    { id: 1, title: '분기별 보고서 작성', dueDate: '2025-04-30', status: '진행중' },
+                    { id: 2, title: '프로젝트 미팅 준비', dueDate: '2025-04-22', status: '미시작' },
+                    { id: 3, title: '마케팅 자료 검토', dueDate: '2025-04-25', status: '진행중' }
+                ];
+
+                const fallbackStats = {
+                    completed: 12,
+                    inProgress: 8,
+                    pending: 5,
+                    delayed: 2
+                };
+
+                updateTaskStats(fallbackStats);
+                displayRecentTasks(fallbackTasks);
+            });
+    }
+
+    /**
+     * 프로젝트 상태별 통계 계산 함수
+     */
+    function calculateProjectStats(projects) {
+        const stats = {
+            ongoing: 0,
+            preparing: 0,
+            delayed: 0
+        };
+
+        projects.forEach(project => {
+            if (project.status === '진행중') {
+                stats.ongoing++;
+            } else if (project.status === '준비중') {
+                stats.preparing++;
+            } else if (project.status === '지연') {
+                stats.delayed++;
+            }
+        });
+
+        return stats;
+    }
 
 
+    /**
+     * 업무 상태별 통계 계산 함수
+     */
+    function calculateTaskStats(tasks) {
+        const stats = {
+            completed: 0,
+            inProgress: 0,
+            pending: 0,
+            delayed: 0
+        };
+
+        tasks.forEach(task => {
+            if (task.status === '완료') {
+                stats.completed++;
+            } else if (task.status === '진행중') {
+                stats.inProgress++;
+            } else if (task.status === '미시작') {
+                stats.pending++;
+            } else if (task.overdue || (task.dueDate && new Date(task.dueDate) < new Date() && task.status !== '완료')) {
+                stats.delayed++;
+            }
+        });
+
+        return stats;
+    }
+
+
+    /**
+     * 프로젝트 통계 업데이트 함수
+     */
+    function updateProjectStats(stats) {
+        if (!stats) return;
+
+        // 상태별 프로젝트 수 업데이트
+        document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = stats.ongoing || 0;
+        document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = stats.preparing || 0;
+        document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = stats.delayed || 0;
+    }
+
+    /**
+     * 업무 통계 업데이트 함수
+     */
+    function updateTaskStats(stats) {
+        if (!stats) return;
+
+        // 상태별 업무 수 업데이트
+        document.querySelector('.legend-item:nth-child(1) .legend-value').textContent = stats.completed || 0;
+        document.querySelector('.legend-item:nth-child(2) .legend-value').textContent = stats.inProgress || 0;
+        document.querySelector('.legend-item:nth-child(3) .legend-value').textContent = stats.pending || 0;
+        document.querySelector('.legend-item:nth-child(4) .legend-value').textContent = stats.delayed || 0;
+
+        // 개선된 도넛 차트 업데이트
+        updateDonutChart(stats);
+    }
+
+    /**
+     * 도넛 차트 업데이트 함수
+     */
+    function updateDonutChart(stats) {
+        const chartElement = document.getElementById('taskChart');
+        if (!chartElement) return;
+
+        const total = stats.completed + stats.inProgress + stats.pending + stats.delayed;
+
+        if (total === 0) {
+            chartElement.innerHTML = '<div class="no-data-message">데이터 없음</div>';
+            return;
+        }
+
+        const completedPercent = (stats.completed / total) * 100;
+        const inProgressPercent = (stats.inProgress / total) * 100;
+        const pendingPercent = (stats.pending / total) * 100;
+        const delayedPercent = (stats.delayed / total) * 100;
+
+        chartElement.style.background = `conic-gradient(
+        #4caf50 0% ${completedPercent}%,
+        #2196f3 ${completedPercent}% ${completedPercent + inProgressPercent}%,
+        #ff9800 ${completedPercent + inProgressPercent}% ${completedPercent + inProgressPercent + pendingPercent}%,
+        #f44336 ${completedPercent + inProgressPercent + pendingPercent}% 100%
+    )`;
+    }
+
+
+
+    /**
+     * 도넛 차트 세그먼트 생성 함수
+     */
+    function createDonutSegment(chartElement, percentage, color) {
+        const segment = document.createElement('div');
+        segment.className = 'donut-segment';
+        segment.style.setProperty('--percentage', percentage);
+        segment.style.setProperty('--fill', color);
+        chartElement.appendChild(segment);
+    }
+
+    // 차트 세그먼트 추가 함수
+    function addChartSegment(chartElement, startAngle, percentage, color) {
+        // 각도를 라디안으로 변환
+        const endAngle = startAngle + (percentage / 100) * 360;
+
+        // 180도 이상인지 확인 (반원 이상)
+        const largeArcFlag = percentage > 50 ? 1 : 0;
+
+        // 첫 번째 반원 세그먼트 (0-180도)
+        const segment = document.createElement('div');
+        segment.className = 'chart-segment';
+
+        // 내부 세그먼트 스타일링
+        const segmentInner = document.createElement('div');
+        segmentInner.className = 'segment-inner';
+        segmentInner.style.backgroundColor = color;
+        segmentInner.style.transform = `rotate(${startAngle}deg)`;
+
+        segment.appendChild(segmentInner);
+        chartElement.appendChild(segment);
+
+        // 180도 이상인 경우 두 번째 반원 세그먼트 추가 (180-360도)
+        if (endAngle > startAngle + 180) {
+            const segment2 = document.createElement('div');
+            segment2.className = 'chart-segment';
+            segment2.style.transform = 'rotate(180deg)';
+
+            const segmentInner2 = document.createElement('div');
+            segmentInner2.className = 'segment-inner';
+            segmentInner2.style.backgroundColor = color;
+            segmentInner2.style.transform = `rotate(${Math.max(0, startAngle - 180)}deg)`;
+
+            segment2.appendChild(segmentInner2);
+            chartElement.appendChild(segment2);
+        }
+    }
+
+    /**
+     * 프로젝트 목록 표시 함수
+     */
+    function displayProjects(projects) {
+        const projectList = document.querySelector('.project-list');
+        if (!projectList) return;
+
+        // 기존 내용 삭제
+        projectList.innerHTML = '';
+
+        // 프로젝트가 없는 경우
+        if (!projects || projects.length === 0) {
+            const noDataMessage = document.createElement('div');
+            noDataMessage.className = 'no-data-message';
+            noDataMessage.textContent = '표시할 프로젝트가 없습니다.';
+            projectList.appendChild(noDataMessage);
+            return;
+        }
+
+        // 각 프로젝트 항목 생성 및 추가
+        projects.forEach(project => {
+            const projectItem = document.createElement('div');
+            projectItem.className = 'project-item';
+            if (project.status === '지연') {
+                projectItem.classList.add('delayed-project');
+            }
+
+            projectItem.innerHTML = `
+            <div class="project-info">
+                <div class="project-name">${escapeHtml(project.name)}</div>
+                <div class="project-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                    </div>
+                    <span class="progress-text">${project.progress}%</span>
+                </div>
+            </div>
+        `;
+
+            // 클릭 이벤트 추가 - 프로젝트 상세 페이지로 이동
+            projectItem.addEventListener('click', function(e) {
+                e.stopPropagation(); // 부모 요소의 클릭 이벤트 버블링 방지
+                window.location.href = `/workmanagement?projectId=${project.id}`;
+            });
+
+            projectList.appendChild(projectItem);
+        });
+    }
+
+    /**
+     * 최근 업무 목록 표시 함수
+     */
+    function displayRecentTasks(tasks) {
+        const taskList = document.querySelector('.task-list');
+        if (!taskList) return;
+
+        // 기존 내용 삭제
+        taskList.innerHTML = '';
+
+        // 업무가 없는 경우
+        if (!tasks || tasks.length === 0) {
+            const noDataMessage = document.createElement('li');
+            noDataMessage.className = 'no-data-message';
+            noDataMessage.textContent = '표시할 최근 업무가 없습니다.';
+            taskList.appendChild(noDataMessage);
+            return;
+        }
+
+        // 각 업무 항목 생성 및 추가
+        tasks.forEach(task => {
+            const taskItem = document.createElement('li');
+            taskItem.className = 'task-item';
+
+            // 상태 텍스트 및 클래스 결정
+            let statusText = '대기중';
+            let statusClass = 'pending';
+
+            if (task.status === '완료') {
+                statusText = '완료';
+                statusClass = 'completed';
+            } else if (task.status === '진행중') {
+                statusText = '진행중';
+                statusClass = 'in-progress';
+            } else if (task.overdue || task.status === '지연') {
+                statusText = '지연';
+                statusClass = 'delayed';
+            }
+
+            // 마감일 형식화
+            const formattedDate = formatDueDate(task.dueDate);
+
+            taskItem.innerHTML = `
+            <div class="task-info">
+                <span class="task-title">${escapeHtml(task.title)}</span>
+                <span class="task-date">${formattedDate}</span>
+            </div>
+            <span class="task-badge ${statusClass}">${statusText}</span>
+        `;
+
+            // 클릭 이벤트 추가 - 업무 상세 페이지로 이동
+            taskItem.addEventListener('click', function(e) {
+                e.stopPropagation(); // 부모 요소의 클릭 이벤트 버블링 방지
+                window.location.href = `/workmanagement?taskId=${task.id}`;
+            });
+
+            taskList.appendChild(taskItem);
+        });
+    }
+
+    /**
+     * 마감일 형식화 함수
+     */
+    function formatDueDate(dateStr) {
+        if (!dateStr) return '기한 없음';
+
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffTime = date.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
+
+        // YYYY-MM-DD 형식
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+
+        // 마감일이 지났으면 '마감일 지남', 당일이면 '오늘 마감', 아니면 'N일 남음'
+        if (diffDays < 0) {
+            return `${formattedDate} (${Math.abs(diffDays)}일 지남)`;
+        } else if (diffDays === 0) {
+            return `${formattedDate} (오늘 마감)`;
+        } else {
+            return `${formattedDate} (${diffDays}일 남음)`;
+        }
+    }
+
+    /**
+     * HTML 이스케이프 함수 - XSS 방지
+     */
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 </script>
+
+<!-- 회사 캐러셀 스크립트 포함 -->
+<script th:src="@{/assets/js/main/main-util.js}"></script>
+<!--<div th:replace="/assets/js/main/main-util.js"></div>-->
 
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
