@@ -40,12 +40,12 @@ public class BoardController {
         // 현재 로그인한 사용자 정보 가져오기
         int empId = (int)request.getAttribute("id");
 
-        // 접근 가능한 모든 게시글 조회
-        List<PostsDTO> posts = postsService.getAccessiblePosts(empId);
-
         // 접근 가능한 게시판 목록 추가
         List<BoardsDTO> accessibleBoards = boardsService.getAccessibleBoards(empId);
         model.addAttribute("accessibleBoards", accessibleBoards);
+
+        // 접근 가능한 모든 게시글 조회
+        List<PostsDTO> posts = postsService.getAccessiblePosts(empId);
 
         model.addAttribute("posts", posts);
         model.addAttribute("boardName", "통합 게시판");
@@ -56,6 +56,7 @@ public class BoardController {
     // 특정 게시판의 게시글 목록 보기
     @GetMapping("/{boardId}")
     public String boardPosts(@PathVariable Integer boardId, HttpServletRequest request, Model model) {
+        // 현재 로그인한 사용자 정보 가져오기
         int empId = (int)request.getAttribute("id");
 
         // 게시판 접근 권한 확인

@@ -92,11 +92,10 @@
         FROM posts p
                  JOIN boards b ON p.board_id = b.id
                  JOIN employees e ON p.emp_id = e.id
-        WHERE
-            b.is_global = 1
-           OR p.board_id IN (
-            SELECT board_id FROM board_permissions WHERE emp_id = #{empId}
-        )
+        WHERE (b.is_global = 1 OR p.board_id IN (SELECT board_id
+                                                 FROM board_permissions
+                                                 WHERE emp_id = #{empId}))
+          AND b.is_active = 1
         ORDER BY p.created_at DESC
     </select>
 
