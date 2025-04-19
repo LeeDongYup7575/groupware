@@ -100,8 +100,8 @@ public class MainPageFacadeImpl implements MainPageFacade {
         List<Notice> notices = noticeService.getCachedNotices();  // 변경된 부분
         data.setNotices(notices);
 
-        // 공개 게시판 게시글 로드
-        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
+        // 자유 게시판 게시글 로드 (최대 4개)
+        List<PostsDTO> publicList = postsService.findTop4ByBoardId(2);
         data.setPublicList(publicList);
     }
 

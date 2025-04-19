@@ -22,6 +22,9 @@ public interface PostsMapper {
     // 특정 게시판의 게시글 조회
     List<PostsDTO> getPostsByBoardId(Integer boardId);
 
+    // 특정 게시판 게시글 중 최신순으로 4개만 가져오는 쿼리
+    List<PostsDTO> findTop4ByBoardId(Integer boardId);
+
     // 게시판 ID로 게시글 수 조회
     int countPostsByBoardId(Integer boardId);
 
