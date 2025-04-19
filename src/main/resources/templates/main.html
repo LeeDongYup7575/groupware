@@ -91,6 +91,7 @@
                         </div>
                     </div>
 
+                    <!-- 자유게시판 -->
                     <div id="free" class="tab-content">
                         <div th:if="${!publicList.isEmpty()}">
                             <div class="list-group">
@@ -105,7 +106,7 @@
                                 </a>
                             </div>
                         </div>
-
+                        <!-- 게시글이 없는 경우 -->
                         <div th:if="${publicList.isEmpty()}" class="alert">
                             표시할 게시글이 없습니다.
                         </div>

@@ -79,6 +79,26 @@
             p.created_at DESC
     </select>
 
+    <!-- 특정 게시판의 게시글 목록을 최대 4개까지 조회 -->
+    <select id="findTop4ByBoardId" parameterType="Integer"
+            resultType="com.example.projectdemo.domain.board.dto.PostsDTO">
+        SELECT p.id,
+               p.emp_id     as empId,
+               p.title,
+               p.content,
+               p.views,
+               p.created_at as createdAt,
+               p.board_id   as boardId,
+               b.name       as boardName,
+               e.name       as author
+        FROM posts p
+                 JOIN boards b ON p.board_id = b.id
+                 JOIN employees e ON p.emp_id = e.id
+        WHERE p.board_id = #{boardId}
+        ORDER BY p.created_at DESC
+        LIMIT 4
+    </select>
+
     <!-- 게시판 ID로 게시글 수 조회 -->
     <select id="countPostsByBoardId" parameterType="int" resultType="int">
         SELECT COUNT(*)

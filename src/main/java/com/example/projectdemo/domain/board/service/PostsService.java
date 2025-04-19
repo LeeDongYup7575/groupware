@@ -83,6 +83,23 @@ public class PostsService {
         return posts;
     }
 
+    // 특정 게시판의 게시글 목록 중 최신순으로 4개만 조회
+    public List<PostsDTO> findTop4ByBoardId(Integer boardId) {
+        // 해당 게시판의 모든 게시글을 조회
+        List<PostsDTO> posts = postsMapper.findTop4ByBoardId(boardId);
+
+        // 각 게시글에 댓글 수 설정
+        for (PostsDTO post : posts) {
+            // 해당 게시글의 댓글 수 조회
+            int commentCount = commentsMapper.countByPostId(post.getId());
+            // 게시글 DTO에 댓글 수 설정
+            post.setCommentCount(commentCount);
+        }
+        return posts;
+    }
+
+    ;
+
     // 게시판 ID로 게시글 수 조회
     public int countPostsByBoardId(Integer boardId) {
         return postsMapper.countPostsByBoardId(boardId);
