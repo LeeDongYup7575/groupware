@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TECH X - 그룹웨어 FAQ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
     <style>
         :root {
             --primary-color: #007bff;
@@ -19,8 +21,8 @@
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            margin: 0;
-            padding: 0;
+            /*margin: 0;*/
+            padding: 10px;
             background-color: #f4f4f4;
             color: #333;
         }
@@ -332,13 +334,19 @@
                 transform: translateY(-6px);
             }
         }
+
+        .gw-container {
+            width: 97%;
+            margin: 0 auto;
+            /*padding: 0 20px;*/
+        }
+
     </style>
 
     <!-- 사이드바 스타일 포함 -->
     <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 
-    <!-- 헤더 에셋 포함 -->
-    <th:block th:replace="fragments/header :: headerAssets"></th:block>
+
 </head>
 <body>
 <!-- 헤더 포함 -->
