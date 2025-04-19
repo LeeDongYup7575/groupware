@@ -107,6 +107,7 @@ public class JwtTokenUtil {
      * 직원 정보로 액세스 토큰 생성
      */
     public String generateToken(EmployeesDTO employee) {
+        System.out.println("generate token: "+employee);
         Map<String, Object> claims = new HashMap<>();
         // 기본 인증 정보
         claims.put("id", employee.getId());
@@ -114,6 +115,7 @@ public class JwtTokenUtil {
         claims.put("name", employee.getName());
         claims.put("empNum", employee.getEmpNum());
         claims.put("email", employee.getEmail());
+
 
         return doGenerateToken(claims, employee.getEmpNum(), jwtExpiration);
     }
@@ -130,6 +132,8 @@ public class JwtTokenUtil {
         claims.put("name", employee.getName());
         claims.put("empNum", employee.getEmpNum());
         claims.put("email", employee.getEmail());
+        claims.put("tempPassword", tempPassword);
+
 
         return doGenerateToken(claims, employee.getEmpNum(), jwtExpiration);
     }
@@ -152,6 +156,22 @@ public class JwtTokenUtil {
         return doGenerateToken(claims, empNum, qrExpiration * 1000);
     }
 
+    /**
+     * QR 토큰에서 출결 유형 추출
+     */
+    public String getAttendanceTypeFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("type", String.class);
+    }
+
+    /**
+     * QR 토큰에서 타임스탬프 추출
+     */
+    public Long getTimestampFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("timestamp", Long.class);
+    }
+
     private String doGenerateToken(Map<String, Object> claims, String subject, long expiration) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -169,6 +189,7 @@ public class JwtTokenUtil {
         try {
             // 블랙리스트 확인 (로그아웃된 토큰인지)
             if (logoutService.isTokenBlacklisted(token)) {
+                System.out.println("블랙리스트에 있는 토큰입니다.");
                 return false;
             }
 
@@ -178,8 +199,10 @@ public class JwtTokenUtil {
                     .parseClaimsJws(token);
             return !isTokenExpired(token);
         } catch (ExpiredJwtException e) {
+            System.out.println("토큰 만료: " + e.getMessage());
             return false;
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("유효하지 않은 토큰: " + e.getMessage());
             return false;
         }
     }

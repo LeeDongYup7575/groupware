@@ -82,14 +82,17 @@ public interface EmployeesMapper {
     // 직원 활성화 (관리자용)
     int activateEmployee(@Param("id") Integer id);
 
-    // 관리자 권한(ROLE_ADMIN)을 가진 사원의 ID 목록을 조회
-    List<Integer> getAdminIds();
-
     // 활성화된 직원 목록 가져오기
     List<EmployeesDTO> getAllActiveEmployees();
 
     int updateProfileImgUrl(@Param("empNum") String empNum, @Param("profileImgUrl") String profileImgUrl);
 
+
+    /**
+     * 직원 추가
+     * @param employeeDTO 추가할 직원 정보
+     * @return 성공 시 1, 실패 시 0
+     */
     int insertEmployee(EmployeesDTO employeeDTO);
     int updateByDepId(Integer depId);
 }
