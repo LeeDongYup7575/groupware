@@ -2,6 +2,14 @@
  * 그룹웨어 사이드바 공통 JavaScript
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // 사이드바 토글 버튼에 이벤트 리스너 추가
+    const toggleBtn = document.getElementById('sidebarToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            toggleSidebar();
+        });
+    }
+
     // 특정 ID를 가진 사이드바 선택 (메인 콘텐츠 내 사이드바)
     const mainSidebar = document.getElementById('sidebar');
 

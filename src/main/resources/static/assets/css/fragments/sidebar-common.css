@@ -278,7 +278,7 @@
         transform: translateX(-100%);
     }
 
-    .mypage-sidebar.open, .sidebar.open, #importedSidebar.open, #sidebar.open {
+    .mypage-sidebar.open, .sidebar.open, #importedSidebar.open, #sidebar.open, .container .sidebar.open {
         transform: translateX(0);
         z-index: 999;
         background-color: #f3f7fb;
