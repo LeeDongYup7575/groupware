@@ -11,7 +11,7 @@
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
 
 
-<!--    <link rel="stylesheet" th:href="@{assets/css/video/videochat.css}">-->
+    <link rel="stylesheet" th:href="@{assets/css/video/videochat.css}">
     <!-- 사이드바 스타일 포함 -->
     <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 </head>
@@ -96,8 +96,8 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="roomPassword">비밀번호 (선택)</label>
-                    <input type="password" id="roomPassword" name="roomPassword" placeholder="비밀번호를 설정하지 않으면 공개 회의실로 생성됩니다">
+<!--                    <label for="roomPassword">비밀번호 (선택)</label>-->
+                    <input type="hidden" id="roomPassword" name="roomPassword" placeholder="비밀번호를 설정하지 않으면 공개 회의실로 생성됩니다">
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="primary-btn">회의실 생성</button>
