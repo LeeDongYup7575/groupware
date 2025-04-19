@@ -14,30 +14,59 @@
 
 > 이메일, 메시지(실시간 채팅), 게시판, 화상회의, 전자결재, 출결관리 등 조직 내 전반적인 협업 기능을 통합한 풀스택 그룹웨어 시스템입니다.
 
+[TechX-Groupware 링크 클릭](http://groupware.techx.kro.kr/)
+
 ---
 
 ## 📸 Preview 
-(이미지 추가 예정)
 
-| Web (PC) 버전 | 모바일 앱 (Flutter) |
-|---------------|---------------------|
-| ![web-preview](https://via.placeholder.com/400x250?text=Web+Main) | ![app-preview](https://via.placeholder.com/200x400?text=QR+Check-in) |
+[//]: # (### INTRO )
+
+[//]: # (![intro]&#40;src/main/resources/static/assets/readme/intro.png&#41;)
+
+| 모바일 - 로그인 | 모바일 - 출퇴근QR                                               | 모바일 - 출퇴근 기록 출력                                           |
+|-----------|-----------------------------------------------------------|-----------------------------------------------------------|
+|     ![app1](src/main/resources/static/assets/readme/app1.png)       | ![app2](src/main/resources/static/assets/readme/app2.png) | ![app3](src/main/resources/static/assets/readme/app3.png) |
 ---
 ### 메인 페이지
+![main](src/main/resources/static/assets/readme/main.png)
 ### 조직도
+![members](src/main/resources/static/assets/readme/member_structure.png)
 ### 이메일
+![mail](src/main/resources/static/assets/readme/mail.png)
 ### 메시지(실시간 채팅)
+![chatting](src/main/resources/static/assets/readme/chatting.gif)
 ### 근태관리
+![attendance1](src/main/resources/static/assets/readme/attendance.png)
+![attendance2](src/main/resources/static/assets/readme/att1.png)
+![attendance3](src/main/resources/static/assets/readme/att2.png)
+![attendance4](src/main/resources/static/assets/readme/att3.png)
+![attendance5](src/main/resources/static/assets/readme/att4.png)
 ### 전자결재
+![edsm1](src/main/resources/static/assets/readme/edsm1.png)
+![edsm2](src/main/resources/static/assets/readme/edsm2.png)
 ### 업무관리
+![works1](src/main/resources/static/assets/readme/projects.png)
+![works2](src/main/resources/static/assets/readme/register-projects.png)
+![works3](src/main/resources/static/assets/readme/task-list.png)
+![works4](src/main/resources/static/assets/readme/task-log.png)
 ### 회의실/비품 예약
+![booking1](src/main/resources/static/assets/readme/booking1.png)
+![booking2](src/main/resources/static/assets/readme/booking2.png)
+![booking3](src/main/resources/static/assets/readme/booking3.png)
 ### 주소록
+![contacts](src/main/resources/static/assets/readme/contacts.png)
 ### 게시판
+![board1](src/main/resources/static/assets/readme/board1.png)
+![board2](src/main/resources/static/assets/readme/board2.png)
 ### 화상회의
+![video](src/main/resources/static/assets/readme/video.png)
 ### 그 외
-| QR체크                            | 마이페이지                                   | FAQs |
-|---------------------------------|-----------------------------------------|------|
-| ![main](./screenshots/main.png) | ![approval](./screenshots/approval.png) | 하이   |
+QR check, 마이페이지, faqs 등 
+
+```
+http://groupware.techx.kro.kr/ 에서 확인 가능합니다.
+```
 
 ---
 
@@ -100,6 +129,7 @@
 ---
 
 ## ⚙️ 주요 기술 스택
+![stack](src/main/resources/static/assets/readme/stack.png)
 
 ### 📌 백엔드
 - **Spring Boot (v2.7+)**
@@ -157,11 +187,6 @@
 
 # React Admin Frontend
 "groupware-admin" repository 에서 확인할 수 있습니다.
-
-cd admin/
-npm install
-npm install react-router-dom axios zustand lucid-react 
-npm install -D tailwindcss postcss autoprefixer
 
 # Flutter App
 "groupware-app" repository에서 확인할 수 있습니다.
