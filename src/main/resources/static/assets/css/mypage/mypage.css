@@ -412,42 +412,6 @@ tbody .title-col a:hover {
     text-decoration: underline;
 }
 
-#sidebarOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 998; /* 사이드바보다 아래 */
-    display: none;
-}
-
-/* 사이드바가 열렸을 때 오버레이도 보여주기 */
-#sidebarOverlay.show {
-    display: block;
-}
-
-#sidebarToggleBtn {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 40px;
-    height: 40px;
-    background-color: #1e3a8a;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    font-size: 15px;
-    line-height: 1;
-    z-index: 1100;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: grid;
-    place-items: center;
-}
-
 /* 반응형 스타일 */
 @media (max-width: 1200px) {
     .mypage-sidebar {
@@ -475,13 +439,7 @@ tbody .title-col a:hover {
     }
 }
 
-/* 1200px 이상일 때만 숨김 */
-@media (min-width: 1201px) {
-    #sidebarToggleBtn {
-        display: none;
-    }
-}
-
+/* 반응형 */
 @media (max-width: 768px){
     .post-table th.board-col,
     .post-table td.board-col,
