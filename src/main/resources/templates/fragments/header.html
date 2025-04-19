@@ -382,7 +382,7 @@
 
             .gw-navbar-collapse {
                 position: fixed;
-                top: 50%;
+                top: calc(80px + 80px + 5vh);
                 left: 50%;
                 transform: translate(-50%, -50%) scale(0.9);
                 width: 80%;
@@ -392,17 +392,20 @@
                 border-radius: 1rem;
                 box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
                 transition: all 0.3s ease;
-                z-index: 1000;
+                z-index: -1;
                 padding: 1.5rem;
                 overflow-y: auto;
                 opacity: 0;
                 visibility: hidden;
+                display: none;
             }
 
             .gw-navbar-toggle:checked ~ .gw-navbar-collapse {
                 transform: translate(-50%, -50%) scale(1);
                 opacity: 1;
                 visibility: visible;
+                display: block;
+                z-index: 1000;
             }
 
             .gw-navbar-nav {
