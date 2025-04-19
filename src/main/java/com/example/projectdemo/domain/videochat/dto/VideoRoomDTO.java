@@ -14,10 +14,9 @@ public class VideoRoomDTO {
     private int maxParticipants;
     private int currentParticipants;
 
-    // 추가 필드 - 현재 참가자 수를 저장하기 위한 필드
     private boolean isPasswordProtected;
 
-    // 비밀번호 존재 여부 확인
+    // 비밀번호 존재 여부 확인 -> 비밀번호 기능 없애서 삭제해도 되지만.. 일단 냅둠
     public boolean getIsPasswordProtected() {
         return password != null && !password.isEmpty();
     }

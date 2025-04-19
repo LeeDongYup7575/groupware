@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ScheduleDTO {
     private Integer id;
-    private String creatorEmpNum;          // 일정 생성자
+    private String creatorEmpNum;
     private String creatorName;            // 일정 생성자 이름 (매핑용)
     private String title;
     private String description;
@@ -33,7 +33,7 @@ public class ScheduleDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // 화면 표시용 추가 필드
+    // 화면 표시용
     private Integer participantCount;
-    private String statusColor;            // 일정 상태에 따른 색상
+    private String statusColor;
 }

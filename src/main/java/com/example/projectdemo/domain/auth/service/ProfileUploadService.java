@@ -19,7 +19,6 @@ public class ProfileUploadService {
     private S3Service s3Service;
 
     /**
-     * 프로필 이미지를 S3에 업로드하고 URL을 반환합니다.
      *
      * @param profileImage 업로드할 프로필 이미지
      * @param requestId 고유 요청 ID

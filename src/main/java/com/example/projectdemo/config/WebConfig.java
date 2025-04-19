@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    //왜 경로가 같은거지.. 하지만 건들기 무서우니까 냅둬야겠다.
     @Value("${file.upload-dir:uploads/profiles}")
     private String uploadDir;
 
