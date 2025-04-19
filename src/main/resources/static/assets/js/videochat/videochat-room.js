@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 참가자 관리
     const participants = {};
+    let participantCount = 0; // 참가자 수 카운트 추가
 
     // 로컬 스토리지에서 미디어 설정 불러오기
     const useCamera = localStorage.getItem('videoChat_useCamera') === 'true';
@@ -60,6 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initialize();
 
     // 초기화 함수
+    // 초기화 함수
     async function initialize() {
         try {
             // 로컬 미디어 스트림 가져오기
@@ -71,8 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // 하트비트 시작
             startHeartbeat();
 
-            // UI 이벤트 핸들러 설정
+            // UI 이벤트 핸들러 설정 (한 번만 호출)
             setupUIHandlers();
+
+            // 추가 콘솔 로그
+            console.log('초기화 완료. 참가자 목록 및 UI 상태 확인:');
+            console.log('참가자 목록:', participants);
+            console.log('사이드 패널 상태:', sidePanel.style.display);
+            console.log('패널 토글 버튼 상태:', chatToggleBtn.classList, participantsToggleBtn.classList);
 
         } catch (error) {
             console.error('초기화 중 오류 발생:', error);
@@ -141,11 +149,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 참가자 변경 알림 구독
             stompClient.subscribe('/topic/videochat/participant/' + roomId, function(message) {
+                console.log('참가자 이벤트 수신:', JSON.parse(message.body));
                 handleParticipantEvent(JSON.parse(message.body));
             });
 
             // 참가자 목록 업데이트 구독
             stompClient.subscribe('/topic/videochat/participants/' + roomId, function(message) {
+                console.log('참가자 목록 수신:', JSON.parse(message.body));
                 updateParticipantsList(JSON.parse(message.body).participants);
             });
 
@@ -210,19 +220,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 참가자 목록 가져오기
     function fetchParticipants() {
+        console.log('참가자 목록 가져오기 요청');
         fetch('/api/videochat/rooms/' + roomId + '/participants')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버에서 참가자 목록을 가져오는데 실패했습니다: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('서버에서 받은 참가자 목록:', data);
                 updateParticipantsList(data);
             })
-            .catch(error => console.error('참가자 목록 가져오기 오류:', error));
+            .catch(error => {
+                console.error('참가자 목록 가져오기 오류:', error);
+            });
     }
 
     // 참가자 목록 업데이트
     function updateParticipantsList(participantsList) {
-        // 참가자 맵 업데이트
+        // 참가자 맵 초기화 - 이전 상태를 지우고 새로 구성
+        Object.keys(participants).forEach(key => delete participants[key]);
+
+        // 참가자 정보 추가
         participantsList.forEach(participant => {
             participants[participant.empNum] = participant;
+        });
+
+        // 비디오 요소의 이름도 업데이트
+        Object.keys(participants).forEach(id => {
+            const infoElement = document.querySelector(`#video-container-${id} .participant-info`);
+            if (infoElement && participants[id].empName) {
+                infoElement.textContent = participants[id].empName;
+            }
         });
 
         // UI 업데이트
@@ -241,15 +271,87 @@ document.addEventListener('DOMContentLoaded', function() {
                 const nameInitial = (participant.empName || participant.empNum).charAt(0).toUpperCase();
 
                 participantElement.innerHTML = `
-                    <div class="participant-avatar">${nameInitial}</div>
-                    <div class="participant-name">${isMe ? participant.empName + ' (나)' : participant.empName || participant.empNum}</div>
-                `;
+                <div class="participant-avatar">${nameInitial}</div>
+                <div class="participant-name">${isMe ? participant.empName + ' (나)' : participant.empName || participant.empNum}</div>
+            `;
 
                 participantsListElement.appendChild(participantElement);
             });
         }
     }
 
+// 참가자 목록 UI 업데이트를 별도 함수로 분리
+    // 참가자 목록 UI 업데이트를 별도 함수로 분리
+    function updateParticipantsUI() {
+        const participantsListElement = document.getElementById('participantsList');
+        if (!participantsListElement) {
+            console.error('참가자 목록 요소를 찾을 수 없습니다');
+            return;
+        }
+
+        // 기존 리스트 내용 초기화
+        participantsListElement.innerHTML = '';
+
+        console.log('참가자 목록 UI 업데이트, 총 참가자 수:', Object.keys(participants).length);
+        console.log('전체 참가자 객체:', participants);
+
+        // 내 정보 먼저 표시
+        const myInfo = participants[empNum];
+        if (myInfo) {
+            const participantElement = document.createElement('li');
+            participantElement.className = 'participant-item';
+
+            // 첫 글자로 아바타 생성
+            const nameInitial = (myInfo.empName || '나').charAt(0).toUpperCase();
+
+            participantElement.innerHTML = `
+            <div class="participant-avatar">${nameInitial}</div>
+            <div class="participant-name">${myInfo.empName || '나'} (나)</div>
+        `;
+
+            participantsListElement.appendChild(participantElement);
+        }
+
+        // 다른 참가자 목록 추가 (나 제외)
+        Object.keys(participants).forEach(key => {
+            const participant = participants[key];
+            console.log('참가자 처리 확인:', key, participant);
+
+            if (key !== empNum && participant.isActive) {
+                console.log('UI에 참가자 추가:', key, participant.empName);
+                const participantElement = document.createElement('li');
+                participantElement.className = 'participant-item';
+
+                // 첫 글자로 아바타 생성
+                const nameInitial = (participant.empName || key).charAt(0).toUpperCase();
+
+                participantElement.innerHTML = `
+                <div class="participant-avatar">${nameInitial}</div>
+                <div class="participant-name">${participant.empName || key}</div>
+            `;
+
+                participantsListElement.appendChild(participantElement);
+            }
+        });
+
+        console.log('참가자 목록 UI 업데이트 완료, 아이템 수:', participantsListElement.children.length);
+    }
+
+    // 비디오 그리드 레이아웃 업데이트
+    function updateVideoGridLayout() {
+        // 이전 클래스 제거
+        videoGrid.className = 'video-grid';
+
+        // 사이드 패널이 열려있는지 확인하고 클래스 추가
+        if (sidePanel.style.display !== 'none') {
+            videoGrid.classList.add('side-panel-open');
+        }
+
+        // 참가자 수 데이터 어트리뷰트 추가 (디버깅/스타일링 목적)
+        videoGrid.setAttribute('data-participants', participantCount);
+    }
+
+    // 비디오 엘리먼트 생성
     // 비디오 엘리먼트 생성
     function createVideoElement(id, name, isLocal, noVideo = false, stream = null) {
         // 이미 존재하는 비디오인지 확인
@@ -259,6 +361,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (stream) {
                 existingVideo.srcObject = stream;
             }
+
+            // 이름 업데이트
+            const infoElement = document.querySelector(`#video-container-${id} .participant-info`);
+            if (infoElement && participants[id] && participants[id].empName) {
+                infoElement.textContent = participants[id].empName;
+            }
+
             return;
         }
 
@@ -297,15 +406,23 @@ document.addEventListener('DOMContentLoaded', function() {
         participantInfo.className = 'participant-info';
 
         // 참가자 이름 표시 (자신이면 "나"로 표시)
-        const displayName = isLocal ? '나' : (participants[id] ? participants[id].empName : id);
-        participantInfo.textContent = displayName;
+        let displayName;
+        if (isLocal) {
+            displayName = '나';
+        } else if (participants[id] && participants[id].empName) {
+            displayName = participants[id].empName;
+        } else {
+            displayName = id;
+        }
 
+        participantInfo.textContent = displayName;
         videoItem.appendChild(participantInfo);
 
         // 비디오 그리드에 추가
         videoGrid.appendChild(videoItem);
     }
 
+    // UI 이벤트 핸들러 설정
     // UI 이벤트 핸들러 설정
     function setupUIHandlers() {
         // 카메라 토글
@@ -317,13 +434,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // 화면 공유 토글
         screenShareToggleBtn.addEventListener('click', toggleScreenShare);
 
-        // 채팅 패널 토글
+        // 채팅 패널 토글 - 한 번만 설정
         chatToggleBtn.addEventListener('click', function() {
+            console.log('채팅 버튼 클릭');
             togglePanel('chat');
         });
 
-        // 참가자 목록 패널 토글
+        // 참가자 목록 패널 토글 - 한 번만 설정
         participantsToggleBtn.addEventListener('click', function() {
+            console.log('참가자 목록 버튼 클릭');
             togglePanel('participants');
         });
 
@@ -332,6 +451,17 @@ document.addEventListener('DOMContentLoaded', function() {
             sidePanel.style.display = 'none';
             chatToggleBtn.classList.remove('active');
             participantsToggleBtn.classList.remove('active');
+
+            // 비디오 그리드 레이아웃 업데이트 (필요시)
+            if (videoGrid.classList.contains('side-panel-open')) {
+                videoGrid.classList.remove('side-panel-open');
+            }
+
+            // 비디오 컨테이너 클래스 업데이트 (필요시)
+            const videoContainer = document.querySelector('.video-container');
+            if (videoContainer && videoContainer.classList.contains('panel-open')) {
+                videoContainer.classList.remove('panel-open');
+            }
         });
 
         // 채팅 전송 버튼
@@ -350,6 +480,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 leaveRoom();
                 window.location.href = '/videochat';
             }
+        });
+    }
+
+    function resetEventListeners() {
+        console.log('이벤트 리스너 재설정');
+
+        // 이벤트 리스너 제거
+        chatToggleBtn.removeEventListener('click', function() {});
+        participantsToggleBtn.removeEventListener('click', function() {});
+
+        // 이벤트 리스너 재설정
+        chatToggleBtn.addEventListener('click', function() {
+            console.log('채팅 버튼 클릭');
+            togglePanel('chat');
+        });
+
+        participantsToggleBtn.addEventListener('click', function() {
+            console.log('참가자 목록 버튼 클릭');
+            togglePanel('participants');
         });
     }
 
@@ -399,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
 
                     // 로컬 비디오 업데이트
-                    const localVideo = document.querySelector('#local-video');
+                    const localVideo = document.querySelector('#video-local');
                     if (localVideo) {
                         localVideo.srcObject = localStream;
                     }
@@ -502,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStream = newStream;
 
                 // 로컬 비디오 엘리먼트 업데이트
-                const localVideo = document.querySelector('#local-video');
+                const localVideo = document.querySelector('#video-local');
                 if (localVideo) {
                     localVideo.srcObject = localStream;
                 }
@@ -572,7 +721,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStream = newStream;
 
                 // 로컬 비디오 엘리먼트 업데이트
-                const localVideo = document.querySelector('#local-video');
+                const localVideo = document.querySelector('#video-local');
                 if (localVideo) {
                     localVideo.srcObject = localStream;
                 }
@@ -602,7 +751,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStream = audioOnlyStream;
 
                 // 로컬 비디오 엘리먼트 업데이트
-                const localVideo = document.querySelector('#local-video');
+                const localVideo = document.querySelector('#video-local');
                 if (localVideo) {
                     localVideo.srcObject = localStream;
                 }
@@ -628,20 +777,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 패널 토글 (채팅 또는 참가자 목록)
+    // 패널 토글 (채팅 또는 참가자 목록)
     function togglePanel(panelType) {
+        console.log('토글 패널 호출:', panelType);
+
         const isCurrentPanel = sidePanel.style.display !== 'none' &&
             (panelType === 'chat' ? chatPanel.style.display !== 'none' : participantsPanel.style.display !== 'none');
 
         // 현재 표시중인 패널이면 닫기
         if (isCurrentPanel) {
+            console.log('같은 패널 닫기');
             sidePanel.style.display = 'none';
             chatToggleBtn.classList.remove('active');
             participantsToggleBtn.classList.remove('active');
+
+            // 비디오 그리드 레이아웃 업데이트
+            document.querySelector('.video-container').classList.remove('panel-open');
+            videoGrid.classList.remove('side-panel-open');
             return;
         }
 
         // 패널 표시
+        console.log('패널 열기:', panelType);
         sidePanel.style.display = 'flex';
+
+        // 비디오 그리드 레이아웃 업데이트
+        document.querySelector('.video-container').classList.add('panel-open');
+        videoGrid.classList.add('side-panel-open');
 
         if (panelType === 'chat') {
             chatPanel.style.display = 'block';
@@ -652,6 +814,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 채팅 입력창에 포커스
             chatInput.focus();
+
+            // 스크롤을 최신 메시지로 이동
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
             chatPanel.style.display = 'none';
             participantsPanel.style.display = 'block';
@@ -661,6 +826,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 참가자 목록 새로고침
             fetchParticipants();
+
+            // 참가자 목록이 보이는지 확인하기 위한 로그
+            console.log('참가자 패널 표시 여부:', participantsPanel.style.display);
+            console.log('참가자 목록 내용:', participantsList.innerHTML);
         }
     }
 
@@ -730,7 +899,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         switch (event.type) {
             case 'join':
-                // 새 참가자 입장
+                // 새 참가자 입장 - 최대 인원수 확인
                 console.log('새 참가자 입장:', participantId);
 
                 // 새 참가자에게 오퍼 전송
@@ -743,6 +912,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // 연결 종료 및 비디오 제거
                 cleanupPeer(participantId);
+
+                // 참가자 카운트 감소
+                participantCount--;
+                updateVideoGridLayout();
                 break;
 
             case 'screenShare':
@@ -842,9 +1015,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 // PeerConnection 생성
+    // PeerConnection 생성 함수에 로깅 추가
     function createPeerConnection(peerId) {
         // 이미 존재하는 연결이면 반환
         if (peerConnections[peerId]) {
+            console.log('기존 PeerConnection 재사용:', peerId);
             return peerConnections[peerId];
         }
 
@@ -856,14 +1031,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 로컬 스트림 추가
         if (localStream) {
+            console.log('로컬 스트림 트랙을 PeerConnection에 추가:');
             localStream.getTracks().forEach(track => {
+                console.log('트랙 추가:', track.kind, track.id);
                 pc.addTrack(track, localStream);
             });
+        } else {
+            console.warn('로컬 스트림이 없어 트랙을 추가할 수 없습니다');
         }
 
         // ICE Candidate 이벤트 핸들러
         pc.onicecandidate = event => {
             if (event.candidate) {
+                console.log('ICE 후보 생성:', peerId, event.candidate.candidate.substring(0, 50) + '...');
                 sendSignalingMessage({
                     type: 'candidate',
                     sender: empNum,
@@ -875,10 +1055,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 원격 스트림 이벤트 핸들러
         pc.ontrack = event => {
-            console.log('원격 트랙 수신:', peerId, event.streams[0]);
+            console.log('원격 트랙 수신:', peerId, event.track.kind, event.track.id);
 
-            // 원격 비디오 엘리먼트 생성
-            createVideoElement(peerId, peerId, false, false, event.streams[0]);
+            if (event.streams && event.streams.length > 0) {
+                console.log('원격 스트림 정보:', event.streams[0].id, '트랙 개수:', event.streams[0].getTracks().length);
+
+                // 원격 비디오 엘리먼트 생성
+                createVideoElement(peerId, peerId, false, false, event.streams[0]);
+            } else {
+                console.warn('원격 트랙은 수신했지만 스트림이 없습니다.');
+            }
         };
 
         // ICE 연결 상태 변경 이벤트 핸들러
@@ -890,6 +1076,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 pc.iceConnectionState === 'failed' ||
                 pc.iceConnectionState === 'closed') {
 
+                console.warn('ICE 연결 상태 불량:', pc.iceConnectionState);
                 cleanupPeer(peerId);
             }
         };
@@ -901,6 +1088,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer);
+                console.log('로컬 설명 설정됨:', offer.type);
 
                 sendSignalingMessage({
                     type: 'offer',
@@ -921,9 +1109,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('PeerConnection 정리:', peerId);
 
         // 비디오 엘리먼트 제거
-        const videoElement = document.getElementById(`video-${peerId}`);
-        if (videoElement) {
-            videoElement.parentElement.remove();
+        const videoContainer = document.getElementById(`video-container-${peerId}`);
+        if (videoContainer) {
+            videoContainer.remove();
         }
 
         // PeerConnection 종료
@@ -946,5 +1134,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 참가자 목록에서 제거
         delete participants[peerId];
+
+        // 비디오 그리드 레이아웃 업데이트
+        updateVideoGridLayout();
     }
 });

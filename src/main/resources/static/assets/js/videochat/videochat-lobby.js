@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const micToggle = document.getElementById('micToggle');
     const mediaStatus = document.getElementById('mediaStatus');
 
+    // 방 가득참 모달 추가
+    const roomFullModal = document.getElementById('roomFullModal');
+    const closeRoomFullBtn = roomFullModal ? roomFullModal.querySelector('.close') : null;
+
     // 검색 관련 요소
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
@@ -43,6 +47,21 @@ document.addEventListener('DOMContentLoaded', function() {
         mediaPermissionModal.style.display = 'none';
     });
 
+    // 방 가득참 모달 닫기
+    if (closeRoomFullBtn) {
+        closeRoomFullBtn.addEventListener('click', function() {
+            roomFullModal.style.display = 'none';
+        });
+    }
+
+    // 모달 닫기 버튼들 추가 설정
+    const closeButtons = document.querySelectorAll('.close, .close-modal');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (roomFullModal) roomFullModal.style.display = 'none';
+        });
+    });
+
     // 모달 외부 클릭 시 닫기
     window.addEventListener('click', function(event) {
         if (event.target === createRoomModal) {
@@ -53,6 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (event.target === mediaPermissionModal) {
             mediaPermissionModal.style.display = 'none';
+        }
+        if (roomFullModal && event.target === roomFullModal) {
+            roomFullModal.style.display = 'none';
         }
     });
 
@@ -111,6 +133,20 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const roomId = this.getAttribute('data-room-id');
             const passwordProtected = this.getAttribute('data-password-protected') === 'true';
+
+            // 최대 인원수 체크 추가
+            const maxParticipants = parseInt(this.getAttribute('data-max-participants') || '10');
+            const currentParticipants = parseInt(this.getAttribute('data-current-participants') || '0');
+
+            // 이미 가득 찬 방인지 확인
+            if (currentParticipants >= maxParticipants) {
+                if (roomFullModal) {
+                    roomFullModal.style.display = 'block';
+                } else {
+                    alert('회의실 최대 인원수에 도달했습니다.');
+                }
+                return;
+            }
 
             if (passwordProtected) {
                 // 비밀번호가 필요한 경우 비밀번호 모달 표시
@@ -201,7 +237,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         </p>
                     </div>
                     <div class="room-actions">
-                        <button class="join-btn" data-room-id="${room.id}" data-password-protected="${room.isPasswordProtected}">
+                        <button class="join-btn" 
+                            data-room-id="${room.id}" 
+                            data-password-protected="${room.isPasswordProtected}"
+                            data-max-participants="${room.maxParticipants}"
+                            data-current-participants="${room.currentParticipants}">
                             입장
                         </button>
                     </div>
@@ -214,6 +254,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 newJoinBtn.addEventListener('click', function() {
                     const roomId = this.getAttribute('data-room-id');
                     const passwordProtected = this.getAttribute('data-password-protected') === 'true';
+                    const maxParticipants = parseInt(this.getAttribute('data-max-participants') || '10');
+                    const currentParticipants = parseInt(this.getAttribute('data-current-participants') || '0');
+
+                    // 이미 가득 찬 방인지 확인
+                    if (currentParticipants >= maxParticipants) {
+                        if (roomFullModal) {
+                            roomFullModal.style.display = 'block';
+                        } else {
+                            alert('회의실 최대 인원수에 도달했습니다.');
+                        }
+                        return;
+                    }
 
                     if (passwordProtected) {
                         document.getElementById('passwordRoomId').value = roomId;

@@ -61,7 +61,8 @@
                                 </p>
                             </div>
                             <div class="room-actions">
-                                <button class="join-btn" th:data-room-id="${room.id}" th:data-password-protected="${room.isPasswordProtected}">
+                                <button class="join-btn" th:data-room-id="${room.id}" th:data-password-protected="${room.isPasswordProtected}"
+                                        th:data-max-participants="${room.maxParticipants}" th:data-current-participants="${room.currentParticipants}">
                                     입장
                                 </button>
                             </div>
@@ -89,14 +90,13 @@
                 <div class="form-group">
                     <label for="maxParticipants">최대 참가자 수</label>
                     <select id="maxParticipants" name="maxParticipants">
+                        <option value="2">2명</option>
                         <option value="5">5명</option>
                         <option value="10" selected>10명</option>
-                        <option value="15">15명</option>
-                        <option value="20">20명</option>
                     </select>
                 </div>
                 <div class="form-group">
-<!--                    <label for="roomPassword">비밀번호 (선택)</label>-->
+                    <!--                    <label for="roomPassword">비밀번호 (선택)</label>-->
                     <input type="hidden" id="roomPassword" name="roomPassword" placeholder="비밀번호를 설정하지 않으면 공개 회의실로 생성됩니다">
                 </div>
                 <div class="form-actions">
@@ -158,7 +158,66 @@
     </div>
 </div>
 
+<!-- 방 입장 실패 모달 -->
+<div id="roomFullModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>입장 불가</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>회의실 최대 인원수에 도달했습니다.</p>
+            <div class="form-actions">
+                <button class="primary-btn close-modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script th:src="@{assets/js/videochat/videochat-lobby.js}"></script>
+
+<!-- 추가 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 입장 버튼 클릭 이벤트 핸들러 수정
+        const joinButtons = document.querySelectorAll('.join-btn');
+        const roomFullModal = document.getElementById('roomFullModal');
+
+        joinButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const maxParticipants = parseInt(this.getAttribute('data-max-participants'));
+                const currentParticipants = parseInt(this.getAttribute('data-current-participants'));
+
+                // 이미 가득 찬 방인지 확인
+                if (currentParticipants >= maxParticipants) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // 방 가득참 모달 표시
+                    roomFullModal.style.display = 'block';
+                    return;
+                }
+
+                // 기존 이벤트 처리 계속 진행
+            });
+        });
+
+        // 모달 닫기 버튼들
+        const closeButtons = document.querySelectorAll('.close, .close-modal');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                roomFullModal.style.display = 'none';
+            });
+        });
+
+        // 모달 바깥 클릭시 닫기
+        window.addEventListener('click', function(event) {
+            if (event.target === roomFullModal) {
+                roomFullModal.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 <div th:replace="fragments/header :: headerScripts"></div>
 </body>

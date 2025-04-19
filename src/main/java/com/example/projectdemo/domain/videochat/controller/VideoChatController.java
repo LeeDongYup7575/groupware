@@ -93,12 +93,14 @@ public class VideoChatController {
         }
 
         String empNum = (String) request.getAttribute("empNum");
+        String empName = (String) request.getAttribute("name");
 
         // 회의실 참가처리
         videoRoomService.joinRoom(roomId, empNum);
 
         model.addAttribute("room", room);
         model.addAttribute("empNum", empNum);
+        model.addAttribute("empName", empName);
 
         return "videochat/room";
     }

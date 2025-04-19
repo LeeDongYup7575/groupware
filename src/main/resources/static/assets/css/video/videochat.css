@@ -32,19 +32,15 @@ body {
 
 /* 화상회의 로비 스타일 */
 .video-lobby {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-    padding: 30px;
-    margin-bottom: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 .video-lobby h1 {
-    color: #2d3748;
     font-size: 28px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #f0f2f5;
-    padding-bottom: 15px;
+    margin-bottom: 30px;
+    color: #333;
 }
 
 /* 검색 영역 */
@@ -52,171 +48,136 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .search-box {
     display: flex;
     flex: 1;
-    margin-right: 15px;
-    position: relative;
+    max-width: 500px;
+    margin-right: 20px;
 }
 
 .search-box input {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
+    flex: 1;
+    padding: 12px 15px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.search-box input:focus {
+    border-radius: 5px 0 0 5px;
+    font-size: 15px;
     outline: none;
-    border-color: #4a6cf7;
-    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
 }
 
 .search-box button {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #718096;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.primary-btn {
+    padding: 0 20px;
     background-color: #4a6cf7;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.primary-btn {
     padding: 12px 20px;
-    font-size: 16px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+    transition: background-color 0.2s;
 }
 
 .primary-btn:hover {
     background-color: #3a5bd7;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(74, 108, 247, 0.25);
 }
 
 /* 회의실 목록 */
 .room-list {
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .empty-list {
     text-align: center;
     padding: 50px 0;
-    color: #718096;
-    background-color: #f8fafc;
+    background-color: #f9f9f9;
     border-radius: 8px;
-    font-size: 18px;
+    border: 1px dashed #ddd;
+}
+
+.empty-list p {
+    color: #666;
+    font-size: 16px;
 }
 
 .room-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
 
 .room-card {
-    background-color: #fff;
-    border-radius: 12px;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-    padding: 20px;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .room-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
-    border-color: #e2e8f0;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .room-info {
-    flex: 1;
+    padding: 20px;
 }
 
 .room-info h3 {
-    color: #2d3748;
     font-size: 18px;
-    margin-bottom: 8px;
-    font-weight: 600;
-    word-break: break-word;
+    margin-bottom: 10px;
+    color: #333;
 }
 
 .room-info p {
-    color: #718096;
-    margin-bottom: 5px;
-    font-size: 14px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-}
-
-.room-id {
-    color: #a0aec0;
-    font-size: 13px;
-}
-
-.room-participants {
-    font-weight: 500;
-    color: #4a5568;
-}
-
-.room-participants i {
-    color: #4a6cf7;
-    margin-right: 5px;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
 }
 
 .room-created {
-    font-size: 13px !important;
-    color: #a0aec0 !important;
-    margin-top: 5px;
+    font-size: 13px;
+    color: #888;
 }
 
 .room-locked {
-    color: #e53e3e;
-    display: flex;
-    align-items: center;
-    font-size: 13px;
+    color: #f59f00;
 }
 
-.room-locked i {
-    margin-right: 4px;
+.room-participants {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .room-actions {
-    margin-top: 15px;
+    padding: 0 20px 20px 20px;
     display: flex;
     justify-content: flex-end;
 }
 
 .join-btn {
+    padding: 8px 20px;
     background-color: #4a6cf7;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 8px 20px;
-    font-size: 15px;
+    border-radius: 5px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s;
 }
 
 .join-btn:hover {
@@ -227,67 +188,66 @@ body {
 .modal {
     display: none;
     position: fixed;
-    z-index: 1000;
-    left: 0;
     top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.3s;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
 }
 
 .modal-content {
-    background-color: #fff;
-    margin: 5% auto;
+    position: relative;
+    background-color: white;
+    margin: 10% auto;
     width: 90%;
     max-width: 500px;
-    border-radius: 12px;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
-    animation: slideIn 0.3s;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s;
 }
 
-@keyframes slideIn {
-    from { transform: translateY(-30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-header {
-    padding: 20px 25px;
-    border-bottom: 1px solid #edf2f7;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
 }
 
 .modal-header h2 {
     font-size: 20px;
-    color: #2d3748;
-    font-weight: 600;
+    color: #333;
+    margin: 0;
 }
 
 .close {
-    color: #a0aec0;
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 24px;
+    color: #aaa;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: color 0.2s;
+    font-weight: bold;
 }
 
 .close:hover {
-    color: #4a5568;
+    color: #555;
 }
 
 .modal-body {
-    padding: 25px;
+    padding: 20px;
 }
 
-/* 폼 스타일 */
 .form-group {
     margin-bottom: 20px;
 }
@@ -296,26 +256,21 @@ body {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #4a5568;
+    color: #333;
 }
 
 .form-group input, .form-group select {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s;
+    border-radius: 5px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
 .form-group input:focus, .form-group select:focus {
-    outline: none;
     border-color: #4a6cf7;
-    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
-}
-
-.form-group input::placeholder {
-    color: #a0aec0;
 }
 
 .form-actions {
@@ -324,83 +279,79 @@ body {
     justify-content: flex-end;
 }
 
-/* 미디어 권한 모달 스타일 */
+/* 미디어 토글 스타일 */
 .media-toggle {
-    margin: 20px 0;
     display: flex;
-    gap: 20px;
+    justify-content: space-around;
+    margin: 20px 0;
 }
 
 .toggle-group {
     display: flex;
+    flex-direction: column;
     align-items: center;
+    gap: 10px;
 }
 
 .toggle-group label {
-    margin-right: 10px;
     font-weight: 500;
-}
-
-.toggle-group input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
 }
 
 .toggle-slider {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 26px;
-    background-color: #cbd5e0;
-    border-radius: 34px;
-    transition: .4s;
+    width: 60px;
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 15px;
     cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-group input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-group input[type="checkbox"]:checked + .toggle-slider {
+    background-color: #4a6cf7;
 }
 
 .toggle-slider:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 20px;
+    height: 24px;
+    width: 24px;
     left: 3px;
     bottom: 3px;
     background-color: white;
     border-radius: 50%;
-    transition: .4s;
+    transition: 0.3s;
 }
 
-input:checked + .toggle-slider {
-    background-color: #4a6cf7;
-}
-
-input:checked + .toggle-slider:before {
-    transform: translateX(24px);
+.toggle-group input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(30px);
 }
 
 .media-status {
-    padding: 10px;
-    border-radius: 6px;
-    font-size: 14px;
     text-align: center;
-    color: #4a5568;
+    color: #666;
+    margin: 15px 0;
+    font-style: italic;
 }
 
 /* 반응형 스타일 */
 @media (max-width: 768px) {
     .search-area {
         flex-direction: column;
-        gap: 15px;
+        align-items: stretch;
     }
 
     .search-box {
-        width: 100%;
         margin-right: 0;
-    }
-
-    .primary-btn {
-        width: 100%;
+        margin-bottom: 15px;
+        max-width: none;
     }
 
     .room-grid {
@@ -408,25 +359,30 @@ input:checked + .toggle-slider:before {
     }
 
     .modal-content {
+        margin: 20% auto;
         width: 95%;
-        margin: 10% auto;
     }
 }
 
-@media (max-width: 480px) {
-    .video-lobby {
-        padding: 20px 15px;
-    }
+/* 방 입장 실패 모달 스타일 */
+#roomFullModal .modal-body {
+    text-align: center;
+    padding: 30px 20px;
+}
 
-    .video-lobby h1 {
-        font-size: 24px;
-    }
+#roomFullModal p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #e53e3e;
+}
 
-    .modal-header h2 {
-        font-size: 18px;
-    }
-
-    .form-actions button {
-        width: 100%;
-    }
+/* 최대 참가자 수 선택 스타일 */
+#maxParticipantsSelect {
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
 }
