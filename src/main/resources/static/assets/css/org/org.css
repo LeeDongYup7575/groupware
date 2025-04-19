@@ -116,6 +116,7 @@ body {
 
 .employee-card {
     padding: 3vh 0;
+    cursor: pointer;
 }
 
 .profile-image {
