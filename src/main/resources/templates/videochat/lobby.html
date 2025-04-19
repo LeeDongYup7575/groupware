@@ -10,9 +10,10 @@
     <!-- 헤더 에셋 포함 -->
     <th:block th:replace="fragments/header :: headerAssets"></th:block>
 
+
+<!--    <link rel="stylesheet" th:href="@{assets/css/video/videochat.css}">-->
     <!-- 사이드바 스타일 포함 -->
-<!--    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">-->
-    <link rel="stylesheet" th:href="@{assets/css/video/videochat.css}">
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 </head>
 <body>
 
@@ -21,8 +22,6 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="main-content">
-        <!-- 사이드바 -->
-<!--        <div th:replace="fragments/sidebar/main-sidebar :: sidebar"></div>-->
 
         <div class="content-area">
             <div class="video-lobby">
@@ -161,10 +160,6 @@
 
 <script th:src="@{assets/js/videochat/videochat-lobby.js}"></script>
 
-<!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
-
-<!-- 공통 사이드바 스크립트 포함 -->
-<!--<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">-->
 </body>
 </html>
