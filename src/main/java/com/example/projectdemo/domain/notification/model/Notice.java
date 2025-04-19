@@ -59,19 +59,4 @@ public class Notice {
         this.date = date;
     }
 
-    public int getViewCount() {
-        return viewCount;
-    }
-
-    public void setViewCount(int viewCount) {
-        this.viewCount = viewCount;
-    }
-
-    public boolean isHighlighted() {
-        return isHighlighted;
-    }
-
-    public void setHighlighted(boolean highlighted) {
-        isHighlighted = highlighted;
-    }
 }

@@ -29,10 +29,6 @@ public class VideoChatController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    private EmployeesMapper employeesMapper;
-
-
     // 화상회의 로비 페이지
     @GetMapping("/videochat")
     public String videoLobby(Model model) {

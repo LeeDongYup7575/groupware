@@ -18,15 +18,10 @@ public class NoticeService {
         this.noticeCrawler = noticeCrawler;
     }
 
-    /**
-     * 캐시된 공지사항을 가져오는 메소드
-     * MainPageFacade에서 호출됨
-     */
     public List<Notice> getCachedNotices() {
         try {
             return noticeCrawler.getNotices();
         } catch (Exception e) {
-            System.out.println("공지사항 로드 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
             return Collections.emptyList();
         }

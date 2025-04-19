@@ -141,15 +141,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 sendErrorResponse(response, 403, "비밀번호 변경이 필요합니다.", true);
                 return;
             }
-
-            // 마지막 로그인 시간 업데이트
-            // *** 스택오버플로우 수정: 세션 사용 최소화 ***
-            // 불필요한 세션 접근 제거 (HttpSession 사용 제한)
-            // 이미 로그인 정보가 JWT 토큰에 있으므로 세션 사용 없이 처리
             try {
                 employeeMapper.updateLastLogin(empNum, LocalDateTime.now());
             } catch (Exception e) {
-                // 로그만 남기고 계속 진행 (실패해도 블로킹하지 않음)
                 logger.warn("마지막 로그인 시간 업데이트 실패", e);
             }
 
@@ -163,7 +157,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
-            System.out.println("인증 처리 중 예외 발생: " + e.getMessage());
             e.printStackTrace();
             sendErrorResponse(response, 401, "인증 처리 중 오류가 발생했습니다.");
         }

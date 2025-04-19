@@ -20,7 +20,6 @@ import java.util.regex.Pattern;
 @Component
 public class NoticeCrawler {
 
-    // 메모리 캐시 (실제 프로덕션에서는 Redis 등의 외부 캐시 서버 권장)
     private static final ConcurrentHashMap<String, CacheEntry<List<Notice>>> CACHE = new ConcurrentHashMap<>();
     private static final long CACHE_EXPIRY_TIME_MS = 3600000; // 1시간(밀리초)
 
@@ -42,12 +41,10 @@ public class NoticeCrawler {
 
         // 캐시가 유효한지 확인
         if (isValidCache(cachedNotices)) {
-            System.out.println("캐시에서 공지사항 데이터를 로드합니다.");
             return cachedNotices.getData();
         }
 
         // 캐시가 없거나 만료되었으면 크롤링 실행
-        System.out.println("캐시가 없거나 만료되어 크롤링을 시작합니다.");
         List<Notice> freshNotices = crawlNotices();
 
         // 결과를 캐시에 저장
@@ -62,20 +59,15 @@ public class NoticeCrawler {
     public List<Notice> crawlNotices() {
         List<Notice> noticeList = new ArrayList<>();
 
-        System.out.println("===== 공지사항 크롤링 시작 =====");
-
         try {
             // JSoup을 사용하여 페이지 로드
-            System.out.println("공지사항 페이지 로드 중...");
             Document document = Jsoup.connect(noticeUrl)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36")
                     .timeout(10000)  // 10초 타임아웃
                     .get();
-            System.out.println("페이지 로드 완료");
 
             // 테이블에서 모든 행(tr) 찾기 - tbody 내의 tr들을 찾음
             Elements rows = document.select("tbody > tr");
-            System.out.println("찾은 행 수: " + rows.size());
 
             // 각 행에서 공지사항 정보 추출
             int count = 0;
@@ -115,15 +107,8 @@ public class NoticeCrawler {
                         try {
                             viewCount = Integer.parseInt(viewCountStr);
                         } catch (NumberFormatException e) {
-                            System.out.println("조회수 변환 실패: " + viewCountStr);
+                            e.printStackTrace();
                         }
-
-                        System.out.println("공지사항 ID: " + id);
-                        System.out.println("제목: " + title);
-                        System.out.println("URL: " + postUrl);
-                        System.out.println("등록일: " + dateStr);
-                        System.out.println("조회수: " + viewCount);
-                        System.out.println("강조 여부: " + isHighlighted);
 
                         // 확장된 Notice 객체 생성 및 추가
                         Notice notice = new Notice(id, title, postUrl, dateStr, viewCount, isHighlighted);
@@ -134,17 +119,12 @@ public class NoticeCrawler {
             }
 
         } catch (IOException e) {
-            System.out.println("크롤링 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
 
-            // 오류 발생 시 빈 리스트 반환 대신 기본 공지사항 추가 (서비스 안정성)
             if (noticeList.isEmpty()) {
                 noticeList.add(new Notice("0", "현재 공지사항을 불러올 수 없습니다.", "#", "2025-04-17", 0, false));
             }
         }
-
-        System.out.println("총 수집된 공지사항 수: " + noticeList.size());
-        System.out.println("===== 공지사항 크롤링 종료 =====");
 
         return noticeList;
     }
@@ -158,9 +138,6 @@ public class NoticeCrawler {
                 (System.currentTimeMillis() - cacheEntry.getCreatedTime() < CACHE_EXPIRY_TIME_MS);
     }
 
-    /**
-     * 캐시 데이터와 생성 시간을 저장하는 내부 클래스
-     */
     private static class CacheEntry<T> {
         private final T data;
         private final long createdTime;

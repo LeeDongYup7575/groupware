@@ -1,7 +1,6 @@
 package com.example.projectdemo.domain.projects.service;
 
 import com.example.projectdemo.domain.projects.dto.ScheduleDTO;
-import com.example.projectdemo.domain.projects.dto.ScheduleParticipantDTO;
 import com.example.projectdemo.domain.projects.mapper.ScheduleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,26 +52,6 @@ public class ScheduleService {
 
     public void deleteSchedule(Integer id) {
         scheduleMapper.deleteSchedule(id);
-    }
-
-    public List<ScheduleParticipantDTO> getScheduleParticipants(Integer scheduleId) {
-        return scheduleMapper.selectScheduleParticipants(scheduleId);
-    }
-
-    public ScheduleParticipantDTO addScheduleParticipant(Integer scheduleId, String empNum) {
-        ScheduleParticipantDTO dto = ScheduleParticipantDTO.builder()
-                .scheduleId(scheduleId)
-                .empNum(empNum)
-                .status("대기") // 기본 상태
-                .build();
-
-        scheduleMapper.insertScheduleParticipant(dto);
-        return dto;
-    }
-
-    public ScheduleParticipantDTO updateParticipantStatus(Integer scheduleId, String empNum, String status) {
-        scheduleMapper.updateParticipantStatus(scheduleId, empNum, status);
-        return scheduleMapper.selectScheduleParticipant(scheduleId, empNum);
     }
 
     public void removeScheduleParticipant(Integer scheduleId, String empNum) {

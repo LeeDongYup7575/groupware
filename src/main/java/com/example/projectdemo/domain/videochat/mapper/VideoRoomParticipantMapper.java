@@ -24,7 +24,7 @@ public interface VideoRoomParticipantMapper {
     VideoRoomParticipantDTO findParticipantByRoomIdAndEmpNum(@Param("roomId") String roomId,
                                                              @Param("empNum") String empNum);
 
-    // 하트비트 업데이트
+    // 하트비트 업데이트 - 연결상태 확인용이니 윤진언니 자꾸 2PM 리슨투마하트비트 금지
     int updateHeartbeat(@Param("id") Long id, @Param("lastHeartbeat") LocalDateTime lastHeartbeat);
 
     // 오래된 하트비트를 가진 참가자 조회 (비활성화 대상)
