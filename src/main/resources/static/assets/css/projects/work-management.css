@@ -1,3 +1,21 @@
+/* Base Styles */
+:root {
+    --primary: #3498db;
+    --primary-dark: #2980b9;
+    --secondary: #95a5a6;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+    --light: #f5f8fa;
+    --dark: #2c3e50;
+    --gray: #6c757d;
+    --light-gray: #f8f9fa;
+    --border-color: rgba(0, 0, 0, 0.125);
+    --shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
 /* Task Progress Bar Styles */
 .task-progress {
     height: 10px;
@@ -13,33 +31,39 @@
 
 /* Priority Border Styles */
 .priority-high {
-    border-left: 4px solid #dc3545 !important;
+    border-left: 4px solid var(--danger) !important;
 }
 
 .priority-medium {
-    border-left: 4px solid #ffc107 !important;
+    border-left: 4px solid var(--warning) !important;
 }
 
 .priority-low {
-    border-left: 4px solid #0d6efd !important;
+    border-left: 4px solid var(--primary) !important;
 }
 
 /* Project Card Styles */
 .project-card {
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.125);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
     height: 100%;
+    cursor: pointer;
 }
 
 .project-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-hover);
 }
 
 .project-card .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: var(--light-gray);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+}
+
+.project-card .card-body {
+    padding: 1.25rem;
 }
 
 /* Task List Item Styles */
@@ -48,10 +72,11 @@
     margin-bottom: 10px;
     border-radius: 5px;
     transition: background-color 0.2s;
+    cursor: pointer;
 }
 
 .task-list-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--light-gray);
 }
 
 .task-list-item h5 {
@@ -68,12 +93,12 @@
 }
 
 .todo-list-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--light-gray);
 }
 
 .todo-list-item.completed {
     text-decoration: line-through;
-    color: #6c757d;
+    color: var(--gray);
     background-color: rgba(0, 0, 0, 0.02);
 }
 
@@ -83,7 +108,7 @@
 
 /* Task Log Styles */
 .task-log-item {
-    border-left: 3px solid #6c757d;
+    border-left: 3px solid var(--gray);
     padding-left: 15px;
     margin-bottom: 15px;
     position: relative;
@@ -95,7 +120,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background-color: #6c757d;
+    background-color: var(--gray);
     left: -7.5px;
     top: 10px;
 }
@@ -115,7 +140,7 @@
 }
 
 .nav-tabs .nav-link.active {
-    color: #0d6efd;
+    color: var(--primary);
     font-weight: 600;
 }
 
@@ -127,35 +152,8 @@
 .search-filter-bar {
     margin-bottom: 20px;
     padding: 10px;
-    background-color: #f8f9fa;
+    background-color: var(--light-gray);
     border-radius: 5px;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .project-selector {
-        margin-bottom: 15px;
-    }
-
-    .nav-tabs .nav-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.9rem;
-    }
-
-    .todo-list-item .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-}
-
-.project-card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-}
-
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .task-row {
@@ -176,4 +174,450 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
+}
+
+/* Sidebar responsive behavior */
+@media (min-width: 1200px) {
+    .work-sidebar {
+        display: block;
+    }
+
+    main.col-md-10 {
+        width: 83.333333%;
+    }
+
+    .container {
+        max-width: 1140px;
+    }
+}
+
+/* Responsive Media Queries */
+
+/* Extra large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .task-list-item, .todo-list-item {
+        padding: 12px;
+    }
+
+    .project-card .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* Sidebar becomes a horizontal navigation at the top */
+    .work-sidebar {
+        width: 100% !important;
+        height: auto;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .work-sidebar .nav {
+        flex-direction: row !important;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+    }
+
+    .work-sidebar .nav-item {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+
+    .work-sidebar .nav-link {
+        padding: 0.5rem 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Main content takes full width */
+    main.col-md-10 {
+        width: 100%;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    .project-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .todo-list-item .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .task-progress {
+        height: 8px;
+    }
+
+    .progress {
+        height: 15px;
+    }
+
+    .todo-list-item {
+        padding: 8px 10px;
+    }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+    /* Sidebar becomes a compact horizontal menu */
+    .work-sidebar {
+        width: 100% !important;
+        height: auto;
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .work-sidebar .nav {
+        flex-direction: row !important;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 0.25rem;
+    }
+
+    .work-sidebar .nav-item {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+    .work-sidebar .nav-link {
+        padding: 0.4rem 0.8rem;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .work-sidebar .nav-link i {
+        margin-right: 5px;
+    }
+
+    /* Main content takes full width */
+    main.col-md-10 {
+        width: 100%;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .nav-tabs .nav-link i {
+        margin-right: 3px;
+    }
+
+    .tab-content {
+        padding: 15px;
+    }
+
+    .project-card .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .project-card .card-body {
+        padding: 0.75rem;
+    }
+
+    .task-progress {
+        height: 6px;
+        margin-bottom: 8px;
+    }
+
+    .project-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .task-list-item, .todo-list-item {
+        padding: 10px;
+    }
+
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .progress {
+        height: 15px;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+    }
+
+    .d-flex.justify-content-between > div {
+        margin-bottom: 10px;
+    }
+}
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+    /* Hide sidebar completely on very small screens */
+    .work-sidebar {
+        display: none !important;
+    }
+
+    /* Add a floating menu button to show the menu when needed */
+    .sidebar-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        background-color: var(--primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 1050;
+        border: none;
+    }
+
+    /* When sidebar is shown on small screens */
+    .mobile-sidebar-visible .work-sidebar {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+        height: 100%;
+        background-color: white;
+        z-index: 1040;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+    .mobile-sidebar-visible .work-sidebar .nav {
+        flex-direction: column !important;
+    }
+
+    .mobile-sidebar-visible .work-sidebar .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .mobile-sidebar-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--gray);
+    }
+
+    /* Main content takes full width */
+    main.col-md-10 {
+        width: 100%;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .nav-tabs .nav-link i {
+        margin-right: 2px;
+    }
+
+    .tab-content {
+        padding: 10px;
+    }
+
+    .task-progress {
+        height: 5px;
+    }
+
+    .project-card .card-header {
+        padding: 0.5rem;
+    }
+
+    .project-card .card-body {
+        padding: 0.5rem;
+    }
+
+    .project-card:hover {
+        transform: none;
+    }
+
+    .task-list-item, .todo-list-item {
+        padding: 8px;
+    }
+
+    .btn {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    .task-log-item:before {
+        width: 8px;
+        height: 8px;
+        left: -5.5px;
+    }
+
+    .progress {
+        height: 12px;
+    }
+
+    .progress-bar {
+        font-size: 0.75rem;
+    }
+
+    .card-header h5 {
+        font-size: 1rem;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column;
+    }
+
+    .d-flex.justify-content-between > div {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .d-flex.justify-content-between .input-group {
+        max-width: 100% !important;
+    }
+
+    .form-check.form-switch {
+        margin-top: 10px;
+    }
+
+    .row.mb-3 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .table {
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+    }
+
+    /* Fix for small screens - projects tab search and toggle */
+    #projects .row.mb-3 .col-md-12 .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    #projects .row.mb-3 .col-md-12 .d-flex.justify-content-between .input-group {
+        margin-bottom: 10px;
+    }
+
+    /* Mobile menu adjustments */
+    #workTabs {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    #workTabs .nav-item {
+        flex: 0 0 auto;
+    }
+}
+
+/* Project details adjustments */
+@media (max-width: 767.98px) {
+    .project-detail h3 {
+        font-size: 1.25rem;
+    }
+
+    .project-detail .badge {
+        font-size: 0.7rem;
+    }
+
+    .project-detail .card-header h5 {
+        font-size: 0.9rem;
+    }
+
+    #project-tasks-container .table {
+        font-size: 0.8rem;
+    }
+
+    .card-body .btn-group.w-100 .btn {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.3rem;
+    }
+
+    /* Stack buttons in project detail */
+    .modal-dialog {
+        margin: 0.75rem;
+    }
+
+    .modal-body, .modal-header, .modal-footer {
+        padding: 0.75rem;
+    }
+
+    .project-detail .card-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .project-detail .card-header h5 {
+        margin-bottom: 0.5rem;
+    }
+
+    .project-detail .card-header div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+}
+
+/* Large screen improvements */
+@media (min-width: 1600px) {
+    .container-fluid {
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    .project-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .task-progress {
+        height: 12px;
+    }
+
+    .progress {
+        height: 24px;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+    }
 }

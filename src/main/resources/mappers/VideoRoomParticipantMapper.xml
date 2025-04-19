@@ -1,59 +1,125 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-    <mapper namespace="com.example.projectdemo.domain.videoconf.mapper.VideoRoomParticipantMapper">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-        <resultMap id="participantMap" type="com.example.projectdemo.domain.videoconf.entity.VideoRoomParticipant">
-            <id property="id" column="id"/>
-            <result property="roomId" column="room_id"/>
-            <result property="empNum" column="emp_num"/>
-            <result property="joinedAt" column="joined_at"/>
-            <result property="leftAt" column="left_at"/>
-            <result property="lastHeartbeat" column="last_heartbeat"/>
-            <result property="isActive" column="is_active"/>
-        </resultMap>
+<mapper namespace="com.example.projectdemo.domain.videochat.mapper.VideoRoomParticipantMapper">
+    <resultMap id="participantResultMap" type="com.example.projectdemo.domain.videochat.dto.VideoRoomParticipantDTO">
+        <id property="id" column="id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="empNum" column="emp_num"/>
+        <result property="empName" column="emp_name"/>
+        <result property="empDept" column="emp_dept"/>
+        <result property="joinedAt" column="joined_at"/>
+        <result property="leftAt" column="left_at"/>
+        <result property="isActive" column="is_active"/>
+        <result property="lastHeartbeat" column="last_heartbeat"/>
+    </resultMap>
 
-        <select id="findActiveParticipantsByRoomId" resultMap="participantMap">
-            SELECT * FROM VIDEO_ROOM_PARTICIPANT
-            WHERE room_id = #{roomId} AND is_active = true
-        </select>
+    <select id="findActiveParticipantsByRoomId" resultMap="participantResultMap" parameterType="string">
+        SELECT
+            p.*,
+            e.name as emp_name,
+            d.name as emp_dept
+        FROM
+            video_room_participant p
+                LEFT JOIN
+            employees e ON p.emp_num = e.emp_num
+                LEFT JOIN
+            departments d ON e.dep_id = d.id
+        WHERE
+            p.room_id = #{roomId}
+          AND p.is_active = 1
+        ORDER BY
+            p.joined_at ASC
+    </select>
 
-        <select id="findActiveParticipant" resultMap="participantMap">
-            SELECT * FROM VIDEO_ROOM_PARTICIPANT
-            WHERE room_id = #{roomId} AND emp_num = #{empNum} AND is_active = true
+    <insert id="addParticipant" parameterType="com.example.projectdemo.domain.videochat.dto.VideoRoomParticipantDTO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO video_room_participant (
+            room_id, emp_num, last_heartbeat
+        ) VALUES (
+                     #{roomId}, #{empNum}, NOW()
+                 )
+    </insert>
+
+    <update id="updateParticipantLeftAt">
+        UPDATE video_room_participant
+        SET
+            left_at = #{leftAt},
+            is_active = #{isActive}
+        WHERE
+            id = #{id}
+    </update>
+
+    <select id="findParticipantByRoomIdAndEmpNum" resultMap="participantResultMap">
+        SELECT
+            p.*,
+            e.name as emp_name,
+            d.name as emp_dept
+        FROM
+            video_room_participant p
+                LEFT JOIN
+            employees e ON p.emp_num = e.emp_num
+                LEFT JOIN
+            departments d ON e.dep_id = d.id
+        WHERE
+            p.room_id = #{roomId}
+          AND p.emp_num = #{empNum}
+          AND p.is_active = 1
             LIMIT 1
-        </select>
+    </select>
 
-        <select id="countActiveParticipants" resultType="int">
-            SELECT COUNT(*) FROM VIDEO_ROOM_PARTICIPANT
-            WHERE room_id = #{roomId} AND is_active = true
-        </select>
+    <update id="updateHeartbeat">
+        UPDATE video_room_participant
+        SET
+            last_heartbeat = #{lastHeartbeat}
+        WHERE
+            id = #{id}
+    </update>
 
-        <insert id="addParticipant" parameterType="com.example.projectdemo.domain.videoconf.entity.VideoRoomParticipant" useGeneratedKeys="true" keyProperty="id">
-            INSERT INTO VIDEO_ROOM_PARTICIPANT (room_id, emp_num, joined_at, last_heartbeat, is_active)
-            VALUES (#{roomId}, #{empNum}, #{joinedAt}, #{lastHeartbeat}, #{isActive})
-        </insert>
+    <select id="findInactiveParticipants" resultMap="participantResultMap">
+        SELECT
+            p.*,
+            e.name as emp_name,
+            d.name as emp_dept
+        FROM
+            video_room_participant p
+                LEFT JOIN
+            employees e ON p.emp_num = e.emp_num
+                LEFT JOIN
+            departments d ON e.dep_id = d.id
+        WHERE
+            p.is_active = 1
+          AND p.last_heartbeat &lt; #{threshold}
+    </select>
 
-        <update id="deactivateParticipant">
-            UPDATE VIDEO_ROOM_PARTICIPANT
-            SET is_active = false, left_at = #{leftAt}
-            WHERE room_id = #{roomId} AND emp_num = #{empNum} AND is_active = true
-        </update>
+    <select id="countActiveParticipantsByRoomId" resultType="int" parameterType="string">
+        SELECT COUNT(*)
+        FROM video_room_participant
+        WHERE room_id = #{roomId} AND is_active = 1
+    </select>
 
-        <!-- 하트비트 업데이트 쿼리 추가 -->
-        <update id="updateHeartbeat">
-            UPDATE VIDEO_ROOM_PARTICIPANT
-            SET last_heartbeat = #{heartbeatTime}
-            WHERE room_id = #{roomId} AND emp_num = #{empNum} AND is_active = true
-        </update>
+    <select id="findActiveRoomsByEmpNum" resultType="string" parameterType="string">
+        SELECT room_id
+        FROM video_room_participant
+        WHERE emp_num = #{empNum} AND is_active = 1
+    </select>
 
-        <!-- 하트비트 타임아웃된 참가자 비활성화 -->
-        <update id="deactivateInactiveParticipants">
-            UPDATE VIDEO_ROOM_PARTICIPANT
-            SET is_active = false, left_at = NOW()
-            WHERE is_active = true
-            AND (last_heartbeat IS NULL OR last_heartbeat &lt; #{timeoutThreshold})
-            <if test="roomId != null">
-                AND room_id = #{roomId}
-            </if>
-        </update>
+    <update id="deactivateParticipantsByRoomId" parameterType="string">
+        UPDATE video_room_participant
+        SET
+            is_active = 0,
+            left_at = NOW()
+        WHERE
+            room_id = #{roomId}
+          AND is_active = 1
+    </update>
+
+    <update id="deactivateOldParticipants">
+        UPDATE video_room_participant
+        SET
+            is_active = 0,
+            left_at = NOW()
+        WHERE
+            is_active = 1
+          AND last_heartbeat &lt; #{threshold}
+    </update>
 </mapper>
