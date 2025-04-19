@@ -18,6 +18,56 @@
         body{
             margin-top: 80px;
         }
+
+        /* 사이드바 토글 버튼 스타일 */
+        #sidebarToggleBtn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 40px;
+            height: 40px;
+            background-color: #1e3a8a;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            font-size: 15px;
+            line-height: 1;
+            z-index: 1100;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /*display: grid;*/
+            display: none;
+            place-items: center;
+            opacity: 0;
+        }
+
+        /* 반응형 스타일 */
+        @media (max-width: 1200px) {
+            .sidebar, #importedSidebar, #sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open, #importedSidebar.open, #sidebar.open, .container .sidebar.open {
+                transform: translateX(0);
+                z-index: 999;
+                background-color: #f3f7fb;
+            }
+
+            #importedSidebar.open {
+                z-index: 1010;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            /* 사이드바 토글 버튼 스타일 */
+            #sidebarToggleBtn {
+                display: grid;
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -26,7 +76,7 @@
 
 <div class="container-fluid">
 
-    <div class="row">
+    <div class="row work-wrap">
         <div th:replace="fragments/sidebar/work-sidebar :: work-sidebar"></div>
         <!-- Main content -->
         <main class="col-md-10 px-md-4">
@@ -323,6 +373,12 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 사이드바 토글 버튼 (1200px 이하일 때만 표시됨) -->
+            <button id="sidebarToggleBtn">
+                <i class="fas fa-plus"></i>
+            </button>
+            <div id="sidebarOverlay"></div>
         </main>
     </div>
 </div>
@@ -2249,6 +2305,32 @@
         });
     }
 
+
+    // 사이드바 토글 관련
+    $(document).ready(function () {
+        // 사이드바 토글 버튼 초기화
+        $("#sidebarToggleBtn").css("display", "grid");
+
+        // 사이드바 토글 버튼 클릭 이벤트
+        $("#sidebarToggleBtn").on("click", function () {
+            // 모든 사이드바 요소 선택
+            $(".sidebar, #importedSidebar, #sidebar, .work-sidebar").toggleClass("open");
+        });
+
+        // 반응형 이벤트 처리
+        function handleResponsive() {
+            if (window.innerWidth <= 1200) {
+                $("#sidebarToggleBtn").css("display", "grid");
+            } else {
+                // 큰 화면에서는 사이드바를 항상 표시
+                $(".sidebar, #importedSidebar, #sidebar, .work-sidebar").removeClass("open");
+            }
+        }
+
+        // 초기화 및 창 크기 변경 시 반응형 처리
+        handleResponsive();
+        $(window).resize(handleResponsive);
+    });
 
 </script>
 <div th:replace="fragments/header :: headerScripts"></div>
