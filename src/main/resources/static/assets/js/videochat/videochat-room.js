@@ -172,14 +172,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 하트비트 시작
     function startHeartbeat() {
+        // JWT 토큰 가져오기
+        const token = localStorage.getItem('accessToken');
+
         // 20초마다 하트비트 전송
         heartbeatInterval = setInterval(function() {
             fetch('/api/videochat/rooms/' + roomId + '/heartbeat', {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
             })
                 .catch(error => console.error('하트비트 전송 오류:', error));
         }, 20000);
     }
+
 
     // 회의실 나가기
     function leaveRoom() {
@@ -212,29 +219,16 @@ document.addEventListener('DOMContentLoaded', function() {
             stompClient.disconnect();
         }
 
+        // JWT 토큰 가져오기
+        const token = localStorage.getItem('accessToken');
+
         // 서버에 퇴장 알림
         fetch('/api/videochat/rooms/' + roomId + '/leave', {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : ''
+            }
         }).catch(error => console.error('퇴장 알림 오류:', error));
-    }
-
-    // 참가자 목록 가져오기
-    function fetchParticipants() {
-        console.log('참가자 목록 가져오기 요청');
-        fetch('/api/videochat/rooms/' + roomId + '/participants')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('서버에서 참가자 목록을 가져오는데 실패했습니다: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('서버에서 받은 참가자 목록:', data);
-                updateParticipantsList(data);
-            })
-            .catch(error => {
-                console.error('참가자 목록 가져오기 오류:', error);
-            });
     }
 
     // 참가자 목록 업데이트

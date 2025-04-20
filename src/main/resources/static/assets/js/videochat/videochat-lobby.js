@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // URL에서 토큰 파라미터 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenParam = urlParams.get('token');
+
+    // URL 파라미터로 받은 토큰이 있으면 저장
+    if (tokenParam) {
+        localStorage.setItem('accessToken', tokenParam);
+        // 토큰 정보가 URL에 노출되지 않도록 history API를 사용해 URL 파라미터 제거
+        const url = new URL(window.location.href);
+        url.searchParams.delete('token');
+        window.history.replaceState({}, document.title, url.toString());
+    }
+
     // 모달 관련 요소
     const createRoomModal = document.getElementById('createRoomModal');
     const createRoomBtn = document.getElementById('createRoomBtn');
@@ -92,11 +105,15 @@ document.addEventListener('DOMContentLoaded', function() {
             password: roomPassword
         };
 
-        // 방 생성 API 호출
+        // 토큰 가져오기
+        const token = localStorage.getItem('accessToken');
+
+        // 방 생성 API 호출 (토큰 포함)
         fetch('/api/videochat/rooms', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
             },
             body: JSON.stringify(roomData)
         })
@@ -169,9 +186,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function performSearch() {
         const searchTerm = searchInput.value.trim();
+        const token = localStorage.getItem('accessToken');
 
         // 검색 API 호출
-        fetch('/api/videochat/rooms/search?name=' + encodeURIComponent(searchTerm))
+        fetch('/api/videochat/rooms/search?name=' + encodeURIComponent(searchTerm), {
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : ''
+            }
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('검색에 실패했습니다.');
@@ -341,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // 미디어 설정 후 회의실 입장
-        continueWithMediaBtn.addEventListener('click', function() {
+        continueWithMediaBtn.addEventListener('click', function () {
             const useCamera = cameraToggle.checked && !cameraToggle.disabled;
             const useMic = micToggle.checked && !micToggle.disabled;
 
@@ -349,37 +371,53 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('videoChat_useCamera', useCamera);
             localStorage.setItem('videoChat_useMic', useMic);
 
+            // JWT 토큰 가져오기
+            const token = localStorage.getItem('accessToken');
+
             // 회의실로 이동
             let roomUrl = '/videochat/room/' + roomId;
+
+            // URL 파라미터 구성
+            const params = new URLSearchParams();
+
+            if (token) {
+                params.append('token', token);
+            }
+
             if (password) {
-                roomUrl += '?password=' + encodeURIComponent(password);
+                params.append('password', password);
+            }
+
+            // 파라미터가 있으면 URL에 추가
+            if (params.toString()) {
+                roomUrl += '?' + params.toString();
             }
 
             window.location.href = roomUrl;
-        }, { once: true }); // 이벤트 리스너는 한 번만 실행
-    }
+        }, {once: true}); // 이벤트 리스너는 한 번만 실행
 
-    // URL 파라미터에서 오류 메시지 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const errorParam = urlParams.get('error');
+        // URL 파라미터에서 오류 메시지 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorParam = urlParams.get('error');
 
-    if (errorParam) {
-        let errorMessage = '';
+        if (errorParam) {
+            let errorMessage = '';
 
-        switch (errorParam) {
-            case 'room_not_found':
-                errorMessage = '존재하지 않거나 비활성화된 회의실입니다.';
-                break;
-            case 'wrong_password':
-                errorMessage = '비밀번호가 올바르지 않습니다.';
-                break;
-            case 'room_full':
-                errorMessage = '회의실 참가자 수가 초과되었습니다.';
-                break;
-            default:
-                errorMessage = '오류가 발생했습니다.';
+            switch (errorParam) {
+                case 'room_not_found':
+                    errorMessage = '존재하지 않거나 비활성화된 회의실입니다.';
+                    break;
+                case 'wrong_password':
+                    errorMessage = '비밀번호가 올바르지 않습니다.';
+                    break;
+                case 'room_full':
+                    errorMessage = '회의실 참가자 수가 초과되었습니다.';
+                    break;
+                default:
+                    errorMessage = '오류가 발생했습니다.';
+            }
+
+            alert(errorMessage);
         }
-
-        alert(errorMessage);
     }
 });
