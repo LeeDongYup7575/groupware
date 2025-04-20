@@ -1,7 +1,6 @@
 package com.example.projectdemo.domain.notification.service;
 
 import com.example.projectdemo.domain.board.entity.Comments;
-import com.example.projectdemo.domain.board.entity.Posts;
 import com.example.projectdemo.domain.board.service.CommentsService;
 import com.example.projectdemo.domain.booking.entity.MeetingRoomBooking;
 import com.example.projectdemo.domain.booking.entity.SuppliesBooking;
@@ -15,9 +14,7 @@ import com.example.projectdemo.domain.projects.dto.TaskDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +100,7 @@ public class NotificationEventHandler {
             }
 
             String content = "새 프로젝트에 참여하게 되었습니다: " + project.getName();
-            String link = "/projects/" + project.getId();
+            String link = "/workmanagement";
 
             notificationService.createNotification(
                     member.getEmpNum(),
@@ -121,7 +118,7 @@ public class NotificationEventHandler {
     public void handleProjectCompletionNotification(ProjectDTO project, List<ProjectMemberDTO> members) {
         for (ProjectMemberDTO member : members) {
             String content = "참여한 프로젝트가 완료되었습니다: " + project.getName();
-            String link = "/projects/" + project.getId();
+            String link = "/workmanagement";
 
             notificationService.createNotification(
                     member.getEmpNum(),
@@ -145,7 +142,7 @@ public class NotificationEventHandler {
         }
 
         String content = "새 업무가 할당되었습니다: " + task.getTitle();
-        String link = "/projects/" + task.getProjectId() + "/tasks/" + task.getId();
+        String link = "/workmanagement";
 
         notificationService.createNotification(
                 task.getAssigneeEmpNum(),
@@ -168,7 +165,7 @@ public class NotificationEventHandler {
         // 업무 생성자에게 알림
         if (!task.getReporterEmpNum().equals(task.getAssigneeEmpNum())) {
             String content = "담당 업무의 상태가 '" + oldStatus + "'에서 '" + newStatus + "'로 변경되었습니다: " + task.getTitle();
-            String link = "/projects/" + task.getProjectId() + "/tasks/" + task.getId();
+            String link = "/workmanagement";
 
             notificationService.createNotification(
                     task.getReporterEmpNum(),
@@ -185,7 +182,7 @@ public class NotificationEventHandler {
      */
     public void handleBookingStartingSoonNotification(MeetingRoomBooking booking) {
         String content = "회의실 예약이 1시간 후에 시작됩니다: " + booking.getTitle();
-        String link = "/booking/meeting-room";
+        String link = "/booking/main";
 
         notificationService.createNotification(
                 booking.getEmpNum(),
@@ -201,7 +198,7 @@ public class NotificationEventHandler {
      */
     public void handleSuppliesBookingStartingSoonNotification(SuppliesBooking booking) {
         String content = "비품 예약이 1시간 후에 시작됩니다: " + booking.getSupplies().getName() + " " + booking.getQuantity() + "개";
-        String link = "/booking/supplies";
+        String link = "/booking/booking-main";
 
         notificationService.createNotification(
                 booking.getEmpNum(),
@@ -209,22 +206,6 @@ public class NotificationEventHandler {
                 link,
                 NotificationType.BOOKING,
                 booking.getId()
-        );
-    }
-
-    /**
-     * 결재 문서 알림 처리 (결재자에게 알림)
-     */
-    public void handleApprovalDocumentNotification(EdsmDocumentDTO document, String approverEmpNum) {
-        String content = "새 결재 문서가 도착했습니다: " + document.getTitle();
-        String link = "/edsm/document/" + document.getId();
-
-        notificationService.createNotification(
-                approverEmpNum,
-                content,
-                link,
-                NotificationType.APPROVAL,
-                document.getId()
         );
     }
 
