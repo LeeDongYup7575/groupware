@@ -33,6 +33,27 @@
                     <li class="gw-nav-item">
                         <a class="gw-nav-link" href="/faq">문의</a>
                     </li>
+                    <!-- 알림 메뉴 추가 -->
+                    <li class="gw-nav-item gw-notification-dropdown" id="notification-dropdown">
+                        <input type="checkbox" id="gw-notification-toggle" class="gw-dropdown-toggle">
+                        <label for="gw-notification-toggle" class="gw-dropdown-toggle-label">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+                        </label>
+                        <div class="gw-dropdown-menu gw-notification-menu" id="notification-menu">
+                            <div class="notification-header">
+                                <h4>알림</h4>
+                                <button type="button" id="mark-all-read-btn" class="mark-all-read-btn">모두 읽음 표시</button>
+                            </div>
+                            <div class="notification-list" id="notification-list">
+                                <!-- 알림 내용이 여기에 동적으로 추가됩니다 -->
+                                <div class="no-notifications">새 알림이 없습니다</div>
+                            </div>
+                            <div class="notification-footer">
+                                <a href="/notifications" class="view-all-link">모든 알림 보기</a>
+                            </div>
+                        </div>
+                    </li>
                     <!-- 로그인 안된 상태일 때 보이는 버튼 -->
                     <li class="gw-nav-item" id="login-button">
                         <a class="gw-btn gw-btn-login" href="/auth/login">로그인</a>
@@ -368,6 +389,119 @@
             opacity: 1;
         }
 
+        /* 알림 관련 CSS 추가 */
+        .gw-notification-dropdown {
+            position: relative;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--gw-accent-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gw-notification-menu {
+            width: 350px;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--gw-secondary-color);
+        }
+
+        .notification-header h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read-btn {
+            background: none;
+            border: none;
+            color: var(--gw-primary-color);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .notification-list {
+            overflow-y: auto;
+            max-height: 300px;
+            padding: 0;
+        }
+
+        .notification-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--gw-secondary-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: var(--gw-primary-light);
+        }
+
+        .notification-item.unread {
+            background-color: rgba(1, 131, 212, 0.05);
+        }
+
+        .notification-item.unread:hover {
+            background-color: rgba(1, 131, 212, 0.1);
+        }
+
+        .notification-content {
+            font-size: 0.85rem;
+            color: var(--gw-text-color);
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--gw-text-light);
+        }
+
+        .notification-footer {
+            padding: 10px 15px;
+            text-align: center;
+            border-top: 1px solid var(--gw-secondary-color);
+        }
+
+        .view-all-link {
+            color: var(--gw-primary-color);
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .no-notifications {
+            padding: 20px;
+            text-align: center;
+            color: var(--gw-text-light);
+            font-size: 0.9rem;
+        }
+
+        .notification-type-icon {
+            margin-right: 8px;
+            width: 16px;
+            display: inline-block;
+            text-align: center;
+        }
+
         /* 반응형 디자인 */
         @media (max-width: 768px) {
             .gw-navbar-toggle-label {
@@ -433,12 +567,17 @@
             .gw-dropdown-toggle:checked ~ .gw-dropdown-menu {
                 display: block;
             }
+
+            .gw-notification-menu {
+                width: 100%;
+            }
         }
     </style>
 </th:block>
-
-<!-- JavaScript 부분 -->
 <th:block th:fragment="headerScripts">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
     <script>
         // 스크롤 시 네비게이션바 스타일 변경
         window.addEventListener('scroll', function() {
@@ -462,6 +601,7 @@
             const userNameElement = document.getElementById('user-name');
             const modalBackdrop = document.querySelector('.gw-modal-backdrop');
             const currentPageToggle = document.getElementById('currentPageToggle');
+            const notificationDropdown = document.getElementById('notification-dropdown');
 
             // 사이드바 관련 변수 및 함수들
             let importedSidebar = document.getElementById('importedSidebar');
@@ -580,6 +720,16 @@
                     } else {
                         currentPageToggle.style.display = 'block';
                     }
+                }
+
+                // 알림 기능 초기화
+                if (notificationDropdown) {
+                    initializeNotifications();
+                }
+            } else {
+                // 로그인되지 않은 경우 알림 버튼 숨김
+                if (notificationDropdown) {
+                    notificationDropdown.style.display = 'none';
                 }
             }
 
@@ -701,6 +851,341 @@
 
             // 현재 페이지 제목 설정 호출
             setPageTitle();
+
+            // 알림 관련 기능
+            function initializeNotifications() {
+                const notificationBadge = document.getElementById('notification-badge');
+                const notificationList = document.getElementById('notification-list');
+                const markAllReadBtn = document.getElementById('mark-all-read-btn');
+
+                // 안읽은 알림 개수 가져오기
+                fetchUnreadCount();
+
+                // 알림 목록 가져오기
+                fetchNotifications();
+
+                // WebSocket 연결 설정
+                connectToNotificationWebSocket();
+
+                // 읽음 표시 버튼 이벤트
+                if (markAllReadBtn) {
+                    markAllReadBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        markAllAsRead();
+                    });
+                }
+
+                // 알림 클릭 이벤트를 위한 이벤트 위임
+                if (notificationList) {
+                    notificationList.addEventListener('click', function(e) {
+                        const notificationItem = e.target.closest('.notification-item');
+                        if (notificationItem) {
+                            const notificationId = notificationItem.dataset.id;
+                            const link = notificationItem.dataset.link;
+
+                            // 알림을 읽음 표시로 변경
+                            markAsRead(notificationId);
+
+                            // 링크가 있으면 해당 페이지로 이동
+                            if (link) {
+                                window.location.href = link;
+                            }
+                        }
+                    });
+                }
+            }
+
+            // WebSocket 연결 설정
+            function connectToNotificationWebSocket() {
+                const token = localStorage.getItem('accessToken');
+                const empNum = localStorage.getItem('empNum');
+                if (!token || !empNum) return;
+
+                const socket = new SockJS('/ws-notification');
+                const stompClient = Stomp.over(socket);
+
+                stompClient.connect({ Authorization: 'Bearer ' + token }, function(frame) {
+                    console.log('Connected to notification websocket');
+
+                    // 개인별 알림 구독
+                    stompClient.subscribe('/user/' + empNum + '/queue/notifications', function(message) {
+                        const notification = JSON.parse(message.body);
+
+                        // 새 알림 추가 및 카운트 업데이트
+                        addNewNotification(notification);
+                        updateUnreadCount();
+
+                        // 브라우저 알림 표시 (권한 있는 경우)
+                        showBrowserNotification(notification);
+                    });
+                }, function(error) {
+                    console.error('Error connecting to notification websocket:', error);
+                    // 3초 후 재연결 시도
+                    setTimeout(connectToNotificationWebSocket, 3000);
+                });
+            }
+
+            // 안읽은 알림 개수 가져오기
+            function fetchUnreadCount() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                fetch('/api/notifications/count', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(response => response.json())
+                    .then(count => {
+                        updateBadgeCount(count);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching notification count:', error);
+                    });
+            }
+
+            // 알림 목록 가져오기
+            function fetchNotifications() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                fetch('/api/notifications/unread', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(response => response.json())
+                    .then(notifications => {
+                        renderNotifications(notifications);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching notifications:', error);
+                    });
+            }
+
+            // 알림 목록 렌더링
+            function renderNotifications(notifications) {
+                const notificationList = document.getElementById('notification-list');
+                if (!notificationList) return;
+
+                if (notifications.length === 0) {
+                    notificationList.innerHTML = '<div class="no-notifications">새 알림이 없습니다</div>';
+                    return;
+                }
+
+                notificationList.innerHTML = '';
+
+                notifications.forEach(notification => {
+                    const notificationItem = createNotificationElement(notification);
+                    notificationList.appendChild(notificationItem);
+                });
+            }
+
+            // 알림 요소 생성
+            function createNotificationElement(notification) {
+                const notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item' + (notification.isRead ? '' : ' unread');
+                notificationItem.dataset.id = notification.id;
+                notificationItem.dataset.link = notification.link;
+
+                const typeIcon = getTypeIcon(notification.type);
+
+                const timeAgo = getTimeAgo(new Date(notification.createdAt));
+
+                notificationItem.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-type-icon">${typeIcon}</span>
+                    ${notification.content}
+                </div>
+                <div class="notification-time">${timeAgo}</div>
+            `;
+
+                return notificationItem;
+            }
+
+            // 알림 타입에 따른 아이콘 반환
+            function getTypeIcon(type) {
+                switch (type) {
+                    case 'COMMENT':
+                        return '<i class="fas fa-comment"></i>';
+                    case 'REPLY':
+                        return '<i class="fas fa-reply"></i>';
+                    case 'PROJECT':
+                        return '<i class="fas fa-project-diagram"></i>';
+                    case 'TASK':
+                        return '<i class="fas fa-tasks"></i>';
+                    case 'BOOKING':
+                        return '<i class="fas fa-calendar-check"></i>';
+                    case 'APPROVAL':
+                        return '<i class="fas fa-file-signature"></i>';
+                    default:
+                        return '<i class="fas fa-bell"></i>';
+                }
+            }
+
+            // 시간 표시 (몇 분 전, 몇 시간 전 등)
+            function getTimeAgo(date) {
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+
+                if (diffInSeconds < 60) {
+                    return '방금 전';
+                }
+
+                const diffInMinutes = Math.floor(diffInSeconds / 60);
+                if (diffInMinutes < 60) {
+                    return `${diffInMinutes}분 전`;
+                }
+
+                const diffInHours = Math.floor(diffInMinutes / 60);
+                if (diffInHours < 24) {
+                    return `${diffInHours}시간 전`;
+                }
+
+                const diffInDays = Math.floor(diffInHours / 24);
+                if (diffInDays < 7) {
+                    return `${diffInDays}일 전`;
+                }
+
+                // 1주일 이상이면 날짜 표시
+                return date.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            }
+
+            // 새 알림 추가
+            function addNewNotification(notification) {
+                const notificationList = document.getElementById('notification-list');
+                if (!notificationList) return;
+
+                // '알림 없음' 메시지 제거
+                const noNotificationsEl = notificationList.querySelector('.no-notifications');
+                if (noNotificationsEl) {
+                    notificationList.removeChild(noNotificationsEl);
+                }
+
+                // 새 알림 요소 추가 (맨 위에)
+                const notificationItem = createNotificationElement(notification);
+                notificationList.insertBefore(notificationItem, notificationList.firstChild);
+
+                // 시각적으로 알림 효과
+                setTimeout(() => {
+                    notificationItem.style.backgroundColor = '';
+                }, 100);
+            }
+
+            // 읽음 표시
+            function markAsRead(notificationId) {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                fetch(`/api/notifications/${notificationId}/read`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(() => {
+                        // UI 업데이트
+                        const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                        if (notificationItem) {
+                            notificationItem.classList.remove('unread');
+                        }
+
+                        // 안읽은 알림 카운트 업데이트
+                        updateUnreadCount();
+                    })
+                    .catch(error => {
+                        console.error('Error marking notification as read:', error);
+                    });
+            }
+
+            // 모두 읽음 표시
+            function markAllAsRead() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                fetch('/api/notifications/read-all', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(() => {
+                        // UI 업데이트
+                        const unreadItems = document.querySelectorAll('.notification-item.unread');
+                        unreadItems.forEach(item => {
+                            item.classList.remove('unread');
+                        });
+
+                        // 알림 카운트 초기화
+                        updateBadgeCount(0);
+                    })
+                    .catch(error => {
+                        console.error('Error marking all notifications as read:', error);
+                    });
+            }
+
+            // 안읽은 알림 개수 업데이트
+            function updateUnreadCount() {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                fetch('/api/notifications/count', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(response => response.json())
+                    .then(count => {
+                        updateBadgeCount(count);
+                    })
+                    .catch(error => {
+                        console.error('Error updating notification count:', error);
+                    });
+            }
+
+            // 알림 뱃지 카운트 업데이트
+            function updateBadgeCount(count) {
+                const notificationBadge = document.getElementById('notification-badge');
+                if (!notificationBadge) return;
+
+                if (count > 0) {
+                    notificationBadge.textContent = count > 99 ? '99+' : count;
+                    notificationBadge.style.display = 'flex';
+                } else {
+                    notificationBadge.style.display = 'none';
+                }
+            }
+
+            // 브라우저 알림 표시
+            function showBrowserNotification(notification) {
+                // 브라우저 알림 권한 확인
+                if (Notification.permission === 'granted') {
+                    const title = '새로운 알림';
+                    const options = {
+                        body: notification.content,
+                        icon: '/assets/images/favicon.ico'
+                    };
+
+                    const browserNotification = new Notification(title, options);
+
+                    // 알림 클릭 시 해당 페이지로 이동
+                    browserNotification.onclick = function() {
+                        window.focus();
+                        if (notification.link) {
+                            window.location.href = notification.link;
+                        }
+                        browserNotification.close();
+                    };
+                } else if (Notification.permission !== 'denied') {
+                    // 권한 요청
+                    Notification.requestPermission();
+                }
+            }
         });
 
         // QR체크 페이지로 이동하는 함수
@@ -751,7 +1236,6 @@
                 alert("로그인이 필요합니다");
                 return;
             }
-
 
             // 새 창 열기
             const url = `http://10.10.55.57:3000?token=${encodeURIComponent(token)}`;

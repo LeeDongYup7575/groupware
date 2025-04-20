@@ -220,4 +220,16 @@ public class SuppliesService {
 
         return dto;
     }
+    /**
+     * 특정 시간 범위 내에 시작하는 비품 예약 목록 조회
+     * 알림을 위해 사용됨
+     *
+     * @param startTimeFrom 시작 시간 범위 (이 시간 이후)
+     * @param startTimeTo 시작 시간 범위 (이 시간 이전)
+     * @return 해당 시간 범위 내에 시작하는 비품 예약 목록
+     */
+    public List<SuppliesBooking> getBookingsStartingBetween(LocalDateTime startTimeFrom, LocalDateTime startTimeTo) {
+        return suppliesMapper.findBookingsStartingBetween(startTimeFrom, startTimeTo);
+    }
+
 }

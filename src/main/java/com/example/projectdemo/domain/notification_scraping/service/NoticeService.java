@@ -1,7 +1,7 @@
-package com.example.projectdemo.domain.notification.service;
+package com.example.projectdemo.domain.notification_scraping.service;
 
-import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
-import com.example.projectdemo.domain.notification.model.Notice;
+import com.example.projectdemo.domain.notification_scraping.crawler.NoticeCrawler;
+import com.example.projectdemo.domain.notification_scraping.model.Notice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

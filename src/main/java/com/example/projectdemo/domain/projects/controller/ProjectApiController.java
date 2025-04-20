@@ -1,5 +1,6 @@
 package com.example.projectdemo.domain.projects.controller;
 
+import com.example.projectdemo.domain.notification.service.NotificationEventHandler;
 import com.example.projectdemo.domain.projects.dto.ProjectDTO;
 import com.example.projectdemo.domain.projects.dto.ProjectMemberDTO;
 import com.example.projectdemo.domain.projects.dto.TaskDTO;
@@ -29,6 +30,9 @@ public class ProjectApiController {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private NotificationEventHandler notificationEventHandler;
 
     // 모든 프로젝트 조회
     @GetMapping
@@ -124,6 +128,12 @@ public class ProjectApiController {
                 }
             }
 
+            // 프로젝트 멤버 목록 조회
+            List<ProjectMemberDTO> members = projectService.getProjectMembers(createdProject.getId());
+
+            // 새 프로젝트 생성 알림 발송
+            notificationEventHandler.handleProjectCreationNotification(createdProject, members);
+
             log.info("프로젝트 등록 성공: ID={}", createdProject.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProject);
         } catch (Exception e) {
@@ -171,6 +181,11 @@ public class ProjectApiController {
     public ResponseEntity<ProjectDTO> completeProject(@PathVariable Integer id) {
         try {
             ProjectDTO project = projectService.completeProject(id);
+
+            // 프로젝트 완료 알림 발송
+            List<ProjectMemberDTO> members = projectService.getProjectMembers(id);
+            notificationEventHandler.handleProjectCompletionNotification(project, members);
+
             return ResponseEntity.ok(project);
         } catch (Exception e) {
             log.error("프로젝트 완료 처리 실패: ID={}", id, e);
@@ -195,6 +210,14 @@ public class ProjectApiController {
             }
 
             projectService.addProjectMember(id, empNum, role);
+
+            // 프로젝트 멤버 추가 알림
+            ProjectDTO project = projectService.getProjectById(id);
+            ProjectMemberDTO newMember = new ProjectMemberDTO();
+            newMember.setEmpNum(empNum);
+            newMember.setRole(role);
+
+            notificationEventHandler.handleProjectCreationNotification(project, List.of(newMember));
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

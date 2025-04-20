@@ -1,6 +1,4 @@
-package com.example.projectdemo.domain.notification.model;
-
-import java.time.LocalDate;
+package com.example.projectdemo.domain.notification_scraping.model;
 
 public class Notice {
     private String id;

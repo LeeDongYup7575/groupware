@@ -1,6 +1,6 @@
-package com.example.projectdemo.domain.notification.crawler;
+package com.example.projectdemo.domain.notification_scraping.crawler;
 
-import com.example.projectdemo.domain.notification.model.Notice;
+import com.example.projectdemo.domain.notification_scraping.model.Notice;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

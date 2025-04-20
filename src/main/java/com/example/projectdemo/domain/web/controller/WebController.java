@@ -1,22 +1,16 @@
 package com.example.projectdemo.domain.web.controller;
 
-import com.example.projectdemo.domain.attend.dto.AttendDTO;
 import com.example.projectdemo.domain.attend.service.AttendService;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
 import com.example.projectdemo.domain.auth.service.LogoutService;
-import com.example.projectdemo.domain.board.dto.PostsDTO;
 import com.example.projectdemo.domain.board.service.PostsService;
-import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
-import com.example.projectdemo.domain.booking.dto.SuppliesBookingDTO;
 import com.example.projectdemo.domain.booking.service.MeetingRoomService;
 import com.example.projectdemo.domain.booking.service.SuppliesService;
 import com.example.projectdemo.domain.booking.util.BookingTimeUtils;
-import com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO;
 import com.example.projectdemo.domain.edsm.services.EdsmService;
-import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
-import com.example.projectdemo.domain.notification.crawler.NoticeCrawler;
-import com.example.projectdemo.domain.notification.model.Notice;
+import com.example.projectdemo.domain.notification_scraping.crawler.NoticeCrawler;
+import com.example.projectdemo.domain.notification_scraping.model.Notice;
 import com.example.projectdemo.main.MainPageData;
 import com.example.projectdemo.main.MainPageFacade;
 import jakarta.servlet.http.Cookie;
@@ -28,10 +22,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;

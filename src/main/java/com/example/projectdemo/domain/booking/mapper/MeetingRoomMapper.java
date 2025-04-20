@@ -36,4 +36,12 @@ public interface MeetingRoomMapper {
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime,
             @Param("excludeBookingId") Integer excludeBookingId);
+
+    /**
+     * 특정 시간 범위 내에 시작하는 회의실 예약 조회
+     */
+    List<MeetingRoomBooking> findBookingsStartingBetween(
+            @Param("startTimeFrom") LocalDateTime startTimeFrom,
+            @Param("startTimeTo") LocalDateTime startTimeTo
+    );
 }

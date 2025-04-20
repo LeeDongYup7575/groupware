@@ -14,8 +14,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
 //        registry.enableSimpleBroker("/topic");
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic", "/queue", "/user");
         registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
@@ -24,6 +25,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // 화상 채팅용 WebSocket 엔드포인트 추가
         registry.addEndpoint("/ws-video")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+
+        registry.addEndpoint("/ws-notification")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }

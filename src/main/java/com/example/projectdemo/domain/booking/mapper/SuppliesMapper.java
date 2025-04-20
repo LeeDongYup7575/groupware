@@ -46,4 +46,12 @@ public interface SuppliesMapper {
             @Param("supplyId") Integer supplyId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime);
+
+    /**
+     * 특정 시간 범위 내에 시작하는 비품 예약 조회
+     */
+    List<SuppliesBooking> findBookingsStartingBetween(
+            @Param("startTimeFrom") LocalDateTime startTimeFrom,
+            @Param("startTimeTo") LocalDateTime startTimeTo
+    );
 }
