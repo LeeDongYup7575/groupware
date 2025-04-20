@@ -15,7 +15,6 @@
         <result property="depId" column="dep_id" />
         <result property="posId" column="pos_id" />
         <result property="hireDate" column="hire_date" />
-        <result property="retirementId" column="retirement_id" />
         <result property="attendStatus" column="attend_status" />
         <result property="salary" column="salary" />
         <result property="enabled" column="enabled" />
@@ -32,7 +31,7 @@
         id, emp_num as empNum, password, name, gender, phone, email, internal_email as InternalEmail,
         profile_img_url as profileImgUrl, ssn, dep_id as depId,
         pos_id as posId, hire_date as hireDate,
-        retirement_id as retirementId, attend_status as attendStatus,
+        attend_status as attendStatus,
         salary, enabled, role, last_login as lastLogin, registered,
         temp_password as temp_password, total_leave as totalLeave,
         used_leave as usedLeave
@@ -280,7 +279,6 @@
             dep_id,
             pos_id,
             hire_date,
-            retirement_id,
             attend_status,
             salary,
             enabled,
