@@ -52,7 +52,7 @@ public class MembershipService {
 
         boolean isAdmin = membershipDAO.isAdmin(params); // ✅ 현재 유저가 일반 참여자인지, 관리자인지 판단
 
-        if (!isAdmin) { // 👉 일반 멤버인 경우: 방 삭제
+        if (!isAdmin) { // 👉 관리자(본인이 방 생성자): 방 삭제
             int rs = membershipDAO.deleteChatRoom(roomid); // 방 통째로 삭제
             if (rs > 0) { // 삭제 성공 시
                 Map<String, Object> payload = new HashMap<>();
@@ -64,7 +64,7 @@ public class MembershipService {
             } else {
                 return "fail"; // 삭제 실패 응답
             }
-        } else { // 👉 관리자(본인이 방 생성자)인 경우: 그냥 "방 나가기"
+        } else { // 👉 일반 멤버인 경우: 그냥 "방 나가기"
             membershipDAO.deleteById(params); // 자기 자신만 멤버 리스트에서 제거
             return "ExitChatroom"; // 방은 유지
         }
