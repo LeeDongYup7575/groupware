@@ -26,15 +26,15 @@ public class JwtResponseDTO {
     private String role;
 
     // 추가 정보
-    private String departmentName;     // 부서명
-    private String positionTitle;      // 직급
-    private String phone;              // 전화번호
-    private String profileImgUrl;      // 프로필 이미지 URL
+    private String departmentName;
+    private String positionTitle;
+    private String phone;
+    private String profileImgUrl;
 
     // 계정 상태 관련
-    private boolean tempPassword;      // 임시 비밀번호 여부
-    private boolean enabled;           // 계정 활성화 상태
-    private LocalDateTime lastLogin;   // 마지막 로그인 시간
+    private boolean tempPassword;
+    private boolean enabled;
+    private LocalDateTime lastLogin;
 
     // 성별, 입사일 등 추가 정보
     private String gender;
@@ -46,5 +46,5 @@ public class JwtResponseDTO {
     private boolean credentialsNonExpired;
 
     // 출퇴근 및 근무 관련 정보
-    private String attendStatus;        // 현재 출퇴근 상태
+    private String attendStatus;
 }

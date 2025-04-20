@@ -10,10 +10,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 임시 비밀번호 인터셉터
- * JWT 토큰에서 임시 비밀번호 상태를 확인하고, 필요시 비밀번호 변경 페이지로 리다이렉트
- */
 @Component
 public class TempPasswordInterceptor implements HandlerInterceptor {
 

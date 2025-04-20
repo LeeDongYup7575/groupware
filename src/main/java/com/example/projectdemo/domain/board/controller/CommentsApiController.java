@@ -3,6 +3,8 @@ package com.example.projectdemo.domain.board.controller;
 import com.example.projectdemo.domain.board.dto.CommentsDTO;
 import com.example.projectdemo.domain.board.entity.Comments;
 import com.example.projectdemo.domain.board.service.CommentsService;
+import com.example.projectdemo.domain.board.service.PostsService;
+import com.example.projectdemo.domain.notification.service.NotificationEventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,12 @@ public class CommentsApiController {
     @Autowired
     private CommentsService commentsService;
 
+    @Autowired
+    private PostsService postsService;
+
+    @Autowired
+    private NotificationEventHandler notificationEventHandler;
+
     // 댓글 추가
     @PostMapping
     public ResponseEntity<Comments> addComments(@RequestBody CommentsDTO commentDTO) {
@@ -31,6 +39,17 @@ public class CommentsApiController {
                 .build();
 
         Comments savedComments = commentsService.addComments(comment);
+
+        // 알림 발생 처리
+        if (savedComments.getParentId() == null) {
+            // 일반 댓글인 경우: 게시글 작성자에게 알림
+            Integer postAuthorId = postsService.getPostById(savedComments.getPostId()).getEmpId();
+            notificationEventHandler.handleCommentNotification(savedComments, postAuthorId);
+        } else {
+            // 대댓글인 경우: 원 댓글 작성자에게 알림
+            notificationEventHandler.handleReplyNotification(savedComments);
+        }
+
         return ResponseEntity.ok(savedComments);
     }
 

@@ -80,6 +80,14 @@
     document.querySelector(".add-button").onclick = function() {
         location.href = "/leaves/leavesForm";
     };
+
+    // 드롭다운 메뉴 기능
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdownHeader = document.querySelector('.dropdown-header');
+        dropdownHeader.addEventListener('click', function() {
+            this.parentElement.classList.toggle('open');
+        });
+    });
 </script>
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>

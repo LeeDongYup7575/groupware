@@ -93,7 +93,13 @@
             </div>
         </div>
     </div>
+
+    <!-- 사이드바 토글 버튼 (1200px 이하일 때만 표시됨) -->
+    <div th:replace="fragments/sidebar-toggle :: sidebarToggle"></div>
 </div>
+
+<!-- 공통 사이드바 스크립트 포함 -->
+<script src="/assets/js/fragments/sidebar-common.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

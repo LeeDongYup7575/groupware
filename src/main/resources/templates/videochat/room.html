@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${room.name + ' - 화상회의'}">화상회의실</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" th:href="@{/assets/css/video/videochat-room.css}">
+</head>
+<body>
+<div class="video-room">
+    <div class="room-header">
+        <div class="room-title">
+            <h2 th:text="${room.name}">회의실 이름</h2>
+            <p class="room-info">
+                <span class="room-id">ID: <span th:text="${room.id}" id="roomId"></span></span>
+                <input type="hidden" id="empNum" th:value="${empNum}">
+            </p>
+        </div>
+        <div class="room-controls">
+            <button class="control-btn active" id="cameraToggle" title="카메라 토글">
+                <i class="fa-solid fa-video"></i>
+            </button>
+            <button class="control-btn active" id="micToggle" title="마이크 토글">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button class="control-btn" id="screenShareToggle" title="화면 공유">
+                <i class="fa-solid fa-desktop"></i>
+            </button>
+            <button class="control-btn" id="chatToggle" title="채팅">
+                <i class="fa-solid fa-comment"></i>
+            </button>
+            <button class="control-btn" id="participantsToggle" title="참가자 목록">
+                <i class="fa-solid fa-users"></i>
+            </button>
+            <button class="control-btn danger" id="leaveRoomBtn" title="회의 나가기">
+                <i class="fa-solid fa-phone-slash"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="video-container" id="videoContainer">
+        <div class="video-grid" id="videoGrid">
+            <!-- 비디오 항목들이 동적으로 추가됨 -->
+        </div>
+
+        <div class="side-panel" id="sidePanel" style="display: none;">
+            <div class="panel-header">
+                <h3 id="panelTitle">참가자 목록</h3>
+                <button class="panel-toggle" id="closePanelBtn">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <!-- 참가자 목록 패널 -->
+                <div id="participantsPanel">
+                    <ul class="participant-list" id="participantsList">
+                        <!-- 참가자 항목들이 동적으로 추가됨 -->
+                    </ul>
+                </div>
+
+                <!-- 채팅 패널 -->
+                <div id="chatPanel" style="display: none;">
+                    <div class="chat-area">
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- 채팅 메시지들이 동적으로 추가됨 -->
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="메시지를 입력하세요...">
+                            <button id="sendChatBtn">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WebRTC 시그널링 및 화상회의 기능을 위한 JavaScript -->
+<script th:src="@{/assets/js/videochat/videochat-room.js}"></script>
+
+
+</body>
+</html>

@@ -49,6 +49,7 @@ body {
     padding-top: calc(var(--header-height) + 4rem);
     min-height: 100vh;
     background-color: #fff;
+    max-width: 100vw;
 }
 
 /* 대시보드 레이아웃 */

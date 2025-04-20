@@ -184,7 +184,8 @@
         transition: all 0.3s ease;
       }
 
-      .container .sidebar.active {
+      .container .sidebar.active,
+      .container .sidebar.open {
         width: 250px;
       }
 
@@ -313,13 +314,15 @@
 
 <!-- 헤더 에셋 포함 -->
 <th:block th:replace="fragments/header :: headerAssets"></th:block>
+<!-- 사이드바 스타일 포함 -->
+<link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
 
 <body>
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
 
 <div class="container">
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <ul class="menu">
       <li class="active">
         <a th:href="@{/booking/main}"><i class="fas fa-calendar-alt"></i>전체 예약 현황</a></li>
@@ -534,7 +537,11 @@
       </div>
     </div>
   </div>
+
+  <!-- 사이드바 토글 버튼 (1200px 이하일 때만 표시됨) -->
+  <div th:replace="fragments/sidebar-toggle :: sidebarToggle"></div>
 </div>
+
 
 <script>
   // 드롭다운 메뉴 기능
@@ -600,6 +607,9 @@
 </script>
 <!-- 헤더 관련 스크립트 포함 -->
 <div th:replace="fragments/header :: headerScripts"></div>
+
+<!-- 공통 사이드바 스크립트 포함 -->
+<script src="/assets/js/fragments/sidebar-common.js"></script>
 
 </body>
 </html>

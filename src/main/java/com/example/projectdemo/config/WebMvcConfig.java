@@ -5,10 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * 웹 MVC 설정
- * 인터셉터 등록 및 경로 설정
- */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
@@ -31,7 +27,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //요청은 나중에 개발 후 수정 예정 ..
 
         // 로그인 추적 인터셉터 등록 (모든 API 요청)
         registry.addInterceptor(loginTrackerInterceptor)

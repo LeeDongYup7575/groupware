@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화상회의 로비</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- 헤더 에셋 포함 -->
+    <th:block th:replace="fragments/header :: headerAssets"></th:block>
+
+
+    <link rel="stylesheet" th:href="@{assets/css/video/videochat.css}">
+    <!-- 사이드바 스타일 포함 -->
+    <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+</head>
+<body>
+
+<div class="container">
+    <!-- 헤더 포함 -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="main-content">
+
+        <div class="content-area">
+            <div class="video-lobby">
+                <h1>화상회의 로비</h1>
+
+                <!-- 검색 영역 -->
+                <div class="search-area">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="회의실 이름 검색">
+                        <button id="searchButton"><i class="fa-solid fa-search"></i></button>
+                    </div>
+                    <button id="createRoomBtn" class="primary-btn">회의실 생성</button>
+                </div>
+
+                <!-- 회의실 목록 -->
+                <div class="room-list">
+                    <div th:if="${rooms.isEmpty()}" class="empty-list">
+                        <p>현재 활성화된 회의실이 없습니다. 새로운 회의실을 생성해보세요!</p>
+                    </div>
+
+                    <div th:unless="${rooms.isEmpty()}" class="room-grid">
+                        <div th:each="room : ${rooms}" class="room-card">
+                            <div class="room-info">
+                                <h3 th:text="${room.name}">회의실 이름</h3>
+                                <p>
+                                    <span class="room-id">ID: <span th:text="${room.id}"></span></span>
+                                    <span class="room-participants">
+                                            <i class="fa-solid fa-user"></i>
+                                            <span th:text="${room.currentParticipants}">0</span>/<span th:text="${room.maxParticipants}">10</span>
+                                        </span>
+                                </p>
+                                <p class="room-created">
+                                    <span th:text="${#temporals.format(room.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                                    <span th:if="${room.isPasswordProtected}" class="room-locked">
+                                            <i class="fa-solid fa-lock"></i> 비밀번호 보호
+                                        </span>
+                                </p>
+                            </div>
+                            <div class="room-actions">
+                                <button class="join-btn" th:data-room-id="${room.id}" th:data-password-protected="${room.isPasswordProtected}"
+                                        th:data-max-participants="${room.maxParticipants}" th:data-current-participants="${room.currentParticipants}">
+                                    입장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 회의실 생성 모달 -->
+<div id="createRoomModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>새 회의실 만들기</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="createRoomForm">
+                <div class="form-group">
+                    <label for="roomName">회의실 이름</label>
+                    <input type="text" id="roomName" name="roomName" required>
+                </div>
+                <div class="form-group">
+                    <label for="maxParticipants">최대 참가자 수</label>
+                    <select id="maxParticipants" name="maxParticipants">
+                        <option value="2">2명</option>
+                        <option value="5">5명</option>
+                        <option value="10" selected>10명</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <!--                    <label for="roomPassword">비밀번호 (선택)</label>-->
+                    <input type="hidden" id="roomPassword" name="roomPassword" placeholder="비밀번호를 설정하지 않으면 공개 회의실로 생성됩니다">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">회의실 생성</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 비밀번호 입력 모달 -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>비밀번호 입력</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="passwordForm">
+                <input type="hidden" id="passwordRoomId">
+                <div class="form-group">
+                    <label for="inputPassword">회의실 비밀번호</label>
+                    <input type="password" id="inputPassword" name="password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">입장하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 미디어 권한 확인 모달 -->
+<div id="mediaPermissionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>미디어 접근 권한</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>화상회의를 위해 카메라와 마이크 접근 권한이 필요합니다.</p>
+            <div class="media-toggle">
+                <div class="toggle-group">
+                    <label for="cameraToggle">카메라</label>
+                    <input type="checkbox" id="cameraToggle" checked>
+                    <span class="toggle-slider"></span>
+                </div>
+                <div class="toggle-group">
+                    <label for="micToggle">마이크</label>
+                    <input type="checkbox" id="micToggle" checked>
+                    <span class="toggle-slider"></span>
+                </div>
+            </div>
+            <p class="media-status" id="mediaStatus"></p>
+            <div class="form-actions">
+                <button id="continueWithMedia" class="primary-btn">계속하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 방 입장 실패 모달 -->
+<div id="roomFullModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>입장 불가</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>회의실 최대 인원수에 도달했습니다.</p>
+            <div class="form-actions">
+                <button class="primary-btn close-modal">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{assets/js/videochat/videochat-lobby.js}"></script>
+
+<!-- 추가 스크립트 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 입장 버튼 클릭 이벤트 핸들러 수정
+        const joinButtons = document.querySelectorAll('.join-btn');
+        const roomFullModal = document.getElementById('roomFullModal');
+
+        joinButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const maxParticipants = parseInt(this.getAttribute('data-max-participants'));
+                const currentParticipants = parseInt(this.getAttribute('data-current-participants'));
+
+                // 이미 가득 찬 방인지 확인
+                if (currentParticipants >= maxParticipants) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // 방 가득참 모달 표시
+                    roomFullModal.style.display = 'block';
+                    return;
+                }
+
+                // 기존 이벤트 처리 계속 진행
+            });
+        });
+
+        // 모달 닫기 버튼들
+        const closeButtons = document.querySelectorAll('.close, .close-modal');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                roomFullModal.style.display = 'none';
+            });
+        });
+
+        // 모달 바깥 클릭시 닫기
+        window.addEventListener('click', function(event) {
+            if (event.target === roomFullModal) {
+                roomFullModal.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+<div th:replace="fragments/header :: headerScripts"></div>
+</body>
+</html>

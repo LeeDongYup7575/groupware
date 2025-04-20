@@ -19,8 +19,8 @@ public class ProjectMemberDTO {
     private LocalDateTime joinedAt;
     private LocalDateTime leftAt;
 
-    // Mapping fields
-    private String name;       // Employee name (used in mapper)
-    private String depName;    // Department name
-    private String posTitle;   // Position title
+    // 매핑용
+    private String name;
+    private String depName;
+    private String posTitle;
 }

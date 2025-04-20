@@ -13,8 +13,8 @@ import com.example.projectdemo.domain.edsm.dto.EdsmDocumentDTO;
 import com.example.projectdemo.domain.edsm.services.EdsmService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
 import com.example.projectdemo.domain.employees.service.EmployeesService;
-import com.example.projectdemo.domain.notification.model.Notice;
-import com.example.projectdemo.domain.notification.service.NoticeService;
+import com.example.projectdemo.domain.notification_scraping.model.Notice;
+import com.example.projectdemo.domain.notification_scraping.service.NoticeService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +100,8 @@ public class MainPageFacadeImpl implements MainPageFacade {
         List<Notice> notices = noticeService.getCachedNotices();  // 변경된 부분
         data.setNotices(notices);
 
-        // 공개 게시판 게시글 로드
-        List<PostsDTO> publicList = postsService.getPostsByBoardId(2);
+        // 자유 게시판 게시글 로드 (최대 4개)
+        List<PostsDTO> publicList = postsService.findTop4ByBoardId(2);
         data.setPublicList(publicList);
     }
 
@@ -111,15 +111,11 @@ public class MainPageFacadeImpl implements MainPageFacade {
 
         // 1. 헤더에서 토큰 확인
         String authHeader = request.getHeader("Authorization");
-        System.out.println("Authorization 헤더: " + (authHeader != null ? "존재함" : "없음"));
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             accessToken = authHeader.substring(7);
             if (jwtTokenUtil.validateToken(accessToken)) {
                 empNum = jwtTokenUtil.getEmpNumFromToken(accessToken);
-                System.out.println("헤더에서 유효한 토큰 확인: " + empNum);
-            } else {
-                System.out.println("헤더에 토큰이 있지만 유효하지 않음");
             }
         }
 
@@ -128,9 +124,6 @@ public class MainPageFacadeImpl implements MainPageFacade {
             if (jwtTokenUtil.validateToken(tokenParam)) {
                 accessToken = tokenParam;
                 empNum = jwtTokenUtil.getEmpNumFromToken(tokenParam);
-                System.out.println("쿼리 파라미터에서 유효한 토큰 확인: " + empNum);
-            } else {
-                System.out.println("쿼리 파라미터에 토큰이 있지만 유효하지 않음");
             }
         }
 
@@ -143,15 +136,10 @@ public class MainPageFacadeImpl implements MainPageFacade {
                         accessToken = cookie.getValue();
                         if (jwtTokenUtil.validateToken(accessToken)) {
                             empNum = jwtTokenUtil.getEmpNumFromToken(accessToken);
-                            System.out.println("쿠키에서 유효한 토큰 확인: " + empNum);
-                        } else {
-                            System.out.println("쿠키에 토큰이 있지만 유효하지 않음");
                         }
                         break;
                     }
                 }
-            } else {
-                System.out.println("쿠키가 없음");
             }
         }
 
@@ -165,7 +153,6 @@ public class MainPageFacadeImpl implements MainPageFacade {
     private EmployeesDTO loadEmployeeData(String empNum) {
         EmployeesDTO employee = employeesService.findByEmpNum(empNum);
         if (employee == null) {
-            System.out.println("사용자 정보를 찾을 수 없음: " + empNum);
             return null;
         }
         return employee;
@@ -199,8 +186,6 @@ public class MainPageFacadeImpl implements MainPageFacade {
 
         // 내 예약 개수 계산
         int myBookingsCount = data.getMyMeetingRoomBookings().size() + mySuppliesCount;
-        System.out.println(mySuppliesCount + " : 비품예약 개수" +
-                data.getMyMeetingRoomBookings().size() + " : 룸예약현황");
 
         data.setMyBookingsCount(myBookingsCount);
     }

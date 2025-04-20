@@ -19,12 +19,6 @@ public interface TodoMapper {
     List<TodoDTO> selectTodosByPriority(
             @Param("empNum") String empNum,
             @Param("priority") String priority);
-    List<TodoDTO> selectTodosByDateRange(
-            @Param("empNum") String empNum,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
-    List<TodoDTO> selectOverdueTodos(@Param("empNum") String empNum);
-    List<TodoDTO> selectCompletedTodos(@Param("empNum") String empNum);
 
     // 할 일 관리 관련 메서드
     int insertTodo(TodoDTO todo);

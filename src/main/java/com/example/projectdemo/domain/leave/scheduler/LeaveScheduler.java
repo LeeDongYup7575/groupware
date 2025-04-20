@@ -11,9 +11,8 @@ public class LeaveScheduler {
     private LeavesService leavesService;
 
     // 매일 자정에 실행
-    @Scheduled(cron = "0 0 0 * * *") // 초, 분, 시, 일, 월, 요일
+    @Scheduled(cron = "0 0 0 * * *")
     public void runLeaveUpdate() {
         leavesService.updateByLeaves();
-        System.out.println("자동 연차 갱신 실행됨!");
     }
 }

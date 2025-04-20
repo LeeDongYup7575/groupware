@@ -44,7 +44,7 @@ public class HolidayService {
 
             for (int i = 0; i < items.getLength(); i++) {
                 Element item = (Element) items.item(i);
-                String locdate = item.getElementsByTagName("locdate").item(0).getTextContent(); // ex: 20250415
+                String locdate = item.getElementsByTagName("locdate").item(0).getTextContent();
                 LocalDate date = LocalDate.parse(locdate, DateTimeFormatter.ofPattern("yyyyMMdd"));
                 holidays.add(date);
             }

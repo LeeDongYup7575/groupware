@@ -44,25 +44,4 @@ public class EmailService {
             throw new RuntimeException("이메일 전송 중 오류가 발생했습니다.", e);
         }
     }
-
-    public void sendVerificationEmail(String to, String name, String verificationLink) {
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(to);
-            helper.setSubject("그룹웨어 이메일 인증 안내");
-
-            Context context = new Context();
-            context.setVariable("name", name);
-            context.setVariable("verificationLink", verificationLink);
-
-            String htmlContent = templateEngine.process("auth/email-verification", context);
-            helper.setText(htmlContent, true);
-
-            emailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("이메일 인증 메일 발송 중 오류가 발생했습니다.", e);
-        }
-    }
 }

@@ -2,7 +2,6 @@ package com.example.projectdemo.domain.auth.controller;
 
 import com.example.projectdemo.domain.auth.dto.*;
 import com.example.projectdemo.domain.auth.jwt.JwtTokenUtil;
-import com.example.projectdemo.domain.auth.service.EmailService;
 import com.example.projectdemo.domain.auth.service.LogoutService;
 import com.example.projectdemo.domain.auth.service.ProfileUploadService;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
@@ -41,7 +40,6 @@ public class AuthController {
     private final EmployeesMapper employeeMapper;
     private final PasswordEncoder passwordEncoder;
     private final EmployeesService employeeService;
-    private final EmailService emailService;
     private final ProfileUploadService profileUploadService;
     private final LogoutService logoutService;
     private final LeavesService leavesService;
@@ -51,7 +49,6 @@ public class AuthController {
                           EmployeesMapper employeeMapper,
                           PasswordEncoder passwordEncoder,
                           EmployeesService employeeService,
-                          EmailService emailService,
                           ProfileUploadService profileUploadService,
                           LogoutService logoutService,
                           LeavesService leavesService) {
@@ -59,7 +56,6 @@ public class AuthController {
         this.employeeMapper = employeeMapper;
         this.passwordEncoder = passwordEncoder;
         this.employeeService = employeeService;
-        this.emailService = emailService;
         this.profileUploadService = profileUploadService;
         this.logoutService = logoutService;
         this.leavesService = leavesService;
@@ -101,6 +97,29 @@ public class AuthController {
             String refreshToken = jwtTokenUtil.generateRefreshToken(employee);
 
             // 응답 생성
+//            JwtResponseDTO jwtResponse = JwtResponseDTO.builder()
+//                    .accessToken(accessToken)
+//                    .refreshToken(refreshToken)
+//                    .id(employee.getId())
+//                    .empNum(employee.getEmpNum())
+//                    .name(employee.getName())
+//                    .email(employee.getEmail())
+//                    .internalEmail(employee.getInternalEmail())
+//                    .role(employee.getRole())
+//                    .tempPassword(isTempPassword)
+//                    .departmentName(employee.getDepartmentName())
+//                    .positionTitle(employee.getPositionTitle())
+//                    .phone(employee.getPhone())
+//                    .profileImgUrl(employee.getProfileImgUrl())
+//                    .enabled(employee.isEnabled())
+//                    .lastLogin(employee.getLastLogin())
+//                    .gender(employee.getGender())
+//                    .hireDate(employee.getHireDate())
+//                    .accountNonExpired(employee.isAccountNonExpired())
+//                    .accountNonLocked(employee.isAccountNonLocked())
+//                    .credentialsNonExpired(employee.isCredentialsNonExpired())
+//                    .attendStatus(employee.getAttendStatus())
+//                    .build();
             JwtResponseDTO jwtResponse = JwtResponseDTO.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
@@ -109,19 +128,9 @@ public class AuthController {
                     .name(employee.getName())
                     .email(employee.getEmail())
                     .internalEmail(employee.getInternalEmail())
-                    .role(employee.getRole())
-                    .tempPassword(isTempPassword)
-                    .departmentName(employee.getDepartmentName())
-                    .positionTitle(employee.getPositionTitle())
-                    .phone(employee.getPhone())
-                    .profileImgUrl(employee.getProfileImgUrl())
-                    .enabled(employee.isEnabled())
                     .lastLogin(employee.getLastLogin())
-                    .gender(employee.getGender())
-                    .hireDate(employee.getHireDate())
-                    .accountNonExpired(employee.isAccountNonExpired())
-                    .accountNonLocked(employee.isAccountNonLocked())
-                    .credentialsNonExpired(employee.isCredentialsNonExpired())
+                    .role(employee.getRole())
+                    .tempPassword(false)  // 기본값 사용
                     .attendStatus(employee.getAttendStatus())
                     .build();
 
@@ -164,15 +173,18 @@ public class AuthController {
             String newAccessToken = jwtTokenUtil.generateToken(employee);
             String newRefreshToken = jwtTokenUtil.generateRefreshToken(employee);
 
-            // 응답 생성
             JwtResponseDTO jwtResponse = JwtResponseDTO.builder()
                     .accessToken(newAccessToken)
                     .refreshToken(newRefreshToken)
+                    .id(employee.getId())
                     .empNum(employee.getEmpNum())
                     .name(employee.getName())
                     .email(employee.getEmail())
+                    .internalEmail(employee.getInternalEmail())
+                    .lastLogin(employee.getLastLogin())
                     .role(employee.getRole())
                     .tempPassword(false)  // 기본값 사용
+                    .attendStatus(employee.getAttendStatus())
                     .build();
 
             return ResponseEntity.ok(jwtResponse);
@@ -201,10 +213,6 @@ public class AuthController {
         // 토큰이 유효하면 블랙리스트에 추가
         if (token != null) {
             logoutService.blacklistToken(token);
-            System.out.println("토큰 블랙리스트 추가 성공: " + token.substring(0, Math.min(10, token.length())) + "...");
-            System.out.println("현재 블랙리스트 크기: " + logoutService.getBlacklistSize());
-        } else {
-            System.out.println("로그아웃 처리: 토큰이 제공되지 않았습니다.");
         }
 
         // 쿠키 제거
@@ -435,22 +443,18 @@ public class AuthController {
 
         // 헤더에서 토큰 추출
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("토큰 검증 실패: Authorization 헤더가 없거나 잘못된 형식입니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(
                             "valid", false,
                             "message", "인증 토큰이 없거나 형식이 잘못되었습니다."
                     ));
         }
-
         String token = authHeader.substring(7);
-        System.out.println("토큰 검증 시작: " + token.substring(0, Math.min(10, token.length())) + "...");
 
         // 토큰 유효성 검증
         if (jwtTokenUtil.validateToken(token)) {
             // 토큰에서 사원번호 추출
             String empNum = jwtTokenUtil.getEmpNumFromToken(token);
-            System.out.println("토큰 검증 성공: 사원번호 " + empNum);
 
             return ResponseEntity.ok(Map.of(
                     "valid", true,
@@ -458,7 +462,6 @@ public class AuthController {
                     "message", "유효한 토큰입니다."
             ));
         } else {
-            System.out.println("토큰 검증 실패: 만료되었거나 유효하지 않은 토큰입니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(
                             "valid", false,

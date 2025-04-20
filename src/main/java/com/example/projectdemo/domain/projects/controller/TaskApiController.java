@@ -1,5 +1,6 @@
 package com.example.projectdemo.domain.projects.controller;
 
+import com.example.projectdemo.domain.notification.service.NotificationEventHandler;
 import com.example.projectdemo.domain.projects.dto.SubTaskDTO;
 import com.example.projectdemo.domain.projects.dto.TaskDTO;
 import com.example.projectdemo.domain.projects.dto.TaskLogDTO;
@@ -20,6 +21,9 @@ public class TaskApiController {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private NotificationEventHandler notificationEventHandler;
 
     /**
      * 모든 업무 목록 조회
@@ -122,6 +126,10 @@ public class TaskApiController {
 
         try {
             TaskDTO createdTask = taskService.createTask(task);
+
+            // 업무 생성 알림 발송
+            notificationEventHandler.handleTaskCreationNotification(createdTask);
+
             return ResponseEntity.ok(createdTask);
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,8 +137,6 @@ public class TaskApiController {
                     .body(null);
         }
     }
-
-
 
     /**
      * 업무 정보 업데이트
@@ -143,8 +149,22 @@ public class TaskApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        // 기존 업무 상태 조회
+        TaskDTO existingTask = taskService.getTaskById(id);
+        if (existingTask == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String oldStatus = existingTask.getStatus();
+
         task.setId(id);
         TaskDTO updatedTask = taskService.updateTask(task);
+
+        // 상태 변경이 있는 경우 알림 발송
+        if (!oldStatus.equals(updatedTask.getStatus())) {
+            notificationEventHandler.handleTaskUpdateNotification(updatedTask, oldStatus, updatedTask.getStatus());
+        }
+
         return ResponseEntity.ok(updatedTask);
     }
 
@@ -165,7 +185,21 @@ public class TaskApiController {
             return ResponseEntity.badRequest().build();
         }
 
+        // 기존 업무 상태 조회
+        TaskDTO existingTask = taskService.getTaskById(id);
+        if (existingTask == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String oldStatus = existingTask.getStatus();
+
         TaskDTO updatedTask = taskService.updateTaskStatus(id, status, empNum);
+
+        // 상태 변경 알림 발송
+        if (!oldStatus.equals(status)) {
+            notificationEventHandler.handleTaskUpdateNotification(updatedTask, oldStatus, status);
+        }
+
         return ResponseEntity.ok(updatedTask);
     }
 
@@ -187,9 +221,23 @@ public class TaskApiController {
                 return ResponseEntity.badRequest().build();
             }
 
+            // 기존 업무 상태 조회
+            TaskDTO existingTask = taskService.getTaskById(id);
+            if (existingTask == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String oldStatus = existingTask.getStatus();
+
             System.out.println("TaskId: " + id + ", Progress: " + progress + ", EmpNum: " + empNum); // 로깅 추가
 
             TaskDTO updatedTask = taskService.updateTaskProgress(id, progress, empNum);
+
+            // 상태 변경 알림 발송 (진행률 변경이 상태 변경을 트리거할 수 있음)
+            if (!oldStatus.equals(updatedTask.getStatus())) {
+                notificationEventHandler.handleTaskUpdateNotification(updatedTask, oldStatus, updatedTask.getStatus());
+            }
+
             return ResponseEntity.ok(updatedTask);
         } catch (Exception e) {
             e.printStackTrace(); // 예외 스택 트레이스 출력

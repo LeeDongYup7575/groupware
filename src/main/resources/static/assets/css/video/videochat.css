@@ -1,0 +1,388 @@
+/* 기본 스타일 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 80px auto;
+    padding: 0 15px;
+}
+
+/* 메인 콘텐츠 영역 */
+.main-content {
+    display: flex;
+    min-height: calc(100vh - 70px);
+    padding: 20px 0;
+}
+
+.content-area {
+    flex: 1;
+    padding: 0 15px;
+}
+
+/* 화상회의 로비 스타일 */
+.video-lobby {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.video-lobby h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* 검색 영역 */
+.search-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.search-box {
+    display: flex;
+    flex: 1;
+    max-width: 500px;
+    margin-right: 20px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px 0 0 5px;
+    font-size: 15px;
+    outline: none;
+}
+
+.search-box button {
+    padding: 0 20px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.primary-btn {
+    padding: 12px 20px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-btn:hover {
+    background-color: #3a5bd7;
+}
+
+/* 회의실 목록 */
+.room-list {
+    margin-top: 20px;
+}
+
+.empty-list {
+    text-align: center;
+    padding: 50px 0;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+}
+
+.empty-list p {
+    color: #666;
+    font-size: 16px;
+}
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.room-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.room-info {
+    padding: 20px;
+}
+
+.room-info h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.room-info p {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.room-created {
+    font-size: 13px;
+    color: #888;
+}
+
+.room-locked {
+    color: #f59f00;
+}
+
+.room-participants {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.room-actions {
+    padding: 0 20px 20px 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.join-btn {
+    padding: 8px 20px;
+    background-color: #4a6cf7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.join-btn:hover {
+    background-color: #3a5bd7;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: white;
+    margin: 10% auto;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    color: #333;
+    margin: 0;
+}
+
+.close {
+    font-size: 24px;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-weight: bold;
+}
+
+.close:hover {
+    color: #555;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    border-color: #4a6cf7;
+}
+
+.form-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 미디어 토글 스타일 */
+.media-toggle {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.toggle-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-group label {
+    font-weight: 500;
+}
+
+.toggle-slider {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toggle-group input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-group input[type="checkbox"]:checked + .toggle-slider {
+    background-color: #4a6cf7;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-group input[type="checkbox"]:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+.media-status {
+    text-align: center;
+    color: #666;
+    margin: 15px 0;
+    font-style: italic;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .search-area {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        margin-right: 0;
+        margin-bottom: 15px;
+        max-width: none;
+    }
+
+    .room-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
+    }
+}
+
+/* 방 입장 실패 모달 스타일 */
+#roomFullModal .modal-body {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+#roomFullModal p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #e53e3e;
+}
+
+/* 최대 참가자 수 선택 스타일 */
+#maxParticipantsSelect {
+    background-color: #f5f5f5;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}

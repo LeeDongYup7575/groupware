@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const search = urlParams.get('search');
     const tab = urlParams.get('tab') || 'shared';
     const dept = urlParams.get('dept') || 'all';
+    const overlay = document.getElementById('contactSidebarOverlay');
 
     fetchDepartments().then(() => {
         if (search && search.trim() !== "") {
@@ -293,6 +294,20 @@ document.addEventListener('DOMContentLoaded', function () {
         input.dispatchEvent(new Event('input'));
     });
 
+    // 사이드바 토글
+    overlay.addEventListener('click', () => {
+        document.querySelector('.contact-sidebar').classList.remove('open');
+        overlay.classList.remove('show');
+    });
+
+    // 너비 줄어들 시 이벤트
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1200) {
+            document.querySelector('.contact-sidebar').classList.remove('open');
+            document.getElementById('contactSidebarOverlay').classList.remove('show');
+        }
+    });
+
 });
 
 // 개인 주소록 연락처 추가 input 초기화
@@ -376,6 +391,10 @@ function handleSidebarClick(tab, dept = 'all') {
     // 일반 연락처 데이터 로드
     loadContacts(tab, dept);
     updateActiveSidebarItem(tab, dept);
+
+    // 사이드바 닫기
+    document.querySelector('.contact-sidebar')?.classList.remove('open');
+    document.getElementById('sidebarOverlay')?.classList.remove('show');
 }
 
 
@@ -447,7 +466,7 @@ function renderContacts(data, tab) {
                     ${tab === 'shared' ? contact.internalEmail : contact.email || ''}
                 </a>
             </td>
-            <td>${contact.phone}</td>
+            <td class="phone-col">${contact.phone}</td>
             <td class="info-col">${tab === 'shared' ? contact.depName : contact.memo || ''}</td>
         `;
 
@@ -821,6 +840,7 @@ function createSearchSection(title, results, tab) {
 
             // 전화번호
             const tdPhone = document.createElement("td");
+            tdPhone.className = "phone-col";
             tdPhone.textContent = contact.phone;
             tr.appendChild(tdPhone);
 
@@ -860,6 +880,4 @@ function createSearchSection(title, results, tab) {
     section.appendChild(table);
     return section;
 }
-
-
 

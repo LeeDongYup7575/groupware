@@ -125,4 +125,16 @@
             AND id != #{excludeBookingId}
         </if>
     </select>
+
+    <!-- 특정 시간 범위 내에 시작하는 회의실 예약 조회 -->
+    <select id="findBookingsStartingBetween" resultMap="meetingRoomBookingResultMap">
+        SELECT b.*, r.name, r.location, r.capacity, r.description, r.is_available,
+               e.name as emp_name, d.name as dept_name
+        FROM meeting_room_booking b
+                 JOIN meeting_room r ON b.room_id = r.id
+                 LEFT JOIN employees e ON b.emp_num = e.emp_num
+                 LEFT JOIN departments d ON e.dep_id = d.id
+        WHERE b.booking_status = 'CONFIRMED'
+          AND b.start BETWEEN #{startTimeFrom} AND #{startTimeTo}
+    </select>
 </mapper>

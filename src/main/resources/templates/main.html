@@ -23,11 +23,23 @@
     <script src="https://unpkg.com/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.8/index.global.min.js"></script>
 
+    <style>
+        /* 반응형: 사이드바가 토글될 때 */
+        @media (max-width: 1200px) {
+            /*페이지 내비게이션 토글 버튼*/
+            .gw-current-page {
+                display: block !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
+
+<!-- 사이드바 토글 버튼 (1200px 이하일 때만 표시됨) -->
+<div th:replace="fragments/sidebar-toggle :: sidebarToggle"></div>
 
 <div class="main-container">
     <!-- 사이드바 -->
@@ -91,6 +103,7 @@
                         </div>
                     </div>
 
+                    <!-- 자유게시판 -->
                     <div id="free" class="tab-content">
                         <div th:if="${!publicList.isEmpty()}">
                             <div class="list-group">
@@ -105,7 +118,7 @@
                                 </a>
                             </div>
                         </div>
-
+                        <!-- 게시글이 없는 경우 -->
                         <div th:if="${publicList.isEmpty()}" class="alert">
                             표시할 게시글이 없습니다.
                         </div>
@@ -379,7 +392,9 @@
         </div>
 
     </div>
+
 </div>
+
 
 <!-- 페이지 스크립트 -->
 <script>
@@ -422,7 +437,7 @@
                     events: [
                         {
                             title: '회사창립일 🎉',
-                            start: '2025-04-24', // 원하는 날짜 (YYYY-MM-DD)
+                            start: '2012-04-24', // 원하는 날짜 (YYYY-MM-DD)
                             allDay: true,
                             className: 'company-anniversary' // 원하는 스타일을 위해 클래스 추가 가능
                         }
@@ -1038,7 +1053,8 @@
 <div th:replace="fragments/header :: headerScripts"></div>
 
 <!-- 공통 사이드바 스크립트 포함 -->
-<link rel="stylesheet" th:href="@{/assets/js/fragments/sidebar-common.js}">
+<script src="/assets/js/fragments/sidebar-common.js"></script>
+
 
 </body>
 </html>

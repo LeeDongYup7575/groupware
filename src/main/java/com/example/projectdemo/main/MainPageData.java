@@ -4,7 +4,7 @@ import com.example.projectdemo.domain.attend.dto.AttendDTO;
 import com.example.projectdemo.domain.board.dto.PostsDTO;
 import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
 import com.example.projectdemo.domain.employees.dto.EmployeesDTO;
-import com.example.projectdemo.domain.notification.model.Notice;
+import com.example.projectdemo.domain.notification_scraping.model.Notice;
 import lombok.Data;
 
 import java.time.LocalDateTime;

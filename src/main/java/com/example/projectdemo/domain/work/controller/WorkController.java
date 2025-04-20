@@ -93,23 +93,26 @@ public class WorkController {
         List<Map<String, Object>> overtimeHoursList = workService.getMonthlyOvertimeHours(empId, year);
 
         List<Map<String, Object>> statisticsByMonth = attendService.getMonthlyAttendanceStatisticsThisMonth(empId);
-
+        System.out.println(statisticsByMonth);
         // 현재 월의 총합을 계산
         double currentMonthTotalOvertime = 0;
         for (Map<String, Object> data : overtimeHoursList) {
             Integer month = (Integer) data.get("month");
             if (month != null && month == currentMonth) {
-                Object totalHoursObj = data.get("totalHours");
+                Object totalOvertimeObj = data.get("total_overtime"); // 여기가 중요!
+
                 double hours = 0;
-                if (totalHoursObj == null || totalHoursObj.toString().trim().isEmpty()) {
-                    hours = 0; // null 이거나 빈 문자열인 경우 0으로 처리
-                } else if (totalHoursObj instanceof Number) {
-                    hours = ((Number) totalHoursObj).doubleValue();
+                if (totalOvertimeObj == null || totalOvertimeObj.toString().trim().isEmpty()) {
+                    hours = 0;
                 } else {
+                    String timeStr = totalOvertimeObj.toString(); // "11:00" 형식
                     try {
-                        hours = Double.parseDouble(totalHoursObj.toString());
-                    } catch (NumberFormatException e) {
-                        hours = 0; // 파싱 에러 발생 시 0으로 처리
+                        String[] parts = timeStr.split(":");
+                        int h = Integer.parseInt(parts[0]);
+                        int m = Integer.parseInt(parts[1]);
+                        hours = h + (m / 60.0);
+                    } catch (Exception e) {
+                        hours = 0; // 파싱 실패 시 0
                     }
                 }
                 currentMonthTotalOvertime += hours;

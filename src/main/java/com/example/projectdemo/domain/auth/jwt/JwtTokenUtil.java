@@ -116,20 +116,6 @@ public class JwtTokenUtil {
         claims.put("empNum", employee.getEmpNum());
         claims.put("email", employee.getEmail());
 
-        // 부가 정보
-        claims.put("gender", employee.getGender());
-        claims.put("phone", employee.getPhone());
-        claims.put("profileImgUrl", employee.getProfileImgUrl());
-
-        // 근무 관련 정보
-        claims.put("depId", employee.getDepId());
-        claims.put("posId", employee.getPosId());
-        claims.put("hireDate", employee.getHireDate().toString());
-        claims.put("attendStatus", employee.getAttendStatus());
-
-        // 휴가 관련 정보
-        claims.put("totalLeave", employee.getTotalLeave());
-        claims.put("usedLeave", employee.getUsedLeave());
 
         return doGenerateToken(claims, employee.getEmpNum(), jwtExpiration);
     }
@@ -148,20 +134,6 @@ public class JwtTokenUtil {
         claims.put("email", employee.getEmail());
         claims.put("tempPassword", tempPassword);
 
-        // 부가 정보
-        claims.put("gender", employee.getGender());
-        claims.put("phone", employee.getPhone());
-        claims.put("profileImgUrl", employee.getProfileImgUrl());
-
-        // 근무 관련 정보
-        claims.put("depId", employee.getDepId());
-        claims.put("posId", employee.getPosId());
-        claims.put("hireDate", employee.getHireDate().toString());
-        claims.put("attendStatus", employee.getAttendStatus());
-
-        // 휴가 관련 정보
-        claims.put("totalLeave", employee.getTotalLeave());
-        claims.put("usedLeave", employee.getUsedLeave());
 
         return doGenerateToken(claims, employee.getEmpNum(), jwtExpiration);
     }

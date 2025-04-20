@@ -18,24 +18,23 @@ public class ProjectDTO {
     private Integer id;
     private String name;
     private String description;
-    private String managerEmpNum;  // Changed from managerId to match schema
-    private String managerName;    // Mapping field
+    private String managerEmpNum;
+    private String managerName;   //매핑용
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDate actualEndDate;
     private String status;
     private Integer depId;
-    private String depName;        // Mapping field
-    private Integer progress;      // Added to match mapper
-    private Boolean isPublic;      // Added to match mapper
+    private String depName;        // 매핑용
+    private Integer progress;      // 매핑용
+    private Boolean isPublic;      // 매핑용
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Additional fields for business logic (not directly mapped)
-    private int taskCount;         // Total tasks
-    private int completedTaskCount; // Completed tasks
-    private List<String> memberNames; // Project member names
+    // db와 매핑은 안돼도 필요해서..
+    private int taskCount;
+    private int completedTaskCount;
+    private List<String> memberNames;
 
-    // Project members data for registration
-    private List<Map<String, String>> members; // For adding members during project creation
+    private List<Map<String, String>> members;
 }

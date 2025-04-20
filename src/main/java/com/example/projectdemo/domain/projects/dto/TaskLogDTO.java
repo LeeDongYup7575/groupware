@@ -20,7 +20,7 @@ public class TaskLogDTO {
     private String projectName;
     private String empNum;
     private String empName;
-    private String logType; // 업무 생성, 업무 수정, 상태 변경, 진행률 변경 등
+    private String logType;
     private String oldValue;
     private String newValue;
     private String comment;

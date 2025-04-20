@@ -169,7 +169,7 @@
 <body>
 <main class="form-signin">
   <div class="login-header">
-    <div class="logo">GROUP<span>WARE</span></div>
+    <img th:src="@{/assets/images/bigLogo.png}" alt="GroupWare Logo" style="height: 50px; object-fit: contain;" />
     <h1 class="login-title">로그인</h1>
     <p class="login-subtitle">그룹웨어 서비스를 이용하려면 로그인하세요.</p>
   </div>
@@ -270,8 +270,12 @@
 
   // 메일 자동 로그인 처리
   function mailLogin(user, pass) {
-    const url = `http://techx.kro.kr:8081/roundcube/?_autologin=1&_user=${encodeURIComponent(user)}&_pass=${encodeURIComponent(pass)}`;
-    const popup = window.open(
+    const rememberMe = document.getElementById('remember-me').checked;
+
+    const url = `http://techx.kro.kr:8081/roundcube/?_autologin=1&_user=${encodeURIComponent(user)}&_pass=${encodeURIComponent(pass)}`
+            + (rememberMe ? '&_remember=1' : '&_remember=0');
+
+    window.open(
             url,
             'roundcubeLogin',
             'width=1,height=1,top=99999,left=99999,resizable=no,scrollbars=no,status=no,toolbar=no,menubar=no'

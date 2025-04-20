@@ -139,7 +139,9 @@ public class LeaveController {
 
         for (LeavesDTO leave : leavesList) {
             int edsmDocId = leave.getEdsmDocId();
+            System.out.println(edsmDocId);
             String status = leavesService.selectByStatus(drafterId, edsmDocId);
+            System.out.println("status: "+status);
             leave.setStatus(status);
             leavesService.updateLeaveStatus(leave.getId(), status);
 

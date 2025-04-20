@@ -5,14 +5,19 @@ import com.example.projectdemo.domain.booking.dto.MeetingRoomBookingDTO;
 import com.example.projectdemo.domain.booking.dto.MeetingRoomDTO;
 import com.example.projectdemo.domain.booking.dto.SuppliesBookingDTO;
 import com.example.projectdemo.domain.booking.dto.SuppliesDTO;
+import com.example.projectdemo.domain.booking.entity.MeetingRoomBooking;
+import com.example.projectdemo.domain.booking.entity.Supplies;
+import com.example.projectdemo.domain.booking.entity.SuppliesBooking;
 import com.example.projectdemo.domain.booking.service.MeetingRoomService;
 import com.example.projectdemo.domain.booking.service.SuppliesService;
+import com.example.projectdemo.domain.notification.service.NotificationEventHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,6 +35,9 @@ public class BookingApiController {
 
     @Autowired
     private SuppliesService suppliesService;
+
+    @Autowired
+    private NotificationEventHandler notificationEventHandler;
 
     // === 회의실 관련 API ===
 
@@ -114,6 +122,18 @@ public class BookingApiController {
 
             // 예약 생성
             MeetingRoomBookingDTO booking = meetingRoomService.createBooking(empNum, requestDTO);
+
+            // TODO: 예약 시작 시간 1시간 전에 알림을 스케줄링하는 로직 추가
+            // 예약 시간이 1시간 이내인 경우 즉시 알림 발송
+            if (Duration.between(LocalDateTime.now(), startDateTime).toHours() <= 1) {
+                MeetingRoomBooking bookingEntity = new MeetingRoomBooking();
+                bookingEntity.setId(booking.getId());
+                bookingEntity.setEmpNum(empNum);
+                bookingEntity.setTitle(booking.getTitle());
+
+                notificationEventHandler.handleBookingStartingSoonNotification(bookingEntity);
+            }
+
             return ResponseEntity.ok(booking);
         } catch (IllegalArgumentException e) {
             // 유효성 검증 실패
@@ -271,6 +291,31 @@ public class BookingApiController {
 
             // 모든 비품 예약 처리
             List<SuppliesBookingDTO> bookings = suppliesService.createMultipleBookings(empNum, requestDTO);
+
+            // 예약 시간이 1시간 이내인 경우 즉시 알림 발송
+            // 예약 시간이 1시간 이내인 경우 즉시 알림 발송
+            if (Duration.between(LocalDateTime.now(), startDateTime).toHours() <= 1) {
+                for (SuppliesBookingDTO bookingDTO : bookings) {
+                    SuppliesBooking booking = new SuppliesBooking();
+                    booking.setId(bookingDTO.getId());
+                    booking.setEmpNum(empNum);
+                    booking.setQuantity(bookingDTO.getQuantity());
+
+                    // DTO를 엔티티로 변환하거나 필수 정보만 설정
+                    Supplies supplyEntity = new Supplies();
+                    SuppliesDTO supplyDTO = suppliesService.getSuppliesById(bookingDTO.getSupplyId());
+
+                    supplyEntity.setId(supplyDTO.getId());
+                    supplyEntity.setName(supplyDTO.getName());
+                    supplyEntity.setCategory(supplyDTO.getCategory());
+                    supplyEntity.setTotalQuantity(supplyDTO.getTotalQuantity());
+                    supplyEntity.setIsAvailable(supplyDTO.getIsAvailable());
+
+                    booking.setSupplies(supplyEntity);
+
+                    notificationEventHandler.handleSuppliesBookingStartingSoonNotification(booking);
+                }
+            }
 
             // 예약 성공 응답 반환
             return ResponseEntity.ok(bookings);

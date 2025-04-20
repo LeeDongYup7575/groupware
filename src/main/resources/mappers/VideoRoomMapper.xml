@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.projectdemo.domain.videoconf.mapper.VideoRoomMapper">
 
-    <resultMap id="videoRoomMap" type="com.example.projectdemo.domain.videoconf.entity.VideoRoom">
+<mapper namespace="com.example.projectdemo.domain.videochat.mapper.VideoRoomMapper">
+    <resultMap id="roomResultMap" type="com.example.projectdemo.domain.videochat.dto.VideoRoomDTO">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="password" column="password"/>
@@ -10,37 +10,99 @@
         <result property="createdAt" column="created_at"/>
         <result property="isActive" column="is_active"/>
         <result property="maxParticipants" column="max_participants"/>
+        <result property="currentParticipants" column="current_participants"/>
+        <result property="isPasswordProtected" column="is_password_protected"/>
     </resultMap>
 
-    <select id="findActiveRooms" resultMap="videoRoomMap">
-        SELECT * FROM VIDEO_ROOM
-        WHERE is_active = true
+    <select id="findAllActiveRooms" resultMap="roomResultMap">
+        SELECT
+            r.*,
+            (SELECT COUNT(*) FROM video_room_participant p
+             WHERE p.room_id = r.id AND p.is_active = 1) as current_participants,
+            (CASE WHEN r.password IS NOT NULL AND r.password != '' THEN 1 ELSE 0 END) as is_password_protected
+        FROM
+            video_room r
+        WHERE
+            r.is_active = 1
+        ORDER BY
+            r.created_at DESC
     </select>
 
-    <select id="findActiveRoomById" resultMap="videoRoomMap">
-        SELECT * FROM VIDEO_ROOM
-        WHERE id = #{roomId} AND is_active = true
+    <select id="findRoomById" resultMap="roomResultMap" parameterType="string">
+        SELECT
+            r.*,
+            (SELECT COUNT(*) FROM video_room_participant p
+             WHERE p.room_id = r.id AND p.is_active = 1) as current_participants,
+            (CASE WHEN r.password IS NOT NULL AND r.password != '' THEN 1 ELSE 0 END) as is_password_protected
+        FROM
+            video_room r
+        WHERE
+            r.id = #{id}
     </select>
 
-    <select id="findPublicRooms" resultMap="videoRoomMap">
-        SELECT * FROM VIDEO_ROOM
-        WHERE is_active = true AND (password IS NULL OR password = '')
+    <select id="searchRoomsByName" resultMap="roomResultMap" parameterType="string">
+        SELECT
+            r.*,
+            (SELECT COUNT(*) FROM video_room_participant p
+             WHERE p.room_id = r.id AND p.is_active = 1) as current_participants,
+            (CASE WHEN r.password IS NOT NULL AND r.password != '' THEN 1 ELSE 0 END) as is_password_protected
+        FROM
+            video_room r
+        WHERE
+            r.is_active = 1
+          AND r.name LIKE CONCAT('%', #{name}, '%')
+        ORDER BY
+            r.created_at DESC
     </select>
 
-    <select id="findRoomsByCreator" resultMap="videoRoomMap">
-        SELECT * FROM VIDEO_ROOM
-        WHERE created_by = #{empNum} AND is_active = true
-    </select>
-
-    <insert id="createRoom" parameterType="com.example.projectdemo.domain.videoconf.entity.VideoRoom">
-        INSERT INTO VIDEO_ROOM (id, name, password, created_by, created_at, is_active, max_participants)
-        VALUES (#{id}, #{name}, #{password}, #{createdBy}, #{createdAt}, #{isActive}, #{maxParticipants})
+    <insert id="createRoom" parameterType="com.example.projectdemo.domain.videochat.dto.VideoRoomDTO">
+        INSERT INTO video_room (
+            id, name, password, created_by, max_participants
+        ) VALUES (
+                     #{id}, #{name}, #{password}, #{createdBy}, #{maxParticipants}
+                 )
     </insert>
 
-    <update id="deactivateRoom">
-        UPDATE VIDEO_ROOM
-        SET is_active = false
-        WHERE id = #{roomId}
+    <update id="updateRoom" parameterType="com.example.projectdemo.domain.videochat.dto.VideoRoomDTO">
+        UPDATE video_room
+        SET
+            name = #{name},
+            password = #{password},
+            max_participants = #{maxParticipants},
+            is_active = #{isActive}
+        WHERE
+            id = #{id}
     </update>
 
+    <update id="updateRoomActiveStatus">
+        UPDATE video_room
+        SET
+            is_active = #{isActive}
+        WHERE
+            id = #{id}
+    </update>
+
+    <select id="findEmptyRooms" resultType="string">
+        SELECT r.id
+        FROM video_room r
+                 LEFT JOIN (
+            SELECT room_id, COUNT(*) as active_count
+            FROM video_room_participant
+            WHERE is_active = 1
+            GROUP BY room_id
+        ) p ON r.id = p.room_id
+        WHERE r.is_active = 1 AND (p.active_count IS NULL OR p.active_count = 0)
+    </select>
+
+    <select id="getPasswordById" resultType="string" parameterType="string">
+        SELECT password
+        FROM video_room
+        WHERE id = #{id}
+    </select>
+
+    <select id="countCurrentParticipants" resultType="int" parameterType="string">
+        SELECT COUNT(*)
+        FROM video_room_participant
+        WHERE room_id = #{roomId} AND is_active = 1
+    </select>
 </mapper>
