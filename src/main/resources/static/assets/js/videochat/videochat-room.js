@@ -352,7 +352,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 비디오 엘리먼트 생성
-    // 비디오 엘리먼트 생성
     function createVideoElement(id, name, isLocal, noVideo = false, stream = null) {
         // 이미 존재하는 비디오인지 확인
         const existingVideo = document.getElementById(`video-${id}`);
