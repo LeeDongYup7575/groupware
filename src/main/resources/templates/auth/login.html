@@ -270,8 +270,12 @@
 
   // 메일 자동 로그인 처리
   function mailLogin(user, pass) {
-    const url = `http://techx.kro.kr:8081/roundcube/?_autologin=1&_user=${encodeURIComponent(user)}&_pass=${encodeURIComponent(pass)}`;
-    const popup = window.open(
+    const rememberMe = document.getElementById('remember-me').checked;
+
+    const url = `http://techx.kro.kr:8081/roundcube/?_autologin=1&_user=${encodeURIComponent(user)}&_pass=${encodeURIComponent(pass)}`
+            + (rememberMe ? '&_remember=1' : '&_remember=0');
+
+    window.open(
             url,
             'roundcubeLogin',
             'width=1,height=1,top=99999,left=99999,resizable=no,scrollbars=no,status=no,toolbar=no,menubar=no'
