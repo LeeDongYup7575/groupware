@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>공유 주소록</title>
+  <title>주소록</title>
   <link rel="stylesheet" href="/assets/css/contact/contact.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="/assets/js/contact/contact.js"></script>
@@ -11,6 +11,7 @@
   <th:block th:replace="fragments/header :: headerAssets"></th:block>
   <!-- 사이드바 스타일 포함 -->
   <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+  <script src="/assets/js/fragments/sidebar-common.js"></script>
   
 </head>
 <body>
@@ -21,7 +22,7 @@
 
 <main>
   <!-- 사이드바 -->
-  <div class="contact-sidebar">
+  <div class="contact-sidebar" id="sidebar">
     <button class="add-contact-btn"><span><i class="fas fa-plus"></i></span> 연락처 추가</button>
     <h3><i class="fa-solid fa-address-book"></i> 공유 주소록</h3>
     <div id="shared-tab-container">
@@ -60,6 +61,12 @@
     </table>
   </section>
 </main>
+
+<!-- 사이드바 토글 버튼 (1200px 이하일 때만 표시됨) -->
+<div th:replace="fragments/sidebar-toggle :: sidebarToggle"></div>
+
+<!-- 오버레이 -->
+<div id="contactSidebarOverlay"></div>
 
 <!-- 모달 영역 -->
 <div id="contact-modal" class="modal-overlay hidden">
