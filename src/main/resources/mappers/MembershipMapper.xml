@@ -19,9 +19,9 @@
         delete from membership where emp_id=${userid} and chatroom_id=${roomid}
     </delete>
     <select id="getUserList" resultType="com.example.projectdemo.domain.chat.dto.MemberShipDTO">
-        select * from membership where chatroom_id=${roomid}
+        select * from membership where chatroom_id=${roomid} order by role;
     </select>
     <select id="getMemberIdsByRoomId" resultType="int">
-        select emp_id from membership where chatroom_id=${roomid}
+        select emp_id from membership where chatroom_id=${roomid} order by role;
     </select>
 </mapper>

@@ -31,7 +31,7 @@ public class ManageService {
         return managedao.addPosition(title);
     }
     public String deleteDepartment(int[] ids) {
-//        mangedao. 부서를
+
         for(Integer id : ids) {
             employeesService.updateByDepId(id);
         }
