@@ -13,6 +13,7 @@
   <th:block th:replace="fragments/header :: headerAssets"></th:block>
   <!-- 사이드바 스타일 포함 -->
   <link rel="stylesheet" th:href="@{/assets/css/fragments/sidebar-common.css}">
+  <script src="/assets/js/fragments/sidebar-common.js"></script>
 
 </head>
 <body>
@@ -22,7 +23,7 @@
 <div th:replace="fragments/header :: headerScripts"></div>
 
 <main>
-  <div class="mypage-sidebar" id="mypageSidebar">
+  <div class="mypage-sidebar" id="sidebar">
     <div class="mypage-sidebar-item" id="info" onclick="loadTabContent('info')">
       <span class="mypage-sidebar-icon"><i class="fa-solid fa-user"></i></span>
       <span class="mypage-sidebar-link">내 정보</span>

@@ -76,8 +76,9 @@ function loadTabContent(tabName) {
             });
     }
 
-    // 사이드바 닫기
-    closeSidebarIfOpen();
+    document.getElementById('sidebar')?.classList.remove('open');
+    document.getElementById('sidebarOverlay')?.classList.remove('show');
+
 }
 
 function loadMenuContent(menuName) {
@@ -727,20 +728,20 @@ function setupCommentDelete() {
     });
 }
 
-function toggleSidebar() {
-    const sidebar = document.getElementById('mypageSidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('show');
-}
-
-function closeSidebarIfOpen() {
-    const sidebar = document.getElementById('mypageSidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    if (sidebar.classList.contains('open')) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-    }
-}
+// function toggleSidebar() {
+//     const sidebar = document.getElementById('mypageSidebar');
+//     const overlay = document.getElementById('sidebarOverlay');
+//
+//     sidebar.classList.toggle('open');
+//     overlay.classList.toggle('show');
+// }
+//
+// function closeSidebarIfOpen() {
+//     const sidebar = document.getElementById('mypageSidebar');
+//     const overlay = document.getElementById('sidebarOverlay');
+//
+//     if (sidebar.classList.contains('open')) {
+//         sidebar.classList.remove('open');
+//         overlay.classList.remove('show');
+//     }
+// }
