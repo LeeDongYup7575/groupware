@@ -93,7 +93,6 @@ public class WorkController {
         List<Map<String, Object>> overtimeHoursList = workService.getMonthlyOvertimeHours(empId, year);
 
         List<Map<String, Object>> statisticsByMonth = attendService.getMonthlyAttendanceStatisticsThisMonth(empId);
-        System.out.println(statisticsByMonth);
         // 현재 월의 총합을 계산
         double currentMonthTotalOvertime = 0;
         for (Map<String, Object> data : overtimeHoursList) {
