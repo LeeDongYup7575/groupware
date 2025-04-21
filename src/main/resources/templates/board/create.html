@@ -483,7 +483,10 @@
                     // 사용자 목록 렌더링
                     data.forEach(user => {
                         // 현재 로그인한 사용자는 제외
-                        if (user.id === parseInt(localStorage.getItem('empNum'))) {
+                        // if (user.id === parseInt(localStorage.getItem('empNum'))) {
+                        //     return;
+                        // }
+                        if (user.empNum === localStorage.getItem('empNum')) {
                             return;
                         }
 
