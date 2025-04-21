@@ -148,10 +148,6 @@
     function loadQrCode(attendanceType) {
         const token = localStorage.getItem('accessToken');
 
-        // 토큰 검사 및 디버깅
-        console.log('토큰 존재 여부:', !!token);
-        console.log('토큰값:', token); // 개발 중에만 사용, 실제 환경에서는 보안상 제거
-
         if (!token) {
             console.error('토큰이 없습니다. 로그인이 필요합니다.');
             alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');

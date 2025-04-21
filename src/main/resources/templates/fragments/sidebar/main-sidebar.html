@@ -24,23 +24,6 @@
       alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
     }
   }
-
-  function openVideochat() {
-    // JWT 토큰 가져오기
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert("로그인이 필요합니다");
-      return;
-    }
-
-    // 화상회의 ngrok 주소로 리다이렉트 (JWT 토큰 포함)
-    const url = `https://db0d-211-41-194-112.ngrok-free.app/videochat?token=${encodeURIComponent(token)}`;
-    const newWindow = window.open(url, "_blank");
-
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      alert("팝업이 차단되었습니다. 팝업 허용을 해주세요.");
-    }
-  }
 </script>
 
 
@@ -51,9 +34,7 @@
       <li><a href="http://techx.kro.kr:8081/roundcube/" target="_blank" rel="noopener noreferrer"><span class="sidebar-icon"><i class="fa-solid fa-envelope"></i></span> 이메일</a></li>
       <li><a th:href="@{/board}"><span class="sidebar-icon"><i class="fa-solid fa-clipboard"></i></span> 게시판</a></li>
       <li><a href="#" onclick="event.preventDefault(); openChat();"><span class="sidebar-icon"><i class="fa-solid fa-comments"></i></span> 메시지</a></li>
-<!--      <li><a th:href="@{/videochat}"><span class="sidebar-icon"><i class="fa-solid fa-video"></i></span> 화상회의</a></li>-->
-      <li><a href="#" onclick="event.preventDefault(); openVideochat();"><span class="sidebar-icon"><i class="fa-solid fa-video"></i></span> 화상회의</a></li>
-
+      <li><a th:href="@{/videochat}"><span class="sidebar-icon"><i class="fa-solid fa-video"></i></span> 화상회의</a></li>
       <li><a th:href="@{/contact}"><span class="sidebar-icon"><i class="fa-solid fa-book-open-reader"></i></span> 주소록</a></li>
       <li><a th:href="@{/booking/main}"><span class="sidebar-icon"><i class="fa-solid fa-tags"></i></span> 예약</a></li>
       <li><a th:href="@{/workmanagement}"><span class="sidebar-icon"><i class="fa-solid fa-folder-open"></i></span> 업무관리 </a></li>

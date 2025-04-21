@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     "http://10.10.55.57:3000",
                     "http://groupware.techx.kro.kr",
                     "https://techx-groupware.web.app",
-                    "https://db0d-211-41-194-112.ngrok-free.app"  // ngrok 도메인 추가
+                    "https://967a-221-150-27-169.ngrok-free.app/"
             );
 
             if (allowedOrigins.contains(origin)) {
