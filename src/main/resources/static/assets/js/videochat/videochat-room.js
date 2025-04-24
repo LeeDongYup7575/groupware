@@ -128,8 +128,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // WebSocket 연결 설정
     function connectWebSocket() {
-        const socket = new SockJS('/wss-video');
-        stompClient = Stomp.over(socket);
+
+        const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+        const host = window.location.host; // localhost:8080 또는 배포 도메인
+
+        const socket = new SockJS(`${protocol}://${host}/wss-video`);
+        const stompClient = Stomp.over(socket);
 
         // 디버그 로그 비활성화
         stompClient.debug = null;

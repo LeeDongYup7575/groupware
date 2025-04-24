@@ -893,7 +893,11 @@
                 const empNum = localStorage.getItem('empNum');
                 if (!token || !empNum) return;
 
-                const socket = new SockJS('/wss-notification');
+
+                const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
+                const host = window.location.host; // localhost:8080 또는 배포 도메인
+
+                const socket = new SockJS(`${protocol}://${host}/wss-notification`);
                 const stompClient = Stomp.over(socket);
 
                 stompClient.connect({ Authorization: 'Bearer ' + token }, function(frame) {
