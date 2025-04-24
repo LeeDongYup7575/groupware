@@ -893,7 +893,7 @@
                 const empNum = localStorage.getItem('empNum');
                 if (!token || !empNum) return;
 
-                const socket = new SockJS('/ws-notification');
+                const socket = new SockJS('/wss-notification');
                 const stompClient = Stomp.over(socket);
 
                 stompClient.connect({ Authorization: 'Bearer ' + token }, function(frame) {
