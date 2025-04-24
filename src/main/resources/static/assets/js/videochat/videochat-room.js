@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // WebSocket 연결 설정
     function connectWebSocket() {
-        const socket = new SockJS('/ws-video');
+        const socket = new SockJS('/wss-video');
         stompClient = Stomp.over(socket);
 
         // 디버그 로그 비활성화

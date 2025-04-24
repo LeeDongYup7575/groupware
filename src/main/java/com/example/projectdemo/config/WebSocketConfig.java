@@ -13,7 +13,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-//        registry.enableSimpleBroker("/topic");
         registry.enableSimpleBroker("/topic", "/queue", "/user");
         registry.setApplicationDestinationPrefixes("/app");
         registry.setUserDestinationPrefix("/user");
@@ -21,14 +20,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("http://10.10.55.57:3000","http://172.20.10.3:3000","http://172.30.1.74:3000");
+        registry.addEndpoint("/wss").setAllowedOrigins("http://10.10.55.57:3000","http://172.20.10.3:3000","http://172.30.1.74:3000");
 
         // 화상 채팅용 WebSocket 엔드포인트 추가
-        registry.addEndpoint("/ws-video")
+        registry.addEndpoint("/wss-video")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
 
-        registry.addEndpoint("/ws-notification")
+        //실시간 알림용
+        registry.addEndpoint("/wss-notification")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
