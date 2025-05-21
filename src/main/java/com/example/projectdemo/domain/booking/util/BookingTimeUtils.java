@@ -13,7 +13,7 @@ public class BookingTimeUtils {
     public static int calculateWidth(MeetingRoomBookingDTO booking) {
         // 시작 시간과 종료 시간 사이의 시간 차이 계산 (5시간 표시 중 차지하는 비율)
         long duration = ChronoUnit.MINUTES.between(booking.getStart(), booking.getEnd());
-        return (int) (duration * 100 / 300); // 5시간(300분) 기준으로 퍼센트 계산
+        return (int) (duration * 100 / 350); // 5시간(300분) 기준으로 퍼센트 계산
     }
 
     public static int calculatePosition(MeetingRoomBookingDTO booking) {
@@ -22,7 +22,7 @@ public class BookingTimeUtils {
         LocalTime bookingStart = booking.getStart().toLocalTime();
 
         long minutesFromStart = ChronoUnit.MINUTES.between(start, bookingStart);
-        return (int) (minutesFromStart * 100 / 300); // 5시간(300분) 기준으로 퍼센트 계산
+        return (int) (minutesFromStart * 100 / 570); // 5시간(300분) 기준으로 퍼센트 계산
     }
 
     public static String getBookingColor(MeetingRoomBookingDTO booking) {

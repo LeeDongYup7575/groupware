@@ -94,7 +94,7 @@
         FROM posts p
                  JOIN boards b ON p.board_id = b.id
                  JOIN employees e ON p.emp_id = e.id
-        WHERE p.board_id = #{boardId}
+        WHERE p.board_id = 13
         ORDER BY p.created_at DESC
         LIMIT 4
     </select>
